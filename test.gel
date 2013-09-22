@@ -1,3 +1,6 @@
+
 reply 5 * 34;
+
 reply 14 * 37;
-reply 42 * 2;
+
+reply 42 + 2;

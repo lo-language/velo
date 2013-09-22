@@ -36,7 +36,7 @@
 %% /* language grammar */
 
 procedure
-    : statement_list EOF { return $1; }
+    : statement_list EOF { $$ = $1; return $$; }
     ;
 
 statement_list
@@ -45,18 +45,16 @@ statement_list
 	;
 
 statement
-	: expression_statement { $$ = $1; }
+	: expression_statement
+	| REPLY expression ';' { $$ = new yy.OpNode('reply', $2); }
 	;
 
 expression_statement
 	: ';'
-	| expression ';' { $$ = $1; }
+	| expression ';'
 	;
 
 expression
-    : REPLY mathexp { $$ = new yy.OpNode('reply', $2); }
-    ;
-
-mathexp
-    : NUMBER '*' NUMBER { $$ = new yy.OpNode('mult', $1, $3); }
+    : NUMBER '*' NUMBER { $$ = new yy.OpNode('mult', parseInt($1), parseInt($3)); }
+    | NUMBER '+' NUMBER { $$ = new yy.OpNode('add', parseInt($1), parseInt($3)); }
     ;
