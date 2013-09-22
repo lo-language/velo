@@ -1,0 +1,3 @@
+#!/bin/bash
+
+jison gel.jison -o GelParser.js

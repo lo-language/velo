@@ -4,7 +4,7 @@
 
 var OpNode = require('./vm/OpNode');
 var Procedure = require('./vm/Procedure');
-var parser = require('./vm/GelParser').parser;
+var parser = require('./parser/GelParser').parser;
 var fs = require('fs');
 
 // node [path to this file] [path to input file]

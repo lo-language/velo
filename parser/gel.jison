@@ -19,6 +19,7 @@
 "E"                   return 'E'
 <<EOF>>               return 'EOF'
 "reply"               return 'REPLY'
+';'                   return ';'
 .                     return 'INVALID'
 
 /lex
@@ -37,7 +38,11 @@
 %% /* language grammar */
 
 process
-    : expr EOF { return $1; }
+    : stmt EOF { return $1; }
+    ;
+
+stmt
+    : expr ';'
     ;
 
 expr
