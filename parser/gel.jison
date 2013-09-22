@@ -33,19 +33,27 @@
 %right '%'
 %left UMINUS
 
-%start process
-
 %% /* language grammar */
 
-process
-    : stmt EOF { return $1; }
+procedure
+    : statement_list EOF { return $1; }
     ;
 
-stmt
-    : expr ';'
-    ;
+statement_list
+	: statement { $$ = [$1]; }
+	| statement_list statement { $$ = $1; $1.push($2); }
+	;
 
-expr
+statement
+	: expression_statement { $$ = $1; }
+	;
+
+expression_statement
+	: ';'
+	| expression ';' { $$ = $1; }
+	;
+
+expression
     : REPLY mathexp { $$ = new yy.OpNode('reply', $2); }
     ;
 

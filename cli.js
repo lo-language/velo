@@ -10,12 +10,16 @@ var fs = require('fs');
 // node [path to this file] [path to input file]
 var source = fs.readFileSync(process.argv[2], 'utf8');
 
+// todo - create parser tests
+
 parser.yy = {
     OpNode: OpNode
 };
 
 var result = parser.parse(source);
 
-var proc = new Procedure([result]);
+//console.log(result);
+
+var proc = new Procedure(result);
 
 proc.run();
