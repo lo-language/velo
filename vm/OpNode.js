@@ -1,5 +1,7 @@
 'use strict';
 
+var Identifier = require('./Identifier');
+
 var OpNode = function (name, operand1, operand2) {
 
     this.op = name;
@@ -49,9 +51,14 @@ OpNode.prototype.perform = function (scope) {
          operand2 is the value
          */
         case '=':
-            var identifier = operand1[1];
-            console.log("assigning " + operand2 + " to " + identifier);
-            scope[identifier] = operand2;
+            if (operand1 instanceof Identifier) {
+
+                console.log("assigning " + operand2 + " to " + operand1.name);
+                scope[operand1.name] = operand2;
+            }
+            else {
+                console.log("assignment target is not a valid lvalue");
+            }
             break;
 
         case 'send':

@@ -20,8 +20,8 @@
 "E"                   return 'E'
 <<EOF>>               return 'EOF'
 "reply"               return 'REPLY'
-[a-zA-Z][a-zA-Z0-9]*  return 'IDENTIFIER'
 ';'                   return ';'
+[a-zA-Z][a-zA-Z0-9]*  return 'IDENTIFIER'
 .                     return 'INVALID'
 
 /lex
@@ -57,7 +57,7 @@ expression_statement
 	;
 
 primary_expression
-	: IDENTIFIER { $$ = ['id', $1]; }
+	: IDENTIFIER { $$ = new yy.Identifier($1); }
 	| NUMBER { $$ = parseFloat($1); }
 	| STRING_LITERAL
 	| '(' expression ')' { $$ = $2; }
