@@ -1,3 +1,4 @@
+count = 5;
 
 reply 5 * 34;
 

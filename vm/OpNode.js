@@ -44,12 +44,14 @@ OpNode.prototype.perform = function (scope) {
             break;
 
         /*
-         assigns a value to a tape
+         writes a value to a tape
          operand1 is the tape name
          operand2 is the value
          */
-        case 'assign':
-            scope[operand1] = operand2;
+        case '=':
+            var identifier = operand1[1];
+            console.log("assigning " + operand2 + " to " + identifier);
+            scope[identifier] = operand2;
             break;
 
         case 'send':
@@ -57,6 +59,10 @@ OpNode.prototype.perform = function (scope) {
 
         case 'reply':
             scope.__reply(operand1);
+            break;
+
+        default:
+            console.log("unhandled operator: " + this.op);
             break;
     }
 };

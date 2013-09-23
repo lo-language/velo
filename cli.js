@@ -2,10 +2,10 @@
 
 'use strict';
 
+var fs = require('fs');
+var parser = require('./parser/GelParser').parser;
 var OpNode = require('./vm/OpNode');
 var Procedure = require('./vm/Procedure');
-var parser = require('./parser/GelParser').parser;
-var fs = require('fs');
 
 // node [path to this file] [path to input file]
 var source = fs.readFileSync(process.argv[2], 'utf8');

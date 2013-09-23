@@ -15,10 +15,12 @@
 "%"                   return '%'
 "("                   return '('
 ")"                   return ')'
+"="                   return '='
 "PI"                  return 'PI'
 "E"                   return 'E'
 <<EOF>>               return 'EOF'
 "reply"               return 'REPLY'
+[a-zA-Z][a-zA-Z0-9]*  return 'IDENTIFIER'
 ';'                   return ';'
 .                     return 'INVALID'
 
@@ -54,17 +56,37 @@ expression_statement
 	| expression ';'
 	;
 
-expression
-    : primary_expression
-    | primary_expression '*' expression { $$ = new yy.OpNode($2, $1, $3); }
-    | primary_expression '/' expression { $$ = new yy.OpNode($2, $1, $3); }
-    | primary_expression '+' expression { $$ = new yy.OpNode($2, $1, $3); }
-    | primary_expression '-' expression { $$ = new yy.OpNode($2, $1, $3); }
-    ;
-
 primary_expression
-	: IDENTIFIER
+	: IDENTIFIER { $$ = ['id', $1]; }
 	| NUMBER { $$ = parseFloat($1); }
 	| STRING_LITERAL
 	| '(' expression ')' { $$ = $2; }
+	;
+
+multiplicative_expression
+	: primary_expression
+	| multiplicative_expression '*' primary_expression { $$ = new yy.OpNode($2, $1, $3); }
+	| multiplicative_expression '/' primary_expression { $$ = new yy.OpNode($2, $1, $3); }
+	| multiplicative_expression '%' primary_expression { $$ = new yy.OpNode($2, $1, $3); }
+	;
+
+additive_expression
+	: multiplicative_expression
+	| additive_expression '+' multiplicative_expression { $$ = new yy.OpNode($2, $1, $3); }
+	| additive_expression '-' multiplicative_expression { $$ = new yy.OpNode($2, $1, $3); }
+	;
+
+/* should it just be IDENTIFIER for the left of assignment_expression? */
+assignment_expression
+	: additive_expression
+	| primary_expression assignment_operator assignment_expression { $$ = new yy.OpNode($2, $1, $3); }
+	;
+
+assignment_operator
+	: '='
+	;
+
+expression
+	: assignment_expression
+	| expression ',' assignment_expression
 	;

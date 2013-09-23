@@ -1,5 +1,5 @@
 /**
- * A procedure is simply a list of operations.
+ * A procedure is simply a list of statements.
  *
  * tapes maintain state and comprise 1 or more cells
  * each tape has a name unique in its scope
@@ -12,14 +12,16 @@
 
 'use strict';
 
+var OpNode = require('./OpNode');
+
 /**
  * creates a new procedure
  *
- * @param ops   a list of OpNodes
+ * @param stmts   a list of statements
  * @constructor
  */
-var Procedure = function (ops) {
-    this.ops = ops;
+var Procedure = function (stmts) {
+    this.statements = stmts;
 };
 
 module.exports = Procedure;
@@ -37,7 +39,10 @@ Procedure.prototype.run = function () {
 
     // load things into the scope?
 
-    this.ops.forEach(function (op) {
-        op.perform(scope);
+    this.statements.forEach(function (stmt) {
+
+        if (stmt instanceof OpNode) {
+            stmt.perform(scope);
+        }
     });
 };
