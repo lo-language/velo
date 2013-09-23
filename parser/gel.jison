@@ -55,6 +55,14 @@ expression_statement
 	;
 
 expression
-    : NUMBER '*' NUMBER { $$ = new yy.OpNode('mult', parseInt($1), parseInt($3)); }
-    | NUMBER '+' NUMBER { $$ = new yy.OpNode('add', parseInt($1), parseInt($3)); }
+    : primary_expression
+    | primary_expression '*' expression { $$ = new yy.OpNode('mult', $1, $3); }
+    | primary_expression '+' expression { $$ = new yy.OpNode('add', $1, $3); }
     ;
+
+primary_expression
+	: IDENTIFIER
+	| NUMBER { $$ = parseFloat($1); }
+	| STRING_LITERAL
+	| '(' expression ')' { $$ = $2; }
+	;
