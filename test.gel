@@ -1,8 +1,6 @@
 count = 5;
 
-7 = 5;
-
-reply count * 34;
+reply count * count;
 
 reply ((14 / 37));
 

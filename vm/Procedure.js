@@ -42,7 +42,7 @@ Procedure.prototype.run = function () {
     this.statements.forEach(function (stmt) {
 
         if (stmt instanceof OpNode) {
-            stmt.perform(scope);
+            stmt.evaluate(scope);
         }
     });
 };

@@ -14,17 +14,38 @@ var OpNode = function (name, operand1, operand2) {
 
 module.exports = OpNode;
 
-OpNode.prototype.perform = function (scope) {
+OpNode.prototype.evaluate = function (scope) {
 
     var operand1 = this.operand1,
         operand2 = this.operand2;
 
-    if (operand1 instanceof OpNode) {
-        operand1 = this.operand1.perform(scope);
+    // assignments are a special case
+    /*
+     writes a value to a tape
+     operand1 is the tape name
+     operand2 is the value
+     */
+
+    if (this.op == '=') {
+
+        if (operand1 instanceof Identifier) {
+
+            console.log("assigning " + operand2 + " to " + operand1.name);
+            scope[operand1.name] = operand2;
+        }
+        else {
+            console.log("assignment target is not a valid lvalue");
+        }
+
+        return;
     }
 
-    if (operand2 instanceof OpNode) {
-        operand2 = this.operand2.perform(scope);
+    if (operand1.evaluate !== undefined) {
+        operand1 = this.operand1.evaluate(scope);
+    }
+
+    if (operand2 && operand2.evaluate !== undefined) {
+        operand2 = this.operand2.evaluate(scope);
     }
 
     switch (this.op) {
@@ -43,22 +64,6 @@ OpNode.prototype.perform = function (scope) {
 
         case '/':
             return operand1 / operand2;
-            break;
-
-        /*
-         writes a value to a tape
-         operand1 is the tape name
-         operand2 is the value
-         */
-        case '=':
-            if (operand1 instanceof Identifier) {
-
-                console.log("assigning " + operand2 + " to " + operand1.name);
-                scope[operand1.name] = operand2;
-            }
-            else {
-                console.log("assignment target is not a valid lvalue");
-            }
             break;
 
         case 'send':
