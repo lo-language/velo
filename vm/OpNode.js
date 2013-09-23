@@ -27,20 +27,20 @@ OpNode.prototype.perform = function (scope) {
 
     switch (this.op) {
 
-        case 'add':
+        case '+':
             return operand1 + operand2;
             break;
 
-        case 'sub':
+        case '-':
             return operand1 - operand2;
             break;
 
-        case 'div':
-            return operand1 / operand2;
+        case '*':
+            return operand1 * operand2;
             break;
 
-        case 'mult':
-            return operand1 * operand2;
+        case '/':
+            return operand1 / operand2;
             break;
 
         /*

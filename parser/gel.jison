@@ -56,8 +56,10 @@ expression_statement
 
 expression
     : primary_expression
-    | primary_expression '*' expression { $$ = new yy.OpNode('mult', $1, $3); }
-    | primary_expression '+' expression { $$ = new yy.OpNode('add', $1, $3); }
+    | primary_expression '*' expression { $$ = new yy.OpNode($2, $1, $3); }
+    | primary_expression '/' expression { $$ = new yy.OpNode($2, $1, $3); }
+    | primary_expression '+' expression { $$ = new yy.OpNode($2, $1, $3); }
+    | primary_expression '-' expression { $$ = new yy.OpNode($2, $1, $3); }
     ;
 
 primary_expression
