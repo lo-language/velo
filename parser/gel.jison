@@ -4,8 +4,10 @@
 %lex
 %%
 
+"//".*                /* ignore comment */
 \s+                   /* skip whitespace */
 [0-9]+("."[0-9]+)?\b  return 'NUMBER'
+\".*\"                yytext = yytext.substr(1,yyleng-2); return 'STRING_LITERAL';
 "*"                   return '*'
 "/"                   return '/'
 "-"                   return '-'

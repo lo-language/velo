@@ -1,7 +1,9 @@
-count = 5;
+// hi there
 
-reply count * count;
+count = 11;
+
+reply count + count;
 
 reply ((14 / 37));
 
-reply 42 + (3 * 6);
+reply "hi there";
