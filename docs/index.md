@@ -1,12 +1,12 @@
-Gel
-Security - Concurrency - Testability
+=Gel=
+Security Concurrency Testability
 
 Gel is a simple language designed to make it easy to write secure, concurrent, testable software.
 
 This is achieved through three key differences from most languages:
 
-- Gel has no concept of global symbols.
-- Objects are totally opaque.
+- Gel has no global symbols - not just global variables, but global symbols.
+- Objects are totally opaque - only messages, no direct read/write of attributes.
 - All function calls are asynchronous.
 
 The first two ensure *perfect encapsulation*:

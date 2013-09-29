@@ -1,15 +1,26 @@
-// hi there.shy
+// hi there
 
 count = 11;
-record = { "Seth": 14, "Rachel"}; // set - values are optional
+record = { "Seth", "Rachel"}; // set - values are optional
+list = [ 5 ];
 
 reply count + count;
 
 reply ((14 / 37));
 
-{
-    count = 7;
-    reply "hi there ";
+// could use << for iterating backwards??
+// chained blocks
+
+list >> (num) {
+
+    if (num == 17) {
+        remote::mult(num)
+    }
+}
+
+
+1..n >> (i) {
+
 }
 
 reply count;

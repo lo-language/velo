@@ -3,26 +3,13 @@
 'use strict';
 
 var fs = require('fs');
-var parser = require('./parser/GelParser').parser;
-var OpNode = require('./vm/OpNode');
-var Procedure = require('./vm/Procedure');
-var Identifier = require('./vm/Identifier');
+var Runtime = require('./vm/Runtime');
 
 // node [path to this file] [path to input file]
 var source = fs.readFileSync(process.argv[2], 'utf8');
 
-// todo - create parser tests
+var vm = new Runtime(source);
 
-parser.yy = {
-    OpNode: OpNode,
-    Identifier: Identifier,
-    Procedure: Procedure
-};
+console.log(vm.parse());
 
-var result = parser.parse(source);
-
-console.log(result);
-
-var proc = new Procedure(result);
-
-proc.run();
+vm.run();

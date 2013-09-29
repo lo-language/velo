@@ -17,9 +17,13 @@
 "%"                   return '%'
 "("                   return '('
 ")"                   return ')'
+"["                   return '['
+"]"                   return ']'
 "{"                   return '{'
 "}"                   return '}'
 "="                   return '='
+">>"                  return '>>'
+"true"|"false"        return 'BOOLEAN'
 "PI"                  return 'PI'
 "E"                   return 'E'
 <<EOF>>               return 'EOF'
@@ -53,6 +57,7 @@ statement_list
 statement
 	: expression_statement
 	| compound_statement
+	| iteration_statement
 	| REPLY expression ';' { $$ = new yy.OpNode('reply', $2); }
 	;
 
@@ -65,17 +70,28 @@ compound_statement
     : '{' statement_list '}' { $$ = new yy.Procedure($2); }
     ;
 
+iteration_statement
+    : expression '>>' '(' ')' statement { console.log('iteration'); }
+    ;
+
 primary_expression
 	: IDENTIFIER { $$ = new yy.Identifier($1); }
 	| NUMBER { $$ = parseFloat($1); }
 	| STRING_LITERAL
-	| set_definition
+	| BOOLEAN { $$ = ($1 === 'true' ? true : false); }
+	| set
+	| list
 	| '(' expression ')' { $$ = $2; }
 	;
 
-set_definition
+set
     : '{' '}' { $$ = {}; }
     | '{' expression_list '}' { $$ = $2; }
+    ;
+
+list
+    : '[' ']' { $$ = []; }
+    | '[' expression_list ']' { $$ = $2; }
     ;
 
 multiplicative_expression
