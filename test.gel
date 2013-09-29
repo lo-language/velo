@@ -1,9 +1,15 @@
-// hi there
+// hi there.shy
 
 count = 11;
+record = { "Seth": 14, "Rachel"}; // set - values are optional
 
 reply count + count;
 
 reply ((14 / 37));
 
-reply "hi there";
+{
+    count = 7;
+    reply "hi there ";
+}
+
+reply count;

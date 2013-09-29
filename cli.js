@@ -15,12 +15,13 @@ var source = fs.readFileSync(process.argv[2], 'utf8');
 
 parser.yy = {
     OpNode: OpNode,
-    Identifier: Identifier
+    Identifier: Identifier,
+    Procedure: Procedure
 };
 
 var result = parser.parse(source);
 
-//console.log(result);
+console.log(result);
 
 var proc = new Procedure(result);
 

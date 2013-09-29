@@ -26,22 +26,31 @@ var Procedure = function (stmts) {
 
 module.exports = Procedure;
 
-Procedure.prototype.run = function () {
+Procedure.prototype.evaluate = function (scope) {
+    console.log('here');
+    this.run(scope);
+};
+
+Procedure.prototype.run = function (scope) {
 
     var self = this;
 
-    // create a new scope for this run
-    var scope = {
-        __reply: function (message) {
-            console.log(message);
-        }
-    };
+    if (scope == undefined) {
+
+        // create a new scope for this run
+        scope = {
+            __reply: function (message) {
+                console.log(message);
+            }
+        };
+    }
 
     // load things into the scope?
+    // make the top node be a procedure?
 
     this.statements.forEach(function (stmt) {
 
-        if (stmt instanceof OpNode) {
+        if (stmt.evaluate !== undefined) {
             stmt.evaluate(scope);
         }
     });

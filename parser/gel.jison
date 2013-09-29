@@ -17,6 +17,8 @@
 "%"                   return '%'
 "("                   return '('
 ")"                   return ')'
+"{"                   return '{'
+"}"                   return '}'
 "="                   return '='
 "PI"                  return 'PI'
 "E"                   return 'E'
@@ -50,6 +52,7 @@ statement_list
 
 statement
 	: expression_statement
+	| compound_statement
 	| REPLY expression ';' { $$ = new yy.OpNode('reply', $2); }
 	;
 
@@ -58,12 +61,22 @@ expression_statement
 	| expression ';'
 	;
 
+compound_statement
+    : '{' statement_list '}' { $$ = new yy.Procedure($2); }
+    ;
+
 primary_expression
 	: IDENTIFIER { $$ = new yy.Identifier($1); }
 	| NUMBER { $$ = parseFloat($1); }
 	| STRING_LITERAL
+	| set_definition
 	| '(' expression ')' { $$ = $2; }
 	;
+
+set_definition
+    : '{' '}' { $$ = {}; }
+    | '{' expression_list '}' { $$ = $2; }
+    ;
 
 multiplicative_expression
 	: primary_expression
@@ -84,11 +97,15 @@ assignment_expression
 	| primary_expression assignment_operator assignment_expression { $$ = new yy.OpNode($2, $1, $3); }
 	;
 
+expression_list
+    : expression { $$ = [$1]; }
+    | expression_list ',' expression { $1.push($3); $$ = $1; }
+    ;
+
 assignment_operator
 	: '='
 	;
 
 expression
 	: assignment_expression
-	| expression ',' assignment_expression
 	;
