@@ -3,13 +3,11 @@
 'use strict';
 
 var fs = require('fs');
-var Runtime = require('./vm/Runtime');
+var parser = require('./vm/Parser');
 
 // node [path to this file] [path to input file]
 var source = fs.readFileSync(process.argv[2], 'utf8');
 
-var vm = new Runtime(source);
+var ast = parser.parse(source);
 
-console.log(vm.parse());
-
-vm.run();
+ast.run();

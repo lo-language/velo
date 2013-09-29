@@ -15,7 +15,7 @@ var Identifier = require('../../Identifier');
 
 exports["literals"] = {
 
-    "integers": function (test) {
+    "numbers": function (test) {
 
         var result = parser.parse("42; 63.4;");
 
