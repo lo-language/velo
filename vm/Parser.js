@@ -5,13 +5,13 @@
 
 "use strict";
 
-var OpNode = require('./OpNode');
+var ASTNode = require('./ASTNode');
 var Procedure = require('./Procedure');
 var Identifier = require('./Identifier');
 var parser = require('../parser/aero').parser;
 
 parser.yy = {
-    OpNode: OpNode,
+    ASTNode: ASTNode,
     Identifier: Identifier,
     Procedure: Procedure
 };

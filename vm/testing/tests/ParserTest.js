@@ -7,66 +7,71 @@
 var fs = require('fs');
 var parser = require('../../Parser');
 
-var OpNode = require('../../OpNode');
+var ASTNode = require('../../ASTNode');
 var Procedure = require('../../Procedure');
 var Identifier = require('../../Identifier');
 
 //        var source = fs.readFileSync(__dirname + '/literals.gel', 'utf8');
 
-exports["literals"] = {
+var tests = {
 
-    "numbers": function (test) {
+    literals: {
 
-        var result = parser.parse("42; 63.4;");
+        booleans: [
+            'true; false;',
+            [ true, false ]
+        ],
 
-        test.deepEqual(result, [ 42, 63.4 ]);
-        test.done();
+        numbers: [
+            "42; 63.4;",
+            [ 42, 63.4 ]
+        ],
+
+        strings: [
+            '"hello, world!";',
+            [ "hello, world!" ]
+        ]
     },
 
-    "strings": function (test) {
+    assignment: {
 
-        var result = parser.parse('"hello, world!";');
+        integers: [
+            "count = 42; age = 63.4;",
+            [
+                new ASTNode('=', new Identifier('count'), 42),
+                new ASTNode('=', new Identifier('age'), 63.4) ]
+        ],
 
-        test.deepEqual(result, [ "hello, world!" ]);
-        test.done();
-    },
+        "booleans": [
+            'value = true;',
+            [
+                new ASTNode('=', new Identifier('value'), true) ]
+        ],
 
-    "booleans": function (test) {
-
-        var result = parser.parse('true;');
-
-        test.deepEqual(result, [ true ]);
-        test.done();
+        "strings": [
+            'message = "hello, world!";',
+            [
+                new ASTNode('=', new Identifier('message'), "hello, world!") ]
+        ]
     }
 };
 
-exports["assignment"] = {
+Object.keys(tests).forEach(function (groupName) {
 
-    "integers": function (test) {
+    var group = tests[groupName];
+    var testGroup = module.exports[groupName] = {};
 
-        var result = parser.parse("count = 42; age = 63.4;");
+    Object.keys(group).forEach(function (key) {
 
-        test.deepEqual(result, [
-            new OpNode('=', new Identifier('count'), 42),
-            new OpNode('=', new Identifier('age'), 63.4) ]);
-        test.done();
-    },
+        var input = group[key][0];
+        var expected = group[key][1];
 
-    "strings": function (test) {
+        testGroup[key] = function (test) {
 
-        var result = parser.parse('message = "hello, world!";');
+            var result = parser.parse(input);
 
-        test.deepEqual(result, [
-            new OpNode('=', new Identifier('message'), "hello, world!") ]);
-        test.done();
-    },
-
-    "booleans": function (test) {
-
-        var result = parser.parse('value = true;');
-
-        test.deepEqual(result, [
-            new OpNode('=', new Identifier('value'), true) ]);
-        test.done();
-    }
-};
+            test.deepEqual(result, expected);
+            test.done();
+        };
+    });
+});

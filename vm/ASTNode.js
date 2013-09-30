@@ -1,8 +1,19 @@
+/**
+ * Created by: spurcell
+ * 9/29/13
+ */
+
 'use strict';
 
 var Identifier = require('./Identifier');
 
-var OpNode = function (name, operand1, operand2) {
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @type {Function}
+ * @private
+ */
+var __ = module.exports = function (name, operand1, operand2) {
 
     this.op = name;
     this.operand1 = operand1;
@@ -12,9 +23,13 @@ var OpNode = function (name, operand1, operand2) {
     }
 };
 
-module.exports = OpNode;
-
-OpNode.prototype.evaluate = function (scope) {
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @return {*}
+ */
+__.prototype.evaluate = function (scope) {
 
     var operand1 = this.operand1,
         operand2 = this.operand2;

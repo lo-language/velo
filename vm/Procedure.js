@@ -12,7 +12,7 @@
 
 'use strict';
 
-var OpNode = require('./OpNode');
+var ASTNode = require('./ASTNode');
 
 /**
  * creates a new procedure

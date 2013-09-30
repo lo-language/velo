@@ -58,7 +58,7 @@ statement
 	: expression_statement
 	| compound_statement
 	| iteration_statement
-	| REPLY expression ';' { $$ = new yy.OpNode('reply', $2); }
+	| REPLY expression ';' { $$ = new yy.ASTNode('reply', $2); }
 	;
 
 expression_statement
@@ -96,21 +96,21 @@ list
 
 multiplicative_expression
 	: primary_expression
-	| multiplicative_expression '*' primary_expression { $$ = new yy.OpNode($2, $1, $3); }
-	| multiplicative_expression '/' primary_expression { $$ = new yy.OpNode($2, $1, $3); }
-	| multiplicative_expression '%' primary_expression { $$ = new yy.OpNode($2, $1, $3); }
+	| multiplicative_expression '*' primary_expression { $$ = new yy.ASTNode($2, $1, $3); }
+	| multiplicative_expression '/' primary_expression { $$ = new yy.ASTNode($2, $1, $3); }
+	| multiplicative_expression '%' primary_expression { $$ = new yy.ASTNode($2, $1, $3); }
 	;
 
 additive_expression
 	: multiplicative_expression
-	| additive_expression '+' multiplicative_expression { $$ = new yy.OpNode($2, $1, $3); }
-	| additive_expression '-' multiplicative_expression { $$ = new yy.OpNode($2, $1, $3); }
+	| additive_expression '+' multiplicative_expression { $$ = new yy.ASTNode($2, $1, $3); }
+	| additive_expression '-' multiplicative_expression { $$ = new yy.ASTNode($2, $1, $3); }
 	;
 
 /* should it just be IDENTIFIER for the left of assignment_expression? */
 assignment_expression
 	: additive_expression
-	| primary_expression assignment_operator assignment_expression { $$ = new yy.OpNode($2, $1, $3); }
+	| primary_expression assignment_operator assignment_expression { $$ = new yy.ASTNode($2, $1, $3); }
 	;
 
 expression_list
