@@ -84,6 +84,10 @@ primary_expression
 	| '(' expression ')' { $$ = $2; }
 	;
 
+postfix_expression
+    : postfix_expression '.' primary_expression
+    ;
+
 set
     : '{' '}' { $$ = {}; }
     | '{' expression_list '}' { $$ = $2; }

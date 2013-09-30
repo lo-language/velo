@@ -16,3 +16,6 @@ The first two ensure *perfect encapsulation*:
 
 The last one achieves locality independence:
  3. any dependency can be replaced with something remote without breaking abstraction
+
+Built-in datatypes
+

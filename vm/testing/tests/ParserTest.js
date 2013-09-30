@@ -33,6 +33,14 @@ var tests = {
         ]
     },
 
+    identifiers: {
+
+        lvalues: [
+            'age = 17;',
+            [ new ASTNode('=', new Identifier('age'), 17) ]
+        ]
+    },
+
     assignment: {
 
         integers: [

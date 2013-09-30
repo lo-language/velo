@@ -34,28 +34,14 @@ __.prototype.evaluate = function (scope) {
     var operand1 = this.operand1,
         operand2 = this.operand2;
 
-    // assignments are a special case
     /*
      writes a value to a tape
      operand1 is the tape name
      operand2 is the value
      */
 
-    if (this.op == '=') {
-
-        if (operand1 instanceof Identifier) {
-
-            console.log("assigning " + operand2 + " to " + operand1.name);
-            scope[operand1.name] = operand2;
-        }
-        else {
-            console.log("assignment target is not a valid lvalue");
-        }
-
-        return;
-    }
-
-    if (operand1.evaluate !== undefined) {
+    // assignments are a special case
+    if (operand1.evaluate !== undefined && this.op !== '=') {
         operand1 = this.operand1.evaluate(scope);
     }
 
@@ -66,11 +52,11 @@ __.prototype.evaluate = function (scope) {
     switch (this.op) {
 
         case '+':
-            return operand1 + operand2;
+            return ev(operand1) + ev(operand2);
             break;
 
         case '-':
-            return operand1 - operand2;
+            return ev(operand1) - ev(operand2);
             break;
 
         case '*':
@@ -79,6 +65,10 @@ __.prototype.evaluate = function (scope) {
 
         case '/':
             return operand1 / operand2;
+            break;
+
+        case '=':
+            return scope[operand1.name] = operand2;
             break;
 
         case 'send':
