@@ -38,6 +38,11 @@ var tests = {
         lvalues: [
             'age = 17;',
             [ new ASTNode('=', new Identifier('age'), 17) ]
+        ],
+
+        rvalues: [
+            'age = count;',
+            [ new ASTNode('=', new Identifier('age'), new Identifier('count')) ]
         ]
     },
 
@@ -60,6 +65,33 @@ var tests = {
             'message = "hello, world!";',
             [
                 new ASTNode('=', new Identifier('message'), "hello, world!") ]
+        ]
+    },
+
+    add: {
+
+        literals: [
+            "43 + 42;",
+            [
+                new ASTNode('+', 43, 42)]
+        ],
+
+        refPlusLiteral: [
+            "age + 42;",
+            [
+                new ASTNode('+', new Identifier('age'), 42)]
+        ],
+
+        refs: [
+            "age + years;",
+            [
+                new ASTNode('+', new Identifier('age'), new Identifier('years'))]
+        ],
+
+        strings: [
+            '"hello " + "bob";',
+            [
+                new ASTNode('+', "hello", "bob")]
         ]
     }
 };
