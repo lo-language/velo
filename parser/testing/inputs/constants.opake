@@ -1,0 +1,4 @@
+{
+    port is 80
+    greeting is "hi there!"
+}

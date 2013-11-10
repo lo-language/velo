@@ -1,6 +1,6 @@
 (args, io, env, shop) {
 
-    port = 8080
+    port is 8080
 
     42 -> out
 

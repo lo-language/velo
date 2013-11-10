@@ -29,6 +29,7 @@
 "*"                     return '*'
 "/"                     return '/'
 "%"                     return '%'
+'is'                    return 'IS'
 "break"                 return 'BREAK'
 "true"|"false"          return 'BOOLEAN'
 [a-zA-Z][a-zA-Z0-9]*    return 'ID'
@@ -70,6 +71,7 @@ expr
     : assignment
     ;
 
+// technically we don't need assignment since we have capture. i'm tempted to drop it
 assignment
     : additive_expr
     | ID '=' assignment
@@ -112,7 +114,9 @@ sequence
     ;
 
 statement
-    : capture
+    : ID IS primitive_expr
+        { $$ = ['define', $1, $3]; }
+    | capture
     | chain
     | BREAK
     ;
