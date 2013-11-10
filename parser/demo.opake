@@ -1,0 +1,23 @@
+(args, io, env, shop) {
+
+    port = 8080
+
+    shop:make('Http/Logger/ELF', stdout) => logger
+    shop:make('Http/Server', logger) => server
+
+    server:onRequest >> (request) {
+        request:end("hi there!")
+    }
+
+    server:open(port) -> {
+        stderr:write("server running on port _port_");
+    }
+    ~ (err) {
+        stderr:write("failed to open port _port_: ");
+    }
+
+    io.signaller:trap('SIGINT') >> {
+        stderr:write("received SIGINT")
+        server:close
+    }
+}
