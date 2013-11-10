@@ -8,7 +8,7 @@
 var ASTNode = require('./ASTNode');
 var Procedure = require('./Procedure');
 var Identifier = require('./Identifier');
-var parser = require('../parser/aero').parser;
+var parser = require('../parser/opake').parser;
 
 parser.yy = {
     ASTNode: ASTNode,

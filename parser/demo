@@ -1,0 +1,4 @@
+(args, io) {
+
+    "Hello, World!\n" -> stdout
+}
