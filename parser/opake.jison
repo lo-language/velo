@@ -57,6 +57,7 @@ expr
     : ID
         { $$ = ['access', $1]; }
     | NUMBER
+        { $$ = parseFloat($1); }
     | STRING_LITERAL
     | BOOLEAN
         { $$ = ($1 === 'true' ? true : false); }
@@ -65,7 +66,6 @@ expr
 
 assignment
     : ID '=' expr
-        { $$ = new yy.ASTNode('assign', [$1, $3]); }
     ;
 
 sequence
@@ -83,13 +83,11 @@ statement
 
 capture
     : chain '=>' ID
-        { $$ = new yy.ASTNode('capture', [$1, $3]); }
     ;
 
 chain
     : source
     | chain connector sink
-        { $$ = new yy.ASTNode($2, [$1, $3]); }
     ;
 
 // is a request not an expression?? probably should be, right? to allow nesting
@@ -101,9 +99,7 @@ source
 
 request
     : message
-        { $$ = new yy.ASTNode('invoke', [$1]); }
     | message '(' params ')'
-        { $$ = new yy.ASTNode('invoke', [$1, $3]); }
     ;
 
 params
