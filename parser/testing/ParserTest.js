@@ -29,26 +29,6 @@ files.forEach(function (file) {
 
 //        var source = fs.readFileSync(__dirname + '/literals.gel', 'utf8');
 
-//var tests = {
-//
-//    literals: {
-//
-//        booleans: [
-//            'true false',
-//            [ true, false ]
-//        ],
-
-//        numbers: [
-//            "42 63.4",
-//            [ 42, 63.4 ]
-//        ],
-//
-//        strings: [
-//            '"hello, world!"',
-//            [ "hello, world!" ]
-//        ]
-//    },
-
 //    identifiers: {
 //
 //        lvalues: [

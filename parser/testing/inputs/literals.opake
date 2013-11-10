@@ -1,4 +1,6 @@
 {
     true false
     42 63.4
+    "hello, world!"
+    'howdy, pardner'
 }
