@@ -11,9 +11,9 @@
  * @type {Function}
  * @private
  */
-var __ = module.exports = function (name, operands) {
+var __ = module.exports = function (type, operands) {
 
-    this.op = name;
+    this.type = type;
     this.operands = operands;
 };
 
@@ -25,5 +25,5 @@ var __ = module.exports = function (name, operands) {
  */
 __.prototype.toString = function (indent) {
 
-    return this.op + '(' + this.operands + ')';
+    return this.type + '(' + this.operands + ')';
 };

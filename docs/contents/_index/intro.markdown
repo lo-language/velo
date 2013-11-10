@@ -1,18 +1,38 @@
-## Concurrency + Security + Testability
+### Introduction
 
-Download Opake v0.1 Here (MIT License)
+Opake is a simple general-purpose programming language designed to make building and testing secure, distributed software systems intuitive and easy.
 
-Opake is a simple general-purpose programming language designed to make writing secure, concurrent software intuitive and easy.
+##### Example 1: Hello World
 
-While most programming languages ignore these, Opake elevates them to primary concerns - and it does so by leaving things *out*.
 
-Opake is secretly a dataflow language.
+    (args, io) {
+        "Hello, world!" -> io.stdout
+    }
 
-This is accomplished primarily by two mechanisms:
+While most languages give little consideration to security, concurrency and testability, Opake elevates these concerns to primary design goals - along with simplicity.
 
-- total encapsulation
-- purely asynchronous communication
+##### Example 2: A trivial web app
 
+    (args, io, env, shop) {
+
+        port = 8080
+
+        shop:make('Http/Server') => server
+
+        server:onRequest >> (request) {
+            request:end("hi there!")
+        }
+
+        server:open(port) ~ (err) {
+            io.stderr:write("failed to open port _port_: " + err)
+        }
+        -> {
+            io.stderr:write("server running on port _port_")
+        }
+    }
+
+Opake aims to facilitate them with two simple concepts: hermetic encapsulation and purely asynchronous communication.
+ 
 Total encapsulation entails:
 
 - no global symbols - not just global variables, but global symbols.
@@ -26,37 +46,9 @@ The last one achieves locality independence:
 
 instead of referential transparency we have locality transparency.
 
-#### Example 1: Hello World
+Opake is secretly a dataflow language.
 
-
-    (args, io) {
-
-        io.stdout:write("Hello, world!\n")
-    }
-
-#### Example 2: A trivial web app using the bundled HTTP library
-
-    (args, io, env, shop) {
-
-        shop:make('Http/Server') => server
-
-        server:accept(8080) >> (request) {}
-
-        server:accept(8080) >> (request) {
-
-            request:end("hi there!")
-        }
-        ~> (err) {
-
-            io.stderr:write("error in server: " + err)
-
-            result ->
-
-            err ~>
-        }
-    }
-
-#### Example 3: A better web app with logging and graceful exit
+##### Example 3: A better web app with logging and graceful exit
 
     (args, io, env, shop) {
 
@@ -69,11 +61,11 @@ instead of referential transparency we have locality transparency.
             request:end("hi there!")
         }
 
-        server:open(port) -> {
-            io.stderr:write("server running on port |port");
-        },
-        (err) {
-            io.stderr:write("failed to open port |port: " + err);
+        server:open(port) ~ (err) {
+            io.stderr:write("failed to open port _port_: " + err);
+        }
+        -> {
+            io.stderr:write("server running on port _port_");
         }
 
         io.signaller:trap('SIGINT') >> {
@@ -82,7 +74,7 @@ instead of referential transparency we have locality transparency.
         }
     }
 
-#### Example: Streaming Base16 Encoding
+##### Example: Streaming Base16 Encoding
 
     // every tape is just a string of bytes at base, but there's metadata as well
     // the type is attached to the NAME, not the tape?
@@ -133,17 +125,6 @@ instead of referential transparency we have locality transparency.
 
         }
     }
-
-Send-message operator is : - creates and sends a message
-
-#### Channels
-
-These are routing operators: >>, ->, ~>
->> means accept multiple messages
--> means accept one message
-send message using target:message(args) syntax
-a send-message statement doesn't evaluate to a value; it produces 0-n messages that can be routed with a routing operator
-likewise a handler block doesn't evaluate to a value; it handles and produces messages
 
 #### Visibility
 

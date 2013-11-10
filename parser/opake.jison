@@ -33,9 +33,9 @@ module
 
 procedure
     : block
-        { $$ = new yy.Procedure([], $1); }
+        { $$ = new yy.ASTNode([], $1); }
     | '(' format ')' block
-        { $$ = new yy.Procedure($2, $4); }
+        { $$ = new yy.ASTNode($2, $4); }
     ;
 
 block
@@ -54,7 +54,7 @@ format
     ;
 
 expr
-    : ID
+    : ID { $$ = ['access', $1]; }
     | NUMBER
     | STRING_LITERAL
     | BOOLEAN
@@ -91,7 +91,7 @@ chain
         { $$ = new yy.ASTNode($2, [$1, $3]); }
     ;
 
-// is an request not an expression?? probably should be, right? to allow nesting
+// is a request not an expression?? probably should be, right? to allow nesting
 
 source
     : expr
