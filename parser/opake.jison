@@ -71,7 +71,8 @@ expr
     : assignment
     ;
 
-// technically we don't need assignment since we have capture. i'm tempted to drop it
+// technically we don't need assignment since we have capture. i'm tempted to drop it, unless it's somehow differentiated
+// also, it's not really assignment - more like overwrite
 assignment
     : additive_expr
     | ID '=' assignment
