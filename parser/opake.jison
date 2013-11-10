@@ -66,6 +66,7 @@ expr
 
 assignment
     : ID '=' expr
+        { $$ = ['assign', $1, $3]; }
     ;
 
 sequence

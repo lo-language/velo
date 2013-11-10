@@ -1,1 +1,1 @@
-["procedure",[],[["access","foo"],["access","bar"],["access","baz"]]]
+["procedure",[],[["access","foo"],["assign","bar",["access","baz"]]]]
