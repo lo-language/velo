@@ -28,15 +28,29 @@
 
 module
     : procedure EOF
+        { $$ = $1; return $$; }
     ;
 
 procedure
-    : '(' format ')' '{' sequence '}' { $$ = new yy.Procedure($2, $5); return $$; }
+    : block
+        { $$ = new yy.Procedure([], $1); }
+    | '(' format ')' block
+        { $$ = new yy.Procedure($2, $4); }
     ;
 
+block
+    : '{' '}'
+        { $$ = []; }
+    | '{' sequence '}'
+        { $$ = $2; }
+    ;
+
+// todo allow capture into formats and assignment to formats
 format
     : ID
+        { $$ = [$1]; }
     | format ',' ID
+        { $$ = $1; $1.push($3); }
     ;
 
 expr
@@ -49,11 +63,14 @@ expr
 
 assignment
     : ID '=' expr
+        { $$ = new yy.ASTNode('assign', [$1, $3]); }
     ;
 
 sequence
-    : statement { $$ = [$1]; }
-    | sequence statement { $$ = $1; $1.push($2); }
+    : statement
+        { $$ = [$1]; }
+    | sequence statement
+        { $$ = $1; $$.push($2); }
     ;
 
 statement
@@ -64,27 +81,40 @@ statement
 
 capture
     : chain '=>' ID
+        { $$ = new yy.ASTNode('capture', [$1, $3]); }
     ;
 
 chain
     : source
+        { $$ = [$1]; }
     | chain connector sink
+        { $$ = new yy.ASTNode($2, [$1, $3]); }
     ;
+
+// is an request not an expression?? probably should be, right? to allow nesting
 
 source
     : expr
-    | command
-    | command '(' params ')'
+    | request
+    ;
+
+request
+    : message
+        { $$ = new yy.ASTNode('invoke', [$1]); }
+    | message '(' params ')'
+        { $$ = new yy.ASTNode('invoke', [$1, $3]); }
     ;
 
 params
-    :
-    | expr
+    : expr
+        { $$ = [$1]; }
     | params ',' expr
+        { $$ = $1; $$.push($3); }
     ;
 
-command
+message
     : ID ':' ID
+        { $$ = $1 + ':' + $3; }
     ;
 
 connector
@@ -95,6 +125,6 @@ connector
 
 sink
     : ID
-    | command
+    | message
     | procedure
     ;

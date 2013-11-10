@@ -20,7 +20,8 @@ var ASTNode = require('./ASTNode');
  * @param stmts   a list of statements
  * @constructor
  */
-var Procedure = function (stmts) {
+var Procedure = function (args, stmts) {
+    this.format = args;
     this.statements = stmts;
 };
 
@@ -29,6 +30,17 @@ module.exports = Procedure;
 Procedure.prototype.evaluate = function (scope) {
     console.log('here');
     this.run(scope);
+};
+
+Procedure.prototype.toString = function () {
+
+    var statements = '';
+
+    this.statements.forEach(function (stmt) {
+        statements += stmt.toString() + '\n';
+    });
+
+    return '(' + this.format + ')\n' + statements;
 };
 
 Procedure.prototype.run = function (scope) {
