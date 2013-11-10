@@ -3,5 +3,5 @@
     bar = baz
     binky = 64
     message = "hi there"
-    foo = bar = baz
+    foo = bar = baz = true
 }

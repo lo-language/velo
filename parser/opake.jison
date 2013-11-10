@@ -1,6 +1,14 @@
 %lex
+
+%s comment
+
 %%
 
+
+"//".*                  /* line comment */
+"/*"                    this.begin("comment");
+<comment>"*/"           this.popState();
+<comment>.              /* skip comment */
 \s+                     /* skip whitespace */
 [0-9]+("."[0-9]+)?\b    return 'NUMBER'
 \".*\"                  yytext = yytext.substr(1, yyleng-2); return 'STRING_LITERAL';
@@ -16,6 +24,11 @@
 "~"                     return '~'
 ">>"                    return '>>'
 "="                     return '='
+"+"                     return '+'
+"-"                     return '-'
+"*"                     return '*'
+"/"                     return '/'
+"%"                     return '%'
 "break"                 return 'BREAK'
 "true"|"false"          return 'BOOLEAN'
 [a-zA-Z][a-zA-Z0-9]*    return 'ID'
@@ -54,6 +67,34 @@ format
     ;
 
 expr
+    : assignment
+    ;
+
+assignment
+    : additive_expr
+    | ID '=' assignment
+        { $$ = ['assign', $1, $3]; }
+    ;
+
+additive_expr
+    : multiplicative_expr
+    | additive_expr '+' multiplicative_expr
+        { $$ = ['add', $1, $3]; }
+    | additive_expr '-' multiplicative_expr
+        { $$ = ['sub', $1, $3]; }
+    ;
+
+multiplicative_expr
+    : primitive_expr
+    | multiplicative_expr '*' primitive_expr
+        { $$ = ['mul', $1, $3]; }
+    | multiplicative_expr '/' primitive_expr
+        { $$ = ['div', $1, $3]; }
+    | multiplicative_expr '%' primitive_expr
+        { $$ = ['mod', $1, $3]; }
+    ;
+
+primitive_expr
     : ID
         { $$ = ['access', $1]; }
     | NUMBER
@@ -61,12 +102,6 @@ expr
     | STRING_LITERAL
     | BOOLEAN
         { $$ = ($1 === 'true' ? true : false); }
-    | assignment
-    ;
-
-assignment
-    : ID '=' expr
-        { $$ = ['assign', $1, $3]; }
     ;
 
 sequence
@@ -126,3 +161,6 @@ sink
     | message
     | procedure
     ;
+
+// todo: add form, set, list literals?
+// add parens for grouping expressions

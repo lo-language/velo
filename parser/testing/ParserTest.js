@@ -27,43 +27,6 @@ files.forEach(function (file) {
     };
 });
 
-//        var source = fs.readFileSync(__dirname + '/literals.gel', 'utf8');
-
-//    identifiers: {
-//
-//        lvalues: [
-//            'age = 17;',
-//            [ new ASTNode('=', new Identifier('age'), 17) ]
-//        ],
-//
-//        rvalues: [
-//            'age = count;',
-//            [ new ASTNode('=', new Identifier('age'), new Identifier('count')) ]
-//        ]
-//    },
-//
-//    assignment: {
-//
-//        integers: [
-//            "count = 42; age = 63.4;",
-//            [
-//                new ASTNode('=', new Identifier('count'), 42),
-//                new ASTNode('=', new Identifier('age'), 63.4) ]
-//        ],
-//
-//        "booleans": [
-//            'value = true;',
-//            [
-//                new ASTNode('=', new Identifier('value'), true) ]
-//        ],
-//
-//        "strings": [
-//            'message = "hello, world!";',
-//            [
-//                new ASTNode('=', new Identifier('message'), "hello, world!") ]
-//        ]
-//    },
-//
 //    add: {
 //
 //        literals: [
@@ -91,23 +54,3 @@ files.forEach(function (file) {
 //        ]
 //    }
 //};
-
-//Object.keys(tests).forEach(function (groupName) {
-//
-//    var group = tests[groupName];
-//    var testGroup = module.exports[groupName] = {};
-//
-//    Object.keys(group).forEach(function (key) {
-//
-//        var input = '() {\n' + group[key][0] + '\n}';
-//        var expected = group[key][1];
-//
-//        testGroup[key] = function (test) {
-//
-//            var result = parser.parse(input);
-//
-//            test.deepEqual(result, expected);
-//            test.done();
-//        };
-//    });
-//});
