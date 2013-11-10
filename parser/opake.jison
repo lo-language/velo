@@ -33,9 +33,9 @@ module
 
 procedure
     : block
-        { $$ = new yy.ASTNode([], $1); }
+        { $$ = ['procedure', [], $1]; }
     | '(' format ')' block
-        { $$ = new yy.ASTNode($2, $4); }
+        { $$ = ['procedure', $2, $4]; }
     ;
 
 block
@@ -54,10 +54,12 @@ format
     ;
 
 expr
-    : ID { $$ = ['access', $1]; }
+    : ID
+        { $$ = ['access', $1]; }
     | NUMBER
     | STRING_LITERAL
     | BOOLEAN
+        { $$ = ($1 === 'true' ? true : false); }
     | assignment
     ;
 
@@ -86,7 +88,6 @@ capture
 
 chain
     : source
-        { $$ = [$1]; }
     | chain connector sink
         { $$ = new yy.ASTNode($2, [$1, $3]); }
     ;

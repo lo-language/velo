@@ -22,7 +22,7 @@ files.forEach(function (file) {
         var expected = fs.readFileSync(__dirname + '/outputs/' + name + '.json', 'utf8');
         var result = parser.parse(source);
 
-        test.deepEqual(result, expected);
+        test.deepEqual(result, JSON.parse(expected));
         test.done();
     };
 });
