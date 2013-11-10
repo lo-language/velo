@@ -26,31 +26,3 @@ files.forEach(function (file) {
         test.done();
     };
 });
-
-//    add: {
-//
-//        literals: [
-//            "43 + 42;",
-//            [
-//                new ASTNode('+', 43, 42)]
-//        ],
-//
-//        refPlusLiteral: [
-//            "age + 42;",
-//            [
-//                new ASTNode('+', new Identifier('age'), 42)]
-//        ],
-//
-//        refs: [
-//            "age + years;",
-//            [
-//                new ASTNode('+', new Identifier('age'), new Identifier('years'))]
-//        ],
-//
-//        strings: [
-//            '"hello " + "bob";',
-//            [
-//                new ASTNode('+', "hello", "bob")]
-//        ]
-//    }
-//};

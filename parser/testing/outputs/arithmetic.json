@@ -1,1 +1,1 @@
-["procedure",[],[["add",2,2],["sub",8,7],["mul",6,7],["div",54,9],["mod",10,2],["add",["access","foo"],18],["add",["access","foo"],["access","barry"]],["add",14,["access","baz"]]]]
+["procedure",[],[["add",2,2],["sub",8,7],["mul",6,7],["div",54,9],["mod",10,2],["add",["access","foo"],18],["add",["access","age"],["access","years"]],["add",14,["access","baz"]]]]

@@ -10,7 +10,7 @@
 <comment>"*/"           this.popState();
 <comment>.              /* skip comment */
 \s+                     /* skip whitespace */
-[0-9]+("."[0-9]+)?\b    return 'NUMBER'
+[0-9]+("."[0-9]+)?\b    return 'CONSTANT'
 \".*\"                  yytext = yytext.substr(1, yyleng-2); return 'STRING_LITERAL';
 \'.*\'                  yytext = yytext.substr(1, yyleng-2); return 'STRING_LITERAL';
 "("                     return '('
@@ -100,11 +100,13 @@ multiplicative_expr
 primitive_expr
     : ID
         { $$ = ['access', $1]; }
-    | NUMBER
+    | CONSTANT
         { $$ = parseFloat($1); }
     | STRING_LITERAL
     | BOOLEAN
         { $$ = ($1 === 'true' ? true : false); }
+    | '(' expr ')'
+        { $$ = $2; }
     ;
 
 sequence
@@ -139,8 +141,8 @@ source
     ;
 
 request
-    : message
-    | message '(' params ')'
+    : action '(' ')'
+    | action '(' params ')'
     ;
 
 params
@@ -150,7 +152,7 @@ params
         { $$ = $1; $$.push($3); }
     ;
 
-message
+action
     : ID ':' ID
         { $$ = $1 + ':' + $3; }
     ;
@@ -163,7 +165,7 @@ connector
 
 sink
     : ID
-    | message
+    | action
     | procedure
     ;
 
