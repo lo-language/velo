@@ -62,15 +62,36 @@ statement
     : expression ';'
     ;
 
-primary_expr
-    : ID
-    | BOOLEAN
-        { $$ = ($1 === 'true' ? true : false); }
-    | CONSTANT
-        { $$ = parseFloat($1); }
-    | STRING_LITERAL
-    | '(' expression ')'
-        { $$ = $2; }
+sequence_expr
+    : additive_expr
+    | sequence_expr connector action
+        { $$ = ['sequence', $1, $2, $3]; }
+    | sequence_expr '=>' postfix_expr
+        { $$ = ['capture', $1, $3]; }
+    ;
+
+additive_expr
+    : multiplicative_expr
+    | additive_expr '+' multiplicative_expr
+        { $$ = ['add', $1, $3]; }
+    | additive_expr '-' multiplicative_expr
+        { $$ = ['sub', $1, $3]; }
+    ;
+
+multiplicative_expr
+    : unary_expr
+    | multiplicative_expr '*' primary_expr
+        { $$ = ['mul', $1, $3]; }
+    | multiplicative_expr '/' primary_expr
+        { $$ = ['div', $1, $3]; }
+    | multiplicative_expr '%' primary_expr
+        { $$ = ['mod', $1, $3]; }
+    ;
+
+unary_expr
+    : postfix_expr
+    | '#' postfix_expr
+        { $$ = ['card', $2]; }
     ;
 
 postfix_expr
@@ -88,22 +109,19 @@ arg_expr_list
     | arg_expr_list ',' assignment_expr
     ;
 
-unary_expr
-    : postfix_expr
-    | '#' postfix_expr
-        { $$ = ['card', $2]; }
-    ;
-
-sequence_expr
-    : unary_expr
-    | sequence_expr connector action
-        { $$ = ['sequence', $1, $2, $3]; }
-    | sequence_expr '=>' postfix_expr
-        { $$ = ['capture', $1, $3]; }
+primary_expr
+    : ID
+    | BOOLEAN
+        { $$ = ($1 === 'true' ? true : false); }
+    | CONSTANT
+        { $$ = parseFloat($1); }
+    | STRING_LITERAL
+    | '(' expression ')'
+        { $$ = $2; }
     ;
 
 action
-    : unary_expr
+    : multiplicative_expr
     ;
 
 assignment_expr
