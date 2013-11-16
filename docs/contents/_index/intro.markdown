@@ -1,3 +1,5 @@
+> Forget for a while about computers and computer programming, and think instead about objects in the world around us, which act and interact with us and with each other in accordance with some characteristic pattern of behaviour. Think of clocks and counters and telephones and board games and vending machines. To describe their patterns of behaviour, ﬁrst decide what kinds of event or action will be of interest; and choose a diﬀerent name for each kind.
+
 Opake is a simple general-purpose programming language designed to make building and testing secure, distributed software systems intuitive and easy.
 
 ##### Example 1: Hello World

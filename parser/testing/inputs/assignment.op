@@ -1,5 +1,5 @@
-foo
-bar = baz
-binky = 64
-message = "hi there"
-foo = bar.baz = true
+foo;
+bar = baz;
+binky = 64;
+message = "hi there";
+foo = bar.baz = true;

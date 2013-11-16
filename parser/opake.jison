@@ -10,6 +10,7 @@
 <comment>"*/"           this.popState();
 <comment>.              /* skip comment */
 \s+                     /* skip whitespace */
+';'                     return ';'
 [0-9]+("."[0-9]+)?\b    return 'CONSTANT'
 \".*\"                  yytext = yytext.substr(1, yyleng-2); return 'STRING_LITERAL';
 \'.*\'                  yytext = yytext.substr(1, yyleng-2); return 'STRING_LITERAL';
@@ -45,7 +46,7 @@
 
 %%
 
-procedure
+program
     : statement_list EOF
         { $$ = $1; return $$; }
     ;
@@ -58,7 +59,7 @@ statement_list
     ;
 
 statement
-    : expression
+    : expression ';'
     ;
 
 primary_expr
@@ -72,22 +73,51 @@ primary_expr
         { $$ = $2; }
     ;
 
-select_expr
+postfix_expr
     : primary_expr
-    | select_expr '[' expression ']'
+    | postfix_expr '[' expression ']'
         { $$ = ['select', $1, $3]; }
-    | select_expr '.' ID
+    | postfix_expr '.' ID
         { $$ = ['select', $1, $3]; }
+    | postfix_expr '(' ')'
+    | postfix_expr '(' arg_expr_list ')'
     ;
 
-prefix_expr
-    : select_expr
-    | '#' select_expr
-        { $$ = ['count', $2]; }
+arg_expr_list
+    : assignment_expr
+    | arg_expr_list ',' assignment_expr
+    ;
+
+unary_expr
+    : postfix_expr
+    | '#' postfix_expr
+        { $$ = ['card', $2]; }
+    ;
+
+sequence_expr
+    : unary_expr
+    | sequence_expr connector action
+        { $$ = ['sequence', $1, $2, $3]; }
+    | sequence_expr '=>' postfix_expr
+        { $$ = ['capture', $1, $3]; }
+    ;
+
+action
+    : unary_expr
+    ;
+
+assignment_expr
+    : sequence_expr
+    | sequence_expr '=' assignment_expr
+        { $$ = ['assign', $1, $3]; }
     ;
 
 expression
-    : prefix_expr
-    | prefix_expr '=' expression
-        { $$ = ['assign', $1, $3]; }
+    : assignment_expr
+    ;
+
+connector
+    : '->'
+    | '>>'
+    | '~'
     ;
