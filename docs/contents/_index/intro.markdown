@@ -1,8 +1,3 @@
-> Programmers are always surrounded by complexity; we cannot avoid it. Our applications are complex because we are ambitious to use our computers in ever more sophisticated ways. Programming is complex because of the large number of conflicting objectives for each of our programming projects. If our basic tool, the language in which we design and code our programs, is also complicated, the language itself becomes part of the problem rather than part of its solution.
-<cite>Tony Hoare</cite>
-
-### Introduction
-
 Opake is a simple general-purpose programming language designed to make building and testing secure, distributed software systems intuitive and easy.
 
 ##### Example 1: Hello World
@@ -12,13 +7,13 @@ Opake is a simple general-purpose programming language designed to make building
         "Hello, world!" -> io.stdout
     }
 
-While most languages give little consideration to security, concurrency and testability, Opake elevates these concerns to primary design goals - along with simplicity.
+While most languages give little consideration to security, concurrency, and testability, Opake elevates these concerns to primary design goals - along with simplicity.
 
 ##### Example 2: A trivial web app
 
     (args, io, env, shop) {
 
-        port = 8080
+        port is 8080
 
         shop:make('Http/Server') => server
 

@@ -7,7 +7,7 @@
     shop:make('Http/Logger/ELF', stdout) => logger
     shop:make('Http/Server', logger) => server
 
-    server:onRequest >> (request) {
+    server:onRequest() >> (request) {
         request:end("hi there!")
     }
 
@@ -18,8 +18,8 @@
         stderr:write("failed to open port _port_: ")
     }
 
-    signaller:trap('SIGINT') >> {
+    io.signaller:trap('SIGINT') >> {
         stderr:write("received SIGINT")
-        server:close
+        server:close()
     }
 }

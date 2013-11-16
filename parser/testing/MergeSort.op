@@ -1,0 +1,38 @@
+/**
+ * MergeSort
+ * created by spurcell
+ * 11/11/2013
+ */
+
+(items) {
+
+    if (#items == 0) {
+        fail "who could sort an empty list?"
+    }
+
+    if (#items == 1) {
+        items -> out
+        done
+    }
+
+    // split the list
+    cut(items, #items / 2) => left
+
+    // sort the halves
+
+    left -> in => left
+    items -> in => right
+
+    // merge the halves
+
+    while (#left > 0 || #right > 0) {
+
+        if (left[0] < right[0]) {
+            cut(left, 0) -> out
+        }
+        else if (left[0] > right[0]) {
+            cut(right, 0) -> out
+        }
+    }
+    => result -> out
+}

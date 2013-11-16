@@ -1,1 +1,1 @@
-["procedure",[],[["access","foo"],["assign","bar",["access","baz"]],["assign","binky",64],["assign","message","hi there"],["assign","foo",["assign","bar",["assign","baz",true]]]]]
+["foo",["select","foo","i"],["select",["select","foo","i"],"j"],["select","foo","bar"],["select",["select","boo","bar"],"baz"],["select",["select","foo","i"],"bar"],["select",["select","foo","bar"],"i"],["count",["select","foo","i"]],["count",["select","foo","bar"]]]
