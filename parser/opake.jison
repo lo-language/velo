@@ -49,6 +49,20 @@
 program
     : statement_list EOF
         { $$ = $1; return $$; }
+    | procedure EOF
+        { $$ = $1; return $$; }
+    ;
+
+procedure
+    : '(' ')' block
+        { $$ = ['procedure', [], $3]; }
+    ;
+
+block
+    : '{' '}'
+        { $$ = []; }
+    | '{' statement_list '}'
+        { $$ = $2; }
     ;
 
 statement_list
