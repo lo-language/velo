@@ -74,6 +74,8 @@ statement_list
 
 statement
     : expression ';'
+    | ID IS primary_expr ';'
+        { $$ = ['define', $1, $3]; }
     ;
 
 sequence_expr
