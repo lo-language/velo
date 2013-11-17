@@ -4,4 +4,5 @@
  */
 {
     // not much to see here
+    fail "oh noes!";
 }

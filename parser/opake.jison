@@ -81,6 +81,8 @@ statement
     : expression ';'
     | ID IS primary_expr ';'
         { $$ = ['define', $1, $3]; }
+    | FAIL expression ';'
+        { $$ = ['fail', $2]; }
     ;
 
 sequence_expr
