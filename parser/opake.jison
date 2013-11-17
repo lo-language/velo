@@ -22,11 +22,17 @@
 "{"                     return '{'
 "}"                     return '}'
 "."                     return '.'
+'=='                    return '=='
+'!='                    return '!='
+'<='                    return '<='
+'>='                    return '>='
 ":"                     return ':'
 "=>"                    return '=>'
 "->"                    return '->'
 "~"                     return '~'
 ">>"                    return '>>'
+'<'                     return '<'
+'>'                     return '>'
 "="                     return '='
 "+"                     return '+'
 "-"                     return '-'
@@ -34,6 +40,7 @@
 "/"                     return '/'
 "%"                     return '%'
 '#'                     return '#'
+'if'                    return 'IF'
 'is'                    return 'IS'
 'fail'                  return 'FAIL'
 "break"                 return 'BREAK'
@@ -83,14 +90,41 @@ statement
         { $$ = ['define', $1, $3]; }
     | FAIL expression ';'
         { $$ = ['fail', $2]; }
+    | selection_stmt
+    ;
+
+selection_stmt
+    : IF '(' expression ')' block
+    | IF '(' expression ')' block ELSE block
+    | SWITCH '(' expression ')' statement
     ;
 
 sequence_expr
-    : additive_expr
+    : equality_expr
     | sequence_expr connector action
         { $$ = ['sequence', $1, $2, $3]; }
     | sequence_expr '=>' postfix_expr
         { $$ = ['capture', $1, $3]; }
+    ;
+
+equality_expr
+    : relational_expr
+    | equality_expr '==' relational_expr
+        { $$ = ['equality', $1, $3]; }
+    | equality_expr '!=' relational_expr
+        { $$ = ['inequality', $1, $3]; }
+    ;
+
+relational_expr
+    : additive_expr
+    | relational_expr '<' additive_expr
+        { $$ = ['lt', $1, $3]; }
+    | relational_expr '>' additive_expr
+        { $$ = ['gt', $1, $3]; }
+    | relational_expr '<=' additive_expr
+        { $$ = ['le', $1, $3]; }
+    | relational_expr '>=' additive_expr
+        { $$ = ['ge', $1, $3]; }
     ;
 
 additive_expr
