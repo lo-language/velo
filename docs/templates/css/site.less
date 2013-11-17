@@ -1,5 +1,6 @@
-@page-background: #eee;
-@title-color: #426;
+@page-background: #fff;
+@title-color: #444;
+@body-color: #aaa;
 
 html {
 	background: @page-background;
@@ -27,23 +28,27 @@ footer {
 }
 
 #title {
-	font-size: 4em;
-	margin: 2em 0;
+	font-size: 80pt;
+	margin: 1em 0;
 	padding: 0;
-  text-align: center;
-  clear: both;
+    text-align: center;
+    clear: both;
 	color: @title-color;
-    font-family: "Republika Exp";
+    font-family: 'Varela Round', cursive;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+  text-transform: uppercase;
 }
 
-#topLinks {
-  float: right;
+#mainLinks {
+  font-size: larger;
+  margin: 0 auto;
+  text-align: center;
   a {
     margin-left: 10px;
-    color: #666;
+    color: @title-color;
   }
   a:hover {
-    color: #666;
+    color: @title-color;
     text-decoration: none;
   }
 }
@@ -70,7 +75,7 @@ body {
   font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB", Arial, sans-serif;
   font-size: 13px;
   line-height: 18px;
-  color: #737373;
+  color: @body-color;
 }
 table {
   margin: 10px 0 15px 0;

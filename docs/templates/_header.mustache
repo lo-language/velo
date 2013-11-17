@@ -12,22 +12,27 @@
 
 			<!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
+            <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
 			{{#stylesheet_bundle}}/css/all.css{{/stylesheet_bundle}} 
     </head>
 
     <body>
 			<header>
-				<div id="topLinks">
+
+				<blockquote>
+				<p>
+				Programmers are always surrounded by complexity; we cannot avoid it. Our applications are complex because we are ambitious to use our computers in ever more sophisticated ways. Programming is complex because of the large number of conflicting objectives for each of our programming projects. If our basic tool, the language in which we design and code our programs, is also complicated, the language itself becomes part of the problem rather than part of its solution.
+                </p>
+                <cite>Tony Hoare</cite>
+                </blockquote>
+
+				<h1 id="title">{{site-title}}</h1>
+
+				<!--div id="mainLinks">
 				    <a href="/download">Download</a>
 				    <a href="/docs">Language Docs</a>
 				    <a href="/docs">Libraries</a>
-                </div>
-				<h1 id="title">{{site-title}}</h1>
-
-				<blockquote>
-				Programmers are always surrounded by complexity; we cannot avoid it. Our applications are complex because we are ambitious to use our computers in ever more sophisticated ways. Programming is complex because of the large number of conflicting objectives for each of our programming projects. If our basic tool, the language in which we design and code our programs, is also complicated, the language itself becomes part of the problem rather than part of its solution.
-                <cite>Tony Hoare</cite>
-                </blockquote>
+                </div-->
 
 				<ul class="navbar">
 				{{#navbar}}

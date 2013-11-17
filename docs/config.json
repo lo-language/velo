@@ -13,5 +13,15 @@
 			"/css/main.css",
 			"/css/site.less"
 		]	
-	}
+	},
+
+    "publish" : {
+        "strategy" : "s3",
+        "options" : {
+            "bucket" : "www.opake.org",
+            "key" : "AKIAIG5HJEN4DWZVUEXQ",
+            "secret" : "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",
+            "x-amz-acl": "public-read"
+        }
+    }
 }
