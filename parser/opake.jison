@@ -29,6 +29,8 @@
 ":"                     return ':'
 "=>"                    return '=>'
 "->"                    return '->'
+'||'                    return '||'
+'&&'                    return '&&'
 "~"                     return '~'
 ">>"                    return '>>'
 '<'                     return '<'
@@ -179,6 +181,7 @@ primary_expr
 
 action
     : multiplicative_expr
+    | block
     ;
 
 assignment_expr

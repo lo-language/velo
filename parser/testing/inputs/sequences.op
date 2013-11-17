@@ -1,0 +1,17 @@
+in -> out;
+hash(password) ~ handler => hashedPw;
+listen >> handler -> out;
+listen ~ { };
+
+hash(pw) ~ {
+
+    in => items;
+}
+-> {
+
+    "hi there" -> log;
+    in -> out;
+}
+-> foo => result;
+
+bar = foo -> { } -> ok;
