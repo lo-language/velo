@@ -54,8 +54,13 @@ program
     ;
 
 procedure
-    : '(' ')' block
-        { $$ = ['procedure', [], $3]; }
+    : block
+        { $$ = ['procedure', $1]; }
+    ;
+
+id_list
+    : ID
+    | id_list ',' ID
     ;
 
 block
