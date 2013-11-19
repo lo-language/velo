@@ -5,30 +5,33 @@ Opake is a simple general-purpose programming language designed to make building
 ##### Example 1: Hello World
 
 
-    (args, io) {
-        "Hello, world!" -> io.stdout
-    }
+    in => (args, io);
+    "Hello, world!" -> io.stdout;
 
 While most languages give little consideration to security, concurrency, and testability, Opake elevates these concerns to primary design goals - along with simplicity.
 
 ##### Example 2: A trivial web app
 
-    (args, io, env, shop) {
+     {    
+        in => (args, io, env, shop);
+        
+        port is 8080;
 
-        port is 8080
+        shop.make('Http/Server') => server;
+        
+        server.request >> {
+        	in => request;
+            request.end("hi there!");
+        };
 
-        shop:make('Http/Server') => server
-
-        server:onRequest >> (request) {
-            request:end("hi there!")
-        }
-
-        server:open(port) ~ (err) {
-            io.stderr:write("failed to open port _port_: " + err)
+        server.open(port) ~ (err) {
+            io.stderr:write("failed to open port _port_: " + err);
         }
         -> {
-            io.stderr:write("server running on port _port_")
-        }
+            io.stderr:write("server running on port _port_");
+        };
+        
+        42 -> in -> out;
     }
 
 Opake aims to facilitate them with two simple concepts: hermetic encapsulation and purely asynchronous communication.

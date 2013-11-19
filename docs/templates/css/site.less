@@ -1,5 +1,6 @@
-@page-background: #fff;
-@title-color: #444;
+@page-background: #777;
+@title-color: #0370ff;
+@link-color: #333;
 @body-color: #aaa;
 
 html {
@@ -29,27 +30,31 @@ footer {
 
 #title {
 	font-size: 80pt;
-	margin: 1em 0;
 	padding: 0;
     text-align: center;
     clear: both;
 	color: @title-color;
     font-family: 'Varela Round', cursive;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
   text-transform: uppercase;
 }
 
-#mainLinks {
-  font-size: larger;
-  margin: 0 auto;
+#desc {
   text-align: center;
+}
+
+#mainLinks {
+  font-size: 20pt;
+  margin: 40px auto 0;
+  text-align: center;
+  text-shadow: 1px 1px 0 #888;
   a {
     margin-left: 10px;
-    color: @title-color;
+    color: @link-color;
+    text-decoration: none;
   }
   a:hover {
-    color: @title-color;
-    text-decoration: none;
+    color: #000;
   }
 }
 
@@ -74,7 +79,7 @@ blockquote {
 body {
   font-family: "Helvetica Neue", Helvetica, "Hiragino Sans GB", Arial, sans-serif;
   font-size: 13px;
-  line-height: 18px;
+  /*line-height: 18px;*/
   color: @body-color;
 }
 table {
@@ -110,7 +115,7 @@ h4,
 h5,
 h6 {
   color: #404040;
-  line-height: 36px;
+  /*line-height: 36px;*/
 }
 h1 {
   margin-bottom: 18px;
