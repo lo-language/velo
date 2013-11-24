@@ -1,1 +1,1 @@
-["foo",["select","foo","bar"],["capture","foo","baz"],["capture","foo","baz"],["capture","foo","fubar"]]
+["action",[],[["invoke","foo"],["invoke",["select","foo","bar"]],["capture",["invoke","foo"],"baz"],["capture",["invoke","foo",["bar"]],"baz"],["capture",["invoke","foo",["bar","baz"]],"foobar"]]]

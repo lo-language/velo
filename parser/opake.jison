@@ -103,6 +103,7 @@ sequence_statement
     | expression connector sink
     | sequence_statement connector sink
     | sequence_statement '=>' identifier
+        { $$ = ['capture', $1, $3]; }
     ;
 
 sink
@@ -124,12 +125,16 @@ expression
 
 invocation
     : identifier '(' ')'
+        { $$ = ['invoke', $1]; }
     | identifier '(' argument_expression_list ')'
+        { $$ = ['invoke', $1, $3]; }
     ;
 
 argument_expression_list
     : assignment_expression
+        { $$ = [$1]; }
     | argument_expression_list ',' assignment_expression
+        { $$ = $1; $$.push($3); }
     ;
 
 assignment_expression
