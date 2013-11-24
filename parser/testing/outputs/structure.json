@@ -1,1 +1,1 @@
-["procedure",[["fail","oh noes!"]]]
+["action",[],[["assign","x",["action",[],[]]],["equality",["card","items"],0],["fail","oh noes!"]]]
