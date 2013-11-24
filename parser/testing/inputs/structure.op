@@ -17,6 +17,16 @@ action () {
         y = 3;
     }
 
+    if (answer == 42) {
+        a -> b
+    }
+    else if (answer == 57) {
+        b -> c
+    }
+    else {
+        c -> d
+    }
+
     // this sends bar the value of x = foo
     x = foo -> bar
 }
