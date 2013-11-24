@@ -47,7 +47,8 @@ errorFiles.forEach(function (filename) {
         var source = fs.readFileSync(__dirname + '/errors/' + filename, 'utf8');
 
         test.throws(function () {
-            parser.parse(source);
+            var result = parser.parse(source);
+            console.log(JSON.stringify(result));
         });
 
         test.done();

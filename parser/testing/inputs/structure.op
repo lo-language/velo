@@ -8,6 +8,9 @@ action () {
 
     #items == 0;
 
+    // this sends bar the value of x = foo
+    x = foo -> bar
+
     // not much to see here
     fail "oh noes!";
 }
