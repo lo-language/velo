@@ -10,7 +10,7 @@
 <comment>"*/"           this.popState();
 <comment>.              /* skip comment */
 \s+                     /* skip whitespace */
-';'                     return ';'
+";"                     return ';'
 [0-9]+("."[0-9]+)?\b    return 'CONSTANT'
 \".*\"                  yytext = yytext.substr(1, yyleng-2); return 'STRING_LITERAL';
 \'.*\'                  yytext = yytext.substr(1, yyleng-2); return 'STRING_LITERAL';
@@ -22,10 +22,10 @@
 "{"                     return '{'
 "}"                     return '}'
 "."                     return '.'
-'=='                    return '=='
-'!='                    return '!='
-'<='                    return '<='
-'>='                    return '>='
+"=="                    return '=='
+"!="                    return '!='
+"<="                    return '<='
+">="                    return '>='
 ":"                     return ':'
 "=>"                    return '=>'
 "->"                    return '->'
@@ -33,8 +33,8 @@
 '&&'                    return '&&'
 "~"                     return '~'
 ">>"                    return '>>'
-'<'                     return '<'
-'>'                     return '>'
+"<"                     return '<'
+">"                     return '>'
 "="                     return '='
 "+"                     return '+'
 "-"                     return '-'

@@ -14,26 +14,27 @@ action (items) {
     }
 
     if (#items == 1) {
-        return items;
+        items -> out
+        done;
     }
 
     // split the list
-    cut(items, #items / 2) => left;
+    cut(items, #items / 2) => left
 
     // sort the halves
 
-    repeat(left) => left;
-    repeat(items) => right;
+    repeat(left) => left
+    repeat(items) => right
 
     // merge the halves
 
     while (#left > 0 || #right > 0) {
 
         if (left[0] < right[0]) {
-            cut(left, 0) -> out;
+            cut(left, 0) -> out
         }
         else if (left[0] > right[0]) {
-            cut(right, 0) -> out;
+            cut(right, 0) -> out
         }
     }
 }
