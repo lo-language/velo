@@ -41,10 +41,11 @@
 "*"                     return '*'
 "/"                     return '/'
 "%"                     return '%'
-'#'                     return '#'
-'if'                    return 'IF'
-'is'                    return 'IS'
-'fail'                  return 'FAIL'
+"#"                     return '#'
+"if"                    return 'IF'
+"else"                  return 'ELSE'
+"is"                    return 'IS'
+"fail"                  return 'FAIL'
 "break"                 return 'BREAK'
 "action"                return 'ACTION'
 "true"|"false"          return 'BOOLEAN'
@@ -96,6 +97,7 @@ statement
     | FAIL expression ';'
         { $$ = ['fail', $2]; }
     | sequence_statement
+    | selection_statement
     ;
 
 sequence_statement
@@ -160,6 +162,14 @@ connector
     ;
 
 // C syntax, mostly
+
+selection_statement
+    : block
+    | IF '(' expression ')' block
+        { $$ = ['if', $3, $5]; }
+    | IF '(' expression ')' block ELSE selection_statement
+        { $$ = ['if', $3, $5, $7]; }
+    ;
 
 equality_expression
     : relational_expression

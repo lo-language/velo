@@ -1,1 +1,1 @@
-["action",[],[["assign","x",["action",[],[]]],["equality",["card","items"],0],["->",["assign","x","foo"],"bar"],["fail","oh noes!"]]]
+["action",[],[["assign","x",["action",[],[]]],["if",["equality",["card","items"],0],[["fail","oh noes!"]]],["if",["equality",["card","items"],1],[["assign","x",2]],[["assign","y",3]]],["->",["assign","x","foo"],"bar"]]]

@@ -6,11 +6,17 @@ action () {
 
     x = action () {};
 
-    #items == 0;
+    if (#items == 0) {
+        fail "oh noes!";
+    }
+
+    if (#items == 1) {
+        x = 2;
+    }
+    else {
+        y = 3;
+    }
 
     // this sends bar the value of x = foo
     x = foo -> bar
-
-    // not much to see here
-    fail "oh noes!";
 }
