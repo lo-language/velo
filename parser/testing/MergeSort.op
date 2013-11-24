@@ -4,16 +4,17 @@
  * 11/11/2013
  */
 
-{
-    in => items;
+ // todo - make streaming on output?
+ // would have to somehow combine two streams
+
+action (items) {
 
     if (#items == 0) {
         fail "who could sort an empty list?";
     }
 
     if (#items == 1) {
-        items -> out;
-        done;
+        return items;
     }
 
     // split the list
@@ -21,8 +22,8 @@
 
     // sort the halves
 
-    left -> in => left;
-    items -> in => right;
+    repeat(left) => left;
+    repeat(items) => right;
 
     // merge the halves
 
@@ -35,5 +36,4 @@
             cut(right, 0) -> out;
         }
     }
-    => result -> out;
 }

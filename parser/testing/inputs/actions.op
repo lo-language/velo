@@ -1,5 +1,0 @@
-foo();           // where foo is a channel identifier
-foo.bar();       // where bar is a channel identifier on record foo
-foo() => baz;    // capture output of foo
-foo(bar) => baz;
-foo(bar, baz) => fubar;
