@@ -1,6 +1,9 @@
-foo == bar;
-foo != bar;
-foo < bar;
-foo > bar;
-foo <= bar;
-foo >= bar;
+action () {
+
+    foo == bar;
+    foo != bar;
+    foo < bar;
+    foo > bar;
+    foo <= bar;
+    foo >= bar;
+}

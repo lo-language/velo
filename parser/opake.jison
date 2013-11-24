@@ -58,26 +58,35 @@
 
 module
     : action_definition EOF
+        { $$ = $1; return $$; }
     ;
 
 action_definition
     : ACTION '(' ')' block
+        { $$ = ['action', [], $4]; }
     | ACTION '(' name_list ')' block
+        { $$ = ['action', $3, $5]; }
     ;
 
 name_list
     : NAME
+        { $$ = [$1]; }
     | name_list ',' NAME
+        { $$ = $1; $$.push($3); }
     ;
 
 block
     : '{' '}'
+        { $$ = []; }
     | '{' statement_list '}'
+        { $$ = $2; }
     ;
 
 statement_list
     : statement
+        { $$ = [$1]; }
     | statement_list statement
+        { $$ = $1; $$.push($2); }
     ;
 
 statement
@@ -104,7 +113,9 @@ sink
 identifier
     : NAME
     | identifier '[' expression ']'
+        { $$ = ['select', $1, $3]; }
     | identifier '.' NAME
+        { $$ = ['select', $1, $3]; }
     ;
 
 expression
@@ -122,15 +133,9 @@ argument_expression_list
     ;
 
 assignment_expression
-    : primary_expression
-    | identifier '=' expression
-    ;
-
-primary_expression
-    : identifier
-    | literal
-    | '(' expression ')'
-        { $$ = $2; }
+    : equality_expression
+    | equality_expression '=' assignment_expression
+        { $$ = ['assign', $1, $3]; }
     ;
 
 literal
@@ -145,4 +150,58 @@ connector
     : '->'
     | '>>'
     | '~'
+    ;
+
+// C syntax, mostly
+
+equality_expression
+    : relational_expression
+    | equality_expression '==' relational_expression
+        { $$ = ['equality', $1, $3]; }
+    | equality_expression '!=' relational_expression
+        { $$ = ['inequality', $1, $3]; }
+    ;
+
+relational_expression
+    : additive_expression
+    | relational_expression '<' additive_expression
+        { $$ = ['lt', $1, $3]; }
+    | relational_expression '>' additive_expression
+        { $$ = ['gt', $1, $3]; }
+    | relational_expression '<=' additive_expression
+        { $$ = ['le', $1, $3]; }
+    | relational_expression '>=' additive_expression
+        { $$ = ['ge', $1, $3]; }
+    ;
+
+additive_expression
+    : multiplicative_expression
+    | additive_expression '+' multiplicative_expression
+        { $$ = ['add', $1, $3]; }
+    | additive_expression '-' multiplicative_expression
+        { $$ = ['sub', $1, $3]; }
+    ;
+
+multiplicative_expression
+    : unary_expression
+    | multiplicative_expression '*' primary_expression
+        { $$ = ['mul', $1, $3]; }
+    | multiplicative_expression '/' primary_expression
+        { $$ = ['div', $1, $3]; }
+    | multiplicative_expression '%' primary_expression
+        { $$ = ['mod', $1, $3]; }
+    ;
+
+unary_expression
+    : primary_expression
+    | '#' primary_expression
+        { $$ = ['card', $2]; }
+    ;
+
+primary_expression
+    : identifier
+    | literal
+    | action_definition
+    | '(' expression ')'
+        { $$ = $2; }
     ;

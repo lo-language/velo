@@ -1,17 +1,20 @@
-in -> out;
-hash(password) ~ handler => hashedPw;
-listen >> handler -> out;
-listen ~ { };
+action () {
 
-hash(pw) ~ {
+    in -> out
+    hash(password) ~ handler => hashedPw
+    listen >> handler -> out
+    listen ~ action () { }
 
-    in => items;
+    hash(pw) ~ action () {
+
+        x -> in => items
+    }
+    -> action () {
+
+        "hi there" -> log
+        in -> out
+    }
+    -> foo => result
+
+    bar = foo -> action () { } -> ok
 }
--> {
-
-    "hi there" -> log;
-    in -> out;
-}
--> foo => result;
-
-bar = foo -> { } -> ok;
