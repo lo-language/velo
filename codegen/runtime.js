@@ -7,10 +7,17 @@
 // define the top-level sinks
 
 var out = function (message) {
+
+    if (typeof message !== 'string') {
+        message = '' + message;
+    }
+
     process.stdout.write(message, 'utf8');
 };
 
 var log = function (message) {
     process.stderr.write(message, 'utf8');
 };
+
+// BEGIN GENERATED CODE
 

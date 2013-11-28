@@ -52,15 +52,22 @@ function codegen(node) {
             break;
 
         case 'define':
-            return 'var ' + node[1] + ' = ' + node[2] + ';';
+            return 'var _' + node[1] + ' = ' + node[2] + ';';
             break;
 
         case '->':
-            return node[2] + '(' + node[1] + ');'
+            return '(' + codegen(node[2]) + ')(' + codegen(node[1]) + ');'
+            break;
+
+        case 'str':
+            return '"' + node[1] + '"';
             break;
 
         default:
-            console.log("unhandled node of type " + nodeType);
+            // identifier
+            if (typeof node == 'string') {
+                return '_' + node;
+            }
             break;
     }
 

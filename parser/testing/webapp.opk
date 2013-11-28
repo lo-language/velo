@@ -6,11 +6,19 @@
  in goes to stdin?
 
 */
-action (args, in, system, shop) {
+action (args, stdin, system, shop) {
 
     port is 8080;
 
-    "hello world!" -> out;
+    "hello, world!\n" -> action (msg) {
+
+        msg -> out
+    }
+
+    fn1(hello world, out([msg], null, null, null);
+
+    // every sink is a function with args (inArgs, out, err, log)?
+
 /*
     shop.make('Http/Logger/ELF', stdout) => logger;
     shop.make('Http/Server', logger) => server;
