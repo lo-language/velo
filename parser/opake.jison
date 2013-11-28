@@ -67,7 +67,9 @@ module
     ;
 
 action_definition
-    : ACTION '(' ')' block
+    : ACTION block
+        { $$ = ['action', [], $2]; }
+    | ACTION '(' ')' block
         { $$ = ['action', [], $4]; }
     | ACTION '(' name_list ')' block
         { $$ = ['action', $3, $5]; }
@@ -101,6 +103,7 @@ statement
     | FAIL expression ';'
         { $$ = ['fail', $2]; }
     | sequence_statement
+    | sequence_statement ';'
     | selection_statement
     ;
 
@@ -111,7 +114,7 @@ selection_statement
     | IF '(' expression ')' block ELSE selection_statement
         { $$ = ['if', $3, $5, $7]; }
     ;
-    
+
 sequence_statement
     : invocation
     | expression connector sink
