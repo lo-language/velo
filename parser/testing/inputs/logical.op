@@ -1,0 +1,4 @@
+action () {
+
+    foo = q && r ? 42 : y && z || a & b ^ c | d;
+}
