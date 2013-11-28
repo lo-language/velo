@@ -3,11 +3,12 @@
 'use strict';
 
 var fs = require('fs');
-var parser = require('./vm/Parser');
+var parser = require('./parser/Parser');
+var util = require('util');
 
 // node [path to this file] [path to input file]
 var source = fs.readFileSync(process.argv[2], 'utf8');
 
 var ast = parser.parse(source);
 
-ast.run();
+console.log(util.inspect(ast, {depth: null}));
