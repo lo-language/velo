@@ -1,13 +1,21 @@
-action (args, io, env, shop) {
+/**
+
+ how do we want to do IO?
+ log goes to stderr
+ out goes to stdout
+ in goes to stdin?
+
+*/
+action (args, in, system, shop) {
 
     port is 8080;
 
     42 -> out;
-
+/*
     shop.make('Http/Logger/ELF', stdout) => logger;
     shop.make('Http/Server', logger) => server;
 
-    server.onRequest() >> action (request) {
+    server.on('request') >> action (request) {
         request.end("hi there!");
     }
 
@@ -18,8 +26,8 @@ action (args, io, env, shop) {
         log.info("server running on port _port_");
     }
 
-    io.signaller.trap('SIGINT') >> action {
-        stderr.write("received SIGINT");
+    system.on('SIGINT') >> action {
+        log.info("received SIGINT");
         server.close();
-    }
+    }*/
 }

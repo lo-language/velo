@@ -2,7 +2,3 @@ To generate the parser,
 
 cd parser
 ./generate
-
-To install, create a link in your path to the cli.js file e.g.:
-
-ln -s [path to gel]/cli.js /usr/local/bin/gel
