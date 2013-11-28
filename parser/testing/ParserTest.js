@@ -9,16 +9,18 @@ var fs = require('fs');
 var path = require('path');
 var parser = require('../Parser');
 
+var EXT = '.opk';
+
 // go through the tests directory and generate a test for each file
 var files = fs.readdirSync(__dirname + '/inputs');
 
 files.forEach(function (filename) {
 
-    if (path.extname(filename) !== '.op') {
+    if (path.extname(filename) !== EXT) {
         return;
     }
 
-    var name = path.basename(filename, '.op');
+    var name = path.basename(filename, EXT);
 
     module.exports[name] = function (test) {
 
@@ -36,11 +38,11 @@ var errorFiles = fs.readdirSync(__dirname + '/errors');
 
 errorFiles.forEach(function (filename) {
 
-    if (path.extname(filename) !== '.op') {
+    if (path.extname(filename) !== EXT) {
         return;
     }
 
-    var name = path.basename(filename, '.op');
+    var name = path.basename(filename, EXT);
 
     module.exports['error - ' + name] = function (test) {
 
