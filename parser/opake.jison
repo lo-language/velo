@@ -162,6 +162,7 @@ literal
     | CONSTANT
         { $$ = parseFloat($1); }
     | STRING_LITERAL
+        { $$ = ['str', $1]; }
     ;
 
 connector

@@ -10,7 +10,7 @@ action (args, in, system, shop) {
 
     port is 8080;
 
-    42 -> out;
+    "hello world!" -> out;
 /*
     shop.make('Http/Logger/ELF', stdout) => logger;
     shop.make('Http/Server', logger) => server;

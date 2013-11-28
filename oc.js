@@ -30,14 +30,39 @@ fs.writeFileSync(process.argv[3], output, 'utf8');
 
 function codegen(node) {
 
-    switch (node[0]) {
+    var nodeType = node[0];
+
+    switch (nodeType) {
 
         case 'action':
 
+            // guard identifier names from JS reserved words
             var args = node[1].map(function (name) { return '_' + name; });
+            var statements = node[2];
 
-            return 'function (' + args.join(',') +
-            ') {\n}';
+            var result = 'function (' + args.join(',') + ') {\n';
+
+            // generate code for statements
+
+            statements.forEach(function (statement) {
+                result += '\t' + codegen(statement) + '\n';
+            });
+
+            return result + '}';
+            break;
+
+        case 'define':
+            return 'var ' + node[1] + ' = ' + node[2] + ';';
+            break;
+
+        case '->':
+            return node[2] + '(' + node[1] + ');'
+            break;
+
+        default:
+            console.log("unhandled node of type " + nodeType);
             break;
     }
+
+    return '';
 }
