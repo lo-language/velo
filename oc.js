@@ -22,15 +22,17 @@ if (ast[0] != 'action') {
     throw new Error('AST root node should be "action", got "' + ast[0] + '"');
 }
 
-var output = fs.readFileSync(__dirname + '/codegen/runtime.js');
+var template = fs.readFileSync(__dirname + '/codegen/runtime.js', 'utf8');
+var code = 'main = ' + codegen(ast) + ';';
 
-output += 'var main = ' + codegen(ast) + ';\n' + 'main();\n';
+fs.writeFileSync(process.argv[3], template.replace('//<<CODE>>', code), 'utf8');
+fs.chmodSync(process.argv[3], '777');
 
-fs.writeFileSync(process.argv[3], output, 'utf8');
-
-function codegen(node) {
+function codegen(node, indent) {
 
     var nodeType = node[0];
+
+    indent = indent || '';
 
     switch (nodeType) {
 
@@ -40,15 +42,15 @@ function codegen(node) {
             var args = node[1].map(function (name) { return '_' + name; });
             var statements = node[2];
 
-            var result = 'function (' + args.join(',') + ') {\n';
+            var result = indent + 'function (args, _out, _err, _log) {\n';
 
             // generate code for statements
 
             statements.forEach(function (statement) {
-                result += '\t' + codegen(statement) + '\n';
+                result += '\t' + codegen(statement, indent + '\t') + '\n';
             });
 
-            return result + '}';
+            return result + indent + '}';
             break;
 
         case 'define':
@@ -56,10 +58,17 @@ function codegen(node) {
             break;
 
         case '->':
-            return '(' + codegen(node[2]) + ')(' + codegen(node[1]) + ');'
+
+            return createSource(node[1]);
+            break;
+
+        case '=>':
+
+            return createSource(node[1]) + '.then(function (val) {});';
             break;
 
         case 'str':
+
             return '"' + node[1] + '"';
             break;
 
@@ -73,3 +82,18 @@ function codegen(node) {
 
     return '';
 }
+
+function createSource (node) {
+
+    if (typeof node == 'number') {
+        return 'Q.when(' + node + ');';
+    }
+
+    var nodeType = node[0];
+
+    if (nodeType == 'str') {
+        return 'Q.when(' + codegen(node) + ');';
+    }
+
+    throw new Error("bummer");
+};

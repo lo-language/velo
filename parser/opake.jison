@@ -121,6 +121,8 @@ sequence_statement
         { $$ = [$2, $1, $3]; }
     | sequence_statement connector sink
         { $$ = [$2, $1, $3]; }
+    | expression '=>' identifier
+        { $$ = ['capture', $1, $3]; }
     | sequence_statement '=>' identifier
         { $$ = ['capture', $1, $3]; }
     ;

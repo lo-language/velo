@@ -1,25 +1,56 @@
 /**
-
- how do we want to do IO?
- log goes to stderr
- out goes to stdout
- in goes to stdin?
-
-*/
+ */
 action (args, stdin, system, shop) {
 
     port is 8080;
+
+    "oh noes!\n" => message
+
+/*
+
+    compile to a promise chain?
+
+    // creates a list if plural?
+    shop.make(name) => thing
+
+    create a function for the LHS
+    create a function for the RHS determined by connector
+    each RHS function has sig (out, err, log)
+
+    the RHS fn is called when LHS result is available?
+    have them return promises?
+
+    call LHS(RHS)
+
+    ~ compiles to
+
+    function (out, err, log) {
+
+        if (out)
+        if (err) {
+
+        }
+    }
+
 
     "hello, world!\n" -> action (msg) {
 
         msg -> out
     }
+    -> out
 
-    fn1(hello world, out([msg], null, null, null);
+    expr -> action translates to
 
-    // every sink is a function with args (inArgs, out, err, log)?
+    action(expr_result,
 
-/*
+    Q.resolve("hello, world!\n").then(
+        function () {
+
+
+        }
+    ).then(out);
+
+
     shop.make('Http/Logger/ELF', stdout) => logger;
     shop.make('Http/Server', logger) => server;
 
