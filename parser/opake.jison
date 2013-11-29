@@ -115,6 +115,7 @@ selection_statement
         { $$ = ['if', $3, $5, $7]; }
     ;
 
+// I'm not sure if the sequences should be left- or right-recursive, defaulting to left
 sequence_statement
     : invocation
     | expression connector sink

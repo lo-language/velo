@@ -27,7 +27,7 @@ var code = 'main = ' + codegen(ast) + ';';
 fs.writeFileSync(process.argv[3], template.replace('//<<CODE>>', code), 'utf8');
 fs.chmodSync(process.argv[3], '777');
 
-function codegen(node, indent) {
+function codegen(node, newline) {
 
     if (typeof node == 'number') {
         return node;
@@ -41,7 +41,7 @@ function codegen(node, indent) {
 
     var nodeType = node[0];
 
-    indent = indent || '';
+    newline = newline || '\n';
 
     switch (nodeType) {
 
@@ -51,30 +51,34 @@ function codegen(node, indent) {
             var args = node[1].map(function (name) { return '_' + name; });
             var statements = node[2];
 
-            var result = indent + 'function (args, _out, _err, _log) {\n';
+            var result = 'function (args, _out, _err, _log) {' + newline + '\t';
 
             // generate code for statements
 
             statements.forEach(function (statement) {
-                result += '\t' + codegen(statement, indent + '\t') + '\n';
+                result += codegen(statement, newline + '\t');
             });
 
-            return result + indent + '}';
+            return result + newline + '}';
             break;
 
         case 'define':
         case 'assign':
-            return 'var ' + codegen(node[1]) + ' = ' + codegen(node[2]) + ';';
+            return 'var ' + codegen(node[1], newline) + ' = ' + codegen(node[2], newline) + ';';
             break;
 
+        case '~':
         case '->':
 
-            return createSource(node[1]);
+            // create a nonce function for the RHS
+
+            var rhs = newline + "var xa = function (message, channel) {" + newline + "};";
+
+            return codegen(node[1], newline) + newline + rhs;
+
             break;
 
         case 'capture':
-            // optimize: if expr =>
-            return createSource(node[1]) + '.then(function (val) { _' + node[2] + ' = val; });';
             break;
 
         case 'str':
@@ -92,18 +96,16 @@ function codegen(node, indent) {
 
     return '';
 }
-
-function createSource (node) {
-
-    if (typeof node == 'number') {
-        return 'Q.when(' + node + ')';
-    }
-
-    var nodeType = node[0];
-
-    if (nodeType == 'str') {
-        return 'Q.when(' + codegen(node) + ')';
-    }
-
-    throw new Error("bummer");
-};
+//
+//function createSource (node) {
+//
+//    if (typeof node == 'number') {
+//        return 'Q.when(' + node + ')';
+//    }
+//
+//    if (typeof node == 'string' || node[0] == 'str') {
+//        return 'Q.when(' + codegen(node) + ')';
+//    }
+//
+//    throw new Error("what's a " + node[0]);
+//};

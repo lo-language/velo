@@ -1,14 +1,68 @@
 /**
+
+    // this gets turned into a function with sig: args, next
+    handler = action (err) { x = 42; };
+
+    _handler = function (args, next) {
+
+        var _repeat = _handler;
+        _x = 42;
+    };
  */
 action (args, stdin, system, shop) {
 
     port is 8080;
 
-    "oh noes!\n" => message
+    shop(foo) -> handler -> server
 
 /*
 
+    a sequence is a bunch of nonce functions
+
+    // define the sequences
+    // how to build this?
+    // just create a function for the RHS?
+
+    var a = function (message, channel) {
+
+        var _repeat = a;
+        var next = a1;
+
+
+    };
+
+    var a1 = function (message, channel) {
+
+        var _repeat = a1;
+        var next = a2;
+
+        if (channel == OUT) {
+            // pass through
+            next(message, channel);
+            return;
+        }
+
+        handler(message);
+    };
+
+    var a2 = function (message, channel) {
+
+        var _repeat = a2;
+        var next = blackHole;
+
+        if (channel == ERR) {
+            // break the sequence
+            throw new Error();
+        }
+    };
+
+    // start the sequences
+    a();
+    b();
+
     compile to a promise chain?
+
+    do log events flow down the chain?
 
     // creates a list if plural?
     shop.make(name) => thing
