@@ -1,7 +1,6 @@
 #!/usr/bin/env node
-
 /**
- * the opake compiler
+ * The Opake-to-node compiler
  *
  * todo: multiline string literals, with and without line breaks
  */
@@ -30,6 +29,16 @@ fs.chmodSync(process.argv[3], '777');
 
 function codegen(node, indent) {
 
+    if (typeof node == 'number') {
+        return node;
+    }
+
+    if (typeof node == 'string') {
+
+        // identifier name
+        return '_' + node;
+    }
+
     var nodeType = node[0];
 
     indent = indent || '';
@@ -54,7 +63,8 @@ function codegen(node, indent) {
             break;
 
         case 'define':
-            return 'var _' + node[1] + ' = ' + node[2] + ';';
+        case 'assign':
+            return 'var ' + codegen(node[1]) + ' = ' + codegen(node[2]) + ';';
             break;
 
         case '->':
@@ -62,9 +72,9 @@ function codegen(node, indent) {
             return createSource(node[1]);
             break;
 
-        case '=>':
-
-            return createSource(node[1]) + '.then(function (val) {});';
+        case 'capture':
+            // optimize: if expr =>
+            return createSource(node[1]) + '.then(function (val) { _' + node[2] + ' = val; });';
             break;
 
         case 'str':
@@ -86,13 +96,13 @@ function codegen(node, indent) {
 function createSource (node) {
 
     if (typeof node == 'number') {
-        return 'Q.when(' + node + ');';
+        return 'Q.when(' + node + ')';
     }
 
     var nodeType = node[0];
 
     if (nodeType == 'str') {
-        return 'Q.when(' + codegen(node) + ');';
+        return 'Q.when(' + codegen(node) + ')';
     }
 
     throw new Error("bummer");

@@ -122,7 +122,7 @@ sequence_statement
     | sequence_statement connector sink
         { $$ = [$2, $1, $3]; }
     | expression '=>' identifier
-        { $$ = ['capture', $1, $3]; }
+        { $$ = ['assign', $3, $1]; }    // optimization
     | sequence_statement '=>' identifier
         { $$ = ['capture', $1, $3]; }
     ;
