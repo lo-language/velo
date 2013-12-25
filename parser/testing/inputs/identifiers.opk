@@ -5,11 +5,10 @@
  */
 
 action () {
-    foo;
-    foo[i];
-    foo[i][j];
-    foo.bar;
-    boo.bar.baz;
-    foo[i].bar;
-    foo.bar[i];
+    foo = 4
+    bar = foo[i]
+    foo[i][j] = foo.bar
+    foo = boo.bar.baz
+    qux = foo[i].bar
+    quux = foo.bar[i]
 }

@@ -4,18 +4,18 @@ action () {
     in -> out
     hash(password) ~ handler => hashedPw
     listen >> handler -> out
-    listen ~ action () { }
+    listen ~ action { }
 
-    hash(pw) ~ action () {
+    hash(pw) ~ action {
 
         x -> in => items
     }
-    -> action () {
+    -> action {
 
         "hi there" -> log
         in -> out
     }
     -> foo => result
 
-    bar = foo -> action () { } -> ok
+    foo -> action { } -> ok
 }

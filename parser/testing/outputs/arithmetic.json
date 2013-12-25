@@ -1,1 +1,1 @@
-["action",[],[["add",["add",2,["div",["mul","foo","bar"],2]],["mod","baz",["sub","age",4]]]]]
+["action",[null],[["assign","qux",["add",["add",2,["div",["mul","foo","bar"],2]],["mod","baz",["sub","age",4]]]]]]

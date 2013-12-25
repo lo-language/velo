@@ -1,1 +1,1 @@
-["action",[],[["invoke","foo"],["invoke",["select","foo","bar"]],["capture",["invoke","foo"],"baz"],["capture",["invoke","foo",["bar"]],"baz"],["capture",["invoke","foo",["bar","baz"]],"foobar"]]]
+["action",[null],[["invoke","foo"],["invoke",["select","foo","bar"]],["=>",["invoke","foo"],"baz"],["=>",["->",["=>",["invoke","foo",["bar"]],"baz"],"foobar"],"bazzle"],["=>",["invoke","foo",["bar","baz"]],"foobar"]]]

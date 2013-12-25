@@ -1,1 +1,1 @@
-["action",[],[["assign","foo",["conditional",["and","q","r"],42,["or",["and","y","z"],["bitwise_or",["xor",["bitwise_and","a","b"],"c"],"d"]]]]]]
+["action",[null],[["assign","foo",["conditional",["and","q","r"],42,["or",["and","y","z"],["bitwise_or",["xor",["bitwise_and","a","b"],"c"],"d"]]]]]]

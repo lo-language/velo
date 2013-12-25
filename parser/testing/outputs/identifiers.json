@@ -1,1 +1,1 @@
-["action",[],["foo",["select","foo","i"],["select",["select","foo","i"],"j"],["select","foo","bar"],["select",["select","boo","bar"],"baz"],["select",["select","foo","i"],"bar"],["select",["select","foo","bar"],"i"]]]
+["action",[null],[["assign","foo",4],["assign","bar",["select","foo","i"]],["assign",["select",["select","foo","i"],"j"],["select","foo","bar"]],["assign","foo",["select",["select","boo","bar"],"baz"]],["assign","qux",["select",["select","foo","i"],"bar"]],["assign","quux",["select",["select","foo","bar"],"i"]]]]

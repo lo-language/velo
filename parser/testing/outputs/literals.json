@@ -1,1 +1,1 @@
-["action",[],[true,false,42,63.4,["str","hello, world!"],["str","howdy, pardner"]]]
+["action",[null],[["assign","x",true],["assign","y",false],["assign","answer",42],["assign","age",63.4],["assign","message",["str","hello, world!"]],["assign","greeting",["str","howdy, pardner"]]]]

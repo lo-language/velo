@@ -21,13 +21,37 @@ if (ast[0] != 'action') {
     throw new Error('AST root node should be "action", got "' + ast[0] + '"');
 }
 
+
+var Context = function (parent) {
+
+    this.parent = parent || null;
+    this.newline = parent ? parent.newline + '\t' : '\n';
+
+    this.seqCounter = 0;
+    this.seqStack = []; // maybe sequences should parse right-recursive?
+};
+
+Context.prototype.push = function () {
+    return new Context(this);
+};
+
+Context.prototype.getSeqName = function () {
+
+    this.seqCounter++;
+    return 'seq' + this.seqCounter;
+};
+
+
 var template = fs.readFileSync(__dirname + '/codegen/runtime.js', 'utf8');
-var code = 'main = ' + codegen(ast) + ';';
+var context = new Context();
+var code = 'main = ' + codegen(ast, context) + ';';
 
 fs.writeFileSync(process.argv[3], template.replace('//<<CODE>>', code), 'utf8');
 fs.chmodSync(process.argv[3], '777');
 
-function codegen(node, newline) {
+
+
+function codegen(node, context) {
 
     if (typeof node == 'number') {
         return node;
@@ -40,8 +64,7 @@ function codegen(node, newline) {
     }
 
     var nodeType = node[0];
-
-    newline = newline || '\n';
+    var newline = context.newline;
 
     switch (nodeType) {
 
@@ -56,7 +79,7 @@ function codegen(node, newline) {
             // generate code for statements
 
             statements.forEach(function (statement) {
-                result += codegen(statement, newline + '\t');
+                result += codegen(statement, context.push());
             });
 
             return result + newline + '}';
@@ -64,7 +87,7 @@ function codegen(node, newline) {
 
         case 'define':
         case 'assign':
-            return 'var ' + codegen(node[1], newline) + ' = ' + codegen(node[2], newline) + ';';
+            return 'var ' + codegen(node[1], context) + ' = ' + codegen(node[2], context) + ';';
             break;
 
         case '~':
@@ -72,9 +95,23 @@ function codegen(node, newline) {
 
             // create a nonce function for the RHS
 
-            var rhs = newline + "var xa = function (message, channel) {" + newline + "};";
+            var nonceFuncName = context.getSeqName();
+            var rhs = newline + "var " + nonceFuncName + " = function (message, channel) {" + newline +
+                newline +
+                "var _repeat = " + nonceFuncName + ';' + newline +
+                "};";
 
-            return codegen(node[1], newline) + newline + rhs;
+            if (context.seqDepth == 0) {
+                rhs = rhs + newline + newline + nonceFuncName + '();';
+            }
+
+            context.seqDepth++;
+
+            var result = codegen(node[1], context) + newline + rhs;
+
+            context.seqDepth--;
+
+            return result;
 
             break;
 
@@ -96,6 +133,7 @@ function codegen(node, newline) {
 
     return '';
 }
+
 //
 //function createSource (node) {
 //

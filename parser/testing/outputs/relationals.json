@@ -1,1 +1,1 @@
-["action",[],[["equality","foo","bar"],["inequality","foo","bar"],["lt","foo","bar"],["gt","foo","bar"],["le","foo","bar"],["ge","foo","bar"]]]
+["action",[null],[["assign","result",["equality","foo","bar"]],["assign","result",["inequality","foo","bar"]],["assign","result",["lt","foo","bar"]],["assign","result",["gt","foo","bar"]],["assign","result",["le","foo","bar"]],["assign","result",["ge","foo","bar"]]]]

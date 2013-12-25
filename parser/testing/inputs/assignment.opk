@@ -1,7 +1,6 @@
 action () {
-    foo;
-    bar = baz;
-    binky = 64;
-    message = "hi there";
-    foo = bar.baz = true;
+    bar = baz
+    binky = 64
+    message = "hi there"
+    foo = true
 }

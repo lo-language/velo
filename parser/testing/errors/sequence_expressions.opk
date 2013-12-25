@@ -1,5 +1,0 @@
-action () {
-
-    // this shouldn't parse!
-    x = (foo -> bar);
-}

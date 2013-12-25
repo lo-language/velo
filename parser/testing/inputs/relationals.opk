@@ -1,9 +1,9 @@
 action () {
 
-    foo == bar;
-    foo != bar;
-    foo < bar;
-    foo > bar;
-    foo <= bar;
-    foo >= bar;
+    result = foo == bar
+    result = foo != bar
+    result = foo < bar
+    result = foo > bar
+    result = foo <= bar
+    result = foo >= bar
 }

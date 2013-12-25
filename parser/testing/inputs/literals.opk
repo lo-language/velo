@@ -1,6 +1,8 @@
 action () {
-    true; false;
-    42; 63.4;
-    "hello, world!";
-    'howdy, pardner';
+    x = true
+    y = false
+    answer = 42
+    age = 63.4
+    message = "hello, world!"
+    greeting = 'howdy, pardner'
 }

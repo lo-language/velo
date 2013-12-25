@@ -59,7 +59,13 @@
 
 /lex
 
+/* enable EBNF grammar syntax */
+%ebnf
+
 %%
+
+////////////////////////////////////////////////////////////////////////////////
+// STRUCTURE
 
 module
     : action_definition EOF
@@ -67,97 +73,32 @@ module
     ;
 
 action_definition
-    : ACTION block
-        { $$ = ['action', [], $2]; }
-    | ACTION '(' ')' block
-        { $$ = ['action', [], $4]; }
-    | ACTION '(' name_list ')' block
-        { $$ = ['action', $3, $5]; }
-    ;
-
-name_list
-    : NAME
-        { $$ = [$1]; }
-    | name_list ',' NAME
-        { $$ = $1; $$.push($3); }
+    : ACTION block -> ['action', [], $2]
+    | ACTION '(' (NAME ',')* NAME? ')' block
+        { $$ = ['action', $3.concat([$4]), $6]; }
     ;
 
 block
-    : '{' '}'
-        { $$ = []; }
-    | '{' statement_list '}'
-        { $$ = $2; }
-    ;
-
-statement_list
-    : statement
-        { $$ = [$1]; }
-    | statement_list statement
-        { $$ = $1; $$.push($2); }
+    : '{' statement* '}' -> $2
     ;
 
 statement
-    : expression ';'
-    | NAME IS literal ';'
-        { $$ = ['define', $1, $3]; }
-    | FAIL expression ';'
-        { $$ = ['fail', $2]; }
-    | sequence_statement
-    | sequence_statement ';'
+    : NAME IS literal -> ['define', $1, $3]
+    | identifier '=' expression -> ['assign', $1, $3]
+    | FAIL expression -> ['fail', $2]
     | selection_statement
+    | sequence_statement
     ;
 
 selection_statement
-    : block
-    | IF '(' expression ')' block
-        { $$ = ['if', $3, $5]; }
-    | IF '(' expression ')' block ELSE selection_statement
-        { $$ = ['if', $3, $5, $7]; }
+    : IF '(' expression ')' block -> ['if', $3, $5]
+    | IF '(' expression ')' block ELSE block -> ['if', $3, $5, $7]
+    | IF '(' expression ')' block ELSE selection_statement -> ['if', $3, $5, $7]
     ;
 
-// I'm not sure if the sequences should be left- or right-recursive, defaulting to left
-sequence_statement
-    : invocation
-    | expression connector sink
-        { $$ = [$2, $1, $3]; }
-    | sequence_statement connector sink
-        { $$ = [$2, $1, $3]; }
-    | expression '=>' identifier
-        { $$ = ['assign', $3, $1]; }    // optimization
-    | sequence_statement '=>' identifier
-        { $$ = ['capture', $1, $3]; }
-    ;
-
-sink
-    : identifier
-    | action_definition
-    ;
-
-identifier
-    : NAME
-    | identifier '[' expression ']'
-        { $$ = ['select', $1, $3]; }
-    | identifier '.' NAME
-        { $$ = ['select', $1, $3]; }
-    ;
-
-expression
-    : assignment_expression
-    ;
-
-invocation
-    : identifier '(' ')'
-        { $$ = ['invoke', $1]; }
-    | identifier '(' argument_expression_list ')'
-        { $$ = ['invoke', $1, $3]; }
-    ;
-
-argument_expression_list
-    : assignment_expression
-        { $$ = [$1]; }
-    | argument_expression_list ',' assignment_expression
-        { $$ = $1; $$.push($3); }
-    ;
+////////////////////////////////////////////////////////////////////////////////
+// EXPRESSIONS
+// C expression syntax, basically
 
 literal
     : BOOLEAN
@@ -168,19 +109,18 @@ literal
         { $$ = ['str', $1]; }
     ;
 
-connector
-    : '->'
-    | '>>'
-    | '~'
+identifier
+    : NAME
+    | identifier '[' expression ']'
+        { $$ = ['select', $1, $3]; }
+    | identifier '.' NAME
+        { $$ = ['select', $1, $3]; }
     ;
 
-
-// C expression syntax, basically
-
 primary_expression
-    : identifier
-    | literal
-    | action_definition
+    : literal
+	| identifier
+	| action_definition
     | '(' expression ')'
         { $$ = $2; }
     ;
@@ -265,8 +205,41 @@ conditional_expression
 	    { $$ = ['conditional', $1, $3, $5]; }
 	;
 
-assignment_expression
+expression
     : conditional_expression
-    | conditional_expression '=' assignment_expression
-        { $$ = ['assign', $1, $3]; }
+    ;
+
+argument_expression_list
+    : expression
+        { $$ = [$1]; }
+    | argument_expression_list ',' expression
+        { $$ = $1; $$.push($3); }
+    ;
+
+////////////////////////////////////////////////////////////////////////////////
+// SEQUENCES
+// invocations are statements, not expressions
+// what about statement ~ statement expressions? e.g. 2/0 ~ log.write(err)
+
+invocation
+    : identifier '(' ')' -> ['invoke', $1]
+    | identifier '(' argument_expression_list ')' -> ['invoke', $1, $3]
+    ;
+
+sequence_statement
+    : invocation
+    | expression connector sink -> [$2, $1, $3]
+    | sequence_statement connector sink -> [$2, $1, $3]
+    ;
+
+sink
+    : identifier
+    | action_definition
+    ;
+
+connector
+    : '->'
+    | '=>'
+    | '>>'
+    | '~'
     ;
