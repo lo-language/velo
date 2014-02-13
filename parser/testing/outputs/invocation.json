@@ -1,1 +1,1 @@
-["action",[null],[["invoke","foo"],["invoke",["select","foo","bar"]],["=>",["invoke","foo"],"baz"],["=>",["->",["=>",["invoke","foo",["bar"]],"baz"],"foobar"],"bazzle"],["=>",["invoke","foo",["bar","baz"]],"foobar"]]]
+["action",[null],[["invoke","foo",[null]],["invoke",["select","foo","bar"],[null]],["=>",["invoke","foo",[null]],"baz"],["=>",["->",["=>",["invoke","foo",["bar"]],"baz"],"foobar"],"bazzle"],["=>",["invoke","foo",["bar","baz"]],"foobar"]]]

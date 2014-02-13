@@ -9,11 +9,11 @@
         _x = 42;
     };
  */
-action (args, stdin, system, shop) {
+action (args, io, system, shop) {
 
-    port is 8080;
+    port is 8080
 
-    shop(foo) -> handler -> server -> nork
+    port -> out
 
 /*
 

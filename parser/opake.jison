@@ -74,8 +74,7 @@ module
 
 action_definition
     : ACTION block -> ['action', [], $2]
-    | ACTION '(' (NAME ',')* NAME? ')' block
-        { $$ = ['action', $3.concat([$4]), $6]; }
+    | ACTION '(' (NAME ',')* NAME? ')' block -> ['action', $3.concat([$4]), $6]
     ;
 
 block
@@ -101,119 +100,88 @@ selection_statement
 // C expression syntax, basically
 
 literal
-    : BOOLEAN
-        { $$ = ($1 === 'true' ? true : false); }
-    | CONSTANT
-        { $$ = parseFloat($1); }
-    | STRING_LITERAL
-        { $$ = ['str', $1]; }
+    : BOOLEAN -> ($1 === 'true' ? true : false)
+    | CONSTANT -> parseFloat($1)
+    | STRING_LITERAL -> ['str', $1]
     ;
 
 identifier
     : NAME
-    | identifier '[' expression ']'
-        { $$ = ['select', $1, $3]; }
-    | identifier '.' NAME
-        { $$ = ['select', $1, $3]; }
+    | identifier '[' expression ']' -> ['select', $1, $3]
+    | identifier '.' NAME -> ['select', $1, $3]
     ;
 
 primary_expression
     : literal
 	| identifier
 	| action_definition
-    | '(' expression ')'
-        { $$ = $2; }
+    | '(' expression ')' -> $2
     ;
 
 unary_expression
     : primary_expression
-    | '#' primary_expression
-        { $$ = ['card', $2]; }
+    | '#' primary_expression -> ['card', $2]
     ;
 
 multiplicative_expression
     : unary_expression
-    | multiplicative_expression '*' primary_expression
-        { $$ = ['mul', $1, $3]; }
-    | multiplicative_expression '/' primary_expression
-        { $$ = ['div', $1, $3]; }
-    | multiplicative_expression '%' primary_expression
-        { $$ = ['mod', $1, $3]; }
+    | multiplicative_expression '*' primary_expression -> ['mul', $1, $3]
+    | multiplicative_expression '/' primary_expression -> ['div', $1, $3]
+    | multiplicative_expression '%' primary_expression -> ['mod', $1, $3]
     ;
 
 additive_expression
     : multiplicative_expression
-    | additive_expression '+' multiplicative_expression
-        { $$ = ['add', $1, $3]; }
-    | additive_expression '-' multiplicative_expression
-        { $$ = ['sub', $1, $3]; }
+    | additive_expression '+' multiplicative_expression -> ['add', $1, $3]
+    | additive_expression '-' multiplicative_expression -> ['sub', $1, $3]
     ;
 
 relational_expression
     : additive_expression
-    | relational_expression '<' additive_expression
-        { $$ = ['lt', $1, $3]; }
-    | relational_expression '>' additive_expression
-        { $$ = ['gt', $1, $3]; }
-    | relational_expression '<=' additive_expression
-        { $$ = ['le', $1, $3]; }
-    | relational_expression '>=' additive_expression
-        { $$ = ['ge', $1, $3]; }
+    | relational_expression '<' additive_expression -> ['lt', $1, $3]
+    | relational_expression '>' additive_expression -> ['gt', $1, $3]
+    | relational_expression '<=' additive_expression -> ['le', $1, $3]
+    | relational_expression '>=' additive_expression -> ['ge', $1, $3]
     ;
 
 equality_expression
     : relational_expression
-    | equality_expression '==' relational_expression
-        { $$ = ['equality', $1, $3]; }
-    | equality_expression '!=' relational_expression
-        { $$ = ['inequality', $1, $3]; }
+    | equality_expression '==' relational_expression -> ['equality', $1, $3]
+    | equality_expression '!=' relational_expression -> ['inequality', $1, $3]
     ;
 
 and_expression
 	: equality_expression
-	| and_expression '&' equality_expression
-	    { $$ = ['bitwise_and', $1, $3]; }
+	| and_expression '&' equality_expression -> ['bitwise_and', $1, $3]
 	;
 
 exclusive_or_expression
 	: and_expression
-	| exclusive_or_expression '^' and_expression
-	    { $$ = ['xor', $1, $3]; }
+	| exclusive_or_expression '^' and_expression -> ['xor', $1, $3]
 	;
 
 inclusive_or_expression
 	: exclusive_or_expression
-	| inclusive_or_expression '|' exclusive_or_expression
-	    { $$ = ['bitwise_or', $1, $3]; }
+	| inclusive_or_expression '|' exclusive_or_expression -> ['bitwise_or', $1, $3]
 	;
 
 logical_and_expression
 	: inclusive_or_expression
-	| logical_and_expression '&&' inclusive_or_expression
-	    { $$ = ['and', $1, $3]; }
+	| logical_and_expression '&&' inclusive_or_expression -> ['and', $1, $3]
 	;
 
 logical_or_expression
 	: logical_and_expression
-	| logical_or_expression '||' logical_and_expression
-	    { $$ = ['or', $1, $3]; }
+	| logical_or_expression '||' logical_and_expression -> ['or', $1, $3]
 	;
 
 conditional_expression
 	: logical_or_expression
-	| logical_or_expression '?' expression ':' conditional_expression
-	    { $$ = ['conditional', $1, $3, $5]; }
+	| logical_or_expression '?' expression ':' conditional_expression -> ['conditional', $1, $3, $5]
 	;
 
 expression
     : conditional_expression
-    ;
-
-argument_expression_list
-    : expression
-        { $$ = [$1]; }
-    | argument_expression_list ',' expression
-        { $$ = $1; $$.push($3); }
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -222,8 +190,7 @@ argument_expression_list
 // what about statement ~ statement expressions? e.g. 2/0 ~ log.write(err)
 
 invocation
-    : identifier '(' ')' -> ['invoke', $1]
-    | identifier '(' argument_expression_list ')' -> ['invoke', $1, $3]
+    : identifier '(' (expression, ',')* expression? ')' -> ['invoke', $1, $3.concat([$4])]
     ;
 
 sequence_statement
