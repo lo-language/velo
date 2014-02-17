@@ -13,43 +13,41 @@ var Task = require('./Task');
 /**
  * Creates a new Opake machine.
  *
- * @param env
+ * @param gateway
  * @param program
  * @private
  */
-var __ = function (inbox, outbox, program) {
+var __ = function (gateway, program) {
 
-    console.log("creating OM");
+    if (program == null) {
+        throw new Error("can't create machine without program");
+    }
 
-    this.inbox = inbox;
-    this.outbox = outbox;
-
+    this.gateway = gateway;
     this.program = program;
-    this.messages = [];
-    this.tasks = [];
-
-    this.requestId = 0;
-    this.requests = []; // pending requests?
+    this.state = new Buffer(100);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Run the machine in the given context.
  */
-__.prototype.run = function (task) {
+__.prototype.run = function () {
 
-    // todo test ordering
-    var message = this.pullMessage();
+    // pick up the next task
 
-    if (message.isRequest) {
-        var task = new Task(message);
-        this.tasks.push(task);
-    }
-    else {
-        // find the referenced task
+    var task = 8; //this.gateway.pullTask();
 
+    if (task === undefined) {
+        return;
     }
 
+    var self = this;
+
+    this.program.forEach(function (instruction) {
+
+        self.execute(instruction);
+    });
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,16 +58,30 @@ __.prototype.run = function (task) {
  */
 __.prototype.execute = function (instruction) {
 
-    switch (instruction) {
 
-        // have explicit inbox and outbox objects?
-        case 'SEND':
-            this.outbox.push();
+    var cmd = instruction.shift();
+
+    switch (cmd) {
+
+        case 'put':
+
+            var page = instruction.shift();
+            var offset = instruction.shift();
+            var value = instruction.shift();
+            var buffer;
+
+            if (page == 0) {
+                buffer = this.state;
+            }
+
+            buffer[offset] = value;
+
             break;
-        case 'REPL':
+        case 'send':
             break;
-        case 'SNDA':
-            this.outbox.sendMessage();
+        case 'repl':
+            break;
+        case 'snda':
             break;
         default:
             throw new Error("illegal instruction");

@@ -10,9 +10,18 @@
 var fs = require('fs');
 var parser = require('./parser/Parser');
 var Context = require('./codegen/Context');
+var path = require('path');
 
 var sourceFile = process.argv[2];
 var destFile = process.argv[3];
+
+if (sourceFile == null) {
+    throw new Error("no source file specified");
+}
+
+if (destFile == null) {
+    destFile =  'out.js';
+}
 
 // node [path to this file] [path to input file]
 // model args as object that throws when you ask for an empty one
@@ -34,6 +43,6 @@ var context = new Context();
 var code = 'main = ' + context.codegen(ast) + ';\n';
 
 console.log("writing output to " + destFile);
-//fs.writeFileSync(destFile, template.replace('//<<CODE>>', code), 'utf8');
-//fs.chmodSync(process.argv[3], '777');
+fs.writeFileSync(destFile, template.replace('//<<CODE>>', code) + '\n', 'utf8');
+fs.chmodSync(destFile, '777');
 process.stdout.write(code, 'utf8');
