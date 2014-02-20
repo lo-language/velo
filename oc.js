@@ -10,7 +10,6 @@
 var fs = require('fs');
 var parser = require('./parser/Parser');
 var Context = require('./codegen/Context');
-var path = require('path');
 
 var sourceFile = process.argv[2];
 var destFile = process.argv[3];

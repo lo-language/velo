@@ -4,39 +4,35 @@
  */
 
 "use strict";
-var Q = require('q');
 
-// define the top-level sinks
+var Machine = require('./Machine');
+var System = require('./System');
 
-var mainOut = function (message) {
+var system = new System();
 
-    if (typeof message !== 'string') {
-        message = '' + message;
-    }
+// create machines to model the runtime environment
 
-    process.stdout.write(message, 'utf8');
+var stdout = system.createMachine(function () {
+
+});
+
+var stderr = system.createMachine(function () {
+
+});
+
+var io = {
+    out: stdout,
+    err: stderr
 };
 
-var mainErr = function (message) {
+// create a machine for the compiled source
+var root = system.createMachine();
 
-    if (typeof message !== 'string') {
-        message = '' + message;
-    }
+// send the launch message to the machine
+// todo make this a real message
+system.sendMessage(root, [process.argv, io, process.env]);
 
-    process.stderr.write(message, 'utf8');
-    process.exit(1);
-};
-
-var mainLog = function (message) {
-
-    if (typeof message !== 'string') {
-        message = '' + message;
-    }
-
-    process.stderr.write(message, 'utf8');
-};
-
-var main = function () {};
+//var main = function () {};
 
 // BEGIN GENERATED CODE
 
@@ -44,4 +40,5 @@ var main = function () {};
 
 // END GENERATED CODE
 
-main([], mainOut, mainErr, mainLog);
+// run the machine
+system.run();

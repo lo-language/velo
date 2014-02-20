@@ -78,12 +78,12 @@ Context.prototype.codegen = function (node) {
                 result += actionContext.codegen(statement);
             });
 
-            return result + this.newline + '}';
+            return result + '}';
             break;
 
         case 'define':
         case 'assign':
-            return 'var ' + this.codegen(node[1]) + ' = ' + this.codegen(node[2]) + ';';
+            return 'var ' + this.codegen(node[1]) + ' = ' + this.codegen(node[2]) + ';' + this.newline;
             break;
 
         case '~':

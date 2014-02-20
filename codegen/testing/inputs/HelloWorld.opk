@@ -1,4 +1,7 @@
-action (args, env, io) {
+action (args, io, env) {
 
-    "hello, world!" -> io.out
+    message = "hello, world!"
+    port is 8080
+
+    message -> out
 }
