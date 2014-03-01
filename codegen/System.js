@@ -22,14 +22,16 @@ var __ = function () {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * Creates a new machine in the system.
  *
+ * @param fn    the function to run to process each message
  * @return {Number}
  */
-__.prototype.createMachine = function () {
+__.prototype.createMachine = function (fn) {
 
     var id = this.nextId++;
 
-    this.machines[id] = new Machine(this);
+    this.machines[id] = new Machine(this, fn);
 
     return id;
 };
@@ -64,7 +66,7 @@ __.prototype.run = function () {
         // validate the recipient address
 
         if (recipient == null) {
-            throw new Error("couldn't find machine with address " + to);
+            throw new Error("couldn't find machine with address " + envelope[0]);
         }
 
         recipient.process(envelope[1]);

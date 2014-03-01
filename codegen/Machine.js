@@ -5,15 +5,17 @@
 
 "use strict";
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ *
+ * @param system
+ * @param fn
+ * @private
  */
-var __ = function (system) {
+var __ = function (system, fn) {
 
-};
-
-__.prototype.process = function (message) {
-
-    console.log("processing message " + message);
+    this.system = system;
+    this.process = fn;
 };
 
 module.exports = __;

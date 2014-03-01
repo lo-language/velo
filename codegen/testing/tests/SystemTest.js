@@ -19,10 +19,12 @@ exports["constructor"] = {
     "createMachine": function (test) {
 
         var system = new System();
+        var fn = function () {};
 
-        var m = system.createMachine();
+        var m = system.createMachine(fn);
 
         test.equal(m, 0);
+        test.equal(system.machines[0].process, fn);
 
         test.done();
     },
@@ -57,9 +59,17 @@ exports["constructor"] = {
 
     "run success": function (test) {
 
+        test.expect(4);
+
         var system = new System();
 
-        var m = system.createMachine();
+        var expected = [42, 57];
+
+        var fn = function (message) {
+            test.equal(message, expected.shift());
+        };
+
+        var m = system.createMachine(fn);
 
         system.sendMessage(0, 42);
         test.deepEqual(system.messages, [[0, 42]]);
@@ -71,4 +81,4 @@ exports["constructor"] = {
 
         test.done();
     }
-}
+};

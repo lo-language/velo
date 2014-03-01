@@ -26,21 +26,20 @@ var io = {
 };
 
 // create a machine for the compiled source
-var root = system.createMachine();
+var main = function () {console.log("I think you ought to know I'm feeling very depressed.")};
+var root = system.createMachine(function () {
+    main();
+});
 
 // send the launch message to the machine
 // todo make this a real message
 system.sendMessage(root, [process.argv, io, process.env]);
 
-//var main = function () {};
+// run the machine
+system.run();
 
 // BEGIN GENERATED CODE
 
 //<<CODE>>
 
 // END GENERATED CODE
-
-// run the machine
-system.run();
-
-console.log('ok');
