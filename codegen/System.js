@@ -40,11 +40,14 @@ __.prototype.createMachine = function (fn) {
 /**
  *
  * @param to
- * @param message
+ * @param body
+ * @param out
+ * @param err
+ * @param chunk
  */
-__.prototype.sendMessage = function (to, message) {
+__.prototype.sendMessage = function (to, body, out, err, chunk) {
 
-    this.messages.push([to, message]);
+    this.messages.push([to, body, out, err, chunk]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,7 +72,7 @@ __.prototype.run = function () {
             throw new Error("couldn't find machine with address " + envelope[0]);
         }
 
-        recipient.process(envelope[1]);
+        recipient.process(envelope[1], envelope[2], envelope[3], envelope[4]);
     }
 };
 

@@ -48,18 +48,18 @@ exports["constructor"] = {
 
         var m = system.createMachine();
 
-        system.sendMessage(0, 42);
-        test.deepEqual(system.messages, [[0, 42]]);
+        system.sendMessage(0, 42, 1, 2, 3);
+        test.deepEqual(system.messages, [[0, 42, 1, 2, 3]]);
 
-        system.sendMessage(0, 57);
-        test.deepEqual(system.messages, [[0, 42],[0, 57]]);
+        system.sendMessage(0, 57, 4, 5, 6);
+        test.deepEqual(system.messages, [[0, 42, 1, 2, 3],[0, 57, 4, 5, 6]]);
 
         test.done();
     },
 
     "run success": function (test) {
 
-        test.expect(4);
+//        test.expect(4);
 
         var system = new System();
 
@@ -71,11 +71,11 @@ exports["constructor"] = {
 
         var m = system.createMachine(fn);
 
-        system.sendMessage(0, 42);
-        test.deepEqual(system.messages, [[0, 42]]);
+        system.sendMessage(0, 42, 1, 2, 3);
+        test.deepEqual(system.messages, [[0, 42, 1, 2, 3]]);
 
-        system.sendMessage(0, 57);
-        test.deepEqual(system.messages, [[0, 42],[0, 57]]);
+        system.sendMessage(0, 57, 4, 5, 6);
+        test.deepEqual(system.messages, [[0, 42, 1, 2, 3],[0, 57, 4, 5, 6]]);
 
         system.run();
 

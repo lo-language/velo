@@ -48,6 +48,8 @@ Context.prototype.getSeqName = function () {
  */
 Context.prototype.codegen = function (node) {
 
+    return 'function (message, out, err, chunk) { this.system.sendMessage(out, "yay"); }';
+
     if (typeof node == 'number') {
         return node;
     }
@@ -68,7 +70,7 @@ Context.prototype.codegen = function (node) {
             var args = node[1].map(function (name) { return '_' + name; });
             var statements = node[2];
 
-            var result = 'function (args, _out, _err, _log) {' + this.newline + '\t';
+            var result = 'function (message, out, err, chunk) {' + this.newline + '\t';
 
             // create a new context for this action
             var actionContext = this.push();

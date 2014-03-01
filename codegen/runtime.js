@@ -12,12 +12,26 @@ var system = new System();
 
 // create machines to model the OS environment
 
-var stdout = system.createMachine(function () {
+var stdout = system.createMachine(function (body) {
 
 });
 
-var stderr = system.createMachine(function () {
+var stderr = system.createMachine(function (body) {
 
+});
+
+var exitCode = 0;
+
+// this machine just stores the exit code
+var out = system.createMachine(function (body) {
+
+    process.stdout.write(body);
+});
+
+var err = system.createMachine(function (body) {
+
+    process.stderr.write(body);
+    exitCode = 1;
 });
 
 var io = {
@@ -25,21 +39,22 @@ var io = {
     err: stderr
 };
 
-// create a machine for the compiled source
 var main = function () {console.log("I think you ought to know I'm feeling very depressed.")};
-var root = system.createMachine(function () {
-    main();
-});
-
-// send the launch message to the machine
-// todo make this a real message
-system.sendMessage(root, [process.argv, io, process.env]);
-
-// run the machine
-system.run();
 
 // BEGIN GENERATED CODE
 
 //<<CODE>>
 
 // END GENERATED CODE
+
+// create a machine for the compiled source
+var root = system.createMachine(main);
+
+// send the launch message to the machine
+// todo make this a real message
+system.sendMessage(root, [process.argv, io, process.env], out, err);
+
+// run the machine
+system.run();
+
+process.exit(exitCode);

@@ -26,10 +26,10 @@ if (destFile == null) {
 // model args as object that throws when you ask for an empty one
 var source = fs.readFileSync(process.argv[2], 'utf8');
 
-console.log("parsing " + sourceFile);
+console.error("parsing " + sourceFile);
 var ast = parser.parse(source);
 
-console.log("compiling");
+console.error("compiling");
 
 // top node should be an action
 if (ast[0] != 'action') {
@@ -41,7 +41,8 @@ var context = new Context();
 
 var code = 'main = ' + context.codegen(ast) + ';\n';
 
-//console.log("writing output to " + destFile);
+//console.err("writing output to " + destFile);
 //fs.writeFileSync(destFile, template.replace('//<<CODE>>', code) + '\n', 'utf8');
 //fs.chmodSync(destFile, '777');
-process.stdout.write(code, 'utf8');
+//process.stdout.write(code, 'utf8');
+process.stdout.write(template.replace('//<<CODE>>', code) + '\n', 'utf8');
