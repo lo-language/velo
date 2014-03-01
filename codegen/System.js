@@ -6,7 +6,6 @@
 "use strict";
 
 var Machine = require('./Machine');
-var Gateway = require('./Gateway');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -17,6 +16,8 @@ var __ = function () {
 
     this.machines = [];
     this.nextId = 0;
+
+    this.messages = [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,7 +29,7 @@ __.prototype.createMachine = function () {
 
     var id = this.nextId++;
 
-    this.machines[id] = new Machine(new Gateway(this));
+    this.machines[id] = new Machine(this);
 
     return id;
 };
@@ -41,10 +42,32 @@ __.prototype.createMachine = function () {
  */
 __.prototype.sendMessage = function (to, message) {
 
-    var recipient = this.machines[to];
+    this.messages.push([to, message]);
+};
 
-    if (recipient == null) {
-        throw new Error("couldn't find machine with address " + to);
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ */
+__.prototype.run = function () {
+
+    // process all messages
+
+    var envelope, recipient;
+
+    while (this.messages.length > 0) {
+
+        envelope = this.messages.shift();
+
+        recipient = this.machines[envelope[0]];
+
+        // validate the recipient address
+
+        if (recipient == null) {
+            throw new Error("couldn't find machine with address " + to);
+        }
+
+        recipient.process(envelope[1]);
     }
 };
 

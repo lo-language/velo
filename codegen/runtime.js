@@ -10,7 +10,7 @@ var System = require('./System');
 
 var system = new System();
 
-// create machines to model the runtime environment
+// create machines to model the OS environment
 
 var stdout = system.createMachine(function () {
 
@@ -42,3 +42,5 @@ system.sendMessage(root, [process.argv, io, process.env]);
 
 // run the machine
 system.run();
+
+console.log('ok');

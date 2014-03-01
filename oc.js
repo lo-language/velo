@@ -41,7 +41,7 @@ var context = new Context();
 
 var code = 'main = ' + context.codegen(ast) + ';\n';
 
-console.log("writing output to " + destFile);
-fs.writeFileSync(destFile, template.replace('//<<CODE>>', code) + '\n', 'utf8');
-fs.chmodSync(destFile, '777');
+//console.log("writing output to " + destFile);
+//fs.writeFileSync(destFile, template.replace('//<<CODE>>', code) + '\n', 'utf8');
+//fs.chmodSync(destFile, '777');
 process.stdout.write(code, 'utf8');

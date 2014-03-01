@@ -27,12 +27,14 @@ exports["constructor"] = {
         test.done();
     },
 
-    "sendMessage invalid address": function (test) {
+    "run with invalid address": function (test) {
 
         var system = new System();
 
+        system.sendMessage(0, 42);
+
         test.throws(function () {
-            system.sendMessage(0, 42);
+            system.run();
         });
 
         test.done();
@@ -45,6 +47,27 @@ exports["constructor"] = {
         var m = system.createMachine();
 
         system.sendMessage(0, 42);
+        test.deepEqual(system.messages, [[0, 42]]);
+
+        system.sendMessage(0, 57);
+        test.deepEqual(system.messages, [[0, 42],[0, 57]]);
+
+        test.done();
+    },
+
+    "run success": function (test) {
+
+        var system = new System();
+
+        var m = system.createMachine();
+
+        system.sendMessage(0, 42);
+        test.deepEqual(system.messages, [[0, 42]]);
+
+        system.sendMessage(0, 57);
+        test.deepEqual(system.messages, [[0, 42],[0, 57]]);
+
+        system.run();
 
         test.done();
     }

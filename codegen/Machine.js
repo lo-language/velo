@@ -7,13 +7,13 @@
 
 /**
  */
-var __ = function (gateway) {
+var __ = function (system) {
 
-    this.gateway = gateway;
 };
 
-__.prototype.sendMessage = function (dest, message) {
+__.prototype.process = function (message) {
 
+    console.log("processing message " + message);
 };
 
 module.exports = __;
