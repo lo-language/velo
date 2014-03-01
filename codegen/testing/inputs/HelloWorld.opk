@@ -1,7 +1,6 @@
 action () {
 
-    message = "hello, world!"
-    port is 8080
+    message = "hello, world!\n"
 
     // test cases - no followers should equal no cb address sent, etc.
     message -> out

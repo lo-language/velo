@@ -25,12 +25,12 @@ var exitCode = 0;
 // this machine just stores the exit code
 var out = system.createMachine(function (body) {
 
-    process.stdout.write(body);
+    process.stdout.write("" + body);
 });
 
 var err = system.createMachine(function (body) {
 
-    process.stderr.write(body);
+    process.stderr.write("" + body);
     exitCode = 1;
 });
 

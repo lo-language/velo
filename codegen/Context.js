@@ -48,7 +48,7 @@ Context.prototype.getSeqName = function () {
  */
 Context.prototype.codegen = function (node) {
 
-    return 'function (message, out, err, chunk) { this.system.sendMessage(out, "yay"); }';
+//    return 'function (message, out, err, chunk) { this.system.sendMessage(out, "yay"); }';
 
     if (typeof node == 'number') {
         return node;
@@ -56,7 +56,7 @@ Context.prototype.codegen = function (node) {
 
     if (typeof node == 'string') {
 
-        // identifier name
+        // guard identifier name
         return '_' + node;
     }
 
@@ -91,23 +91,7 @@ Context.prototype.codegen = function (node) {
         case '~':
         case '->':
 
-            console.log(node);
-
-            // create a nonce function for the RHS
-
-            var nonceFuncName = this.getSeqName();
-
-            var rhs = this.newline + "var " + nonceFuncName + " = function (message, channel) {" + this.newline +
-                this.newline +
-                "};";
-
-            var result = this.codegen(node[1]);
-
-            if (this.seqStack.length == 0) {
-                result += this.newline + nonceFuncName + '();';
-            }
-
-            return result;
+            return "this.system.sendMessage(" + node[2] + ", " + this.codegen(node[1]) + ")";
 
             break;
 

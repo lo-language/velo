@@ -28,6 +28,7 @@ var source = fs.readFileSync(process.argv[2], 'utf8');
 
 console.error("parsing " + sourceFile);
 var ast = parser.parse(source);
+console.error(ast);
 
 console.error("compiling");
 
