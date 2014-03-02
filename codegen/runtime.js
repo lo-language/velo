@@ -13,30 +13,26 @@ var system = new System();
 // create machines to model the OS environment
 
 var stdout = system.createMachine(function (body) {
-
+    process.stdout.write("" + body);
 });
 
 var stderr = system.createMachine(function (body) {
-
+    process.stderr.write("" + body);
 });
 
 var exitCode = 0;
 
 // this machine just stores the exit code
 var out = system.createMachine(function (body) {
-
-    process.stdout.write("" + body);
 });
 
 var err = system.createMachine(function (body) {
-
-    process.stderr.write("" + body);
     exitCode = 1;
 });
 
 var io = {
-    out: stdout,
-    err: stderr
+    _out: stdout,
+    _err: stderr
 };
 
 var main = function () {console.log("I think you ought to know I'm feeling very depressed.")};

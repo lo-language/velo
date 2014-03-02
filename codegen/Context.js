@@ -62,15 +62,21 @@ Context.prototype.codegen = function (node) {
 
     var nodeType = node[0];
 
+    // results are generated and then tabbed in?
+
     switch (nodeType) {
 
         case 'action':
 
-            // guard identifier names from JS reserved words
-            var args = node[1].map(function (name) { return '_' + name; });
+            // guard argument names from JS reserved words
             var statements = node[2];
 
-            var result = 'function (message, out, err, chunk) {' + this.newline + '\t';
+            var result = 'function (message, out, err, chunk) {' +
+                this.newline + '\t' + node[1].map(
+                    function (name, i) {
+                        return 'var _' + name + ' = message[' + i + '];';
+                    }).join(this.newline + '\t') +
+                    this.newline + '\t';
 
             // create a new context for this action
             var actionContext = this.push();
@@ -90,14 +96,15 @@ Context.prototype.codegen = function (node) {
 
         case '~':
         case '->':
-
-            return "this.system.sendMessage(" + node[2] + ", " + this.codegen(node[1]) + ")";
-
+            return "this.system.sendMessage(" + this.codegen(node[2]) + ", " + this.codegen(node[1]) + ");" + this.newline;
             break;
 
         case 'str':
-
             return '"' + node[1] + '"';
+            break;
+
+        case 'select':
+            return this.codegen(node[1]) + "." + this.codegen(node[2]);
             break;
 
         default:

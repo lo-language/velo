@@ -10,6 +10,7 @@
 var fs = require('fs');
 var parser = require('./parser/Parser');
 var Context = require('./codegen/Context');
+var util = require('util');
 
 var sourceFile = process.argv[2];
 var destFile = process.argv[3];
@@ -28,7 +29,7 @@ var source = fs.readFileSync(process.argv[2], 'utf8');
 
 console.error("parsing " + sourceFile);
 var ast = parser.parse(source);
-console.error(ast);
+console.error(util.inspect(ast, {depth: null}));
 
 console.error("compiling");
 
@@ -37,10 +38,12 @@ if (ast[0] != 'action') {
     throw new Error('AST root node should be "action", got "' + ast[0] + '"');
 }
 
+
 var template = fs.readFileSync(__dirname + '/codegen/runtime.js', 'utf8');
 var context = new Context();
 
 var code = 'main = ' + context.codegen(ast) + ';\n';
+console.error(code);
 
 //console.err("writing output to " + destFile);
 //fs.writeFileSync(destFile, template.replace('//<<CODE>>', code) + '\n', 'utf8');

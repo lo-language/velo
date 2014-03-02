@@ -1,7 +1,8 @@
-action () {
+action (args, io, env) {
 
     message = "hello, world!\n"
 
     // test cases - no followers should equal no cb address sent, etc.
-    message -> out
+    "howdy\n" -> io.err -> io.err
+    "greetings\n" -> io.err
 }
