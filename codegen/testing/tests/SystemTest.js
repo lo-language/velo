@@ -24,7 +24,7 @@ exports["constructor"] = {
         var m = system.createMachine(fn);
 
         test.equal(m, 0);
-        test.equal(system.machines[0].process, fn);
+        test.equal(system.objects[0].process, fn);
 
         test.done();
     },

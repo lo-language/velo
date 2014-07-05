@@ -1,1 +1,8 @@
-["action",[null],[["assign","bar","baz"],["assign","binky",64],["assign","message",["str","hi there"]],["assign","foo",true]]]
+{ "action": [],
+    "statements":
+            [ { "op": "assign", "left": [ "id", "bar" ], "right": [ "id", "baz" ] },
+                { "op": "assign", "left": [ "id", "binky" ], "right": 64 },
+                { "op": "assign",
+                    "left": [ "id", "message" ],
+                    "right": [ "str", "hi there" ] },
+                { "op": "assign", "left": [ "id", "foo" ], "right": true } ] }

@@ -10,7 +10,7 @@ action () {
     x = action () {}
 
     if (#items == 0) {
-        fail "oh noes!"
+        fail("oh noes!")
     }
 
     if (#items == 1) {

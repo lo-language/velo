@@ -1,1 +1,20 @@
-["action",[null],[["invoke","foo",[null]],["invoke",["select","foo","bar"],[null]],["=>",["invoke","foo",[null]],"baz"],["=>",["->",["=>",["invoke","foo",["bar"]],"baz"],"foobar"],"bazzle"],["=>",["invoke","foo",["bar","baz"]],"foobar"]]]
+{ "action": [],
+    "statements":
+            [
+                { "invoke": [ "id", "foo" ], "args": [] },
+                { "invoke": [ "select", [ "id", "foo" ], "bar" ], "args": [] },
+                [ "=>",
+                    { "invoke": [ "id", "foo" ], "args": [] },
+                    [ "id", "baz" ] ],
+                [ "=>",
+                    [ "->",
+                        [ "=>",
+                            { "invoke": [ "id", "foo" ], "args": [ [ "id", "bar" ] ] },
+                            [ "id", "baz" ] ],
+                        [ "id", "foobar" ] ],
+                    [ "id", "bazzle" ] ],
+                [ "=>",
+                    {
+                        "invoke": [ "id", "foo" ],
+                        "args": [ [ "id", "bar" ], [ "id", "baz" ] ] },
+                    [ "id", "foobar" ] ] ] }

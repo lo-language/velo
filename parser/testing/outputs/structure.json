@@ -1,1 +1,19 @@
-["action",[null],[["assign","x",["action",[null],[]]],["if",["equality",["card","items"],0],[["fail",["str","oh noes!"]]]],["if",["equality",["card","items"],1],[["assign","x",2]],[["assign","y",3]]],["if",["equality","answer",42],[["->","a","b"]],["if",["equality","answer",57],[["->","b","c"]],[["->","c","d"]]]]]]
+{ "action": [],
+    "statements":
+            [ { "op": "assign",
+                "left": [ "id", "x" ],
+                "right": { "action": [], "statements": [] } },
+                [ "if",
+                    [ "equality", [ "card", [ "id", "items" ] ], 0 ],
+                    [ { "invoke": [ "id", "fail" ], "args": [ [ "str", "oh noes!" ] ] } ] ],
+                [ "if",
+                    [ "equality", [ "card", [ "id", "items" ] ], 1 ],
+                    [ { "op": "assign", "left": [ "id", "x" ], "right": 2 } ],
+                    [ { "op": "assign", "left": [ "id", "y" ], "right": 3 } ] ],
+                [ "if",
+                    [ "equality", [ "id", "answer" ], 42 ],
+                    [ [ "->", [ "id", "a" ], [ "id", "b" ] ] ],
+                    [ "if",
+                        [ "equality", [ "id", "answer" ], 57 ],
+                        [ [ "->", [ "id", "b" ], [ "id", "c" ] ] ],
+                        [ [ "->", [ "id", "c" ], [ "id", "d" ] ] ] ] ] ] }

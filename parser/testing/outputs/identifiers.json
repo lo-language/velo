@@ -1,1 +1,21 @@
-["action",[null],[["assign","foo",4],["assign","bar",["select","foo","i"]],["assign",["select",["select","foo","i"],"j"],["select","foo","bar"]],["assign","foo",["select",["select","boo","bar"],"baz"]],["assign","qux",["select",["select","foo","i"],"bar"]],["assign","quux",["select",["select","foo","bar"],"i"]]]]
+{ "action": [],
+    "statements":
+            [ { "op": "assign", "left": [ "id", "foo" ], "right": 4 },
+                { "op": "assign",
+                    "left": [ "id", "bar" ],
+                    "right": [ "select", [ "id", "foo" ], [ "id", "i" ] ] },
+                { "op": "assign",
+                    "left":
+                            [ "select",
+                                [ "select", [ "id", "foo" ], [ "id", "i" ] ],
+                                [ "id", "j" ] ],
+                    "right": [ "select", [ "id", "foo" ], "bar" ] },
+                { "op": "assign",
+                    "left": [ "id", "foo" ],
+                    "right": [ "select", [ "select", [ "id", "boo" ], "bar" ], "baz" ] },
+                { "op": "assign",
+                    "left": [ "id", "qux" ],
+                    "right": [ "select", [ "select", [ "id", "foo" ], [ "id", "i" ] ], "bar" ] },
+                { "op": "assign",
+                    "left": [ "id", "quux" ],
+                    "right": [ "select", [ "select", [ "id", "foo" ], "bar" ], [ "id", "i" ] ] } ] }

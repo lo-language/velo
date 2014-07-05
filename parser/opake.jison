@@ -27,15 +27,16 @@
 "<="                    return '<='
 ">="                    return '>='
 ":"                     return ':'
-"=>"                    return '=>'
-"->"                    return '->'
 "||"                    return '||'
 "&&"                    return '&&'
 "&"                     return '&'
 "|"                     return '|'
 "^"                     return '^'
-"~"                     return '~'
+">~"                    return '>~'
+"->"                    return '->'
 ">>"                    return '>>'
+"=>"                    return '=>'
+">|"                    return '>|'
 "<"                     return '<'
 ">"                     return '>'
 "="                     return '='
@@ -49,7 +50,6 @@
 "if"                    return 'IF'
 "else"                  return 'ELSE'
 "is"                    return 'IS'
-"fail"                  return 'FAIL'
 "break"                 return 'BREAK'
 "action"                return 'ACTION'
 "true"|"false"          return 'BOOLEAN'
@@ -73,8 +73,8 @@ module
     ;
 
 action_definition
-    : ACTION block -> ['action', [], $2]
-    | ACTION '(' (NAME ',')* NAME? ')' block -> ['action', $3.concat([$4]), $6]
+    : ACTION block -> {action: [], statements: $2}
+    | ACTION '(' (NAME ',')* NAME? ')' block -> {action: $4 ? $3.concat([$4]) : $3, statements: $6}
     ;
 
 block
@@ -83,8 +83,7 @@ block
 
 statement
     : NAME IS literal -> ['define', $1, $3]
-    | identifier '=' expression -> ['assign', $1, $3]
-    | FAIL expression -> ['fail', $2]
+    | identifier '=' expression -> {op: 'assign', left: $1, right: $3}
     | selection_statement
     | sequence_statement
     ;
@@ -106,7 +105,7 @@ literal
     ;
 
 identifier
-    : NAME
+    : NAME -> ['id', $1]
     | identifier '[' expression ']' -> ['select', $1, $3]
     | identifier '.' NAME -> ['select', $1, $3]
     ;
@@ -125,15 +124,15 @@ unary_expression
 
 multiplicative_expression
     : unary_expression
-    | multiplicative_expression '*' primary_expression -> ['mul', $1, $3]
-    | multiplicative_expression '/' primary_expression -> ['div', $1, $3]
-    | multiplicative_expression '%' primary_expression -> ['mod', $1, $3]
+    | multiplicative_expression '*' primary_expression -> {op: 'mult', left: $1, right: $3}
+    | multiplicative_expression '/' primary_expression -> {op: 'div', left: $1, right: $3}
+    | multiplicative_expression '%' primary_expression -> {op: 'mod', left: $1, right: $3}
     ;
 
 additive_expression
     : multiplicative_expression
-    | additive_expression '+' multiplicative_expression -> ['add', $1, $3]
-    | additive_expression '-' multiplicative_expression -> ['sub', $1, $3]
+    | additive_expression '+' multiplicative_expression -> {op: 'add', left: $1, right: $3}
+    | additive_expression '-' multiplicative_expression -> {op: 'sub', left: $1, right: $3}
     ;
 
 relational_expression
@@ -190,7 +189,7 @@ expression
 // what about statement ~ statement expressions? e.g. 2/0 ~ log.write(err)
 
 invocation
-    : identifier '(' (expression, ',')* expression? ')' -> ['invoke', $1, $3.concat([$4])]
+    : identifier '(' (expression ',')* expression? ')' -> {invoke: $1, args: $4 ? $3.concat([$4]) : $3}
     ;
 
 sequence_statement
@@ -201,12 +200,14 @@ sequence_statement
 
 sink
     : identifier
-    | action_definition
+    | '(' (NAME ',')* NAME? ')' block -> {action: ($3 ? $2.concat([$3]) : $2), statements: $5}
+    | block -> {'action': [], statements: $1}
     ;
 
 connector
-    : '->'
+    : '>~'
+    | '->'
     | '=>'
     | '>>'
-    | '~'
+    | '>|'
     ;

@@ -5,28 +5,30 @@
 
 "use strict";
 
-var Machine = require('./Machine');
+var Obj = require('./Obj');
 var System = require('./System');
 
 var system = new System();
 
-// create machines to model the OS environment
+// create objects to model the OS environment
 
-var stdout = system.createMachine(function (body) {
+var stdout = system.createObject(function (body) {
     process.stdout.write("" + body);
 });
 
-var stderr = system.createMachine(function (body) {
+var stderr = system.createObject(function (body) {
     process.stderr.write("" + body);
 });
+
+//var loader = system.createObject();
 
 var exitCode = 0;
 
 // this machine just stores the exit code
-var out = system.createMachine(function (body) {
+var out = system.createObject(function (body) {
 });
 
-var err = system.createMachine(function (body) {
+var err = system.createObject(function (body) {
     exitCode = 1;
 });
 
@@ -44,7 +46,7 @@ var main = function () {console.log("I think you ought to know I'm feeling very 
 // END GENERATED CODE
 
 // create a machine for the compiled source
-var root = system.createMachine(main);
+var root = system.createObject(main);
 
 // send the launch message to the machine
 // todo make this a real message

@@ -9,13 +9,13 @@
 /**
  *
  * @param system
- * @param fn
+ * @param def
  * @private
  */
-var __ = function (system, fn) {
+var __ = function (system, def) {
 
     this.system = system;
-    this.process = fn;
+    this.process = def;
 };
 
 module.exports = __;

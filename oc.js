@@ -2,6 +2,9 @@
 /**
  * The Opake-to-node compiler
  *
+ * we need the ability to compile dynamically loaded files
+ * compiles provided source file, evals it to create an object
+ *
  * todo: multiline string literals, with and without line breaks
  */
 
@@ -11,6 +14,8 @@ var fs = require('fs');
 var parser = require('./parser/Parser');
 var Context = require('./codegen/Context');
 var util = require('util');
+
+eval('console.log("nork");');
 
 var sourceFile = process.argv[2];
 var destFile = process.argv[3];
@@ -43,10 +48,10 @@ var template = fs.readFileSync(__dirname + '/codegen/runtime.js', 'utf8');
 var context = new Context();
 
 var code = 'main = ' + context.codegen(ast) + ';\n';
-console.error(code);
+//console.error(code);
 
 //console.err("writing output to " + destFile);
 //fs.writeFileSync(destFile, template.replace('//<<CODE>>', code) + '\n', 'utf8');
 //fs.chmodSync(destFile, '777');
 //process.stdout.write(code, 'utf8');
-process.stdout.write(template.replace('//<<CODE>>', code) + '\n', 'utf8');
+//process.stdout.write(template.replace('//<<CODE>>', code) + '\n', 'utf8');

@@ -5,7 +5,7 @@
 
 "use strict";
 
-var Machine = require('./Machine');
+var Obj = require('./Obj');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -14,7 +14,7 @@ var Machine = require('./Machine');
  */
 var __ = function () {
 
-    this.machines = [];
+    this.objects = [];
     this.nextId = 0;
 
     this.messages = [];
@@ -22,16 +22,16 @@ var __ = function () {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Creates a new machine in the system.
+ * Creates a new object in the system.
  *
  * @param fn    the function to run to process each message
  * @return {Number}
  */
-__.prototype.createMachine = function (fn) {
+__.prototype.createObject = function (fn) {
 
     var id = this.nextId++;
 
-    this.machines[id] = new Machine(this, fn);
+    this.objects[id] = new Obj(this, fn);
 
     return id;
 };
@@ -43,11 +43,11 @@ __.prototype.createMachine = function (fn) {
  * @param body
  * @param out
  * @param err
- * @param chunk
+ * @param end
  */
-__.prototype.sendMessage = function (to, body, out, err, chunk) {
+__.prototype.sendMessage = function (to, body, out, err, end) {
 
-    this.messages.push([to, body, out, err, chunk]);
+    this.messages.push([to, body, out, err, end]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,12 +64,12 @@ __.prototype.run = function () {
 
         envelope = this.messages.shift();
 
-        recipient = this.machines[envelope[0]];
+        recipient = this.objects[envelope[0]];
 
         // validate the recipient address
 
         if (recipient == null) {
-            throw new Error("couldn't find machine with address " + envelope[0]);
+            throw new Error("couldn't find object with address " + envelope[0]);
         }
 
         recipient.process(envelope[1], envelope[2], envelope[3], envelope[4]);

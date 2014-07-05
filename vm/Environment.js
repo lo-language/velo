@@ -15,7 +15,7 @@ var __ = function () {
     console.log("creating environment");
 
     this.nextId = 0;
-    this.machines = [];
+    this.objects = [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,7 +28,7 @@ __.prototype.createMachine = function (program) {
 
     var om = new Machine(program, this);
 
-    this.machines[this.nextId] = om;
+    this.objects[this.nextId] = om;
     this.nextId++;
 };
 
@@ -44,7 +44,7 @@ __.prototype.sendRequest = function (to, body, intros) {
 
     var req = Message.createRequest(body, intros);
 
-    var target = this.machines[to];
+    var target = this.objects[to];
 
     if (target === undefined) {
         throw new Error("unknown machine?!");
@@ -62,7 +62,7 @@ __.prototype.sendRequest = function (to, body, intros) {
  */
 __.prototype.run = function () {
 
-    this.machines.forEach(function (machine) {
+    this.objects.forEach(function (machine) {
         machine.run();
     });
 };

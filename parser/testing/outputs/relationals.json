@@ -1,1 +1,20 @@
-["action",[null],[["assign","result",["equality","foo","bar"]],["assign","result",["inequality","foo","bar"]],["assign","result",["lt","foo","bar"]],["assign","result",["gt","foo","bar"]],["assign","result",["le","foo","bar"]],["assign","result",["ge","foo","bar"]]]]
+{ "action": [],
+    "statements":
+            [ { "op": "assign",
+                "left": [ "id", "result" ],
+                "right": [ "equality", [ "id", "foo" ], [ "id", "bar" ] ] },
+                { "op": "assign",
+                    "left": [ "id", "result" ],
+                    "right": [ "inequality", [ "id", "foo" ], [ "id", "bar" ] ] },
+                { "op": "assign",
+                    "left": [ "id", "result" ],
+                    "right": [ "lt", [ "id", "foo" ], [ "id", "bar" ] ] },
+                { "op": "assign",
+                    "left": [ "id", "result" ],
+                    "right": [ "gt", [ "id", "foo" ], [ "id", "bar" ] ] },
+                { "op": "assign",
+                    "left": [ "id", "result" ],
+                    "right": [ "le", [ "id", "foo" ], [ "id", "bar" ] ] },
+                { "op": "assign",
+                    "left": [ "id", "result" ],
+                    "right": [ "ge", [ "id", "foo" ], [ "id", "bar" ] ] } ] }

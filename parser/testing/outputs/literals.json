@@ -1,1 +1,12 @@
-["action",[null],[["assign","x",true],["assign","y",false],["assign","answer",42],["assign","age",63.4],["assign","message",["str","hello, world!"]],["assign","greeting",["str","howdy, pardner"]]]]
+{ "action": [],
+    "statements": [
+        { "op": "assign", "left": [ "id", "x" ], "right": true },
+        { "op": "assign", "left": [ "id", "y" ], "right": false },
+        { "op": "assign", "left": [ "id", "answer" ], "right": 42 },
+        { "op": "assign", "left": [ "id", "age" ], "right": 63.4 },
+        { "op": "assign",
+            "left": [ "id", "message" ],
+            "right": [ "str", "hello, world!" ] },
+        { "op": "assign",
+            "left": [ "id", "greeting" ],
+            "right": [ "str", "howdy, pardner" ] } ] }

@@ -1,8 +1,15 @@
-action (args, io, env) {
+/**
+ * test program
+ *
+ * have a launcher to plug into system
+ */
 
-    message = "hello, world!\n"
+
+action (args, io, env, kit) {
+
+    io.out.writeLine("Hello, world!")
+
+    // message = "hello, world!\n"
 
     // test cases - no followers should equal no cb address sent, etc.
-    "howdy\n" -> io.err -> io.err
-    "greetings\n" -> io.err
 }

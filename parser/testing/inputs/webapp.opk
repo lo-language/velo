@@ -1,0 +1,55 @@
+action (args, io, env, kit) {
+
+    kit.get('Http/Server', log) => server
+    kit.get('Http/Logger/ELF', system.stderr) => log
+
+    // each action call can be followed by a list of continuations
+    server.onRequest()
+        >~ (err) {
+
+        }
+        >> (request) {
+
+            request.response.end("howdy!")
+
+            recur("42")
+        }
+        >| {
+            // wrap up
+        }
+
+    // the continuations are mapped onto:
+    reply() // for channel 0
+    fail() // for channel 1
+    end() // for channel 2
+
+    // these can be saved like anything else
+    listeners.push(reply)
+    listeners.remove(reply)
+
+    button.click() >> (click) {
+
+    }
+
+    foo = action (input) {
+        reply(input * 2)
+    }
+
+    file.read() >> foo >| () {
+
+
+    }
+
+    server.listen(port)
+        >~ (err) {
+            log.err("failed to open port _port_: ")
+        }
+        -> {
+            log.info("server running on port _port_")
+        }
+
+    system.trap('SIGINT') -> {
+        log.info("received SIGINT")
+        server.stop()
+    }
+}

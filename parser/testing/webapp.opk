@@ -9,7 +9,7 @@
         _x = 42;
     };
  */
-action (args, io, env, shop) {
+action (args, system, shop) {
 
     port is 8080
 
@@ -103,22 +103,25 @@ action (args, io, env, shop) {
     ).then(out);
 
 
-    shop.make('Http/Logger/ELF', stdout) => logger;
-    shop.make('Http/Server', logger) => server;
+    shop.make('Http/Logger/ELF', system.stderr) => log;
+    shop.make('Http/Server', log) => server;
 
-    server.on('request') >> action (request) {
-        request.end("hi there!");
+    server.onRequest >> (request) {
+
+        '\n' -> request.rawResponse
     }
 
-    server.open(port) ~ action (err) {
-        log.err("failed to open port _port_: ");
+    server.listen(port) -> {
+        log.info("server running on port _port_")
     }
-    -> action {
-        log.info("server running on port _port_");
+    ~ (err) {
+        log.err("failed to open port _port_: ")
     }
 
-    system.on('SIGINT') >> action {
-        log.info("received SIGINT");
-        server.close();
-    }*/
+    system.trap('SIGINT') -> {
+        log.info("received SIGINT")
+        server.stop()
+    }
+
+    */
 }

@@ -1,1 +1,28 @@
-["action",[null],[["assign","qux",["add",["add",2,["div",["mul","foo","bar"],2]],["mod","baz",["sub","age",4]]]]]]
+{
+    "action": [],
+    "statements": [
+        {
+            "op": "assign",
+            "left": ["id","qux"],
+            "right": {
+                "op": "add",
+                "left": {
+                    "op": "add",
+                    "left": 2,
+                    "right": {
+                        "op": "div",
+                        "left": {
+                            "op": "mult",
+                            "left": ["id","foo"],
+                            "right": ["id","bar"]},
+                        "right": 2}},
+                "right": {
+                    "op":"mod",
+                    "left": ["id","baz"],
+                    "right": {
+                        "op": "sub",
+                        "left": ["id","age"],
+                        "right": 4
+                    }}
+                }}]
+}

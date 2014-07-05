@@ -1,1 +1,5 @@
-["action",[null],[["define","port",80],["define","greeting",["str","hi there!"]],["define","e",2.718281828459045]]]
+{ "action": [],
+    "statements":
+            [ [ "define", "port", 80 ],
+                [ "define", "greeting", [ "str", "hi there!" ] ],
+                [ "define", "e", 2.718281828459045 ] ] }

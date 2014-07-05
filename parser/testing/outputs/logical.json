@@ -1,1 +1,15 @@
-["action",[null],[["assign","foo",["conditional",["and","q","r"],42,["or",["and","y","z"],["bitwise_or",["xor",["bitwise_and","a","b"],"c"],"d"]]]]]]
+{ "action": [],
+    "statements":
+            [ { "op": "assign",
+                "left": [ "id", "foo" ],
+                "right":
+                        [ "conditional",
+                            [ "and", [ "id", "q" ], [ "id", "r" ] ],
+                            42,
+                            [ "or",
+                                [ "and", [ "id", "y" ], [ "id", "z" ] ],
+                                [ "bitwise_or",
+                                    [ "xor",
+                                        [ "bitwise_and", [ "id", "a" ], [ "id", "b" ] ],
+                                        [ "id", "c" ] ],
+                                    [ "id", "d" ] ] ] ] } ] }
