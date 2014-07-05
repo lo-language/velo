@@ -59,6 +59,11 @@
 
 /lex
 
+%{
+    var Operator = require('../ast/Operator');
+    var Action = require('../ast/Action');
+%}
+
 /* enable EBNF grammar syntax */
 %ebnf
 
@@ -73,8 +78,8 @@ module
     ;
 
 action_definition
-    : ACTION block -> {action: [], statements: $2}
-    | ACTION '(' (NAME ',')* NAME? ')' block -> {action: $4 ? $3.concat([$4]) : $3, statements: $6}
+    : ACTION block -> new Action([], $2)
+    | ACTION '(' (NAME ',')* NAME? ')' block -> new Action($4 ? $3.concat([$4]) : $3, $6)
     ;
 
 block
@@ -83,7 +88,7 @@ block
 
 statement
     : NAME IS literal -> ['define', $1, $3]
-    | identifier '=' expression -> {op: 'assign', left: $1, right: $3}
+    | identifier '=' expression -> new Operator('assign', $1, $3)
     | selection_statement
     | sequence_statement
     ;
@@ -124,15 +129,15 @@ unary_expression
 
 multiplicative_expression
     : unary_expression
-    | multiplicative_expression '*' primary_expression -> {op: 'mult', left: $1, right: $3}
-    | multiplicative_expression '/' primary_expression -> {op: 'div', left: $1, right: $3}
-    | multiplicative_expression '%' primary_expression -> {op: 'mod', left: $1, right: $3}
+    | multiplicative_expression '*' primary_expression -> new Operator('mult', $1, $3)
+    | multiplicative_expression '/' primary_expression -> new Operator('div', $1, $3)
+    | multiplicative_expression '%' primary_expression -> new Operator('mod', $1, $3)
     ;
 
 additive_expression
     : multiplicative_expression
-    | additive_expression '+' multiplicative_expression -> {op: 'add', left: $1, right: $3}
-    | additive_expression '-' multiplicative_expression -> {op: 'sub', left: $1, right: $3}
+    | additive_expression '+' multiplicative_expression -> new Operator('add', $1, $3)
+    | additive_expression '-' multiplicative_expression -> new Operator('sub', $1, $3)
     ;
 
 relational_expression

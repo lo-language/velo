@@ -1,7 +1,7 @@
 action (args, io, env, kit) {
 
-    kit.get('Http/Server', log) => server
-    kit.get('Http/Logger/ELF', system.stderr) => log
+    kit.get('http/server', log) => server
+    kit.get('http/logger/elf', io.err) => log
 
     // each action call can be followed by a list of continuations
     server.onRequest()
@@ -40,16 +40,16 @@ action (args, io, env, kit) {
 
     }
 
-    server.listen(port)
+    server.listen(io.port)
         >~ (err) {
-            log.err("failed to open port _port_: ")
+            log.err("failed to open port __port.num__: ")
         }
         -> {
-            log.info("server running on port _port_")
+            log.info("server running on port __port.num__")
         }
 
-    system.trap('SIGINT') -> {
-        log.info("received SIGINT")
+    env.on('SIGINT') -> {
+        io.err.writeLine("received SIGINT")
         server.stop()
     }
 }

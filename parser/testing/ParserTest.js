@@ -28,8 +28,8 @@ files.forEach(function (filename) {
         var expected = fs.readFileSync(__dirname + '/outputs/' + name + '.json', 'utf8');
         var result = parser.parse(source);
 
-        test.deepEqual(result, JSON.parse(expected));
-//        test.deepEqual(JSON.stringify(result), expected);
+        // we shouldn't have to stringify both of these but if we don't, we get a test fail
+        test.deepEqual(JSON.stringify(result), JSON.stringify(JSON.parse(expected)));
         test.done();
     };
 });

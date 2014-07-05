@@ -2,13 +2,13 @@
     "statements":
             [ [ "=>",
                 { "invoke": [ "select", [ "id", "kit" ], "get" ],
-                    "args": [ [ "str", "Http/Server" ], [ "id", "log" ] ] },
+                    "args": [ [ "str", "http/server" ], [ "id", "log" ] ] },
                 [ "id", "server" ] ],
                 [ "=>",
                     { "invoke": [ "select", [ "id", "kit" ], "get" ],
                         "args":
-                                [ [ "str", "Http/Logger/ELF" ],
-                                    [ "select", [ "id", "system" ], "stderr" ] ] },
+                                [ [ "str", "http/logger/elf" ],
+                                    [ "select", [ "id", "io" ], "err" ] ] },
                     [ "id", "log" ] ],
                 [ ">|",
                     [ ">>",
@@ -50,20 +50,20 @@
                 [ "->",
                     [ ">~",
                         { "invoke": [ "select", [ "id", "server" ], "listen" ],
-                            "args": [ [ "id", "port" ] ] },
+                            "args": [ ["select", [ "id", "io" ], "port"] ] },
                         { "action": [ "err" ],
                             "statements":
                                     [ { "invoke": [ "select", [ "id", "log" ], "err" ],
-                                        "args": [ [ "str", "failed to open port _port_: " ] ] } ] } ],
+                                        "args": [ [ "str", "failed to open port __port.num__: " ] ] } ] } ],
                     { "action": [],
                         "statements":
                                 [ { "invoke": [ "select", [ "id", "log" ], "info" ],
-                                    "args": [ [ "str", "server running on port _port_" ] ] } ] } ],
+                                    "args": [ [ "str", "server running on port __port.num__" ] ] } ] } ],
                 [ "->",
-                    { "invoke": [ "select", [ "id", "system" ], "trap" ],
+                    { "invoke": [ "select", [ "id", "env" ], "on" ],
                         "args": [ [ "str", "SIGINT" ] ] },
                     { "action": [],
                         "statements":
-                                [ { "invoke": [ "select", [ "id", "log" ], "info" ],
+                                [ { "invoke": [ "select", ["select", [ "id", "io" ], "err"], "writeLine" ],
                                     "args": [ [ "str", "received SIGINT" ] ] },
                                     { "invoke": [ "select", [ "id", "server" ], "stop" ], "args": [] } ] } ] ] }
