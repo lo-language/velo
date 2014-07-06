@@ -30,6 +30,9 @@ var __ = function (main) {
  */
 __.prototype.init = function () {
 
+    // pop off the args
+    var argv = process.argv.slice(2);
+
     // create some basic objects
 
     var io = {
@@ -37,7 +40,7 @@ __.prototype.init = function () {
         $err: WriteStream.create(this, process.stderr)
     };
 
-    this.sendMessage(this.root, null, io);
+    this.sendMessage(this.root, argv, io, process.env);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
