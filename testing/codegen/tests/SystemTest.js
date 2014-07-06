@@ -5,7 +5,7 @@
 
 "use strict";
 
-var System = require('../../System');
+var System = require('../../../codegen/System');
 
 exports["constructor"] = {
 
@@ -16,12 +16,12 @@ exports["constructor"] = {
         test.done();
     },
 
-    "createMachine": function (test) {
+    "createObject": function (test) {
 
         var system = new System();
         var fn = function () {};
 
-        var m = system.createMachine(fn);
+        var m = system.createObject(fn);
 
         test.equal(m, 0);
         test.equal(system.objects[0].process, fn);
@@ -46,7 +46,7 @@ exports["constructor"] = {
 
         var system = new System();
 
-        var m = system.createMachine();
+        var m = system.createObject();
 
         system.sendMessage(0, 42, 1, 2, 3);
         test.deepEqual(system.messages, [[0, 42, 1, 2, 3]]);
@@ -69,7 +69,7 @@ exports["constructor"] = {
             test.equal(message, expected.shift());
         };
 
-        var m = system.createMachine(fn);
+        var obj = system.createObject(fn);
 
         system.sendMessage(0, 42, 1, 2, 3);
         test.deepEqual(system.messages, [[0, 42, 1, 2, 3]]);

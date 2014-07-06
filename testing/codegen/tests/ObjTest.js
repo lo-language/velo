@@ -5,7 +5,7 @@
 
 "use strict";
 
-var Machine = require('../../Machine');
+var Obj = require('../../../codegen/Obj');
 
 exports["constructor"] = {
 
@@ -13,10 +13,10 @@ exports["constructor"] = {
 
         var mockSystem = {};
         var fn = function () {};
-        var machine = new Machine(mockSystem, fn);
+        var obj = new Obj(mockSystem, fn);
 
-        test.equal(machine.system, mockSystem);
-        test.equal(machine.process, fn);
+        test.equal(obj.system, mockSystem);
+        test.equal(obj.process, fn);
 
         test.done();
     }

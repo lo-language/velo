@@ -46,11 +46,11 @@ __.prototype.toJavaScript = function (context) {
             break;
 
         case "assign":
-            op = '+';
+            op = '=';
             break;
     }
 
-    return this.left.toJavaScript() + op + this.right.toJavaScript();
+    return this.left.toJavaScript() + ' ' + op + ' ' + this.right.toJavaScript();
 };
 
 module.exports = __;

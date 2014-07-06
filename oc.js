@@ -4,8 +4,6 @@
  *
  * we need the ability to compile dynamically loaded files
  * compiles provided source file, evals it to create an object
- *
- * todo: multiline string literals, with and without line breaks
  */
 
 'use strict';
@@ -14,8 +12,6 @@ var fs = require('fs');
 var parser = require('./parser/Parser');
 var Context = require('./codegen/Context');
 var util = require('util');
-
-eval('console.log("nork");');
 
 var sourceFile = process.argv[2];
 var destFile = process.argv[3];
