@@ -21,26 +21,24 @@ var __ = function (args, statements) {
  */
 __.prototype.toJavaScript = function (context) {
 
-    var args = '()';
-    var body = '{}';
+    var body = '';
 
     if (this.args.length > 0) {
 
-        args = '(' +
-            this.args.map(function (argName) {
-                return '$' + argName;
-            }).join(', ') + ')';
+        body +=
+            this.args.map(function (argName, index) {
+                return 'var $' + argName + " = args[" + index + "];";
+            }).join('\n\t') + "\n\t";
     }
 
     if (this.statements.length > 0) {
 
-        body = "{\n\t" +
-            this.statements.map(function (stmt) {
+        body += this.statements.map(function (stmt) {
                 return stmt.toJavaScript(context) + ';';
-            }).join("\n\t") + "\n}";
+            }).join("\n\t");
     }
 
-    return "function " + args + ' ' + body;
+    return "function (args) {\n\t" + body + "\n}";
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

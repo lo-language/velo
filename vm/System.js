@@ -6,6 +6,7 @@
 "use strict";
 
 var Obj = require('./Obj');
+var WriteStream = require('./WriteStream');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -29,32 +30,14 @@ var __ = function (main) {
  */
 __.prototype.init = function () {
 
-    // create some basic objects: io.out, io.err
-
-    var out = this.createObject(function () {
-
-    });
-
-    var err = this.createObject(function () {
-
-    });
+    // create some basic objects
 
     var io = {
-
-        $out: {
-            $writeLine: function (line) {
-                console.log(line);
-            }
-        },
-
-        $err: {
-            $writeLine: function (line) {
-                console.error(line);
-            }
-        }
+        $out: WriteStream.create(this, process.stdout),
+        $err: WriteStream.create(this, process.stderr)
     };
 
-    this.sendMessage(this.root, ["hi there"]);
+    this.sendMessage(this.root, null, io);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,9 +65,11 @@ __.prototype.createObject = function (action) {
  * @param err
  * @param end
  */
-__.prototype.sendMessage = function (to, body, out, err, end) {
+__.prototype.sendMessage = function () {
 
-    this.messages.push([to, body, out, err, end]);
+    var args = Array.prototype.slice.call(arguments); // from MDN
+
+    this.messages.push(args);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +86,7 @@ __.prototype.run = function () {
 
         envelope = this.messages.shift();
 
-        recipient = this.objects[envelope[0]];
+        recipient = this.objects[envelope.shift()];
 
         // validate the recipient address
 
@@ -109,7 +94,7 @@ __.prototype.run = function () {
             throw new Error("couldn't find object with address " + envelope[0]);
         }
 
-        recipient.action(envelope[1], envelope[2], envelope[3], envelope[4]);
+        recipient.action(envelope);
     }
 };
 

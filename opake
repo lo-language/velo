@@ -10,10 +10,7 @@
 
 var fs = require('fs');
 var parser = require('./parser/Parser');
-var Obj = require('./vm/Obj');
 var System = require('./vm/System');
-var Context = require('./vm/Context');
-var util = require('util');
 
 var sourceFile = process.argv[2];
 
@@ -42,11 +39,11 @@ var js = module.toJavaScript();
 console.error("loading");
 var main;
 eval("main = " + js + ';');
+var sys = new System(main);
 
 //////////////////////////////////////////
 // initialize the environment
 console.error("initializing environment");
-var sys = new System(main);
 sys.init();
 
 //////////////////////////////////////////
