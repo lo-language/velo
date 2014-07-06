@@ -9,29 +9,66 @@ var Obj = require('./Obj');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * Creates a new system with the given main action.
  *
  * @private
  */
-var __ = function () {
+var __ = function (main) {
 
     this.objects = [];
     this.nextId = 0;
 
     this.messages = [];
+
+    this.root = this.createObject(main);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Initializes the system environment.
+ */
+__.prototype.init = function () {
+
+    // create some basic objects: io.out, io.err
+
+    var out = this.createObject(function () {
+
+    });
+
+    var err = this.createObject(function () {
+
+    });
+
+    var io = {
+
+        $out: {
+            $writeLine: function (line) {
+                console.log(line);
+            }
+        },
+
+        $err: {
+            $writeLine: function (line) {
+                console.error(line);
+            }
+        }
+    };
+
+    this.sendMessage(this.root, ["hi there"]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Creates a new object in the system.
  *
- * @param fn    the function to run to process each message
+ * @param action    the function to run to process each message
  * @return {Number}
  */
-__.prototype.createObject = function (fn) {
+__.prototype.createObject = function (action) {
 
     var id = this.nextId++;
 
-    this.objects[id] = new Obj(this, fn);
+    this.objects[id] = new Obj(this, action);
 
     return id;
 };
@@ -72,7 +109,7 @@ __.prototype.run = function () {
             throw new Error("couldn't find object with address " + envelope[0]);
         }
 
-        recipient.process(envelope[1], envelope[2], envelope[3], envelope[4]);
+        recipient.action(envelope[1], envelope[2], envelope[3], envelope[4]);
     }
 };
 

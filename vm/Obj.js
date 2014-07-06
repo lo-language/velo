@@ -12,10 +12,18 @@
  * @param def
  * @private
  */
-var __ = function (system, def) {
+var __ = function (system, action) {
 
     this.system = system;
-    this.process = def;
+    this.action = action;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ */
+__.prototype.handle = function (message) {
+
 };
 
 module.exports = __;

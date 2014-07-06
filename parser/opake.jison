@@ -62,8 +62,10 @@
 %{
     var Literal = require('../ast/Literal');
     var Identifier = require('../ast/Identifier');
+    var Invocation = require('../ast/Invocation');
     var Operator = require('../ast/Operator');
     var Action = require('../ast/Action');
+    var Module = require('../ast/Module');
 %}
 
 /* enable EBNF grammar syntax */
@@ -196,7 +198,7 @@ expression
 // what about statement ~ statement expressions? e.g. 2/0 ~ log.write(err)
 
 invocation
-    : identifier '(' (expression ',')* expression? ')' -> {invoke: $1, args: $4 ? $3.concat([$4]) : $3}
+    : identifier '(' (expression ',')* expression? ')' -> new Invocation($1, $4 ? $3.concat([$4]) : $3)
     ;
 
 sequence_statement

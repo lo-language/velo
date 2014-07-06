@@ -5,7 +5,7 @@
 
 "use strict";
 
-var System = require('../../../codegen/System');
+var System = require('../.././System');
 
 exports["constructor"] = {
 

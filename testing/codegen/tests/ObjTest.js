@@ -5,7 +5,7 @@
 
 "use strict";
 
-var Obj = require('../../../codegen/Obj');
+var Obj = require('../.././Obj');
 
 exports["constructor"] = {
 
