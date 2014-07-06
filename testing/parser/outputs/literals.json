@@ -6,7 +6,7 @@
         { "op": "assign", "left": [ "id", "age" ], "right": 63.4 },
         { "op": "assign",
             "left": [ "id", "message" ],
-            "right": [ "str", "hello, world!" ] },
+            "right": "hello, world!" },
         { "op": "assign",
             "left": [ "id", "greeting" ],
-            "right": [ "str", "howdy, pardner" ] } ] }
+            "right": "howdy, pardner" } ] }

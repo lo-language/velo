@@ -5,7 +5,7 @@
                 "right": { "action": [], "statements": [] } },
                 [ "if",
                     [ "equality", [ "card", [ "id", "items" ] ], 0 ],
-                    [ { "invoke": [ "id", "fail" ], "args": [ [ "str", "oh noes!" ] ] } ] ],
+                    [ { "invoke": [ "id", "fail" ], "args": [ "oh noes!" ] } ] ],
                 [ "if",
                     [ "equality", [ "card", [ "id", "items" ] ], 1 ],
                     [ { "op": "assign", "left": [ "id", "x" ], "right": 2 } ],

@@ -1,0 +1,21 @@
+{ "action": [],
+    "statements":
+            [ { "op": "assign", "left": [ "id", "foo" ], "right": 4 },
+                { "op": "assign",
+                    "left": [ "id", "bar" ],
+                    "right": [ "id", [ "id", "foo" ], [ "id", "i" ] ] },
+                { "op": "assign",
+                    "left":
+                            [ "id",
+                                [ "id", [ "id", "foo" ], [ "id", "i" ] ],
+                                [ "id", "j" ] ],
+                    "right": [ "id", [ "id", "foo" ], "bar" ] },
+                { "op": "assign",
+                    "left": [ "id", "foo" ],
+                    "right": [ "id", [ "id", [ "id", "boo" ], "bar" ], "baz" ] },
+                { "op": "assign",
+                    "left": [ "id", "qux" ],
+                    "right": [ "id", [ "id", [ "id", "foo" ], [ "id", "i" ] ], "bar" ] },
+                { "op": "assign",
+                    "left": [ "id", "quux" ],
+                    "right": [ "id", [ "id", [ "id", "foo" ], "bar" ], [ "id", "i" ] ] } ] }

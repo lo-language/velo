@@ -9,10 +9,9 @@
 /**
  *
  */
-var __ = function (args, statements) {
+var __ = function (value) {
 
-    this.args = args;
-    this.statements = statements;
+    this.value = value;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +20,7 @@ var __ = function (args, statements) {
  */
 __.prototype.toJavaScript = function (context) {
 
-    return "function (" + args + ") {" + "}";
+    return this.value;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,10 +29,7 @@ __.prototype.toJavaScript = function (context) {
  */
 __.prototype.toJSON = function () {
 
-    return {
-        "action": this.args,
-        "statements": this.statements
-    };
+    return this.value;
 };
 
 module.exports = __;

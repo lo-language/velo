@@ -9,10 +9,10 @@
 /**
  *
  */
-var __ = function (args, statements) {
+var __ = function (name, selector) {
 
-    this.args = args;
-    this.statements = statements;
+    this.id = name;
+    this.selector = selector;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +21,12 @@ var __ = function (args, statements) {
  */
 __.prototype.toJavaScript = function (context) {
 
-    return "function (" + args + ") {" + "}";
+    if (this.selector) {
+        return this.id.toJavaScript() + '.$' + this.selector;
+    }
+
+    // guard the identifier from colliding with JS reserved words
+    return "$" + this.id;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,10 +35,11 @@ __.prototype.toJavaScript = function (context) {
  */
 __.prototype.toJSON = function () {
 
-    return {
-        "action": this.args,
-        "statements": this.statements
-    };
+    if (typeof this.id == 'string') {
+        return ['id', this.id];
+    }
+
+    return ['id', this.id.toJSON(), this.selector];
 };
 
 module.exports = __;

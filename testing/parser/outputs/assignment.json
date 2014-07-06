@@ -4,5 +4,5 @@
                 { "op": "assign", "left": [ "id", "binky" ], "right": 64 },
                 { "op": "assign",
                     "left": [ "id", "message" ],
-                    "right": [ "str", "hi there" ] },
+                    "right": "hi there" },
                 { "op": "assign", "left": [ "id", "foo" ], "right": true } ] }

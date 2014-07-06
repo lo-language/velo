@@ -24,7 +24,7 @@
                                         [ "id", "items" ] ] ] } ],
                             {
                                 "action": [],
-                                "statements": [ [ "->", [ "str", "hi there" ], [ "id", "log" ] ],
+                                "statements": [ [ "->", "hi there", [ "id", "log" ] ],
                                     [ "->", [ "id", "in" ], [ "id", "out" ] ] ] } ],
                         [ "id", "foo" ] ],
                     [ "id", "result" ] ],

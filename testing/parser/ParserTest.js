@@ -7,7 +7,7 @@
 
 var fs = require('fs');
 var path = require('path');
-var parser = require('../Parser');
+var parser = require('../../parser/Parser');
 
 var EXT = '.opk';
 

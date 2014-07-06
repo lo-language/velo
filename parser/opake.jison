@@ -60,6 +60,8 @@
 /lex
 
 %{
+    var Literal = require('../ast/Literal');
+    var Identifier = require('../ast/Identifier');
     var Operator = require('../ast/Operator');
     var Action = require('../ast/Action');
 %}
@@ -104,15 +106,15 @@ selection_statement
 // C expression syntax, basically
 
 literal
-    : BOOLEAN -> ($1 === 'true' ? true : false)
-    | CONSTANT -> parseFloat($1)
-    | STRING_LITERAL -> ['str', $1]
+    : BOOLEAN -> new Literal($1 === 'true' ? true : false)
+    | CONSTANT -> new Literal(parseFloat($1))
+    | STRING_LITERAL -> new Literal($1)
     ;
 
 identifier
-    : NAME -> ['id', $1]
-    | identifier '[' expression ']' -> ['select', $1, $3]
-    | identifier '.' NAME -> ['select', $1, $3]
+    : NAME -> new Identifier($1)
+    | identifier '[' expression ']' -> new Identifier($1, $3)
+    | identifier '.' NAME -> new Identifier($1, $3)
     ;
 
 primary_expression
