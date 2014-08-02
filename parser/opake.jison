@@ -59,15 +59,6 @@
 
 /lex
 
-%{
-    var Literal = require('../ast/Literal');
-    var Identifier = require('../ast/Identifier');
-    var Invocation = require('../ast/Invocation');
-    var Operator = require('../ast/Operator');
-    var Action = require('../ast/Action');
-    var Module = require('../ast/Module');
-%}
-
 /* enable EBNF grammar syntax */
 %ebnf
 
@@ -82,8 +73,8 @@ module
     ;
 
 action_definition
-    : ACTION block -> new Action([], $2)
-    | ACTION '(' (NAME ',')* NAME? ')' block -> new Action($4 ? $3.concat([$4]) : $3, $6)
+    : ACTION block -> new yy.Action([], $2)
+    | ACTION '(' (NAME ',')* NAME? ')' block -> new yy.Action($4 ? $3.concat([$4]) : $3, $6)
     ;
 
 block
@@ -92,7 +83,7 @@ block
 
 statement
     : NAME IS literal -> ['define', $1, $3]
-    | identifier '=' expression -> new Operator('assign', $1, $3)
+    | identifier '=' expression -> new yy.Operator('assign', $1, $3)
     | selection_statement
     | sequence_statement
     ;
@@ -108,15 +99,15 @@ selection_statement
 // C expression syntax, basically
 
 literal
-    : BOOLEAN -> new Literal($1 === 'true' ? true : false)
-    | CONSTANT -> new Literal(parseFloat($1))
-    | STRING_LITERAL -> new Literal($1)
+    : BOOLEAN -> new yy.Literal($1 === 'true' ? true : false)
+    | CONSTANT -> new yy.Literal(parseFloat($1))
+    | STRING_LITERAL -> new yy.Literal($1)
     ;
 
 identifier
-    : NAME -> new Identifier($1)
-    | identifier '[' expression ']' -> new Identifier($1, $3)
-    | identifier '.' NAME -> new Identifier($1, $3)
+    : NAME -> new yy.Identifier($1)
+    | identifier '[' expression ']' -> new yy.Identifier($1, $3)
+    | identifier '.' NAME -> new yy.Identifier($1, $3)
     ;
 
 primary_expression
@@ -133,15 +124,15 @@ unary_expression
 
 multiplicative_expression
     : unary_expression
-    | multiplicative_expression '*' primary_expression -> new Operator('mult', $1, $3)
-    | multiplicative_expression '/' primary_expression -> new Operator('div', $1, $3)
-    | multiplicative_expression '%' primary_expression -> new Operator('mod', $1, $3)
+    | multiplicative_expression '*' primary_expression -> new yy.Operator('mult', $1, $3)
+    | multiplicative_expression '/' primary_expression -> new yy.Operator('div', $1, $3)
+    | multiplicative_expression '%' primary_expression -> new yy.Operator('mod', $1, $3)
     ;
 
 additive_expression
     : multiplicative_expression
-    | additive_expression '+' multiplicative_expression -> new Operator('add', $1, $3)
-    | additive_expression '-' multiplicative_expression -> new Operator('sub', $1, $3)
+    | additive_expression '+' multiplicative_expression -> new yy.Operator('add', $1, $3)
+    | additive_expression '-' multiplicative_expression -> new yy.Operator('sub', $1, $3)
     ;
 
 relational_expression
@@ -198,7 +189,7 @@ expression
 // what about statement ~ statement expressions? e.g. 2/0 ~ log.write(err)
 
 invocation
-    : identifier '(' (expression ',')* expression? ')' -> new Invocation($1, $4 ? $3.concat([$4]) : $3)
+    : identifier '(' (expression ',')* expression? ')' -> new yy.Invocation($1, $4 ? $3.concat([$4]) : $3)
     ;
 
 sequence_statement

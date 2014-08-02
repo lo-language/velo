@@ -21,6 +21,7 @@ var __ = function (id, args) {
  */
 __.prototype.toJavaScript = function (context) {
 
+    // todo - make this send an actual message, this is fake right now
     return this.id.toJavaScript() + '(' + this.args.map(function (arg) {
         return arg.toJavaScript(context);
     }).join(', ') + ')';

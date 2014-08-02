@@ -13,6 +13,21 @@ A record is a set of named values (fields) which can be of any type, including r
 	student.course = "VI-2"
 	
 	// remove a field
-	delete student.dob
+	drop student.dob
 	
-An important use of records is as a projection of an object.
+An important use of records is as a handle to an object.
+
+##### Operations
+
+Merge two records:
+
+	// non-commutative; right values clobber left values w/same key
+    left + right = merged
+    
+Intersect two records:
+
+	left & right = intersection
+	
+Diff two records:
+
+	whole - part = remainder

@@ -1,0 +1,52 @@
+/**
+ * A circle constructor.
+ *
+ * This file is loaded once. Each time it's run, it returns a new object (independent, isolated, sequential process).
+ * The object is built on the initial message (that way the constructor doesn't have to create it, the caller does).
+ * Normally a message is sent, then acted upon, then dropped by the recipient. But instead of being dropped, it can
+ * be handed to a different process. Where do actions live? How do they hop threads?
+ */
+
+action (center, radius, lib) {
+
+    getTopLeft = action () {
+        return [
+            center.x - radius
+            center.y - radius]
+    }
+
+    parent = lib.createShape(getTopLeft(), radius)
+
+    // merges records; clobbers existing keys
+
+    parent += [
+
+        getCenter: action () {
+            return center
+        }
+
+        getRadius: action () {
+            return radius
+        }
+
+        move: action (xOffset, yOffset) {
+
+            center.x += xOffset
+            center.y += yOffset
+        }
+
+        resize: action (newRadius) {
+            radius = newRadius
+        }
+
+        getArea: action () {
+            return PI * radius * radius
+        }
+
+        draw: action (screen) {
+
+        }
+    ]
+
+    return parent
+}

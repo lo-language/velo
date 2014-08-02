@@ -40,7 +40,17 @@ __.prototype.init = function () {
         $err: WriteStream.create(this, process.stderr)
     };
 
-    this.sendMessage(this.root, argv, io, process.env);
+    // todo - use this instead?
+    var env = process.env;
+//    var env = {
+//        $get: function () {},
+//        $set: function () {},
+//        $on: function () {}
+//    };
+
+    var kit = {};
+
+    this.sendMessage(this.root, argv, io, env, kit);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

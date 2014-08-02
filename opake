@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * The Opake-to-node compiler
+ * The Opake-to-node compiler/VM
  *
  * we need the ability to compile dynamically loaded files
  * compiles provided source file, evals it to create an object
@@ -25,17 +25,20 @@ var source = fs.readFileSync(process.argv[2], 'utf8');
 
 //////////////////////////////////////////
 // parse
+
 console.error("parsing " + sourceFile);
 var module = parser.parse(source);
 //console.error(util.inspect(ast, {depth: null}));
 
 //////////////////////////////////////////
 // compile
+
 console.error("compiling");
 var js = module.toJavaScript();
 
 //////////////////////////////////////////
 // load
+
 console.error("loading");
 var main;
 eval("main = " + js + ';');
@@ -43,11 +46,13 @@ var sys = new System(main);
 
 //////////////////////////////////////////
 // initialize the environment
+
 console.error("initializing environment");
 sys.init();
 
 //////////////////////////////////////////
 // run
+
 console.error("running");
 sys.run();
 //process.exit(exitCode);

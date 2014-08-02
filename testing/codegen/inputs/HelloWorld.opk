@@ -1,13 +1,10 @@
 /**
  * test program
- *
- * have a launcher to plug into system
  */
 
+action (args, io, env, lib) {
 
-action (args, io, env, kit) {
-
-    io.out.writeLine('Hello, world!')
+    io.out.writeLine("Hello, world!")
 
     io.err.writeLine("Goodbye, world!")
 

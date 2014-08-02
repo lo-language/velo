@@ -103,8 +103,8 @@ action (args, system, shop) {
     ).then(out);
 
 
-    shop.make('Http/Logger/ELF', system.stderr) => log;
-    shop.make('Http/Server', log) => server;
+    lib.get('Http/Logger/ELF', system.stderr) => log;
+    lib.get('Http/Server', log) => server;
 
     server.onRequest >> (request) {
 
