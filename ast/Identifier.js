@@ -8,6 +8,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param name
+ * @param selector
+ * @private
  */
 var __ = function (name, selector) {
 
@@ -17,12 +20,16 @@ var __ = function (name, selector) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * An action maps onto a JS function that takes a message.
  */
 __.prototype.toJavaScript = function (context) {
 
+    // inform the context of our usage
+    if (typeof this.id == 'string') {
+        context.declare(this.id);
+    }
+
     if (this.selector) {
-        return this.id.toJavaScript() + '.$' + this.selector;
+        return this.id.toJavaScript(context) + '.$' + this.selector;
     }
 
     // guard the identifier from colliding with JS reserved words

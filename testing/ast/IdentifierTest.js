@@ -6,6 +6,7 @@
 "use strict";
 
 var Identifier = require('../../ast/Identifier');
+var Context = require('../../codegen/Context');
 
 module.exports["json"] = {
 
@@ -28,11 +29,18 @@ module.exports["json"] = {
 
 module.exports["codegen"] = {
 
+    setUp: function (cb) {
+
+        this.context = new Context();
+
+        cb();
+    },
+
     "base name": function (test) {
 
         var id = new Identifier("foo");
 
-        test.equal(id.toJavaScript(), "$foo");
+        test.equal(id.toJavaScript(this.context), "$foo");
         test.done();
     },
 
@@ -40,7 +48,7 @@ module.exports["codegen"] = {
 
         var id = new Identifier(new Identifier("foo"), "bar");
 
-        test.equal(id.toJavaScript(), "$foo.$bar");
+        test.equal(id.toJavaScript(this.context), "$foo.$bar");
         test.done();
     }
 };

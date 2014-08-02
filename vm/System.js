@@ -107,7 +107,7 @@ __.prototype.run = function () {
             throw new Error("couldn't find object with address " + envelope[0]);
         }
 
-        recipient.action(envelope);
+        recipient.action.apply(recipient, envelope);
     }
 };
 

@@ -1,6 +1,7 @@
 #### Language
 
 - [Basics](/intro) - everything you can do without calls
+- [Expressions](/expressions) - everything you can do without calls
 - [Objects](/intro)
 - [Streamlines](/calls) - stateless actions, recursion, concurrency
 - [Modules](/modules)

@@ -6,6 +6,7 @@
 "use strict";
 
 var Literal = require('../../ast/Literal');
+var Context = require('../../codegen/Context');
 
 module.exports["json"] = {
 
@@ -36,11 +37,18 @@ module.exports["json"] = {
 
 module.exports["codegen"] = {
 
+    setUp: function (cb) {
+
+        this.context = new Context();
+
+        cb();
+    },
+
     "number": function (test) {
 
         var val = new Literal(3);
 
-        test.equal(val.toJavaScript(), 3);
+        test.equal(val.toJavaScript(this.context), 3);
         test.done();
     },
 
@@ -48,7 +56,7 @@ module.exports["codegen"] = {
 
         var val = new Literal(true);
 
-        test.equal(val.toJavaScript(), true);
+        test.equal(val.toJavaScript(this.context), true);
         test.done();
     },
 
@@ -56,7 +64,7 @@ module.exports["codegen"] = {
 
         var val = new Literal("Leela");
 
-        test.equal(val.toJavaScript(), '"Leela"');
+        test.equal(val.toJavaScript(this.context), '"Leela"');
         test.done();
     }
 };

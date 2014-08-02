@@ -10,6 +10,7 @@
 
 var fs = require('fs');
 var parser = require('./parser/Parser');
+var Context = require('./codegen/Context');
 var System = require('./vm/System');
 
 var sourceFile = process.argv[2];
@@ -34,13 +35,15 @@ var module = parser.parse(source);
 // compile
 
 console.error("compiling");
-var js = module.toJavaScript();
+var context = new Context();
+var js = module.toJavaScript(context);
+console.log(js);
 
 //////////////////////////////////////////
 // load
 
 console.error("loading");
-var main;
+var main = 'Oh freddled gruntbuggly';
 eval("main = " + js + ';');
 var sys = new System(main);
 

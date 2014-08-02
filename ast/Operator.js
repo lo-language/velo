@@ -50,7 +50,7 @@ __.prototype.toJavaScript = function (context) {
             break;
     }
 
-    return this.left.toJavaScript() + ' ' + op + ' ' + this.right.toJavaScript();
+    return this.left.toJavaScript(context) + ' ' + op + ' ' + this.right.toJavaScript(context);
 };
 
 module.exports = __;

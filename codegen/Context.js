@@ -1,6 +1,8 @@
 /**
  * Created by: spurcell
  * 12/25/13
+ *
+ * A compilation context.
  */
 
 "use strict";
@@ -11,13 +13,29 @@
  * @param parent
  * @constructor
  */
-var Context = function (parent) {
+var __ = function (parent) {
 
-    this.parent = parent || null;
-    this.newline = parent ? parent.newline + '\t' : '\n';
+    this.vars = {};
 
-    this.seqCounter = 0;
-    this.seqStack = []; // maybe sequences should parse right-recursive?
+//
+//    this.parent = parent || null;
+//    this.newline = parent ? parent.newline + '\t' : '\n';
+//
+//    this.seqCounter = 0;
+//    this.seqStack = []; // maybe sequences should parse right-recursive?
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param name
+ * @param value
+ */
+__.prototype.declare = function (name, value) {
+
+    if (this.vars[name] === undefined) {
+        this.vars[name] = value;
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,20 +43,20 @@ var Context = function (parent) {
  *
  * @return {*}
  */
-Context.prototype.push = function () {
-    return new Context(this);
-};
+//__.prototype.push = function () {
+//    return new __(this);
+//};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
  * @return {String}
  */
-Context.prototype.getSeqName = function () {
-
-    this.seqCounter++;
-    return 'seq' + this.seqCounter;
-};
+//__.prototype.getSeqName = function () {
+//
+//    this.seqCounter++;
+//    return 'seq' + this.seqCounter;
+//};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -46,7 +64,7 @@ Context.prototype.getSeqName = function () {
  * @param node
  * @return {*}
  */
-Context.prototype.codegen = function (node) {
+__.prototype.codegen = function (node) {
 
 //    return 'function (message, out, err, chunk) { this.system.sendMessage(out, "yay"); }';
 
@@ -79,11 +97,11 @@ Context.prototype.codegen = function (node) {
                     this.newline + '\t';
 
             // create a new context for this action
-            var actionContext = this.push();
+            var action__ = this.push();
 
             // generate code for statements
             statements.forEach(function (statement) {
-                result += actionContext.codegen(statement);
+                result += action__.codegen(statement);
             });
 
             return result + '}';
@@ -118,4 +136,4 @@ Context.prototype.codegen = function (node) {
     return '';
 };
 
-module.exports = Context;
+module.exports = __;

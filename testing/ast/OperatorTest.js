@@ -8,6 +8,7 @@
 var Operator = require('../../ast/Operator');
 var Literal = require('../../ast/Literal');
 var Identifier = require('../../ast/Identifier');
+var Context = require('../../codegen/Context');
 
 
 module.exports["json"] = {
@@ -23,11 +24,18 @@ module.exports["json"] = {
 
 module.exports["codegen"] = {
 
+    setUp: function (cb) {
+
+        this.context = new Context();
+
+        cb();
+    },
+
     "add": function (test) {
 
         var op = new Operator("add", new Literal(3), new Literal(4));
 
-        test.equal(op.toJavaScript(), "3 + 4");
+        test.equal(op.toJavaScript(this.context), "3 + 4");
         test.done();
     },
 
@@ -35,7 +43,7 @@ module.exports["codegen"] = {
 
         var op = new Operator("sub", new Literal(3), new Literal(4));
 
-        test.equal(op.toJavaScript(), "3 - 4");
+        test.equal(op.toJavaScript(this.context), "3 - 4");
         test.done();
     },
 
@@ -43,7 +51,7 @@ module.exports["codegen"] = {
 
         var op = new Operator("mult", new Literal(3), new Literal(4));
 
-        test.equal(op.toJavaScript(), "3 * 4");
+        test.equal(op.toJavaScript(this.context), "3 * 4");
         test.done();
     },
 
@@ -51,7 +59,7 @@ module.exports["codegen"] = {
 
         var op = new Operator("div", new Literal(3), new Literal(4));
 
-        test.equal(op.toJavaScript(), "3 / 4");
+        test.equal(op.toJavaScript(this.context), "3 / 4");
         test.done();
     },
 
@@ -59,7 +67,7 @@ module.exports["codegen"] = {
 
         var op = new Operator("mod", new Literal(3), new Literal(4));
 
-        test.equal(op.toJavaScript(), "3 % 4");
+        test.equal(op.toJavaScript(this.context), "3 % 4");
         test.done();
     },
 
@@ -67,7 +75,7 @@ module.exports["codegen"] = {
 
         var op = new Operator("assign", new Identifier('foo'), new Literal(4));
 
-        test.equal(op.toJavaScript(), "$foo = 4");
+        test.equal(op.toJavaScript(this.context), "$foo = 4");
         test.done();
     }
 };

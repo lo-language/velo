@@ -21,24 +21,35 @@ var __ = function (args, statements) {
  */
 __.prototype.toJavaScript = function (context) {
 
+    var header = '';
     var body = '';
 
-    if (this.args.length > 0) {
+    // declare args
 
-        body +=
-            this.args.map(function (argName, index) {
-                return 'var $' + argName + " = args[" + index + "];";
-            }).join('\n\t') + "\n\t";
-    }
+    this.args.forEach(function (argName, index) {
+
+        context.declare(argName, "arguments[" + index + "]");
+    });
 
     if (this.statements.length > 0) {
 
-        body += this.statements.map(function (stmt) {
+        body += "\n\t" + this.statements.map(function (stmt) {
                 return stmt.toJavaScript(context) + ';';
             }).join("\n\t");
     }
 
-    return "function (args) {\n\t" + body + "\n}";
+    // declare local vars
+    if (Object.keys(context.vars).length > 0) {
+
+        header += '\n\t var ' +
+        Object.keys(context.vars).map(function (varName) {
+            return '$' + varName + (context.vars[varName] ? ' = ' + context.vars[varName] : '');
+        }).join(', ') + ";";
+    }
+
+
+
+    return "function () {" + header + body + "}";
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

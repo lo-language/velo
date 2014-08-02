@@ -9,6 +9,7 @@ var Operator = require('../../ast/Operator');
 var Literal = require('../../ast/Literal');
 var Identifier = require('../../ast/Identifier');
 var Action = require('../../ast/Action');
+var Context = require('../../codegen/Context');
 
 //module.exports["json"] = {
 //
@@ -23,10 +24,17 @@ var Action = require('../../ast/Action');
 
 module.exports["codegen"] = {
 
+    setUp: function (cb) {
+
+        this.context = new Context();
+
+        cb();
+    },
+
     "no args": function (test) {
 
         var action = new Action([]);
-        test.equal(action.toJavaScript(), "function () {}");
+        test.equal(action.toJavaScript(this.context), "function () {}");
         test.done();
     }
 };

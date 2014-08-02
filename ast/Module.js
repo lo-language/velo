@@ -1,6 +1,6 @@
 /**
  * Created by: spurcell
- * 7/5/14
+ * 8/2/14
  */
 
 "use strict";
@@ -8,23 +8,18 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param name
+ * @param selector
+ * @private
  */
-var __ = function (id, args) {
-
-    this.id = id;
-    this.args = args || [];
+var __ = function () {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * An invocation sends a message to the target action.
  */
 __.prototype.toJavaScript = function (context) {
 
-    // todo - make this send an actual message, this is fake right now
-    return this.id.toJavaScript(context) + '(' + this.args.map(function (arg) {
-        return arg.toJavaScript(context);
-    }).join(', ') + ')';
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,10 +28,11 @@ __.prototype.toJavaScript = function (context) {
  */
 __.prototype.toJSON = function () {
 
-    return {
-        invoke: this.id,
-        args: this.args
-    };
+    if (typeof this.id == 'string') {
+        return ['id', this.id];
+    }
+
+    return ['id', this.id.toJSON(), this.selector];
 };
 
 module.exports = __;
