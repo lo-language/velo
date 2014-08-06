@@ -4,11 +4,12 @@
 
 action (args, io, env, lib) {
 
-    message = "hello, world!\n"
+    message = "Hello, world!"
+    message2 = 2 + 7
 
-    io.out.writeLine("Hello, world!")
+    io.out.writeLine(message)
 
-    io.err.writeLine("Goodbye, world!")
+    io.err.writeLine(args)
 
     // test cases - no followers should equal no cb address sent, etc.
 }

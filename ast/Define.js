@@ -1,31 +1,29 @@
 /**
  * Created by: spurcell
  * 7/5/14
- *
- * todo: list literals, record literals
- * todo: multiline string literals, with and without line breaks
- * todo: string interpolation
  */
 
 "use strict";
-
-var Constant = require('../codegen/Constant');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
  */
-var __ = function (value) {
+var __ = function (name, value) {
 
+    this.name = name;
     this.value = value;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ *
+ * @param scope
+ * @return {*}
  */
-__.prototype.renderJs = function (scope) {
+__.prototype.render = function (scope) {
 
-    return new Constant(this.value);
+    scope.define(this.name, this.value);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +32,7 @@ __.prototype.renderJs = function (scope) {
  */
 __.prototype.toJSON = function () {
 
-    return this.value;
+    return ['define', this.name, this.value];
 };
 
 module.exports = __;

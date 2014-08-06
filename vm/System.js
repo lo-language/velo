@@ -30,7 +30,7 @@ var __ = function (main) {
  */
 __.prototype.init = function () {
 
-    // pop off the args
+    // pop off the args we don't care about
     var argv = process.argv.slice(2);
 
     // create some basic objects

@@ -1,6 +1,8 @@
 /**
  * Created by: spurcell
  * 2/17/14
+ *
+ * An Object is an isolated, stateful, sequential process.
  */
 
 "use strict";

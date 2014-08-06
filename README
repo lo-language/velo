@@ -1,3 +1,11 @@
+# Light
+
+Light is simple general-purpose programming language designed to make building and testing secure, distributed software systems intuitive and easy.
+
+#### Introduction
+
+
+
 To generate the parser,
 
 cd parser

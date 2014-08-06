@@ -6,7 +6,8 @@
 "use strict";
 
 var Identifier = require('../../ast/Identifier');
-var Context = require('../../codegen/Context');
+var Scope = require('../../codegen/Scope');
+var Promise = require('../../codegen/Promise');
 
 module.exports["json"] = {
 
@@ -31,7 +32,7 @@ module.exports["codegen"] = {
 
     setUp: function (cb) {
 
-        this.context = new Context();
+        this.scope = new Scope();
 
         cb();
     },
@@ -40,15 +41,23 @@ module.exports["codegen"] = {
 
         var id = new Identifier("foo");
 
-        test.equal(id.toJavaScript(this.context), "$foo");
-        test.done();
-    },
+        var result = id.renderJs(this.scope);
 
-    "field selector": function (test) {
-
-        var id = new Identifier(new Identifier("foo"), "bar");
-
-        test.equal(id.toJavaScript(this.context), "$foo.$bar");
+        test.ok(result instanceof Promise);
+        test.equal(result.getName(), "$foo");
         test.done();
     }
+
+//    "field selector": function (test) {
+//
+//        var id = new Identifier(new Identifier("foo"), "bar");
+//
+//        var result = id.renderJs(this.scope);
+//
+//        test.ok(result instanceof Promise);
+//        test.equal(result.getName(), "$foo");
+//
+//        test.equal(id.renderJs(this.scope), "$foo.$bar");
+//        test.done();
+//    }
 };

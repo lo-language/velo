@@ -17,8 +17,6 @@ action (center, radius, lib) {
 
     parent = lib.createShape(getTopLeft(), radius)
 
-    // merges records; clobbers existing keys
-
     parent += [
 
         getCenter: action () {
@@ -47,6 +45,4 @@ action (center, radius, lib) {
 
         }
     ]
-
-    return parent
 }

@@ -21,19 +21,24 @@ var __ = function (name, selector) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  */
-__.prototype.toJavaScript = function (context) {
+__.prototype.renderJs = function (scope, target) {
+
+    if (scope.isConstant(this.id)) {
+        return scope.resolve(this.id);
+    }
 
     // inform the context of our usage
-    if (typeof this.id == 'string') {
-        context.declare(this.id);
-    }
+    // we could also give it a name and have it give us an ID, rather than passing through the name
 
-    if (this.selector) {
-        return this.id.toJavaScript(context) + '.$' + this.selector;
-    }
+//    if (typeof this.id == 'string') {
+//        context.declare(this.id);
+//    }
+//
+//    if (this.selector) {
+//        return this.id.toJavaScript(context) + '.$' + this.selector;
+//    }
 
-    // guard the identifier from colliding with JS reserved words
-    return "$" + this.id;
+    return target.getVar(this.id);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

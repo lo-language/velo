@@ -35,13 +35,13 @@ __.prototype.toJavaScript = function (context) {
 
         body += "\n\t" + this.statements.map(function (stmt) {
                 return stmt.toJavaScript(context) + ';';
-            }).join("\n\t");
+            }).join("\n\t") + '\n';
     }
 
     // declare local vars
     if (Object.keys(context.vars).length > 0) {
 
-        header += '\n\t var ' +
+        header += '\n\tvar ' +
         Object.keys(context.vars).map(function (varName) {
             return '$' + varName + (context.vars[varName] ? ' = ' + context.vars[varName] : '');
         }).join(', ') + ";";

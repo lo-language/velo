@@ -17,11 +17,22 @@ var __ = function (op, left, right) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * An action maps onto a JS function that takes a message.
  */
-__.prototype.toJavaScript = function (context) {
+__.prototype.renderJs = function (scope, target) {
 
     var op;
+    var left = this.left.renderJs(scope, target);
+    var right = this.right.renderJs(scope, target);
+
+    // see if we're trying to assign to a constant
+    if (left.isConstant() && this.op == 'assign') {
+        // todo throw compile error
+    }
+
+    // if left & right are both constant expressions, we can simplify it
+    if (left.isConstant() && right.isConstant()) {
+        return this.simplify(this.op, left.value, right.value, target);
+    }
 
     switch(this.op) {
 
@@ -44,13 +55,57 @@ __.prototype.toJavaScript = function (context) {
         case "mod":
             op = '%';
             break;
-
-        case "assign":
-            op = '=';
-            break;
     }
 
-    return this.left.toJavaScript(context) + ' ' + op + ' ' + this.right.toJavaScript(context);
+    if (left.isConstant()) {
+
+        return target.createPromise('Q.when(' + right.getName() +
+            ', function (val) {return ' + left.getValue() + ' ' + op + ' val;});');
+    }
+
+    if (right.isConstant()) {
+
+        return target.createPromise('Q.when(' + left.getName() +
+            ', function (val) {return ' + right.getValue() + ' ' + op + ' val;});');
+    }
+
+    // neither are constants
+
+    return target.createPromise('Q.all([' + left.getName() + ', ' + right.getName() + ']).then('
+        + 'function (left, right) {return left ' + op + ' right;});');
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param left
+ * @param right
+ * @return {Constant}
+ */
+__.prototype.simplify = function (op, left, right, target) {
+
+    switch(op) {
+
+        case "add":
+            return target.createConstant(left + right);
+            break;
+
+        case "sub":
+            return target.createConstant(left - right);
+            break;
+
+        case "mult":
+            return target.createConstant(left * right);
+            break;
+
+        case "div":
+            return target.createConstant(left / right);
+            break;
+
+        case "mod":
+            return target.createConstant(left % right);
+            break;
+    }
 };
 
 module.exports = __;

@@ -2,7 +2,7 @@
  * Created by: spurcell
  * 7/6/14
  *
- * Factory for wraping node writable streams
+ * Factory for wrapping node writable streams
  */
 
 "use strict";
