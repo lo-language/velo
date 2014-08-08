@@ -36,7 +36,7 @@ module.exports["constants"] = {
         var constant = this.scope.resolve('foo');
 
         test.ok(constant instanceof Constant);
-        test.equal(constant.getVal(), 7);
+        test.equal(constant.getValue(), 7);
         test.done();
     },
 

@@ -46,7 +46,7 @@ module.exports["render"] = {
 
     "number": function (test) {
 
-        var val = new Literal(3).render(this.scope);
+        var val = new Literal(3).renderJs(this.scope);
 
         test.ok(val.isConstant());
         test.done();
@@ -54,7 +54,7 @@ module.exports["render"] = {
 
     "boolean": function (test) {
 
-        var val = new Literal(true).render(this.scope);
+        var val = new Literal(true).renderJs(this.scope);
 
         test.ok(val.isConstant());
         test.done();
@@ -62,7 +62,7 @@ module.exports["render"] = {
 
     "string": function (test) {
 
-        var val = new Literal("Leela").render(this.scope);
+        var val = new Literal("Leela").renderJs(this.scope);
 
         test.ok(val.isConstant());
         test.done();

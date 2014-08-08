@@ -5,11 +5,9 @@
 
 "use strict";
 
-var Operator = require('../../ast/Operator');
-var Literal = require('../../ast/Literal');
-var Identifier = require('../../ast/Identifier');
 var Action = require('../../ast/Action');
-var Context = require('../../codegen/Context');
+var Scope = require('../../codegen/Scope');
+var TargetScope = require('../../codegen/TargetScope');
 
 //module.exports["json"] = {
 //
@@ -26,7 +24,8 @@ module.exports["codegen"] = {
 
     setUp: function (cb) {
 
-        this.context = new Context();
+        this.scope = new Scope();
+        this.target = new TargetScope();
 
         cb();
     },
@@ -34,7 +33,7 @@ module.exports["codegen"] = {
     "no args": function (test) {
 
         var action = new Action([]);
-        test.equal(action.toJavaScript(this.context), "function () {}");
+        test.equal(action.renderJs(this.scope, this.target), "function () {}");
         test.done();
     }
 };

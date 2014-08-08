@@ -19,12 +19,25 @@ var __ = function (id, args) {
 /**
  * An invocation sends a message to the target action.
  */
-__.prototype.toJavaScript = function (context) {
+__.prototype.renderJs = function (scope, target) {
 
-    // todo - make this send an actual message, this is fake right now
-    return this.id.toJavaScript(context) + '(' + this.args.map(function (arg) {
-        return arg.toJavaScript(context);
-    }).join(', ') + ')';
+    // todo assert operand is not a constant
+
+    var keyVar = this.id.renderJs(scope, target);
+    var waitList = [keyVar.getName()];
+
+    // render all args
+    this.args.forEach(function (arg) {
+
+        var p = arg.renderJs(scope, target);
+
+        waitList.push(p.renderJs());
+    });
+
+    // will also have to *wait on* all the promise args to be resolved before we can send our message
+
+    return target.createPromise('Q.all([' + waitList.join(', ') +
+        ']).then(function (key) { vm.sendMessage(key); });');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -5,7 +5,7 @@
 
 "use strict";
 
-var Obj = require('../../../vm/Obj');
+var Obj = require('../../vm/Obj');
 
 exports["constructor"] = {
 

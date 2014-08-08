@@ -38,5 +38,12 @@ __.prototype.isConstant = function () {
     return false;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ */
+__.prototype.renderJs = function (scope, target) {
+    return this.name;
+};
+
 
 module.exports = __;

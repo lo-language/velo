@@ -8,6 +8,7 @@
 var Identifier = require('../../ast/Identifier');
 var Scope = require('../../codegen/Scope');
 var Promise = require('../../codegen/Promise');
+var TargetScope = require('../../codegen/TargetScope');
 
 module.exports["json"] = {
 
@@ -33,6 +34,7 @@ module.exports["codegen"] = {
     setUp: function (cb) {
 
         this.scope = new Scope();
+        this.target = new TargetScope();
 
         cb();
     },
@@ -41,7 +43,7 @@ module.exports["codegen"] = {
 
         var id = new Identifier("foo");
 
-        var result = id.renderJs(this.scope);
+        var result = id.renderJs(this.scope, this.target);
 
         test.ok(result instanceof Promise);
         test.equal(result.getName(), "$foo");

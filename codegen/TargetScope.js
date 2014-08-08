@@ -24,17 +24,6 @@ var __ = function () {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Adds a statement to the target scope.
- *
- * @param stmt
- */
-__.prototype.addStatement = function (stmt) {
-
-    this.statements.push(stmt);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
  * Returns the target variable for the given source name.
  *
  * @param name  the name of the source variable

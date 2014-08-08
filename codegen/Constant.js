@@ -17,7 +17,7 @@ __.prototype.isConstant = function () {
     return true;
 };
 
-__.prototype.renderJs = function () {
+__.prototype.renderJs = function (scope, target) {
 
     if (typeof this.value == 'string') {
         return '"' + this.value + '"';

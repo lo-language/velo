@@ -27,25 +27,21 @@ module.exports["basics"] = {
         test.done();
     },
 
-//    "empty target": function (test) {
-//
-//        test.equal(this.target.renderJs(), 'function () {}');
-//        test.done();
-//    },
-//
-//    "getVar": function (test) {
-//
-//        var p = this.target.getVar('foo');
-//
+    "getVar": function (test) {
+
+        var p = this.target.getVar('foo');
+
+        test.ok(p instanceof Promise);
+        test.equal(p.getName(), '$foo');
+
+        // test idempotency
+
+        var p2 = this.target.getVar('foo');
+
+        test.ok(p2 instanceof Promise);
+        test.equal(p2.getName(), '$foo');
+
 //        test.equal(this.target.renderJs(), 'function () {\n\tvar $foo;\n}');
-//        test.done();
-//    },
-//
-//    "createPromise": function (test) {
-//
-//        var p = this.target.createPromise('foo');
-//
-//        test.equal(this.target.renderJs(), 'function () {\n\tvar $0;\n}');
-//        test.done();
-//    }
+        test.done();
+    }
 }
