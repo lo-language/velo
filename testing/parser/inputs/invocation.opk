@@ -1,8 +1,7 @@
-action () {
+action ()
 
     foo()           // where foo holds an action address
     foo.bar()       // where bar is an action address on record foo
     foo() => baz    // capture output of foo
     foo(bar) => baz -> foobar => bazzle
     foo(bar, baz) => foobar
-}

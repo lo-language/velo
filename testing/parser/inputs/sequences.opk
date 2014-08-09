@@ -1,21 +1,23 @@
-action () {
+action ()
 
     42 => answer
     in -> out
     hash(password) >~ handler => hashedPw
-    listen >> handler >| (chunks) {}
-    listen -> () { }
-
-    hash(pw) >~ () {
+    listen >> handler >| (chunks)
+        pass
+    listen -> ()
+        pass
+    hash(pw) >~ ()
 
         x -> in => items
-    }
-    -> () {
+
+    -> ()
 
         "hi there" -> log
         in -> out
-    }
+
     -> foo => result
 
-    foo -> { } -> ok
-}
+    foo -> ()
+        pass
+    -> ok

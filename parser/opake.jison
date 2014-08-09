@@ -9,24 +9,24 @@
 "/*"                    this.begin("comment");
 <comment>"*/"           this.popState();
 <comment>.              /* skip comment */
-<INITIAL>\s*<<EOF>>              %{
+\s*<<EOF>>              %{
                             var tokens = [];
 
-                            console.log('wrapup');
                             while (indents.length > 1) {
                                 tokens.unshift('END');
                                 indents.shift();
                             }
+
                             tokens.unshift('EOF');
-                            console.log(tokens);
                             return tokens;
 				        %}
-[\n\r]+{spc}*/![^\n\r]		/* eat blank lines */
-\n\s+                   %{
+<INITIAL>\n+            this.begin("indent");
+<indent>\s*\n+          /* ignore blank lines */
+<indent>\s*             %{
+                            // process indentation
+                            this.popState();
                             if (yyleng > indents[0].length) {
                                 indents.unshift(yytext);
-                                console.log('begin: ' + yytext);
-                                console.log(indents);
                                 return 'BEGIN';
                             }
 
@@ -40,13 +40,12 @@
 
                                     indents.shift();
                                     tokens.push('END');
-                                    console.log('end');
                                 }
 
                                 return tokens;
                             }
                         %}
-\s+                     /* skip all other whitespace */
+\s+                     /* ignore all other whitespace */
 ";"                     return ';'
 [0-9]+("."[0-9]+)?\b    return 'CONSTANT'
 \".*\"                  yytext = yytext.substr(1, yyleng-2); return 'STRING_LITERAL';
@@ -88,6 +87,7 @@
 "break"                 return 'BREAK'
 "action"                return 'ACTION'
 "true"|"false"          return 'BOOLEAN'
+"pass"                  return 'PASS'
 [a-zA-Z][a-zA-Z0-9]*    return 'NAME'
 .                       return 'INVALID'
 
@@ -118,7 +118,8 @@ action_definition
     ;
 
 block
-    : BEGIN statement* END -> $2
+    : BEGIN PASS END -> []
+    | BEGIN statement* END -> $2
     ;
 
 statement

@@ -1,22 +1,18 @@
-action (args, io, env, kit) {
+action (args, io, env, lib)
 
-    kit.get('http/server', log) => server
-    kit.get('http/logger/elf', io.err) => log
+    lib.get('http/server', log) => server
+    lib.get('http/logger/elf', io.err) => log
 
     // each action call can be followed by a list of continuations
     server.onRequest()
-        >~ (err) {
+    >~ (err)
+        pass
+    >> (request)
 
-        }
-        >> (request) {
-
-            request.response.end("howdy!")
-
-            recur("42")
-        }
-        >| {
-            // wrap up
-        }
+        request.response.end("howdy!")
+        recur("42")
+    >|
+        // wrap up
 
     // the continuations are mapped onto:
     reply() // for channel 0
@@ -27,29 +23,21 @@ action (args, io, env, kit) {
     listeners.push(reply)
     listeners.remove(reply)
 
-    button.click() >> (click) {
+    button.click() >> (click)
+        pass
 
-    }
-
-    foo = action (input) {
+    foo = action (input)
         reply(input * 2)
-    }
 
-    file.read() >> foo >| () {
-
-
-    }
+    file.read() >> foo >| ()
+        pass
 
     server.listen(io.port)
-        >~ (err) {
-            log.err("failed to open port __port.num__: ")
-        }
-        -> {
-            log.info("server running on port __port.num__")
-        }
+    >~ (err)
+        log.err("failed to open port __port.num__: ")
+    ->
+        log.info("server running on port __port.num__")
 
-    env.on('SIGINT') -> {
+    env.on('SIGINT') ->
         io.err.writeLine("received SIGINT")
         server.stop()
-    }
-}

@@ -1,4 +1,4 @@
-action () {
+action ()
 
     result = foo == bar
     result = foo != bar
@@ -6,4 +6,3 @@ action () {
     result = foo > bar
     result = foo <= bar
     result = foo >= bar
-}

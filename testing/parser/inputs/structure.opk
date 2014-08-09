@@ -5,28 +5,22 @@
  * problem: can't tell if x -> y is an invocation (x is a constant, or non-action-valued variable)
  * or a sequence definition (x is an action; b = x -> y defines action b)
  */
-action () {
+action ()
 
-    x = action () {}
+    x = action ()
+        pass
 
-    if (#items == 0) {
+    if (#items == 0)
         fail("oh noes!")
-    }
 
-    if (#items == 1) {
+    if (#items == 1)
         x = 2
-    }
-    else {
+    else
         y = 3
-    }
 
-    if (answer == 42) {
+    if (answer == 42)
         a -> b
-    }
-    else if (answer == 57) {
+    else if (answer == 57)
         b -> c
-    }
-    else {
+    else
         c -> d
-    }
-}
