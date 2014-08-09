@@ -21,6 +21,9 @@ var __ = function (args, statements) {
  */
 __.prototype.renderJs = function (scope, target) {
 
+    // create the action in the scope
+
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

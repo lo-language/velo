@@ -37,7 +37,7 @@ __.prototype.renderJs = function (scope, target) {
     // will also have to *wait on* all the promise args to be resolved before we can send our message
 
     return target.createPromise('Q.all([' + waitList.join(', ') +
-        ']).then(function (key) { vm.sendMessage(key); });');
+        ']).then(function (args) { vm.sendMessage(args); });');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
