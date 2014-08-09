@@ -1,15 +1,52 @@
 %lex
 
 %s comment
+%x indent
 
 %%
-
 
 "//".*                  /* line comment */
 "/*"                    this.begin("comment");
 <comment>"*/"           this.popState();
 <comment>.              /* skip comment */
-\s+                     /* skip whitespace */
+<INITIAL>\s*<<EOF>>              %{
+                            var tokens = [];
+
+                            console.log('wrapup');
+                            while (indents.length > 1) {
+                                tokens.unshift('END');
+                                indents.shift();
+                            }
+                            tokens.unshift('EOF');
+                            console.log(tokens);
+                            return tokens;
+				        %}
+[\n\r]+{spc}*/![^\n\r]		/* eat blank lines */
+\n\s+                   %{
+                            if (yyleng > indents[0].length) {
+                                indents.unshift(yytext);
+                                console.log('begin: ' + yytext);
+                                console.log(indents);
+                                return 'BEGIN';
+                            }
+
+                            if (yyleng < indents[0].length) {
+
+                                // check for match between indent and what we pop
+
+                                var tokens = [];
+
+                                while (yyleng < indents[0].length) {
+
+                                    indents.shift();
+                                    tokens.push('END');
+                                    console.log('end');
+                                }
+
+                                return tokens;
+                            }
+                        %}
+\s+                     /* skip all other whitespace */
 ";"                     return ';'
 [0-9]+("."[0-9]+)?\b    return 'CONSTANT'
 \".*\"                  yytext = yytext.substr(1, yyleng-2); return 'STRING_LITERAL';
@@ -19,8 +56,6 @@
 "("                     return '('
 ")"                     return ')'
 ","                     return ','
-"{"                     return '{'
-"}"                     return '}'
 "."                     return '.'
 "=="                    return '=='
 "!="                    return '!='
@@ -54,13 +89,18 @@
 "action"                return 'ACTION'
 "true"|"false"          return 'BOOLEAN'
 [a-zA-Z][a-zA-Z0-9]*    return 'NAME'
-<<EOF>>                 return 'EOF'
 .                       return 'INVALID'
 
 /lex
 
+%{
+    indents = [''];
+%}
+
 /* enable EBNF grammar syntax */
 %ebnf
+
+%options token-stack
 
 %%
 
@@ -78,7 +118,7 @@ action_definition
     ;
 
 block
-    : '{' statement* '}' -> $2
+    : BEGIN statement* END -> $2
     ;
 
 statement
