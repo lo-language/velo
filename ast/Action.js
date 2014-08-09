@@ -5,25 +5,29 @@
 
 "use strict";
 
+var Constant = require('../codegen/Constant');
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
  */
-var __ = function (args, statements) {
+var __ = function (params, statements) {
 
-    this.args = args;
+    this.params = params || [];
     this.statements = statements || [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * An action maps onto a JS function that takes a message.
+ * Compiles this action into the given target function.
+ *
+ * @param target
  */
-__.prototype.renderJs = function (scope, target) {
+__.prototype.compile = function (target) {
 
-    // create the action in the scope
-
-
+    this.statements.forEach(function (stmt) {
+        stmt.compile(target);
+    });
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,7 +37,7 @@ __.prototype.renderJs = function (scope, target) {
 __.prototype.toJSON = function () {
 
     return {
-        "action": this.args,
+        "action": this.params,
         "statements": this.statements
     };
 };

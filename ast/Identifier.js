@@ -21,22 +21,18 @@ var __ = function (name, selector) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  */
-__.prototype.renderJs = function (scope, target) {
+__.prototype.compile = function (target) {
 
-    if (scope.isConstant(this.id)) {
-        return scope.resolve(this.id);
+//    if (scope.isConstant(this.id)) {
+//        return scope.resolve(this.id);
+//    }
+
+    // async selectors? will actually have to wait for the base name, then apply the selector
+    // might even have to use temp vars!
+
+    if (this.selector) {
+        return this.id.compile(target) + '.$' + this.selector;
     }
-
-    // inform the context of our usage
-    // we could also give it a name and have it give us an ID, rather than passing through the name
-
-//    if (typeof this.id == 'string') {
-//        context.declare(this.id);
-//    }
-//
-//    if (this.selector) {
-//        return this.id.toJavaScript(context) + '.$' + this.selector;
-//    }
 
     return target.getVar(this.id);
 };

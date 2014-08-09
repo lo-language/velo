@@ -19,25 +19,23 @@ var __ = function (id, args) {
 /**
  * An invocation sends a message to the target action.
  */
-__.prototype.renderJs = function (scope, target) {
+__.prototype.compile = function (target) {
 
     // todo assert operand is not a constant
 
-    var keyVar = this.id.renderJs(scope, target);
-    var waitList = [keyVar.getName()];
+    var keyVar = this.id.compile(target);
+    var waitList = [keyVar];
 
     // render all args
     this.args.forEach(function (arg) {
 
-        var p = arg.renderJs(scope, target);
-
-        waitList.push(p.renderJs());
+        waitList.push(arg.compile(target));
     });
 
     // will also have to *wait on* all the promise args to be resolved before we can send our message
 
-    return target.createPromise('Q.all([' + waitList.join(', ') +
-        ']).then(function (args) { vm.sendMessage(args); });');
+    return target.createTemp('Q.all([' + waitList.join(', ') +
+        ']).then(function (args) { var fn = args.shift(); return fn(args); });');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -10,40 +10,44 @@
 <comment>"*/"           this.popState();
 <comment>.              /* skip comment */
 \s*<<EOF>>              %{
-                            var tokens = [];
 
-                            while (indents.length > 1) {
-                                tokens.unshift('END');
-                                indents.shift();
-                            }
+    var tokens = [];
 
-                            tokens.unshift('EOF');
-                            return tokens;
+    while (indents.length > 1) {
+        tokens.unshift('END');
+        indents.shift();
+    }
+
+    tokens.unshift('EOF');
+    return tokens;
 				        %}
 <INITIAL>\n+            this.begin("indent");
 <indent>\s*\n+          /* ignore blank lines */
 <indent>\s*             %{
-                            // process indentation
-                            this.popState();
-                            if (yyleng > indents[0].length) {
-                                indents.unshift(yytext);
-                                return 'BEGIN';
-                            }
 
-                            if (yyleng < indents[0].length) {
+    // process indentation
 
-                                // check for match between indent and what we pop
+    this.popState();
 
-                                var tokens = [];
+    if (yyleng > indents[0].length) {
+        indents.unshift(yytext);
+        return 'BEGIN';
+    }
 
-                                while (yyleng < indents[0].length) {
+    if (yyleng < indents[0].length) {
 
-                                    indents.shift();
-                                    tokens.push('END');
-                                }
+        // todo throw on mismatch between indent and what we pop?
 
-                                return tokens;
-                            }
+        var tokens = [];
+
+        while (yyleng < indents[0].length) {
+
+            indents.shift();
+            tokens.push('END');
+        }
+
+        return tokens;
+    }
                         %}
 \s+                     /* ignore all other whitespace */
 ";"                     return ';'

@@ -6,7 +6,8 @@
 "use strict";
 
 var Literal = require('../../ast/Literal');
-var Scope = require('../../codegen/Scope');
+var Action = require('../../ast/Action');
+var TargetFn = require('../../codegen/TargetFn');
 
 module.exports["json"] = {
 
@@ -35,36 +36,36 @@ module.exports["json"] = {
     }
 };
 
-module.exports["render"] = {
+module.exports["compile"] = {
 
     setUp: function (cb) {
 
-        this.scope = new Scope();
+        this.target = new TargetFn(new Action());
 
         cb();
     },
 
     "number": function (test) {
 
-        var val = new Literal(3).renderJs(this.scope);
+        var val = new Literal(3).compile(this.target);
 
-        test.ok(val.isConstant());
+        test.equal(val, 3);
         test.done();
     },
 
     "boolean": function (test) {
 
-        var val = new Literal(true).renderJs(this.scope);
+        var val = new Literal(true).compile(this.target);
 
-        test.ok(val.isConstant());
+        test.equal(val, true);
         test.done();
     },
 
     "string": function (test) {
 
-        var val = new Literal("Leela").renderJs(this.scope);
+        var val = new Literal("Leela").compile(this.target);
 
-        test.ok(val.isConstant());
+        test.equal(val, '"Leela"');
         test.done();
     }
 };

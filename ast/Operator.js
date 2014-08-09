@@ -18,21 +18,26 @@ var __ = function (op, left, right) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  */
-__.prototype.renderJs = function (scope, target) {
+__.prototype.compile = function (target) {
+
+    if (this.op == 'assign') {
+        target.assign(this.left, this.right);
+        return;
+    }
 
     var op;
-    var left = this.left.renderJs(scope, target);
-    var right = this.right.renderJs(scope, target);
+    var left = this.left.compile(target);
+    var right = this.right.compile(target);
 
     // see if we're trying to assign to a constant
-    if (left.isConstant() && this.op == 'assign') {
-        // todo throw compile error
-    }
+//    if (left.isConstant() && this.op == 'assign') {
+//        // todo throw compile error
+//    }
 
     // if left & right are both constant expressions, we can simplify it
-    if (left.isConstant() && right.isConstant()) {
-        return this.simplify(this.op, left.value, right.value, target);
-    }
+//    if (left.isConstant() && right.isConstant()) {
+//        return this.simplify(this.op, left.value, right.value, target);
+//    }
 
     switch(this.op) {
 
@@ -55,24 +60,31 @@ __.prototype.renderJs = function (scope, target) {
         case "mod":
             op = '%';
             break;
+
+        case "assign":
+            op = '=';
+            break;
     }
 
-    if (left.isConstant()) {
-
-        return target.createPromise('Q.when(' + right.getName() +
-            ', function (val) {return ' + left.getValue() + ' ' + op + ' val;});');
-    }
-
-    if (right.isConstant()) {
-
-        return target.createPromise('Q.when(' + left.getName() +
-            ', function (val) {return ' + right.getValue() + ' ' + op + ' val;});');
-    }
-
-    // neither are constants
-
-    return target.createPromise('Q.all([' + left.getName() + ', ' + right.getName() + ']).then('
+    return target.createTemp('Q.all([' + left + ', ' + right + ']).then('
         + 'function (left, right) {return left ' + op + ' right;});');
+
+//    if (left.isConstant()) {
+//
+//        return target.intermediate('Q.when(' + right.getName() +
+//            ', function (val) {return ' + left.getValue() + ' ' + op + ' val;});');
+//    }
+//
+//    if (right.isConstant()) {
+//
+//        return target.createPromise('Q.when(' + left.getName() +
+//            ', function (val) {return ' + right.getValue() + ' ' + op + ' val;});');
+//    }
+//
+//    // neither are constants
+//
+//    return target.createPromise('Q.all([' + left.getName() + ', ' + right.getName() + ']).then('
+//        + 'function (left, right) {return left ' + op + ' right;});');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

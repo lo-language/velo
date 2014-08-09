@@ -10,8 +10,9 @@
 
 var fs = require('fs');
 var parser = require('./parser/Parser');
-var Context = require('./codegen/Context');
+var TargetFn = require('./codegen/TargetFn');
 var System = require('./vm/System');
+var Q = require('q');
 
 var sourceFile = process.argv[2];
 
@@ -35,8 +36,8 @@ var module = parser.parse(source);
 // compile
 
 console.error("compiling");
-var context = new Context();
-var js = module.toJavaScript(context);
+var root = new TargetFn(module);
+var js = root.getCode();
 console.log(js);
 
 //////////////////////////////////////////
@@ -48,13 +49,7 @@ eval("main = " + js + ';');
 var sys = new System(main);
 
 //////////////////////////////////////////
-// initialize the environment
-
-console.error("initializing environment");
-sys.init();
-
-//////////////////////////////////////////
-// run
+// initialize the environment and run
 
 console.error("running");
 sys.run();

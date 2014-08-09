@@ -5,9 +5,9 @@
 
 "use strict";
 
-var Action = require('../../ast/Action');
+var ast = require('../../ast');
 var Scope = require('../../codegen/Scope');
-var TargetScope = require('../../codegen/TargetScope');
+var TargetFn = require('../../codegen/TargetFn');
 
 //module.exports["json"] = {
 //
@@ -25,15 +25,29 @@ module.exports["codegen"] = {
     setUp: function (cb) {
 
         this.scope = new Scope();
-        this.target = new TargetScope();
 
         cb();
     },
 
-    "no args": function (test) {
+    "no params empty": function (test) {
 
-        var action = new Action([]);
-        test.equal(action.renderJs(this.scope, this.target), "function () {}");
+        var action = new ast.Action([]);
+        var target = new TargetFn(action);
+
+        test.equal(this.target.statements[0], "$0 = function () {}");
+        test.done();
+    },
+
+    "two params": function (test) {
+
+        var action = new ast.Action(['foo', 'bar'],[
+            new ast.Operator("add", new ast.Identifier('foo'), new ast.Literal(4)),
+            new ast.Operator("add", new ast.Identifier('bar'), new ast.Literal(7))
+        ]);
+
+        action.renderJs(this.scope, this.target)
+
+        test.equal(this.target.statements[0], "$0 = function () {\n\tvar $foo, $1;\n\n\t$1 = Q.when($foo, function (val) {return 4 + val;});\n}");
         test.done();
     }
 };

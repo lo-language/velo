@@ -40,7 +40,7 @@ module.exports["renderJs"] = {
         var p = inv.renderJs(this.scope, this.target);
 
         test.ok(p instanceof Promise);
-        test.equal(this.target.statements[0], '$1 = Q.all([$foo]).then(function (key) { vm.sendMessage(key); });');
+        test.equal(this.target.statements[0], '$1 = Q.all([$foo]).then(function (args) { var fn = args.shift(); return fn(args); });');
         test.done();
     },
 
@@ -51,7 +51,7 @@ module.exports["renderJs"] = {
         var p = inv.renderJs(this.scope, this.target);
 
         test.ok(p instanceof Promise);
-        test.equal(this.target.statements[0], '$1 = Q.all([$foo, 3]).then(function (key) { vm.sendMessage(key); });');
+        test.equal(this.target.statements[0], '$1 = Q.all([$foo, 3]).then(function (args) { var fn = args.shift(); return fn(args); });');
         test.done();
     },
 
@@ -62,18 +62,18 @@ module.exports["renderJs"] = {
         var p = inv.renderJs(this.scope, this.target);
 
         test.ok(p instanceof Promise);
-        test.equal(this.target.statements[0], '$1 = Q.all([$foo, 3, "hi there"]).then(function (key) { vm.sendMessage(key); });');
+        test.equal(this.target.statements[0], '$1 = Q.all([$foo, 3, "hi there"]).then(function (args) { var fn = args.shift(); return fn(args); });');
         test.done();
     },
 
     "var args": function (test) {
 
-        var inv = new Invocation(new Identifier("foo"), [new Literal(3), new Literal("hi there")]);
+        var inv = new Invocation(new Identifier("foo"), [new Identifier('snooks'), new Literal("hi there")]);
 
         var p = inv.renderJs(this.scope, this.target);
 
         test.ok(p instanceof Promise);
-        test.equal(this.target.statements[0], '$1 = Q.all([$foo, 3, "hi there"]).then(function (key) { vm.sendMessage(key); });');
+        test.equal(this.target.statements[0], '$2 = Q.all([$foo, $snooks, "hi there"]).then(function (args) { var fn = args.shift(); return fn(args); });');
         test.done();
     }
 };

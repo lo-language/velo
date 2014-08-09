@@ -1,0 +1,21 @@
+/**
+ * WriteStream
+ * created by spurcell
+ * 11/11/2013
+ */
+
+// constructor?
+action (fd) {
+
+    // this is now sequential with all objects of this type!
+    // how do we get around this??
+
+    return [
+
+        writeLine: action (line) {
+
+            fd.write();
+        }
+    ]
+
+}
