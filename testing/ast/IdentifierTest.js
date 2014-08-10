@@ -32,7 +32,7 @@ module.exports["codegen"] = {
 
     setUp: function (cb) {
 
-        this.target = new TargetFn(new Action());
+        this.target = new TargetFn(new Action(['foo']));
 
         cb();
     },
@@ -41,19 +41,29 @@ module.exports["codegen"] = {
 
         var id = new Identifier("foo");
 
-        var result = id.compile(this.target);
+        var result = id.compile(this.target).getCode();
 
         test.equal(result, "$foo");
         test.done();
     },
 
-    "field selector": function (test) {
+    "immediate selector": function (test) {
 
         var id = new Identifier(new Identifier("foo"), "bar");
 
-        var result = id.compile(this.target);
+        var result = id.compile(this.target).getCode();
 
         test.equal(result, "$foo.$bar");
+        test.done();
+    },
+
+    "deferred selector": function (test) {
+
+        var id = new Identifier(new Identifier("bar"), "baz");
+
+        var result = id.compile(this.target).getCode();
+
+        test.equal(result, "$bar.then(function (val) {val.$baz;})");
         test.done();
     }
 };

@@ -11,5 +11,7 @@ module.exports = {
     Identifier: require('./Identifier'),
     Invocation: require('./Invocation'),
     Literal: require('./Literal'),
-    Operator: require('./Operator')
+    Operator: require('./Operator'),
+    Relational: require('./Relational'),
+    Selection: require('./Selection')
 };

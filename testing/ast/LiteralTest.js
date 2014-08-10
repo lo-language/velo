@@ -49,7 +49,7 @@ module.exports["compile"] = {
 
         var val = new Literal(3).compile(this.target);
 
-        test.equal(val, 3);
+        test.equal(val.getCode(), "3");
         test.done();
     },
 
@@ -57,7 +57,7 @@ module.exports["compile"] = {
 
         var val = new Literal(true).compile(this.target);
 
-        test.equal(val, true);
+        test.equal(val.getCode(), true);
         test.done();
     },
 
@@ -65,7 +65,7 @@ module.exports["compile"] = {
 
         var val = new Literal("Leela").compile(this.target);
 
-        test.equal(val, '"Leela"');
+        test.equal(val.getCode(), '"Leela"');
         test.done();
     }
 };

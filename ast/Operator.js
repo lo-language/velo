@@ -66,8 +66,8 @@ __.prototype.compile = function (target) {
             break;
     }
 
-    return target.createTemp('Q.all([' + left + ', ' + right + ']).then('
-        + 'function (left, right) {return left ' + op + ' right;});');
+    return 'Q.all([' + left + ', ' + right + ']).then('
+        + 'function (args) {return args[0] ' + op + ' args[1];})';
 
 //    if (left.isConstant()) {
 //

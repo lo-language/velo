@@ -3,12 +3,13 @@
  * 12/25/13
  *
  * A target-language scope.
+ *
+ * have a method called compile block or something?
  */
 
 "use strict";
 
-var Constant = require('./Constant');
-var Promise = require('./Promise');
+var Expression = require('./Expression');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -23,8 +24,53 @@ var __ = function (action) {
     this.vars = {};
     this.tempVars = 0;
     this.statements = [];
+};
 
-    action.compile(this);
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Creates an immediate value.
+ *
+ * @param value
+ */
+__.prototype.createLiteral = function (value) {
+    return Expression.createLiteral(value);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Creates a compound expression.
+ *
+ * @param value
+ */
+__.prototype.createCompound = function (code, subExpr) {
+    return Expression.createCompound(code, subExpr);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns the target variable for the given source name.
+ *
+ * todo should some refs be immediate? e.g. params, record fields? until they're overwritten by a non-immediate expr?
+ *
+ * @param id  the name of the source variable
+ */
+__.prototype.createRef = function (id) {
+
+    var name = '$' + id;
+
+    // see if we're requesting a param
+    if (this.action.params.indexOf(id) >= 0) {
+        return Expression.createRef(name, true); // params are immediate
+    }
+
+    if (this.vars[id] !== undefined) {
+        return this.vars[id];
+    }
+
+    // track vars required in this scope
+    this.vars[id] = name;
+
+    return Expression.createRef(name);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,57 +83,23 @@ __.prototype.assign = function (id, expr) {
     this.statements.push(id.compile(this) + ' = ' + expr.compile(this));
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Returns the target variable for the given source name.
- *
- * @param id  the name of the source variable
- */
-__.prototype.getVar = function (id) {
-
-    // see if we're requesting a param
-    if (this.action.params.indexOf(id) >= 0) {
-        return '$' + id;
-    }
-
-    if (this.vars[id] !== undefined) {
-        return this.vars[id];
-    }
-
-    // register a new var
-    var name = '$' + id;
-
-    // track vars required in this scope
-    this.vars[id] = name;
-
-    return name;
-};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- *
- * @param value
- * @return {Constant}
  */
-__.prototype.createConstant = function (value) {
-
-    return new Constant(value);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param def {String}  the code that defines the promise
- * @return {Promise}
- */
-__.prototype.createTemp = function (def) {
+__.prototype.createDeferred = function (values, code) {
 
     var varName = '_' + this.tempVars++;
 
     this.vars[varName] = varName;
-    this.statements.push(varName + ' = ' + def);
+//    this.statements.push(varName + ' = ' + def);
 
-    return varName;
+    var names = values.map(function (value) {
+
+        return value.getRef();
+    });
+
+    return new Promise(varName, 'Q.all([' + names.join(', ') + ']).then(function (args) { return ' + code + ';}))');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

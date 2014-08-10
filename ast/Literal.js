@@ -22,8 +22,7 @@ var __ = function (value) {
 /**
  */
 __.prototype.compile = function (target) {
-
-    return typeof this.value === 'string' ? '"' + this.value + '"' : this.value;
+    return target.createLiteral(this.value);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,7 +30,6 @@ __.prototype.compile = function (target) {
  *
  */
 __.prototype.toJSON = function () {
-
     return this.value;
 };
 

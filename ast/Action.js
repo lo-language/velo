@@ -5,7 +5,7 @@
 
 "use strict";
 
-var Constant = require('../codegen/Constant');
+var TargetFn = require('../codegen/TargetFn');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -19,15 +19,16 @@ var __ = function (params, statements) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Compiles this action into the given target function.
- *
- * @param target
+ * Compiles this action into a new target function.
  */
-__.prototype.compile = function (target) {
+__.prototype.compile = function () {
 
-    this.statements.forEach(function (stmt) {
-        stmt.compile(target);
-    });
+    var target = new TargetFn(this);
+
+    target.compileBlock(this.statements);
+
+    // now what does I do with it?
+    return target;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

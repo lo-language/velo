@@ -6,7 +6,6 @@
 "use strict";
 
 var ast = require('../../ast');
-var Scope = require('../../codegen/Scope');
 var TargetFn = require('../../codegen/TargetFn');
 
 //module.exports["json"] = {
@@ -24,8 +23,6 @@ module.exports["codegen"] = {
 
     setUp: function (cb) {
 
-        this.scope = new Scope();
-
         cb();
     },
 
@@ -34,7 +31,7 @@ module.exports["codegen"] = {
         var action = new ast.Action([]);
         var target = new TargetFn(action);
 
-        test.equal(this.target.statements[0], "$0 = function () {}");
+        test.equal(target.statements[0], "");
         test.done();
     },
 
@@ -44,10 +41,9 @@ module.exports["codegen"] = {
             new ast.Operator("add", new ast.Identifier('foo'), new ast.Literal(4)),
             new ast.Operator("add", new ast.Identifier('bar'), new ast.Literal(7))
         ]);
+        var target = new TargetFn(action);
 
-        action.renderJs(this.scope, this.target)
-
-        test.equal(this.target.statements[0], "$0 = function () {\n\tvar $foo, $1;\n\n\t$1 = Q.when($foo, function (val) {return 4 + val;});\n}");
+        test.equal(target.statements[0], "$0 = function () {\n\tvar $foo, $1;\n\n\t$1 = Q.when($foo, function (val) {return 4 + val;});\n}");
         test.done();
     }
 };

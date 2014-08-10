@@ -34,8 +34,8 @@ __.prototype.compile = function (target) {
 
     // will also have to *wait on* all the promise args to be resolved before we can send our message
 
-    return target.createTemp('Q.all([' + waitList.join(', ') +
-        ']).then(function (args) { var fn = args.shift(); return fn(args); });');
+    return 'Q.all([' + waitList.join(', ') +
+        ']).then(function (args) { var fn = args.shift(); return fn(args); })';
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

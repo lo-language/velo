@@ -12,10 +12,11 @@
  * @param selector
  * @private
  */
-var __ = function (name, selector) {
+var __ = function (op, left, right) {
 
-    this.id = name;
-    this.selector = selector;
+    this.op = op;
+    this.left = left;
+    this.right = right;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,18 +24,31 @@ var __ = function (name, selector) {
  */
 __.prototype.compile = function (target) {
 
-    // async selectors? will actually have to wait for the base name, then apply the selector
-    // might even have to use temp
+    var left = this.left.compile(target);
+    var right = this.right.compile(target);
 
-    var self = this;
+    var op;
 
-    if (this.selector) {
-        return target.createCompound(function (args) {
-            return args[0] + '.$' + self.selector
-        }, [this.id.compile(target)]);
+    switch (this.op) {
+
+        case 'gt':
+            op = '>';
+            break;
+
+        case 'lt':
+            op = '<';
+            break;
+
+        case 'eq':
+            op = '===';
+            break;
+
+
     }
 
-    return target.createRef(this.id);
+    return target.createCompound(function (args) {
+        return args[0] + ' ' + op + ' ' + args[1];
+    }, [left, right]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
