@@ -93,7 +93,7 @@ module.exports["compound"] = {
     "mixed promises": function (test) {
 
         var a = Expression.createRef('$prak');
-        var b = Expression.createRef("42");
+        var b = Expression.createLiteral(42);
         var d = Expression.createRef("$zaphod");
 
         var c = Expression.createCompound(function (args) {
@@ -101,7 +101,7 @@ module.exports["compound"] = {
         }, [a, b, d]);
 
         test.equal(c.isImmediate(), false);
-        test.equal(c.getCode(), 'Q.all([$prak, 42, $zaphod]).then(function (args) {return args[0] ? args[1] : args[2];})');
+        test.equal(c.getCode(), 'Q.all([$prak, $zaphod]).then(function (args) {return args[0] ? 42 : args[1];})');
         test.done();
     }
 };

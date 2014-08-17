@@ -23,7 +23,6 @@ var __ = function (action) {
     this.action = action;
     this.vars = {};
     this.tempVars = 0;
-    this.statements = [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,6 +43,16 @@ __.prototype.createLiteral = function (value) {
  */
 __.prototype.createCompound = function (code, subExpr) {
     return Expression.createCompound(code, subExpr);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Creates a compound statement (non-expression).
+ *
+ * @param value
+ */
+__.prototype.createStatement = function (code, subExpr) {
+    return Expression.createCompound(code, subExpr, false);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,16 +85,9 @@ __.prototype.createRef = function (id) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param stmt
- */
-__.prototype.assign = function (id, expr) {
-
-    this.statements.push(id.compile(this) + ' = ' + expr.compile(this));
-};
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
+ * @param values
+ * @param code
+ * @return {Promise}
  */
 __.prototype.createDeferred = function (values, code) {
 
@@ -95,7 +97,6 @@ __.prototype.createDeferred = function (values, code) {
 //    this.statements.push(varName + ' = ' + def);
 
     var names = values.map(function (value) {
-
         return value.getRef();
     });
 
@@ -110,7 +111,7 @@ __.prototype.getCode = function () {
 
     var self = this;
     var params = this.action.params.map(function (name) {
-        return self.getVar(name);
+        return '$' + name;
     });
 
     // open the function
@@ -119,20 +120,22 @@ __.prototype.getCode = function () {
     // declare vars required in this scope
 
     var vars = Object.keys(this.vars).map(function (name) {
-        return self.getVar(name);
+        return '$' + name; // i don't like this duplication
     });
 
     if (vars.length > 0) {
         js += '\n\tvar ' + vars.join(', ') + ';\n';
     }
 
-    // render statements
+    // compile statements
 
-    if (this.statements.length > 0) {
-        js += '\n\t' + this.statements.join('\n\t') + '\n';
-    }
+    var compiled = this.action.compile(self);
 
-    js += '}';
+    js += '\n' + compiled.map(function (stmt) {
+        return stmt.getCode();
+    }).join('\n');
+
+    js += '\n}';
 
     return js;
 };

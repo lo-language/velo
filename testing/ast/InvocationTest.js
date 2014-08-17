@@ -5,18 +5,14 @@
 
 "use strict";
 
-var Literal = require('../../ast/Literal');
-var Identifier = require('../../ast/Identifier');
-var Invocation = require('../../ast/Invocation');
-var Scope = require('../../codegen/Scope');
-var TargetScope = require('../../codegen/TargetScope');
-var Promise = require('../../codegen/Promise');
+var ast = require('../../ast');
+var TargetFn = require('../../codegen/TargetFn');
 
 module.exports["json"] = {
 
     "add": function (test) {
 
-        var inv = new Invocation(new Identifier("foo"), []);
+        var inv = new ast.Invocation(new ast.Identifier("foo"), []);
 
         test.equal(JSON.stringify(inv), '{"invoke":["id","foo"],"args":[]}');
         test.done();
@@ -27,53 +23,108 @@ module.exports["renderJs"] = {
 
     setUp: function (cb) {
 
-        this.scope = new Scope();
-        this.target = new TargetScope();
+        this.target = new TargetFn(new ast.Action(['foo']));
 
         cb();
     },
 
-    "no args": function (test) {
+    "immediate fn with no args": function (test) {
 
-        var inv = new Invocation(new Identifier("foo"), []);
+        var inv = new ast.Invocation(new ast.Identifier("foo"), []);
+        var expr = inv.compile(this.target);
 
-        var p = inv.renderJs(this.scope, this.target);
-
-        test.ok(p instanceof Promise);
-        test.equal(this.target.statements[0], '$1 = Q.all([$foo]).then(function (args) { var fn = args.shift(); return fn(args); });');
+        test.equal(expr.isImmediate(), false);
+        test.equal(expr.getCode(), '$foo()');
         test.done();
     },
 
-    "one arg": function (test) {
+    "immediate fn immediate arg": function (test) {
 
-        var inv = new Invocation(new Identifier("foo"), [new Literal(3)]);
+        var inv = new ast.Invocation(new ast.Identifier("foo"), [new ast.Literal(3)]);
+        var expr = inv.compile(this.target);
 
-        var p = inv.renderJs(this.scope, this.target);
-
-        test.ok(p instanceof Promise);
-        test.equal(this.target.statements[0], '$1 = Q.all([$foo, 3]).then(function (args) { var fn = args.shift(); return fn(args); });');
+        test.equal(expr.isImmediate(), false);
+        test.equal(expr.getCode(), '$foo(3)');
         test.done();
     },
 
-    "two args": function (test) {
+    "immediate fn immediate args": function (test) {
 
-        var inv = new Invocation(new Identifier("foo"), [new Literal(3), new Literal("hi there")]);
+        var inv = new ast.Invocation(new ast.Identifier("foo"), [new ast.Literal("hello there!"), new ast.Literal(3)]);
+        var expr = inv.compile(this.target);
 
-        var p = inv.renderJs(this.scope, this.target);
-
-        test.ok(p instanceof Promise);
-        test.equal(this.target.statements[0], '$1 = Q.all([$foo, 3, "hi there"]).then(function (args) { var fn = args.shift(); return fn(args); });');
+        test.equal(expr.isImmediate(), false);
+        test.equal(expr.getCode(), '$foo("hello there!", 3)');
         test.done();
     },
 
-    "var args": function (test) {
+    "pending fn with no args": function (test) {
 
-        var inv = new Invocation(new Identifier("foo"), [new Identifier('snooks'), new Literal("hi there")]);
+        var inv = new ast.Invocation(new ast.Identifier("bar"), []);
+        var expr = inv.compile(this.target);
 
-        var p = inv.renderJs(this.scope, this.target);
+        test.equal(expr.isImmediate(), false);
+        test.equal(expr.getCode(), '$bar.then(function (val) {return val();})');
+        test.done();
+    },
 
-        test.ok(p instanceof Promise);
-        test.equal(this.target.statements[0], '$2 = Q.all([$foo, $snooks, "hi there"]).then(function (args) { var fn = args.shift(); return fn(args); });');
+    "pending fn with immediate arg": function (test) {
+
+        var inv = new ast.Invocation(new ast.Identifier("bar"), [new ast.Literal(3)]);
+        var expr = inv.compile(this.target);
+
+        test.equal(expr.isImmediate(), false);
+        test.equal(expr.getCode(), '$bar.then(function (val) {return val(3);})');
+        test.done();
+    },
+
+    "pending fn with immediate args": function (test) {
+
+        var inv = new ast.Invocation(new ast.Identifier("bar"), [new ast.Literal(3), new ast.Literal("hi there")]);
+        var expr = inv.compile(this.target);
+
+        test.equal(expr.isImmediate(), false);
+        test.equal(expr.getCode(), '$bar.then(function (val) {return val(3, \"hi there\");})');
+        test.done();
+    },
+
+    "immediate fn with pending arg": function (test) {
+
+        var inv = new ast.Invocation(new ast.Identifier("foo"), [new ast.Identifier('snooks'), new ast.Literal("hi there")]);
+        var expr = inv.compile(this.target);
+
+        test.equal(expr.isImmediate(), false);
+        test.equal(expr.getCode(), '$snooks.then(function (val) {return $foo(val, "hi there");})');
+        test.done();
+    },
+
+    "immediate fn with pending args": function (test) {
+
+        var inv = new ast.Invocation(new ast.Identifier("foo"), [new ast.Identifier('snooks'), new ast.Literal("hi there"), new ast.Identifier('baz')]);
+        var expr = inv.compile(this.target);
+
+        test.equal(expr.isImmediate(), false);
+        test.equal(expr.getCode(), 'Q.all([$snooks, $baz]).then(function (args) {return $foo(args[0], "hi there", args[1]);})');
+        test.done();
+    },
+
+    "pending fn with pending arg": function (test) {
+
+        var inv = new ast.Invocation(new ast.Identifier("bar"), [new ast.Identifier('snooks'), new ast.Literal("hi there")]);
+        var expr = inv.compile(this.target);
+
+        test.equal(expr.isImmediate(), false);
+        test.equal(expr.getCode(), 'Q.all([$bar, $snooks]).then(function (args) {return args[0](args[1], "hi there");})');
+        test.done();
+    },
+
+    "pending fn with pending args": function (test) {
+
+        var inv = new ast.Invocation(new ast.Identifier("bar"), [new ast.Identifier('snooks'), new ast.Literal("hi there"), new ast.Identifier('baz')]);
+        var expr = inv.compile(this.target);
+
+        test.equal(expr.isImmediate(), false);
+        test.equal(expr.getCode(), 'Q.all([$bar, $snooks, $baz]).then(function (args) {return args[0](args[1], "hi there", args[2]);})');
         test.done();
     }
 };

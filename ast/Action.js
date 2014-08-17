@@ -21,14 +21,13 @@ var __ = function (params, statements) {
 /**
  * Compiles this action into a new target function.
  */
-__.prototype.compile = function () {
+__.prototype.compile = function (target) {
 
-    var target = new TargetFn(this);
+    // do we need compile AND getCode?
 
-    target.compileBlock(this.statements);
-
-    // now what does I do with it?
-    return target;
+    return this.statements.map(function (stmt) {
+        return stmt.compile(target);
+    });
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

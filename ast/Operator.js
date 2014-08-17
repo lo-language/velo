@@ -66,25 +66,9 @@ __.prototype.compile = function (target) {
             break;
     }
 
-    return 'Q.all([' + left + ', ' + right + ']).then('
-        + 'function (args) {return args[0] ' + op + ' args[1];})';
-
-//    if (left.isConstant()) {
-//
-//        return target.intermediate('Q.when(' + right.getName() +
-//            ', function (val) {return ' + left.getValue() + ' ' + op + ' val;});');
-//    }
-//
-//    if (right.isConstant()) {
-//
-//        return target.createPromise('Q.when(' + left.getName() +
-//            ', function (val) {return ' + right.getValue() + ' ' + op + ' val;});');
-//    }
-//
-//    // neither are constants
-//
-//    return target.createPromise('Q.all([' + left.getName() + ', ' + right.getName() + ']).then('
-//        + 'function (left, right) {return left ' + op + ' right;});');
+    return target.createCompound(function (args) {
+        return args[0] + ' ' + op + ' ' + args[1];
+    }, [left, right]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

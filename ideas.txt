@@ -1,0 +1,16 @@
+symbols - like lisp
+
+expect - declarations above action to validate input
+
+config vars - some way to declare vars to be set outside the program - maybe all literals are automatically config vars?
+maybe there's no way to have literals at all - they're all config vars?
+
+libraries - collections of modules, local and online
+
+
+
+lots of little black boxes in space
+
+The goal of Exa is to provide a way to express programmatic intent as clearly and concisely as possible.
+The goal is not to "be fast". The goal is not to be terse. The goal is not to be "pure" in some way or another.
+

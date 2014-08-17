@@ -56,7 +56,7 @@ module.exports["compile"] = {
 
         var val = new ast.Selection(new ast.Relational('gt', new ast.Identifier('foo'), new ast.Literal(8))).compile(this.target);
 
-        test.equal(val.getCode(), "$foo.then(function (val) {if (val) {  }})");
+        test.equal(val.getCode(), "$foo.then(function (val) {return val > 8;}).then(function (val) {return if (val) {  };})");
         test.done();
     }
 };

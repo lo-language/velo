@@ -17,25 +17,39 @@ var __ = function (id, args) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * An invocation sends a message to the target action.
+ * An invocation sends a message to the specified action.
  */
 __.prototype.compile = function (target) {
 
-    // todo assert operand is not a constant
-
     var keyVar = this.id.compile(target);
-    var waitList = [keyVar];
+    var immediate = true;
 
-    // render all args
-    this.args.forEach(function (arg) {
+    // render all args and see if we have to wait on anything
+    var argList = this.args.map(function (arg) {
 
-        waitList.push(arg.compile(target));
+        var result = arg.compile(target);
+
+        if (result.isImmediate() == false) {
+            immediate = false;
+        }
+
+        return result;
     });
 
-    // will also have to *wait on* all the promise args to be resolved before we can send our message
+    // make sure the fn var is always the first arg
+    argList.unshift(keyVar);
 
-    return 'Q.all([' + waitList.join(', ') +
-        ']).then(function (args) { var fn = args.shift(); return fn(args); })';
+    var result = target.createCompound(function (args) {
+
+            var fnName = args.shift();
+
+            return fnName + '(' + args.join(', ') + ')'
+        }, argList);
+
+    // all invocations are non-immediate!
+    result.immediate = false;
+
+    return result;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

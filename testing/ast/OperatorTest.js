@@ -7,19 +7,15 @@
 
 "use strict";
 
-var Operator = require('../../ast/Operator');
-var Literal = require('../../ast/Literal');
-var Identifier = require('../../ast/Identifier');
-var Scope = require('../../codegen/Scope');
-var TargetScope = require('../../codegen/TargetScope');
-var Constant = require('../../codegen/Constant');
-var Promise = require('../../codegen/Promise');
+var ast = require('../../ast');
+var TargetFn = require('../../codegen/TargetFn');
+var Expression = require('../../codegen/Expression');
 
 module.exports["json"] = {
 
     "add": function (test) {
 
-        var op = new Operator("add", new Literal(3), new Literal(4));
+        var op = new ast.Operator("add", new ast.Literal(3), new ast.Literal(4));
 
         test.equal(JSON.stringify(op), '{"op":"add","left":3,"right":4}');
         test.done();
@@ -40,8 +36,7 @@ Object.keys(operators).forEach(function (op, index) {
 
         setUp: function (cb) {
 
-            this.scope = new Scope();
-            this.target = new TargetScope();
+            this.target = new TargetFn(new ast.Action());
             this.op = op;
             this.symbol = operators[op][0];
             this.result = operators[op][1];
@@ -49,68 +44,57 @@ Object.keys(operators).forEach(function (op, index) {
             cb();
         },
 
-        "constants": function (test) {
+        "constants are simplified": function (test) {
 
-            var op = new Operator(this.op, new Literal(3), new Literal(4));
+            var op = new ast.Operator(this.op, new ast.Literal(3), new ast.Literal(4));
+            var expr = op.compile(this.target);
 
-            var c = op.renderJs(this.scope, this.target);
-
-            test.ok(c instanceof Constant);
-            test.equal(c.getValue(), this.result);
-
-            test.done();
-        },
-
-        "const and promise": function (test) {
-
-            var op = new Operator(this.op, new Literal(4), new Identifier('foo'));
-
-            var p = op.renderJs(this.scope, this.target);
-
-            test.ok(p instanceof Promise);
-            test.equal(p.getName(), '$1');
-            test.equal(this.target.statements[0], '$1 = Q.when($foo, function (val) {return 4 ' + this.symbol + ' val;});');
+            test.ok(expr.isImmediate());
+//            test.equal(c.getValue(), this.result);
 
             test.done();
         },
 
-        "promise and const": function (test) {
+        "const and var": function (test) {
 
-            var op = new Operator(this.op, new Identifier('foo'), new Literal(4));
+            var op = new ast.Operator(this.op, new ast.Literal(4), new ast.Identifier('foo'));
+            var expr = op.compile(this.target);
 
-            var p = op.renderJs(this.scope, this.target);
+            test.equal(expr.isImmediate(), false);
+            test.equal(expr.getCode(), "$foo.then(function (val) {return 4 " + this.symbol + " val;})");
 
-            test.ok(p instanceof Promise);
-            test.equal(p.getName(), '$1');
-            test.equal(this.target.statements[0], '$1 = Q.when($foo, function (val) {return 4 ' + this.symbol + ' val;});');
+            test.done();
+        },
+
+        "var and const": function (test) {
+
+            var op = new ast.Operator(this.op, new ast.Identifier('foo'), new ast.Literal(4));
+            var expr = op.compile(this.target);
+
+            test.equal(expr.isImmediate(), false);
+            test.equal(expr.getCode(), "$foo.then(function (val) {return val " + this.symbol + " 4;})");
 
             test.done();
         },
 
         "promises": function (test) {
 
-            var op = new Operator(this.op, new Identifier('foo'), new Identifier('bar'));
+            var op = new ast.Operator(this.op, new ast.Identifier('foo'), new ast.Identifier('bar'));
+            var expr = op.compile(this.target);
 
-            var p = op.renderJs(this.scope, this.target);
-
-            test.ok(p instanceof Promise);
-//        test.equal(p.getName(), '$1');
-            test.equal(this.target.statements[0], '$2 = Q.all([$foo, $bar]).then(function (left, right) {return left ' + this.symbol + ' right;});');
+            test.equal(expr.isImmediate(), false);
+            test.equal(expr.getCode(), "Q.all([$foo, $bar]).then(function (args) {return args[0] " + this.symbol + " args[1];})");
 
             test.done();
         },
 
         "promises twice": function (test) {
 
-            var op = new Operator(this.op, new Operator(this.op, new Identifier('foo'), new Identifier('bar')), new Identifier('qux'));
+            var op = new ast.Operator(this.op, new ast.Operator(this.op, new ast.Identifier('foo'), new ast.Identifier('bar')), new ast.Identifier('qux'));
+            var expr = op.compile(this.target);
 
-            var p = op.renderJs(this.scope, this.target);
-
-            console.log(this.target.renderJs());
-
-            test.ok(p instanceof Promise);
-//        test.equal(p.getName(), '$1');
-            test.equal(this.target.statements[0], '$2 = Q.all([$foo, $bar]).then(function (left, right) {return left ' + this.symbol + ' right;});');
+            test.equal(expr.isImmediate(), false);
+            test.equal(expr.getCode(), "Q.all([$foo, $bar]).then(function (args) {return args[0] " + this.symbol + " args[1];})");
 
             test.done();
         }

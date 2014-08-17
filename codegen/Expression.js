@@ -89,15 +89,17 @@ __.createCompound = function (codeGen, subExpr) {
     }
     else {
 
+        var promiseCount = 0;
+
         x.code = 'Q.all([' + promises.map(function (expr) {return expr.getCode();}).join(', ') + ']).then(function (args) {return ' +
-            codeGen(subExpr.map(function (expr, index) {
+            codeGen(subExpr.map(function (expr) {
 
                 if (expr.isImmediate()) {
                     return expr.getCode();
                 }
                 else {
                     x.immediate = false;
-                    return 'args[' + index + ']';
+                    return 'args[' + promiseCount++ + ']';
                 }
             })) + ';})';
     }

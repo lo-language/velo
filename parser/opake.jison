@@ -134,9 +134,9 @@ statement
     ;
 
 selection_statement
-    : IF '(' expression ')' block -> ['if', $3, $5]
-    | IF '(' expression ')' block ELSE block -> ['if', $3, $5, $7]
-    | IF '(' expression ')' block ELSE selection_statement -> ['if', $3, $5, $7]
+    : IF '(' expression ')' block -> new yy.Selection($3, $5)
+    | IF '(' expression ')' block ELSE block -> new yy.Selection($3, $5, $7)
+    | IF '(' expression ')' block ELSE selection_statement -> new yy.Selection($3, $5, $7)
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -182,10 +182,10 @@ additive_expression
 
 relational_expression
     : additive_expression
-    | relational_expression '<' additive_expression -> ['lt', $1, $3]
-    | relational_expression '>' additive_expression -> ['gt', $1, $3]
-    | relational_expression '<=' additive_expression -> ['le', $1, $3]
-    | relational_expression '>=' additive_expression -> ['ge', $1, $3]
+    | relational_expression '<' additive_expression -> new yy.Relational('lt', $1, $3)
+    | relational_expression '>' additive_expression -> new yy.Relational('gt', $1, $3)
+    | relational_expression '<=' additive_expression -> new yy.Relational('le', $1, $3)
+    | relational_expression '>=' additive_expression -> new yy.Relational('ge', $1, $3)
     ;
 
 equality_expression

@@ -11,10 +11,10 @@
  * @param expr
  * @private
  */
-var __ = function (expr, statements) {
+var __ = function (expr, trueBlock, falseBlock) {
 
     this.expr = expr;
-    this.statements = statements || [];
+    this.statements = trueBlock || [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,18 +30,14 @@ __.prototype.compile = function (target) {
 
     // passing target allows access to the scope - should it be read-only?
     var block = this.statements.map(function (stmt) {
-        return stmt.getCode();
+        return stmt.compile(target).getCode();
     }).join('\n');
 
-    return target.createCompound(function (args) {
+    // should we not generate the code above, but instead pass just expressions?
+
+    return target.createStatement(function (args) {
         return 'if (' + args[0] + ') { ' + block + ' }'
     }, [expr]);
-
-    // just pass a different codegen callback rather than making two different calls to createCompound?
-    // or can we somehow use the same codegen callback?
-//    return target.createCompound(function (args) {
-//        return 'if (val) { ' + block + '}';
-//    }, [expr]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
