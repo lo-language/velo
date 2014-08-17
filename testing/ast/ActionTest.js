@@ -30,8 +30,9 @@ module.exports["codegen"] = {
 
         var action = new ast.Action([]);
         var target = new TargetFn(action);
+        var expr = action.compile(target);
 
-        test.equal(target.statements[0], "");
+        test.equal(expr.isImmediate(), false);
         test.done();
     },
 

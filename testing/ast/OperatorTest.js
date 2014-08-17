@@ -94,7 +94,7 @@ Object.keys(operators).forEach(function (op, index) {
             var expr = op.compile(this.target);
 
             test.equal(expr.isImmediate(), false);
-            test.equal(expr.getCode(), "Q.all([$foo, $bar]).then(function (args) {return args[0] " + this.symbol + " args[1];})");
+            test.equal(expr.getCode(), "Q.all([Q.all([$foo, $bar]).then(function (args) {return args[0] " + this.symbol + " args[1];}), $qux]).then(function (args) {return args[0] " + this.symbol + " args[1];})");
 
             test.done();
         }

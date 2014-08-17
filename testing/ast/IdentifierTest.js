@@ -63,7 +63,7 @@ module.exports["codegen"] = {
 
         var result = id.compile(this.target).getCode();
 
-        test.equal(result, "$bar.then(function (val) {val.$baz;})");
+        test.equal(result, "$bar.then(function (val) {return val.$baz;})");
         test.done();
     }
 };
