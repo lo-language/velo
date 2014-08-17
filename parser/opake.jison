@@ -164,7 +164,7 @@ primary_expression
 
 unary_expression
     : primary_expression
-    | '#' primary_expression -> ['card', $2]
+    | '#' primary_expression -> new yy.Operator('card', $2)
     ;
 
 multiplicative_expression
@@ -190,8 +190,8 @@ relational_expression
 
 equality_expression
     : relational_expression
-    | equality_expression '==' relational_expression -> ['equality', $1, $3]
-    | equality_expression '!=' relational_expression -> ['inequality', $1, $3]
+    | equality_expression '==' relational_expression -> new yy.Relational('equality', $1, $3)
+    | equality_expression '!=' relational_expression -> new yy.Relational('inequality', $1, $3)
     ;
 
 and_expression

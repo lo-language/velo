@@ -53,8 +53,9 @@ __.createRef = function (ref, immediate) {
  *
  * @param code
  * @param subExpr
+ * @param isExpr HACK ALERT
  */
-__.createCompound = function (codeGen, subExpr) {
+__.createCompound = function (codeGen, subExpr, isStmt) {
 
     // if any sub expressions are deferred, so is this one
 
@@ -75,7 +76,7 @@ __.createCompound = function (codeGen, subExpr) {
     }
     else if (promises.length == 1) {
 
-        x.code = promises[0].getCode() + '.then(function (val) {return ' +
+        x.code = promises[0].getCode() + '.then(function (val) {' + (isStmt ? '' : 'return ') +
             codeGen(subExpr.map(function (expr) {
 
                 if (expr.isImmediate()) {
@@ -85,13 +86,13 @@ __.createCompound = function (codeGen, subExpr) {
                     x.immediate = false;
                     return 'val'; // possible name collision? or not since there's no $?
                 }
-            })) + ';})';
+            })) + (isStmt ? '' : ';') + '})';
     }
     else {
 
         var promiseCount = 0;
 
-        x.code = 'Q.all([' + promises.map(function (expr) {return expr.getCode();}).join(', ') + ']).then(function (args) {return ' +
+        x.code = 'Q.all([' + promises.map(function (expr) {return expr.getCode();}).join(', ') + ']).then(function (args) {'  + (isStmt ? '' : 'return ') +
             codeGen(subExpr.map(function (expr) {
 
                 if (expr.isImmediate()) {
@@ -101,7 +102,7 @@ __.createCompound = function (codeGen, subExpr) {
                     x.immediate = false;
                     return 'args[' + promiseCount++ + ']';
                 }
-            })) + ';})';
+            })) + (isStmt ? '' : ';') + '})';
     }
 
     return x;

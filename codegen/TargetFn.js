@@ -52,7 +52,7 @@ __.prototype.createCompound = function (code, subExpr) {
  * @param value
  */
 __.prototype.createStatement = function (code, subExpr) {
-    return Expression.createCompound(code, subExpr, false);
+    return Expression.createCompound(code, subExpr, true);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

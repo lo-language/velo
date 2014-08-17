@@ -57,11 +57,7 @@ __.prototype.compile = function (target) {
  */
 __.prototype.toJSON = function () {
 
-    if (typeof this.id == 'string') {
-        return ['id', this.id];
-    }
-
-    return ['id', this.id.toJSON(), this.selector];
+    return [this.op, this.left, this.right];
 };
 
 module.exports = __;

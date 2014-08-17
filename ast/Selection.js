@@ -14,7 +14,8 @@
 var __ = function (expr, trueBlock, falseBlock) {
 
     this.expr = expr;
-    this.statements = trueBlock || [];
+    this.trueBlock = trueBlock || [];
+    this.falseBlock = falseBlock || [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,6 +23,7 @@ var __ = function (expr, trueBlock, falseBlock) {
  */
 __.prototype.compile = function (target) {
 
+    // compile the expression to select from
     var expr = this.expr.compile(target);
 
     // compile the block - the block may or may not end up in its own closure
@@ -29,14 +31,25 @@ __.prototype.compile = function (target) {
     // but if a statement is also an expression, it doesn't know it's at the top level - only the block does
 
     // passing target allows access to the scope - should it be read-only?
-    var block = this.statements.map(function (stmt) {
+    var trueBlock = this.trueBlock.map(function (stmt) {
+        return stmt.compile(target).getCode();
+    }).join('\n');
+
+    var falseBlock = this.falseBlock.map(function (stmt) {
         return stmt.compile(target).getCode();
     }).join('\n');
 
     // should we not generate the code above, but instead pass just expressions?
 
     return target.createStatement(function (args) {
-        return 'if (' + args[0] + ') { ' + block + ' }'
+
+        var result = 'if (' + args[0] + ') { ' + trueBlock + ' }';
+
+        if (falseBlock.length > 0) {
+            result += ' else { ' + falseBlock + ' }';
+        }
+
+        return result;
     }, [expr]);
 };
 
@@ -46,11 +59,12 @@ __.prototype.compile = function (target) {
  */
 __.prototype.toJSON = function () {
 
-    if (typeof this.id == 'string') {
-        return ['id', this.id];
+    if (this.falseBlock.length == 0) {
+        return ['if', this.expr, this.trueBlock];
     }
-
-    return ['id', this.id.toJSON(), this.selector];
+    else {
+        return ['if', this.expr, this.trueBlock, this.falseBlock];
+    }
 };
 
 module.exports = __;
