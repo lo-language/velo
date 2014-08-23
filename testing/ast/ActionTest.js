@@ -19,24 +19,18 @@ var TargetFn = require('../../codegen/TargetFn');
 //    }
 //};
 
-module.exports["codegen"] = {
+module.exports["root action"] = {
 
-    setUp: function (cb) {
-
-        cb();
-    },
-
-    "no params empty": function (test) {
+    "no params empty body": function (test) {
 
         var action = new ast.Action([]);
-        var target = new TargetFn(action);
-        var expr = action.compile(target);
+        var fn = action.compile();
 
         test.equal(expr.isImmediate(), false);
         test.done();
     },
 
-    "two params": function (test) {
+    "two params empty body": function (test) {
 
         var action = new ast.Action(['foo', 'bar'],[
             new ast.Operator("add", new ast.Identifier('foo'), new ast.Literal(4)),

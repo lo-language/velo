@@ -18,16 +18,16 @@ var __ = function (op, left, right) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  */
-__.prototype.compile = function (target) {
+__.prototype.compile = function (scope) {
 
     if (this.op == 'assign') {
-        target.assign(this.left, this.right);
+        scope.assign(this.left, this.right);
         return;
     }
 
     var op;
-    var left = this.left.compile(target);
-    var right = this.right.compile(target);
+    var left = this.left.compile(scope);
+    var right = this.right.compile(scope);
 
     // see if we're trying to assign to a constant
 //    if (left.isConstant() && this.op == 'assign') {
@@ -66,7 +66,7 @@ __.prototype.compile = function (target) {
             break;
     }
 
-    return target.createCompound(function (args) {
+    return scope.createCompound(function (args) {
         return args[0] + ' ' + op + ' ' + args[1];
     }, [left, right]);
 };

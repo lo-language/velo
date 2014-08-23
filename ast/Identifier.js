@@ -20,21 +20,20 @@ var __ = function (name, selector) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ *
+ * @param scope
  */
-__.prototype.compile = function (target) {
-
-    // async selectors? will actually have to wait for the base name, then apply the selector
-    // might even have to use temp
+__.prototype.compile = function (scope) {
 
     var self = this;
 
     if (this.selector) {
-        return target.createCompound(function (args) {
+        return scope.createCompound(function (args) {
             return args[0] + '.$' + self.selector
         }, [this.id.compile(target)]);
     }
 
-    return target.createRef(this.id);
+    return scope.getRef(this.id);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

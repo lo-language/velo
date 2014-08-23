@@ -34,10 +34,26 @@ __.createLiteral = function (value) {
 /**
  * Creates a simple reference expression.
  *
+ * @param name
+ */
+__.createParam = function (name) {
+
+    var x = new __();
+
+    x.code = name;
+    x.immediate = true;
+
+    return x;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Creates a simple reference expression.
+ *
  * @param ref
  * @param immediate
  */
-__.createRef = function (ref, immediate) {
+__.createTempVar = function (ref, immediate) {
 
     var x = new __();
 

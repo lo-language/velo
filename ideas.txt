@@ -1,15 +1,44 @@
-symbols - like lisp
+symbols: like lisp
 
-expect - declarations above action to validate input
+expect: declarations associated with an action to validate input, maybe allow this logic to be moved to the action client
 
-config vars - some way to declare vars to be set outside the program - maybe all literals are automatically config vars?
+config vars: some way to declare vars to be set outside the program - maybe all literals are automatically config vars?
 maybe there's no way to have literals at all - they're all config vars?
 
-libraries - collections of modules, local and online
+types: have support for strict primitive types, but not compound types? definitely no type checking on objects/handles
 
+libraries: collections of modules, local and online
 
+byte strings: raw data for manipulation, maybe with a literal syntax like <81ba8d8c88d822> - words?
 
-lots of little black boxes in space
+events: enable any action to emit events by accepting N named callbacks?
+make calling an action subscribing to 0 or more events that may happen 0 or more times?
+replace return values and exceptions with this mechanism? how would you then unsubscribe? have a default event? have events
+bubble up automatically? that could probably get really expensive. have two default events - normal and error
+
+foo = action () : emits combo
+
+foo('yarp') :combo >> (path)
+
+default args: pretty obvious
+
+open = action () : emits request
+
+server.open()
+>> request: (req, res)
+    res.end("hello world!")
+>> error:
+    log("there was an error!")
+
+system.trap()
+>> sigint: ()
+    log("sigint")
+>> sighup: ()
+    log("sighup")
+>> sigkill: ()
+    log("sigkill")
+
+lots of little black boxes in space, that vibrate or rotate when you move your cursor over them
 
 The goal of Exa is to provide a way to express programmatic intent as clearly and concisely as possible.
 The goal is not to "be fast". The goal is not to be terse. The goal is not to be "pure" in some way or another.

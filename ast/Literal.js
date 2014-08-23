@@ -2,7 +2,7 @@
  * Created by: spurcell
  * 7/5/14
  *
- * todo: list literals, record literals
+ * todo: list literals, map literals
  * todo: multiline string literals, with and without line breaks
  * todo: string interpolation
  */
@@ -20,9 +20,11 @@ var __ = function (value) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ *
+ * @param scope
  */
-__.prototype.compile = function (target) {
-    return target.createLiteral(this.value);
+__.prototype.compile = function (scope) {
+    return scope.createLiteral(this.value);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

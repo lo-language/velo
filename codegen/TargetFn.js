@@ -9,8 +9,6 @@
 
 "use strict";
 
-var Expression = require('./Expression');
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Takes an action AST node and produces target code.
@@ -18,89 +16,10 @@ var Expression = require('./Expression');
  * @param action
  * @private
  */
-var __ = function (action) {
+var __ = function (params, body) {
 
-    this.action = action;
-    this.vars = {};
-    this.tempVars = 0;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Creates an immediate value.
- *
- * @param value
- */
-__.prototype.createLiteral = function (value) {
-    return Expression.createLiteral(value);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Creates a compound expression.
- *
- * @param value
- */
-__.prototype.createCompound = function (code, subExpr) {
-    return Expression.createCompound(code, subExpr);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Creates a compound statement (non-expression).
- *
- * @param value
- */
-__.prototype.createStatement = function (code, subExpr) {
-    return Expression.createCompound(code, subExpr, true);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Returns the target variable for the given source name.
- *
- * todo should some refs be immediate? e.g. params, record fields? until they're overwritten by a non-immediate expr?
- *
- * @param id  the name of the source variable
- */
-__.prototype.createRef = function (id) {
-
-    var name = '$' + id;
-
-    // see if we're requesting a param
-    if (this.action.params.indexOf(id) >= 0) {
-        return Expression.createRef(name, true); // params are immediate
-    }
-
-    if (this.vars[id] !== undefined) {
-        return this.vars[id];
-    }
-
-    // track vars required in this scope
-    this.vars[id] = name;
-
-    return Expression.createRef(name);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param values
- * @param code
- * @return {Promise}
- */
-__.prototype.createDeferred = function (values, code) {
-
-    var varName = '_' + this.tempVars++;
-
-    this.vars[varName] = varName;
-//    this.statements.push(varName + ' = ' + def);
-
-    var names = values.map(function (value) {
-        return value.getRef();
-    });
-
-    return new Promise(varName, 'Q.all([' + names.join(', ') + ']).then(function (args) { return ' + code + ';}))');
+    this.params = params;
+    this.body = body;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
