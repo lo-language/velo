@@ -1,0 +1,61 @@
+/*
+ * tries to find all unregistered english word domains
+ *
+ * for each TLD, go through every english word that ends in it, and hit whois for the word
+ * if it's unregistered, print it out
+ *
+ * first approach: regex match
+ * second approach: custom-built suffix tree
+ */
+
+// can use = as an indicator to BLOCK on the result and => as an indicator to NOT BLOCK?
+// in this way, opake becomes a typical language?
+
+action (args, io, env, kit) {
+
+    kit.make("/dns/whois") -> (whois) {
+
+        // load the dictionary as an ordered list
+        io.in.readLines() >> (word) {
+
+            if (strlen(word) > 6) {
+                done
+            }
+
+            // see if word fits any TLD - could use a trie for this
+
+            findDomains(word.lower()) >> action (domain) {
+
+                if (checkDomain(domain)) {
+
+                    domain -> io.out
+                }
+            }
+        }
+    }
+
+    findDomains = action (word) {
+
+        tlds = ['com', 'net', 'org', 'io', 'it', 'me', 'to', 'aero', 'co']
+
+        scan(tlds) >> (tld) {
+
+            // wacky syntactic sugar here - /REGEX/ is shorthand for an action
+            word -> /.+tld/ -> {
+                emit(word + tld)
+            }
+        }
+        :: {
+            end()
+        }
+    }
+
+    checkDomain = action (domain) {
+
+        result = whois(domain)
+
+        if (result) {
+            result -> out
+        }
+    }
+}

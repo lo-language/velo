@@ -14,10 +14,9 @@ action (center, radius, lib)
             center.x - radius
             center.y - radius]
 
+    circle = lib.createShape(getTopLeft(), radius)
 
-    parent = lib.createShape(getTopLeft(), radius)
-
-    parent += [
+    circle += [
 
         getCenter: action ()
             return center
@@ -38,3 +37,5 @@ action (center, radius, lib)
         draw: action (screen)
             pass
     ]
+
+    return circle
