@@ -9,7 +9,7 @@
  */
 
 // can use = as an indicator to BLOCK on the result and => as an indicator to NOT BLOCK?
-// in this way, opake becomes a typical language?
+// in this way, we act like a typical language? but I don't like having blocking in there at all
 
 action (args, io, env, kit) {
 

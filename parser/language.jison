@@ -99,6 +99,10 @@
 
 %{
     indents = [''];
+
+    yy = {
+        ast: require('../ast')
+    };
 %}
 
 /* enable EBNF grammar syntax */
