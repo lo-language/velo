@@ -100,7 +100,7 @@
 %{
     indents = [''];
 
-    yy = require('../ast');
+    ast = require('../ast');
 %}
 
 /* enable EBNF grammar syntax */
@@ -119,8 +119,8 @@ module
     ;
 
 action_definition
-    : ACTION block -> new yy.Action([], $2)
-    | ACTION '(' (NAME ',')* NAME? ')' block -> new yy.Action($4 ? $3.concat([$4]) : $3, $6)
+    : ACTION block -> new ast.Action([], $2)
+    | ACTION '(' (NAME ',')* NAME? ')' block -> new ast.Action($4 ? $3.concat([$4]) : $3, $6)
     ;
 
 block
@@ -130,15 +130,15 @@ block
 
 statement
     : NAME IS literal -> ['define', $1, $3]
-    | identifier '=' expression -> new yy.Operator('assign', $1, $3)
+    | identifier '=' expression -> new ast.Operator('assign', $1, $3)
     | selection_statement
     | sequence_statement
     ;
 
 selection_statement
-    : IF '(' expression ')' block -> new yy.Selection($3, $5)
-    | IF '(' expression ')' block ELSE block -> new yy.Selection($3, $5, $7)
-    | IF '(' expression ')' block ELSE selection_statement -> new yy.Selection($3, $5, $7)
+    : IF '(' expression ')' block -> new ast.Selection($3, $5)
+    | IF '(' expression ')' block ELSE block -> new ast.Selection($3, $5, $7)
+    | IF '(' expression ')' block ELSE selection_statement -> new ast.Selection($3, $5, $7)
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -146,15 +146,15 @@ selection_statement
 // C expression syntax, basically
 
 literal
-    : BOOLEAN -> new yy.Literal($1 === 'true' ? true : false)
-    | CONSTANT -> new yy.Literal(parseFloat($1))
-    | STRING_LITERAL -> new yy.Literal($1)
+    : BOOLEAN -> new ast.Literal($1 === 'true' ? true : false)
+    | CONSTANT -> new ast.Literal(parseFloat($1))
+    | STRING_LITERAL -> new ast.Literal($1)
     ;
 
 identifier
-    : NAME -> new yy.Identifier($1)
-    | identifier '[' expression ']' -> new yy.Identifier($1, $3)
-    | identifier '.' NAME -> new yy.Identifier($1, $3)
+    : NAME -> new ast.Identifier($1)
+    | identifier '[' expression ']' -> new ast.Identifier($1, $3)
+    | identifier '.' NAME -> new ast.Identifier($1, $3)
     ;
 
 primary_expression
@@ -166,34 +166,34 @@ primary_expression
 
 unary_expression
     : primary_expression
-    | '#' primary_expression -> new yy.Operator('card', $2)
+    | '#' primary_expression -> new ast.Operator('card', $2)
     ;
 
 multiplicative_expression
     : unary_expression
-    | multiplicative_expression '*' primary_expression -> new yy.Operator('mult', $1, $3)
-    | multiplicative_expression '/' primary_expression -> new yy.Operator('div', $1, $3)
-    | multiplicative_expression '%' primary_expression -> new yy.Operator('mod', $1, $3)
+    | multiplicative_expression '*' primary_expression -> new ast.Operator('mult', $1, $3)
+    | multiplicative_expression '/' primary_expression -> new ast.Operator('div', $1, $3)
+    | multiplicative_expression '%' primary_expression -> new ast.Operator('mod', $1, $3)
     ;
 
 additive_expression
     : multiplicative_expression
-    | additive_expression '+' multiplicative_expression -> new yy.Operator('add', $1, $3)
-    | additive_expression '-' multiplicative_expression -> new yy.Operator('sub', $1, $3)
+    | additive_expression '+' multiplicative_expression -> new ast.Operator('add', $1, $3)
+    | additive_expression '-' multiplicative_expression -> new ast.Operator('sub', $1, $3)
     ;
 
 relational_expression
     : additive_expression
-    | relational_expression '<' additive_expression -> new yy.Relational('lt', $1, $3)
-    | relational_expression '>' additive_expression -> new yy.Relational('gt', $1, $3)
-    | relational_expression '<=' additive_expression -> new yy.Relational('le', $1, $3)
-    | relational_expression '>=' additive_expression -> new yy.Relational('ge', $1, $3)
+    | relational_expression '<' additive_expression -> new ast.Relational('lt', $1, $3)
+    | relational_expression '>' additive_expression -> new ast.Relational('gt', $1, $3)
+    | relational_expression '<=' additive_expression -> new ast.Relational('le', $1, $3)
+    | relational_expression '>=' additive_expression -> new ast.Relational('ge', $1, $3)
     ;
 
 equality_expression
     : relational_expression
-    | equality_expression '==' relational_expression -> new yy.Relational('equality', $1, $3)
-    | equality_expression '!=' relational_expression -> new yy.Relational('inequality', $1, $3)
+    | equality_expression '==' relational_expression -> new ast.Relational('equality', $1, $3)
+    | equality_expression '!=' relational_expression -> new ast.Relational('inequality', $1, $3)
     ;
 
 and_expression
@@ -236,7 +236,7 @@ expression
 // what about statement ~ statement expressions? e.g. 2/0 ~ log.write(err)
 
 invocation
-    : identifier '(' (expression ',')* expression? ')' -> new yy.Invocation($1, $4 ? $3.concat([$4]) : $3)
+    : identifier '(' (expression ',')* expression? ')' -> new ast.Invocation($1, $4 ? $3.concat([$4]) : $3)
     ;
 
 sequence_statement

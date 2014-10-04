@@ -1,7 +1,7 @@
 {
   "name": "clear",
   "description": "A JS implementation of the Clear programming language",
-  "version": "0.1",
+  "version": "0.1.0",
   "preferGlobal": true,
   "main": "lib/jison",
   "bin": {
@@ -18,6 +18,6 @@
     "jison": "0.4.x"
   },
   "scripts": {
-    "test": "nodeunit testing/"
+    "test": "nodeunit testing/*"
   }
 }
