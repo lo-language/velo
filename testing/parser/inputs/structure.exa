@@ -10,17 +10,17 @@ action ()
     x = action ()
         pass
 
-    if (#items == 0)
+    if # items == 0
         fail("oh noes!")
 
-    if (#items == 1)
+    if # items == 1
         x = 2
     else
         y = 3
 
-    if (answer == 42)
+    if answer == 42
         a -> b
-    else if (answer == 57)
+    else if answer == 57
         b -> c
     else
         c -> d

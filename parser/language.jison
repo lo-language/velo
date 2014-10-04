@@ -136,9 +136,9 @@ statement
     ;
 
 selection_statement
-    : IF '(' expression ')' block -> new ast.Selection($3, $5)
-    | IF '(' expression ')' block ELSE block -> new ast.Selection($3, $5, $7)
-    | IF '(' expression ')' block ELSE selection_statement -> new ast.Selection($3, $5, $7)
+    : IF expression block -> new ast.Selection($2, $3)
+    | IF expression block ELSE block -> new ast.Selection($2, $3, $5)
+    | IF expression block ELSE selection_statement -> new ast.Selection($2, $3, $5)
     ;
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -9,7 +9,7 @@ the path is a list of nodes
 action (path)
 
     // base case - only one possibility left
-    if #path == 8
+    if # path == 8
         return 1
 
     combos = 0
