@@ -1,9 +1,18 @@
 # Exa
 
-Exa is a streamlined programming language designed to make building trustworthy, scalable software intuitive and easy.
+Exa is a streamlined programming language designed to make building secure, scalable software intuitive and easy.
+
+To run a program:
+
+    exa [source file]
+
+
+To run the tests:
+
+    npm test
 
 
 To generate the parser,
 
-cd parser
-./generate
+    cd parser
+    ./generate

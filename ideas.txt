@@ -38,7 +38,9 @@ system.trap()
 >> sigkill: ()
     log("sigkill")
 
-lots of little black boxes in space, that vibrate or rotate when you move your cursor over them
+optimizations: to scale out, you can make copies of an action with no internal state, and put them on different cores
+
+
 
 The goal of Exa is to provide a way to express programmatic intent as clearly and concisely as possible.
 The goal is not to "be fast". The goal is not to be terse. The goal is not to be "pure" in some way or another.

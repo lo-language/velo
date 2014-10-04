@@ -9,7 +9,7 @@ var fs = require('fs');
 var path = require('path');
 var parser = require('../../parser/Parser');
 
-var EXT = '.opk';
+var EXT = '.exa';
 
 // go through the tests directory and generate a test for each file
 var files = fs.readdirSync(__dirname + '/inputs');
