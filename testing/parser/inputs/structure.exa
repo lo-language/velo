@@ -11,12 +11,10 @@ action ()
         pass
 
     if # items == 0
-        fail("oh noes!")
+        fail "oh noes!"
 
     if # items == 1
-        x = 2
-    else
-        y = 3
+        return "ok"
 
     if answer == 42
         a -> b
@@ -24,3 +22,5 @@ action ()
         b -> c
     else
         c -> d
+
+    return answer

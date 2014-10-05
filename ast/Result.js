@@ -1,0 +1,35 @@
+/**
+ * Created by: spurcell
+ * 7/5/14
+ */
+
+"use strict";
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ */
+var __ = function (success, expr) {
+
+    this.success = success;
+    this.expr = expr;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ */
+__.prototype.compile = function (scope) {
+    return scope.createLiteral(this.value);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ */
+__.prototype.toJSON = function () {
+    return ["result", this.success, this.expr];
+};
+
+module.exports = __;

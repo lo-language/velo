@@ -1,19 +1,22 @@
 { "action": [],
     "statements":
-            [ { "op": "assign",
+            [
+                { "op": "assign",
                 "left": [ "id", "x" ],
                 "right": { "action": [], "statements": [] } },
                 [ "if",
                     [ "equality", {"op": "card", "left": [ "id", "items" ]}, 0 ],
-                    [ { "invoke": [ "id", "fail" ], "args": [ "oh noes!" ] } ] ],
+                    [ [ "result", false, "oh noes!" ] ] ],
                 [ "if",
                     [ "equality", {"op": "card", "left": [ "id", "items" ]}, 1 ],
-                    [ { "op": "assign", "left": [ "id", "x" ], "right": 2 } ],
-                    [ { "op": "assign", "left": [ "id", "y" ], "right": 3 } ] ],
+                    [ [ "result", true, "ok" ] ] ],
                 [ "if",
                     [ "equality", [ "id", "answer" ], 42 ],
                     [ [ "->", [ "id", "a" ], [ "id", "b" ] ] ],
                     [ "if",
                         [ "equality", [ "id", "answer" ], 57 ],
                         [ [ "->", [ "id", "b" ], [ "id", "c" ] ] ],
-                        [ [ "->", [ "id", "c" ], [ "id", "d" ] ] ] ] ] ] }
+                        [ [ "->", [ "id", "c" ], [ "id", "d" ] ] ] ] ],
+                [ "result", true, [ "id", "answer" ] ]
+            ]
+}

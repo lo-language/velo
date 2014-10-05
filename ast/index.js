@@ -13,5 +13,6 @@ module.exports = {
     Literal: require('./Literal'),
     Operator: require('./Operator'),
     Relational: require('./Relational'),
-    Selection: require('./Selection')
+    Selection: require('./Selection'),
+    Result: require('./Result')
 };

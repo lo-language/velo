@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * The Opake-to-node compiler/VM
+ * The Exa-to-Node compiler/VM
  *
  * we need the ability to compile dynamically loaded files
  * compiles provided source file, evals it to create an object

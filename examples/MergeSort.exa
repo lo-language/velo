@@ -1,38 +1,35 @@
 /**
  * MergeSort
+ *
+ * Sorts a list with merge sort
+ *
  * created by spurcell
  * 11/11/2013
  */
 
- // todo - make streaming on output?
- // would have to somehow combine two streams
+receive items
 
-action (items)
+if # items == 0
+    fail "who could sort an empty list?"
 
-    if #items == 0
-        fail "who could sort an empty list?"
+// base case
+if # items == 1
+    return items
 
-    // produce items? finish items? deliver items? return items? reply items? final items? shutdown items? escape items?
-    if #items == 1
-        items -> out
-        done
+// bisect the list
+left = items<#items / 2>
 
-    // split the list
-    cut(items, #items / 2) => left
+// recursively sort the two halves
+left = __(left)
+right = __(right)
 
-    // sort the halves
-    // backtick means recurrence - or @? or self?
+// merge the sorted halves
 
-    this(left) => left
-    this(items) => right
+while # left > 0 || # right > 0
 
-    // merge the halves
+    if left[0] < right[0]
+        cut(left, 0) +> out
+    else
+        cut(right, 0) +> out
 
-    if #left > 0 || #right > 0
-
-        if left[0] < right[0]:
-            cut(left, 0) +> out
-        else
-            cut(right, 0) +> out
-
-        repeat
+return merged

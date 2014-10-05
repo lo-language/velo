@@ -1,0 +1,9 @@
+receive num
+
+if num < 0
+    fail
+
+if num in 0,1
+    return num
+
+return __(num - 1) + __(num - 2)

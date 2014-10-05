@@ -50,7 +50,6 @@
     }
                         %}
 \s+                     /* ignore all other whitespace */
-";"                     return ';'
 [0-9]+("."[0-9]+)?\b    return 'CONSTANT'
 \".*\"                  yytext = yytext.substr(1, yyleng-2); return 'STRING_LITERAL';
 \'.*\'                  yytext = yytext.substr(1, yyleng-2); return 'STRING_LITERAL';
@@ -59,6 +58,7 @@
 "("                     return '('
 ")"                     return ')'
 ","                     return ','
+".."                    return '..'
 "."                     return '.'
 "=="                    return '=='
 "!="                    return '!='
@@ -85,13 +85,17 @@
 "%"                     return '%'
 "?"                     return '?'
 "#"                     return '#'
+"receive"               return 'RECEIVE'
 "if"                    return 'IF'
 "else"                  return 'ELSE'
+"fail"                  return 'FAIL'
 "is"                    return 'IS'
-"break"                 return 'BREAK'
 "action"                return 'ACTION'
 "true"|"false"          return 'BOOLEAN'
-"pass"                  return 'PASS'
+"pass"                  return 'PASS'   // do we need pass if we have skip?
+"skip"                  return 'SKIP'
+"break"                 return 'BREAK'
+"return"                return 'RETURN'
 [a-zA-Z][a-zA-Z0-9]*    return 'NAME'
 .                       return 'INVALID'
 
@@ -133,12 +137,23 @@ statement
     | identifier '=' expression -> new ast.Operator('assign', $1, $3)
     | selection_statement
     | sequence_statement
+    | return_statement
+    | jump_statement
     ;
 
 selection_statement
     : IF expression block -> new ast.Selection($2, $3)
     | IF expression block ELSE block -> new ast.Selection($2, $3, $5)
     | IF expression block ELSE selection_statement -> new ast.Selection($2, $3, $5)
+    ;
+
+return_statement
+    : RETURN expression -> new ast.Result(true, $2)
+    | FAIL expression -> new ast.Result(false, $2)
+    ;
+
+jump_statement
+    : SKIP -> new ast.Jump($1)
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -228,6 +243,7 @@ conditional_expression
 
 expression
     : conditional_expression
+    | expression '..' conditional_expression
     ;
 
 ////////////////////////////////////////////////////////////////////////////////

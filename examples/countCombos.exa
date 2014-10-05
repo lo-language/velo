@@ -1,0 +1,42 @@
+/*
+
+calculates all possible combinations for the android lockscreen
+
+the path is a list of nodes
+
+*/
+
+receive path
+
+// base case - only one possibility left
+if # path == 8
+    return 1
+
+combos = 0
+
+// go through all nodes
+0..8 >>
+
+    receive node
+
+    if node in path // could also say "if path has node" or "contains node"
+        skip
+
+    // node is novel in the path; see if it's a legal next step
+
+    if path[] == 0 && node == 2 && 1 in path == false
+        skip
+
+    if path[] == 0 && node == 6 && 3 in path == false
+        skip
+
+    if path[] == 0 && node == 8 && 4 in path == false
+        skip
+
+    // todo fill in the rest of these - 3 per corner node, 1 per edge node, 16 cases total
+
+    // how do we know to not call the iter block action? does it not apply to non-root actions?
+    // and how does this interact with the traversal?
+    combos += _(path + node)
+
+return combos

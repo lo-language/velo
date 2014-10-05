@@ -11,51 +11,51 @@
 // can use = as an indicator to BLOCK on the result and => as an indicator to NOT BLOCK?
 // in this way, we act like a typical language? but I don't like having blocking in there at all
 
-action (args, io, env, kit) {
+receive args, io, env, lib
 
-    kit.make("/dns/whois") -> (whois) {
+lib.make("/dns/whois") ->
 
-        // load the dictionary as an ordered list
-        io.in.readLines() >> (word) {
+    receive whois
 
-            if (strlen(word) > 6) {
-                done
-            }
+    // load the dictionary as an ordered list
+    io.in.readLines() >>
 
-            // see if word fits any TLD - could use a trie for this
+        receive word
 
-            findDomains(word.lower()) >> action (domain) {
+        // ignore words over 6 chars
+        if # word > 6
+            skip
 
-                if (checkDomain(domain)) {
+        // see if word fits any TLD - could use a trie for this
 
-                    domain -> io.out
-                }
-            }
+        findDomains(word.lower()) >>
+
+            receive domain
+
+            if (checkDomain(domain))
+                domain -> io.out
+
+findDomains =
+
+    receive word
+
+    ['com', 'net', 'org', 'io', 'it', 'me', 'to', 'aero', 'co'] >>
+
+        receive tld
+
+        // wacky syntactic sugar here - /REGEX/ is shorthand for an action
+        word -> /.+tld/ -> {
+            emit(word + tld)
         }
     }
-
-    findDomains = action (word) {
-
-        tlds = ['com', 'net', 'org', 'io', 'it', 'me', 'to', 'aero', 'co']
-
-        scan(tlds) >> (tld) {
-
-            // wacky syntactic sugar here - /REGEX/ is shorthand for an action
-            word -> /.+tld/ -> {
-                emit(word + tld)
-            }
-        }
-        :: {
-            end()
-        }
-    }
-
-    checkDomain = action (domain) {
-
-        result = whois(domain)
-
-        if (result) {
-            result -> out
-        }
+    :: {
+        end()
     }
 }
+
+checkDomain = action (domain) {
+
+    result = whois(domain)
+
+    if result
+        return result
