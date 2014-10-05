@@ -1,4 +1,5 @@
 [
+    ["receive", ["num"]],
     { "op": "assign",
     "left": [ "id", "x" ],
     "right": { "action": [], "statements": [] } },

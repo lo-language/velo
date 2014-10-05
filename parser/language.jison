@@ -90,7 +90,6 @@
 "else"                  return 'ELSE'
 "fail"                  return 'FAIL'
 "is"                    return 'IS'
-"action"                return 'ACTION'
 "true"|"false"          return 'BOOLEAN'
 "pass"                  return 'PASS'   // do we need pass if we have skip?
 "skip"                  return 'SKIP'
@@ -122,18 +121,17 @@ module
         { $$ = $1; return $$; }
     ;
 
-action_definition
-    : ACTION block -> new ast.Action([], $2)
-    | ACTION '(' (NAME ',')* NAME? ')' block -> new ast.Action($4 ? $3.concat([$4]) : $3, $6)
-    ;
-
 block
     : BEGIN PASS END -> []
     | BEGIN statement* END -> $2
     ;
 
+////////////////////////////////////////////////////////////////////////////////
+// STATEMENTS
+
 statement
-    : NAME IS literal -> ['define', $1, $3]
+    : RECEIVE NAME (',' NAME)* -> ['receive', $3 ? $3.concat([$2]): [$2]]
+    | NAME IS literal -> ['define', $1, $3]
     | identifier '=' expression -> new ast.Operator('assign', $1, $3)
     | selection_statement
     | sequence_statement
@@ -175,7 +173,7 @@ identifier
 primary_expression
     : literal
 	| identifier
-	| action_definition
+	| block -> new ast.Action([], $1)
     | '(' expression ')' -> $2
     ;
 

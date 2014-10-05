@@ -6,7 +6,10 @@
  * or a sequence definition (x is an action; b = x -> y defines action b)
  */
 
-x = action ()
+receive num
+
+// assign an action to x
+x =
     pass
 
 if # items == 0
