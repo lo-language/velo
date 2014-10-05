@@ -1,8 +1,8 @@
-{ "action": [],
-    "statements":
-            [ { "op": "assign", "left": [ "id", "bar" ], "right": [ "id", "baz" ] },
-                { "op": "assign", "left": [ "id", "binky" ], "right": 64 },
-                { "op": "assign",
-                    "left": [ "id", "message" ],
-                    "right": "hi there" },
-                { "op": "assign", "left": [ "id", "foo" ], "right": true } ] }
+[
+    { "op": "assign", "left": [ "id", "bar" ], "right": [ "id", "baz" ] },
+    { "op": "assign", "left": [ "id", "binky" ], "right": 64 },
+    { "op": "assign",
+        "left": [ "id", "message" ],
+        "right": "hi there" },
+    { "op": "assign", "left": [ "id", "foo" ], "right": true }
+]

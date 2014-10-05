@@ -1,12 +1,12 @@
-{ "action": [],
-    "statements": [
-        { "op": "assign", "left": [ "id", "x" ], "right": true },
-        { "op": "assign", "left": [ "id", "y" ], "right": false },
-        { "op": "assign", "left": [ "id", "answer" ], "right": 42 },
-        { "op": "assign", "left": [ "id", "age" ], "right": 63.4 },
-        { "op": "assign",
-            "left": [ "id", "message" ],
-            "right": "hello, world!" },
-        { "op": "assign",
-            "left": [ "id", "greeting" ],
-            "right": "howdy, pardner" } ] }
+[
+    { "op": "assign", "left": [ "id", "x" ], "right": true },
+    { "op": "assign", "left": [ "id", "y" ], "right": false },
+    { "op": "assign", "left": [ "id", "answer" ], "right": 42 },
+    { "op": "assign", "left": [ "id", "age" ], "right": 63.4 },
+    { "op": "assign",
+        "left": [ "id", "message" ],
+        "right": "hello, world!" },
+    { "op": "assign",
+        "left": [ "id", "greeting" ],
+        "right": "howdy, pardner" }
+]

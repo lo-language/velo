@@ -1,20 +1,19 @@
-{ "action": [],
-    "statements":
-            [
-                { "invoke": [ "id", "foo" ], "args": [] },
-                { "invoke": [ "id", [ "id", "foo" ], "bar" ], "args": [] },
-                [ "=>",
-                    { "invoke": [ "id", "foo" ], "args": [] },
-                    [ "id", "baz" ] ],
-                [ "=>",
-                    [ "->",
-                        [ "=>",
-                            { "invoke": [ "id", "foo" ], "args": [ [ "id", "bar" ] ] },
-                            [ "id", "baz" ] ],
-                        [ "id", "foobar" ] ],
-                    [ "id", "bazzle" ] ],
-                [ "=>",
-                    {
-                        "invoke": [ "id", "foo" ],
-                        "args": [ [ "id", "bar" ], [ "id", "baz" ] ] },
-                    [ "id", "foobar" ] ] ] }
+[
+    { "invoke": [ "id", "foo" ], "args": [] },
+    { "invoke": [ "id", [ "id", "foo" ], "bar" ], "args": [] },
+    [ "=>",
+        { "invoke": [ "id", "foo" ], "args": [] },
+        [ "id", "baz" ] ],
+    [ "=>",
+        [ "->",
+            [ "=>",
+                { "invoke": [ "id", "foo" ], "args": [ [ "id", "bar" ] ] },
+                [ "id", "baz" ] ],
+            [ "id", "foobar" ] ],
+        [ "id", "bazzle" ] ],
+    [ "=>",
+        {
+            "invoke": [ "id", "foo" ],
+            "args": [ [ "id", "bar" ], [ "id", "baz" ] ] },
+        [ "id", "foobar" ] ]
+]

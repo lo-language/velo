@@ -1,15 +1,15 @@
-{ "action": [],
-    "statements":
-            [ { "op": "assign",
-                "left": [ "id", "foo" ],
-                "right":
-                        [ "conditional",
-                            [ "and", [ "id", "q" ], [ "id", "r" ] ],
-                            42,
-                            [ "or",
-                                [ "and", [ "id", "y" ], [ "id", "z" ] ],
-                                [ "bitwise_or",
-                                    [ "xor",
-                                        [ "bitwise_and", [ "id", "a" ], [ "id", "b" ] ],
-                                        [ "id", "c" ] ],
-                                    [ "id", "d" ] ] ] ] } ] }
+[
+    { "op": "assign",
+        "left": [ "id", "foo" ],
+        "right":
+                [ "conditional",
+                    [ "and", [ "id", "q" ], [ "id", "r" ] ],
+                    42,
+                    [ "or",
+                        [ "and", [ "id", "y" ], [ "id", "z" ] ],
+                        [ "bitwise_or",
+                            [ "xor",
+                                [ "bitwise_and", [ "id", "a" ], [ "id", "b" ] ],
+                                [ "id", "c" ] ],
+                            [ "id", "d" ] ] ] ] }
+]

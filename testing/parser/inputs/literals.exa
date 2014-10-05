@@ -1,7 +1,6 @@
-action ()
-    x = true
-    y = false
-    answer = 42
-    age = 63.4
-    message = "hello, world!"
-    greeting = 'howdy, pardner'
+x = true
+y = false
+answer = 42
+age = 63.4
+message = "hello, world!"
+greeting = 'howdy, pardner'

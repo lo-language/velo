@@ -118,7 +118,7 @@
 // STRUCTURE
 
 module
-    : action_definition EOF
+    : statement* EOF
         { $$ = $1; return $$; }
     ;
 

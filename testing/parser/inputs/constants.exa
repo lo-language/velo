@@ -1,5 +1,3 @@
-action ()
-
-    port is 80
-    greeting is "hi there!"
-    e is 2.718281828459045
+port is 80
+greeting is "hi there!"
+e is 2.718281828459045

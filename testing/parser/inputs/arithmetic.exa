@@ -1,2 +1,1 @@
-action ()
-    qux = 2 + foo * bar / 2 + baz % ((age - 4))
+qux = 2 + foo * bar / 2 + baz % ((age - 4))
