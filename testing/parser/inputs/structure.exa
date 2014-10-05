@@ -13,10 +13,10 @@ x =
     pass
 
 if # items == 0
-    fail "oh noes!"
+    fail()
 
 if # items == 1
-    return "ok"
+    fail("oh noes!")
 
 if answer == 42
     a -> b
@@ -25,4 +25,4 @@ else if answer == 57
 else
     c -> d
 
-return answer
+return(answer)

@@ -5,10 +5,10 @@
     "right": { "action": [], "statements": [] } },
     [ "if",
         [ "equality", {"op": "card", "left": [ "id", "items" ]}, 0 ],
-        [ [ "result", false, "oh noes!" ] ] ],
+        [ [ "result", false, [] ] ] ],
     [ "if",
         [ "equality", {"op": "card", "left": [ "id", "items" ]}, 1 ],
-        [ [ "result", true, "ok" ] ] ],
+        [ [ "result", false, ["oh noes!"] ] ] ],
     [ "if",
         [ "equality", [ "id", "answer" ], 42 ],
         [ [ "->", [ "id", "a" ], [ "id", "b" ] ] ],
@@ -16,5 +16,5 @@
             [ "equality", [ "id", "answer" ], 57 ],
             [ [ "->", [ "id", "b" ], [ "id", "c" ] ] ],
             [ [ "->", [ "id", "c" ], [ "id", "d" ] ] ] ] ],
-    [ "result", true, [ "id", "answer" ] ]
+    [ "result", true, [ [ "id", "answer" ] ] ]
 ]

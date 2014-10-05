@@ -1,9 +1,9 @@
 receive num
 
 if num < 0
-    fail
+    fail()
 
 if num <= 1
-    return 1
+    return(1)
 
-return num * __(num - 1)
+return(num * __(num - 1))

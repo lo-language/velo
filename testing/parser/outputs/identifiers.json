@@ -13,9 +13,12 @@
         "left": [ "id", "foo" ],
         "right": [ "id", [ "id", [ "id", "boo" ], "bar" ], "baz" ] },
     { "op": "assign",
-        "left": [ "id", "qux" ],
+        "left": [ "id", "_qux" ],
         "right": [ "id", [ "id", [ "id", "foo" ], [ "id", "i" ] ], "bar" ] },
     { "op": "assign",
-        "left": [ "id", "quux" ],
-        "right": [ "id", [ "id", [ "id", "foo" ], "bar" ], [ "id", "i" ] ] }
+        "left": [ "id", "qu-ux" ],
+        "right": [ "id", [ "id", [ "id", "foo" ], "bar" ], [ "id", "i" ] ] },
+    { "op": "assign",
+        "left": [ "id", "moi" ],
+        "right": [ "id", "__" ] }
 ]

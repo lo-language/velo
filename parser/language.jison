@@ -3,6 +3,9 @@
 %s comment
 %x indent
 
+digit                       [0-9]
+id                          [_a-zA-Z][-_a-zA-Z0-9]*
+
 %%
 
 "//".*                  /* line comment */
@@ -50,7 +53,7 @@
     }
                         %}
 \s+                     /* ignore all other whitespace */
-[0-9]+("."[0-9]+)?\b    return 'CONSTANT'
+[0-9]+("."[0-9]+)?\b    return 'NUMBER'
 \".*\"                  yytext = yytext.substr(1, yyleng-2); return 'STRING_LITERAL';
 \'.*\'                  yytext = yytext.substr(1, yyleng-2); return 'STRING_LITERAL';
 "["                     return '['
@@ -95,7 +98,7 @@
 "skip"                  return 'SKIP'
 "break"                 return 'BREAK'
 "return"                return 'RETURN'
-[a-zA-Z][a-zA-Z0-9]*    return 'NAME'
+{id}                    return 'NAME'
 .                       return 'INVALID'
 
 /lex
@@ -135,7 +138,7 @@ statement
     | identifier '=' expression -> new ast.Operator('assign', $1, $3)
     | selection_statement
     | sequence_statement
-    | return_statement
+    | result_statement
     | jump_statement
     ;
 
@@ -145,9 +148,16 @@ selection_statement
     | IF expression block ELSE selection_statement -> new ast.Selection($2, $3, $5)
     ;
 
-return_statement
-    : RETURN expression -> new ast.Result(true, $2)
-    | FAIL expression -> new ast.Result(false, $2)
+// ok, this was a huge battle - making expression optional made the grammar ambiguous
+// didn't want to fix by adding semicolons after statements
+// didn't want to make expression required - actually wanted to support N expressions
+// ended up making results look like invocations - which I like because they pretty much
+// are invocations - sending messages
+// this makes it clear (I think) that fail/return are sending messages - but since they
+// aren't syntactically true invocations, you can't expect a result back
+result_statement
+    : RETURN '(' (expression ',')* expression? ')' -> new ast.Result(true, $4 ? $3.concat([$4]) : $3)
+    | FAIL '(' (expression ',')* expression? ')' -> new ast.Result(false, $4 ? $3.concat([$4]) : $3)
     ;
 
 jump_statement
@@ -160,7 +170,7 @@ jump_statement
 
 literal
     : BOOLEAN -> new ast.Literal($1 === 'true' ? true : false)
-    | CONSTANT -> new ast.Literal(parseFloat($1))
+    | NUMBER -> new ast.Literal(parseFloat($1))
     | STRING_LITERAL -> new ast.Literal($1)
     ;
 
