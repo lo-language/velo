@@ -25,4 +25,4 @@ else if answer == 57
 else
     c -> d
 
-return(answer)
+reply(answer)

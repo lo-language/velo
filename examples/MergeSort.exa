@@ -10,11 +10,11 @@
 receive items
 
 if # items == 0
-    fail "who could sort an empty list?"
+    fail("who could sort an empty list?")
 
 // base case
 if # items == 1
-    return items
+    reply(items)
 
 // bisect the list
 left = items<#items / 2>
@@ -32,4 +32,4 @@ while # left > 0 || # right > 0
     else
         cut(right, 0) +> out
 
-return merged
+reply(merged)

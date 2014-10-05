@@ -1,9 +1,12 @@
-receive num
+receive index
 
-if num < 0
-    fail
+if index < 0
+    fail("whatsamatta, you?")
 
-if num in 0,1
-    return num
+if index in 0,1
+    return(index)
 
-return __(num - 1) + __(num - 2)
+__(index - 1) => oneBefore
+__(index - 2) => twoBefore
+
+respond(oneBefore + twoBefore)

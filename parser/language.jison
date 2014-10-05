@@ -83,6 +83,8 @@ id                          [_a-zA-Z][-_a-zA-Z0-9]*
 "="                     return '='
 "+"                     return '+'
 "-"                     return '-'
+"++"                    return INC_OP
+"--"                    return DEC_OP
 "*"                     return '*'
 "/"                     return '/'
 "%"                     return '%'
@@ -97,7 +99,7 @@ id                          [_a-zA-Z][-_a-zA-Z0-9]*
 "pass"                  return 'PASS'   // do we need pass if we have skip?
 "skip"                  return 'SKIP'
 "break"                 return 'BREAK'
-"return"                return 'RETURN'
+"reply"                 return 'REPLY' // since return is either intransitive verb (which doesn't make sense for us) or giving back something (doesn't make sense either)
 {id}                    return 'NAME'
 .                       return 'INVALID'
 
@@ -156,7 +158,7 @@ selection_statement
 // this makes it clear (I think) that fail/return are sending messages - but since they
 // aren't syntactically true invocations, you can't expect a result back
 result_statement
-    : RETURN '(' (expression ',')* expression? ')' -> new ast.Result(true, $4 ? $3.concat([$4]) : $3)
+    : REPLY '(' (expression ',')* expression? ')' -> new ast.Result(true, $4 ? $3.concat([$4]) : $3)
     | FAIL '(' (expression ',')* expression? ')' -> new ast.Result(false, $4 ? $3.concat([$4]) : $3)
     ;
 
@@ -186,6 +188,17 @@ primary_expression
 	| block -> new ast.Action([], $1)
     | '(' expression ')' -> $2
     ;
+
+// not using this currently
+postfix_expression
+	: primary_expression
+	| postfix_expression '[' expression ']'
+	| postfix_expression '(' ')'
+	| postfix_expression '(' argument_expression_list ')'
+	| postfix_expression '.' NAME
+	| postfix_expression INC_OP
+	| postfix_expression DEC_OP
+	;
 
 unary_expression
     : primary_expression
@@ -278,7 +291,7 @@ sink
 connector
     : '>~'
     | '->'
-    | '=>'
+    | '=>' // like 'receive' but for unpacking return messages
     | '>>'
     | '>|'
     ;
