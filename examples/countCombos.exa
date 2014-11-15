@@ -10,16 +10,17 @@ receive path
 
 // base case - only one possibility left
 if # path == 8
-    return 1
+    reply(1)
 
+// declare just to put in scope - can we make this unnecessary?
 combos = 0
 
 // go through all nodes
-0..8 >>
+repeat 9
 
     receive node
 
-    if node in path // could also say "if path has node" or "contains node"
+    if node in path // could also say "if path has node" or "contains node" - unless we use has for maps
         skip
 
     // node is novel in the path; see if it's a legal next step
@@ -37,6 +38,7 @@ combos = 0
 
     // how do we know to not call the iter block action? does it not apply to non-root actions?
     // and how does this interact with the traversal?
-    combos += _(path + node)
+    combos += recur(path + node)
 
-return combos
+// should this usage be enough to declare the var in this scope? i think it should
+reply(combos)

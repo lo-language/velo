@@ -20,8 +20,8 @@ var __ = function (success, expr) {
  *
  * @param scope
  */
-__.prototype.compile = function (scope) {
-    return scope.createLiteral(this.value);
+__.prototype.compile = function () {
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

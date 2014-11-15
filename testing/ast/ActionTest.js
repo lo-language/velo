@@ -23,22 +23,59 @@ module.exports["root action"] = {
 
     "no params empty body": function (test) {
 
-        var action = new ast.Action([]);
-        var fn = action.compile();
+        var result = new ast.Action([]).compile();
 
-        test.equal(expr.isImmediate(), false);
         test.done();
     },
 
-    "two params empty body": function (test) {
+    "using undefined var": function (test) {
 
-        var action = new ast.Action(['foo', 'bar'],[
-            new ast.Operator("add", new ast.Identifier('foo'), new ast.Literal(4)),
-            new ast.Operator("add", new ast.Identifier('bar'), new ast.Literal(7))
+        var action = new ast.Action([
+            new ast.Operator("add", new ast.Identifier('foo'), new ast.Literal(4))
         ]);
-        var target = new TargetFn(action);
 
-        test.equal(target.statements[0], "$0 = function () {\n\tvar $foo, $1;\n\n\t$1 = Q.when($foo, function (val) {return 4 + val;});\n}");
+        var result = action.compile();
+
+        test.deepEqual(result, {code: '$foo + 4', requires: {$foo: true}});
         test.done();
-    }
+    },
+
+    "using received param succeeds": function (test) {
+
+        var action = new ast.Action([
+            new ast.Receive(["foo"]),
+            new ast.Operator("add", new ast.Identifier('foo'), new ast.Literal(4))
+        ]);
+
+        var result = action.compile();
+
+        test.deepEqual(result, {code: '$foo + 4', requires: {}});
+        test.done();
+    },
+
+    "using assigned var and param": function (test) {
+
+        var action = new ast.Action([
+            new ast.Receive(["bar"]),
+            new ast.Operator("assign", new ast.Identifier('foo'), new ast.Literal(12)),
+            new ast.Operator("add", new ast.Identifier('foo'), new ast.Identifier('bar'))
+        ]);
+
+        var result = action.compile();
+
+        test.deepEqual(result, {code: '$foo = 12\n$foo + $bar', requires: {}});
+        test.done();
+    },
+//
+//    "two params empty body": function (test) {
+//
+//        var result = new ast.Action([
+//            new ast.Operator("add", new ast.Identifier('foo'), new ast.Literal(4)),
+//            new ast.Operator("add", new ast.Identifier('bar'), new ast.Literal(7))
+//        ]).compile();
+//
+//        console.log(result);
+//
+//        test.done();
+//    }
 };

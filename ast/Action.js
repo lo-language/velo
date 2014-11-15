@@ -12,82 +12,84 @@ var TargetFn = require('../codegen/TargetFn');
 /**
  *
  */
-var __ = function (params, statements) {
+var __ = function (statements) {
 
-    this.params = params || [];
     this.statements = statements || [];
-    this.vars = {};
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Returns the target-lang identifier for the given source name.
- *
- * @param id  the name of the source variable
- */
-__.prototype.getRef = function (id) {
-
-    var name = '$' + id;
-
-    // see if we're requesting a param
-    if (this.params.indexOf(id) >= 0) {
-        return Expression.createParam(name);
-    }
-
-    if (this.vars[id] !== undefined) {
-
-        // is there a danger in not creating a new var?
-        return this.vars[id];
-    }
-
-    // track vars required in this scope
-    this.vars[id] = name;
-
-    return Expression.createRef(name);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param value
- */
-__.prototype.createLiteral = function (value) {
-
-    // pass through
-    return Expression.createLiteral(value);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Creates a compound expression.
- *
- * @param value
- */
-__.prototype.createCompound = function (code, subExpr) {
-    return Expression.createCompound(code, subExpr);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Creates a compound statement (non-expression).
- *
- * @param value
- */
-__.prototype.createStatement = function (code, subExpr) {
-    return Expression.createCompound(code, subExpr, true);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Compiles this action into a new target function.
  */
-__.prototype.compile = function (parent) {
+__.prototype.compile = function () {
 
-    var body = this.statements.map(function (stmt) {
-        return stmt.compile(parent || self);
+    var lines = [];
+    var params = {};
+    var vars = {};
+    var requires = {};
+
+    // go through each statement
+
+    this.statements.forEach(function (stmt) {
+
+        var result = stmt.compile();
+
+        // see if this statement requires anything not yet defined
+        if (result.requires) {
+
+            Object.keys(result.requires).forEach(function (id) {
+
+                if (params[id] || vars[id]) {
+
+                }
+                else {
+                    requires[id] = true;
+                }
+            });
+        }
+
+        if (result.defines) {
+
+            Object.keys(result.defines).forEach(function (id) {
+
+                if (result.defines[id] == 'param') {
+                    params[id] = true;
+                }
+                else {
+                    vars[id] = true;
+                }
+            });
+        }
+
+        // not every exa statement produces a JS statement
+
+        if (result.code) {
+            lines.push(result.code);
+        }
     });
 
-    return new TargetFn();
+    return {
+        code: this.getCode(params, vars, lines),
+        requires: requires
+    }
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ */
+__.prototype.getCode = function (params, vars, lines) {
+
+    // open the function
+    var js = 'function (' + Object.keys(params).join(', ') + ') {';
+
+    js += '\n\tvar ' + Object.keys(vars).join(', ') + ';\n';
+
+    // render compile statements
+
+    js += lines.join('\n') + '\n}';
+
+    return js;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

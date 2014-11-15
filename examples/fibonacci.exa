@@ -4,9 +4,9 @@ if index < 0
     fail("whatsamatta, you?")
 
 if index in 0,1
-    return(index)
+    reply(index)
 
 __(index - 1) => oneBefore
 __(index - 2) => twoBefore
 
-respond(oneBefore + twoBefore)
+reply(oneBefore + twoBefore)

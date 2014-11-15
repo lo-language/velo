@@ -12,7 +12,7 @@ module.exports = {
     Invocation: require('./Invocation'),
     Literal: require('./Literal'),
     Operator: require('./Operator'),
-    Relational: require('./Relational'),
     Selection: require('./Selection'),
+    Receive: require('./Receive'),
     Result: require('./Result')
 };

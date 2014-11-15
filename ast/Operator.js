@@ -5,10 +5,12 @@
 
 "use strict";
 
+var Identifier = require('./Identifier');
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  */
-var __ = function (op, left, right) {
+var __ = function (op, left, right, extra) {
 
     this.op = op;
     this.left = left;
@@ -18,16 +20,54 @@ var __ = function (op, left, right) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  */
-__.prototype.compile = function (scope) {
-
-    if (this.op == 'assign') {
-        scope.assign(this.left, this.right);
-        return;
-    }
+__.prototype.compile = function () {
 
     var op;
-    var left = this.left.compile(scope);
-    var right = this.right.compile(scope);
+    var left = this.left.compile();
+    var right = this.right.compile();
+    var code = '';
+
+    // merge the deps
+
+    var requires = {};
+    var defines = {};
+
+    if (left.requires) {
+
+        Object.keys(left.requires).forEach(function (id) {
+            requires[id] = left.requires[id]
+        });
+    }
+
+    if (right.requires) {
+
+        Object.keys(right.requires).forEach(function (id) {
+            requires[id] = right.requires[id]
+        });
+    }
+
+    if (this.op == 'assign' && this.left instanceof Identifier) {
+        code = left.code + ' = ' + right.code;
+        defines[left.code] = true;
+    }
+    else if (this.op = '+') {
+
+        if (this.left instanceof Identifier) {
+            requires[left.code] = true;
+        }
+
+        if (this.right instanceof Identifier) {
+            requires[right.code] = true;
+        }
+
+        code = left.code + ' + ' + right.code;
+    }
+
+    return {
+        code: code,
+        defines: defines,
+        requires: requires
+    };
 
     // see if we're trying to assign to a constant
 //    if (left.isConstant() && this.op == 'assign') {
@@ -66,9 +106,6 @@ __.prototype.compile = function (scope) {
             break;
     }
 
-    return scope.createCompound(function (args) {
-        return args[0] + ' ' + op + ' ' + args[1];
-    }, [left, right]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

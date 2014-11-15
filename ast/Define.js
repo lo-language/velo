@@ -21,9 +21,13 @@ var __ = function (name, value) {
  * @param scope
  * @return {*}
  */
-__.prototype.render = function (scope) {
+__.prototype.render = function () {
 
-    scope.define(this.name, this.value);
+    var defines = {};
+
+    defines[this.name] = this.value;
+
+    return {defines: defines};
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

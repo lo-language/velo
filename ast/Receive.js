@@ -8,14 +8,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param name
- * @param loc
- * @private
  */
-var __ = function (name, loc) {
-
-    this.id = name;
-    this.loc = loc;
+var __ = function (params) {
+    this.params = params;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,9 +20,13 @@ var __ = function (name, loc) {
  */
 __.prototype.compile = function () {
 
-    return {
-        code: '$' + this.id
-    };
+    var defines = {};
+
+    this.params.forEach(function (param) {
+        defines['$' + param] = 'param';
+    });
+
+    return {"defines": defines};
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,8 +34,7 @@ __.prototype.compile = function () {
  *
  */
 __.prototype.toJSON = function () {
-
-    return ['id', this.id];
+    return ['receive', this.params];
 };
 
 module.exports = __;

@@ -80,11 +80,11 @@ id                          [_a-zA-Z][-_a-zA-Z0-9]*
 ">|"                    return '>|'
 "<"                     return '<'
 ">"                     return '>'
-"="                     return '='
+"="                     return 'ASSIGN'
 "+"                     return '+'
 "-"                     return '-'
-"++"                    return INC_OP
-"--"                    return DEC_OP
+"++"                    return 'INC_OP'
+"--"                    return 'DEC_OP'
 "*"                     return '*'
 "/"                     return '/'
 "%"                     return '%'
@@ -100,7 +100,7 @@ id                          [_a-zA-Z][-_a-zA-Z0-9]*
 "skip"                  return 'SKIP'
 "break"                 return 'BREAK'
 "reply"                 return 'REPLY' // since return is either intransitive verb (which doesn't make sense for us) or giving back something (doesn't make sense either)
-{id}                    return 'NAME'
+{id}                    return 'IDENTIFIER'
 .                       return 'INVALID'
 
 /lex
@@ -135,14 +135,27 @@ block
 // STATEMENTS
 
 statement
-    : RECEIVE NAME (',' NAME)* -> ['receive', $3 ? $3.concat([$2]): [$2]]
-    | NAME IS literal -> ['define', $1, $3]
-    | identifier '=' expression -> new ast.Operator('assign', $1, $3)
+    : RECEIVE IDENTIFIER (',' IDENTIFIER)* -> new ast.Receive($3 ? $3.concat([$2]): [$2])
+    | IDENTIFIER IS literal -> ['define', $1, $3]
+    | assignment_statement
     | selection_statement
     | sequence_statement
     | result_statement
     | jump_statement
     ;
+
+assignment_statement
+	: postfix_expression assignment_operator expression -> new ast.Operator($2, $1, $3)
+	;
+
+assignment_operator
+	: ASSIGN -> 'assign'
+	| MUL_ASSIGN
+	| DIV_ASSIGN
+	| MOD_ASSIGN
+	| ADD_ASSIGN
+	| SUB_ASSIGN
+	;
 
 selection_statement
     : IF expression block -> new ast.Selection($2, $3)
@@ -150,13 +163,6 @@ selection_statement
     | IF expression block ELSE selection_statement -> new ast.Selection($2, $3, $5)
     ;
 
-// ok, this was a huge battle - making expression optional made the grammar ambiguous
-// didn't want to fix by adding semicolons after statements
-// didn't want to make expression required - actually wanted to support N expressions
-// ended up making results look like invocations - which I like because they pretty much
-// are invocations - sending messages
-// this makes it clear (I think) that fail/return are sending messages - but since they
-// aren't syntactically true invocations, you can't expect a result back
 result_statement
     : REPLY '(' (expression ',')* expression? ')' -> new ast.Result(true, $4 ? $3.concat([$4]) : $3)
     | FAIL '(' (expression ',')* expression? ')' -> new ast.Result(false, $4 ? $3.concat([$4]) : $3)
@@ -170,40 +176,39 @@ jump_statement
 // EXPRESSIONS
 // C expression syntax, basically
 
+primary_expression
+    : IDENTIFIER -> new ast.Identifier($1, @1)
+    | literal
+	| block -> new ast.Action($1)
+    | '(' expression ')' -> $2
+    ;
+
 literal
     : BOOLEAN -> new ast.Literal($1 === 'true' ? true : false)
     | NUMBER -> new ast.Literal(parseFloat($1))
     | STRING_LITERAL -> new ast.Literal($1)
     ;
 
-identifier
-    : NAME -> new ast.Identifier($1)
-    | identifier '[' expression ']' -> new ast.Identifier($1, $3)
-    | identifier '.' NAME -> new ast.Identifier($1, $3)
-    ;
-
-primary_expression
-    : literal
-	| identifier
-	| block -> new ast.Action([], $1)
-    | '(' expression ')' -> $2
-    ;
-
-// not using this currently
 postfix_expression
 	: primary_expression
-	| postfix_expression '[' expression ']'
-	| postfix_expression '(' ')'
-	| postfix_expression '(' argument_expression_list ')'
-	| postfix_expression '.' NAME
-	| postfix_expression INC_OP
-	| postfix_expression DEC_OP
+	| postfix_expression '[' expression ']' -> new ast.Operator('subscript', $1, $3)
+	| postfix_expression '(' (expression ',')* expression? ')' -> new ast.Operator('send', $1, $4 ? $3.concat([$4]) : $3)
+	| postfix_expression '.' IDENTIFIER -> new ast.Operator('access', $1, $3)
+	| postfix_expression INC_OP -> new ast.Operator('inc', $1)
+	| postfix_expression DEC_OP -> new ast.Operator('dec', $1)
 	;
 
 unary_expression
-    : primary_expression
-    | '#' primary_expression -> new ast.Operator('card', $2)
+    : postfix_expression
+	| INC_OP unary_expression
+	| DEC_OP unary_expression
+	| unary_operator unary_expression -> new ast.Operator($1, $2)
     ;
+
+unary_operator
+	: '#'
+	| '!'
+	;
 
 multiplicative_expression
     : unary_expression
@@ -220,51 +225,51 @@ additive_expression
 
 relational_expression
     : additive_expression
-    | relational_expression '<' additive_expression -> new ast.Relational('lt', $1, $3)
-    | relational_expression '>' additive_expression -> new ast.Relational('gt', $1, $3)
-    | relational_expression '<=' additive_expression -> new ast.Relational('le', $1, $3)
-    | relational_expression '>=' additive_expression -> new ast.Relational('ge', $1, $3)
+    | relational_expression '<' additive_expression -> new ast.Operator('lt', $1, $3)
+    | relational_expression '>' additive_expression -> new ast.Operator('gt', $1, $3)
+    | relational_expression '<=' additive_expression -> new ast.Operator('le', $1, $3)
+    | relational_expression '>=' additive_expression -> new ast.Operator('ge', $1, $3)
     ;
 
 equality_expression
     : relational_expression
-    | equality_expression '==' relational_expression -> new ast.Relational('equality', $1, $3)
-    | equality_expression '!=' relational_expression -> new ast.Relational('inequality', $1, $3)
+    | equality_expression '==' relational_expression -> new ast.Operator('eq', $1, $3)
+    | equality_expression '!=' relational_expression -> new ast.Operator('ne', $1, $3)
     ;
 
 and_expression
 	: equality_expression
-	| and_expression '&' equality_expression -> ['bitwise_and', $1, $3]
+	| and_expression '&' equality_expression -> new ast.Operator('bitwise_and', $1, $3)
 	;
 
 exclusive_or_expression
 	: and_expression
-	| exclusive_or_expression '^' and_expression -> ['xor', $1, $3]
+	| exclusive_or_expression '^' and_expression -> new ast.Operator('xor', $1, $3)
 	;
 
 inclusive_or_expression
 	: exclusive_or_expression
-	| inclusive_or_expression '|' exclusive_or_expression -> ['bitwise_or', $1, $3]
+	| inclusive_or_expression '|' exclusive_or_expression -> new ast.Operator('bitwise_or', $1, $3)
 	;
 
 logical_and_expression
 	: inclusive_or_expression
-	| logical_and_expression '&&' inclusive_or_expression -> ['and', $1, $3]
+	| logical_and_expression '&&' inclusive_or_expression -> new ast.Operator('and', $1, $3)
 	;
 
 logical_or_expression
 	: logical_and_expression
-	| logical_or_expression '||' logical_and_expression -> ['or', $1, $3]
+	| logical_or_expression '||' logical_and_expression -> new ast.Operator('or', $1, $3)
 	;
 
 conditional_expression
 	: logical_or_expression
-	| logical_or_expression '?' expression ':' conditional_expression -> ['conditional', $1, $3, $5]
+	| logical_or_expression '?' expression ':' conditional_expression -> new ast.Operator('conditional', $1, $3, $5)
 	;
 
 expression
     : conditional_expression
-    | expression '..' conditional_expression
+    | expression '..' conditional_expression // not sure where this guy should go, precedence-wise
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -272,21 +277,21 @@ expression
 // invocations are statements, not expressions
 // what about statement ~ statement expressions? e.g. 2/0 ~ log.write(err)
 
-invocation
-    : identifier '(' (expression ',')* expression? ')' -> new ast.Invocation($1, $4 ? $3.concat([$4]) : $3)
-    ;
+//invocation
+//    : identifier '(' (expression ',')* expression? ')' -> new ast.Invocation($1, $4 ? $3.concat([$4]) : $3)
+//    ;
 
-sequence_statement
-    : invocation
-    | expression connector sink -> [$2, $1, $3]
-    | sequence_statement connector sink -> [$2, $1, $3]
-    ;
+//sequence_statement
+//    : invocation
+//    | expression connector sink -> [$2, $1, $3]
+//    | sequence_statement connector sink -> [$2, $1, $3]
+//    ;
 
-sink
-    : identifier
-    | '(' (NAME ',')* NAME? ')' block -> {action: ($3 ? $2.concat([$3]) : $2), statements: $5}
-    | block -> {'action': [], statements: $1}
-    ;
+//sink
+//    : identifier
+//    | '(' (IDENTIFIER ',')* IDENTIFIER? ')' block -> {action: ($3 ? $2.concat([$3]) : $2), statements: $5}
+//    | block -> {'action': [], statements: $1}
+//    ;
 
 connector
     : '>~'

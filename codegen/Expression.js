@@ -69,7 +69,7 @@ __.createTempVar = function (ref, immediate) {
  *
  * @param code
  * @param subExpr
- * @param isExpr HACK ALERT
+ * @param isStmt HACK ALERT
  */
 __.createCompound = function (codeGen, subExpr, isStmt) {
 
@@ -145,5 +145,6 @@ __.prototype.getCode = function () {
 module.exports = {
     createLiteral: __.createLiteral,
     createRef: __.createRef,
-    createCompound: __.createCompound
+    createCompound: __.createCompound,
+    createParam: __.createParam
 };

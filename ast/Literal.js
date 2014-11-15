@@ -16,6 +16,7 @@
 var __ = function (value) {
 
     this.value = value;
+    this.code = (typeof value === 'string' ? '"' + value + '"' : value);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,8 +24,9 @@ var __ = function (value) {
  *
  * @param scope
  */
-__.prototype.compile = function (scope) {
-    return scope.createLiteral(this.value);
+__.prototype.compile = function () {
+
+    return {code: this.code};
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

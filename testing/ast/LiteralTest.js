@@ -38,34 +38,27 @@ module.exports["json"] = {
 
 module.exports["compile"] = {
 
-    setUp: function (cb) {
-
-        this.target = new TargetFn(new Action());
-
-        cb();
-    },
-
     "number": function (test) {
 
-        var val = new Literal(3).compile(this.target);
+        var result = new Literal(3).compile();
 
-        test.equal(val.getCode(), "3");
+        test.equal(result.code, "3");
         test.done();
     },
 
     "boolean": function (test) {
 
-        var val = new Literal(true).compile(this.target);
+        var result = new Literal(true).compile();
 
-        test.equal(val.getCode(), true);
+        test.equal(result.code, true);
         test.done();
     },
 
     "string": function (test) {
 
-        var val = new Literal("Leela").compile(this.target);
+        var result = new Literal("Leela").compile();
 
-        test.equal(val.getCode(), '"Leela"');
+        test.equal(result.code, '"Leela"');
         test.done();
     }
 };

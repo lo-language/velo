@@ -9,15 +9,15 @@
 
 receive center, radius, lib
 
-circle = lib.createShape([center.x - radius, center.y - radius], radius)
+shape = lib.createShape([center.x - radius, center.y - radius], radius)
 
-circle += [
+reply (shape += [
 
     getCenter:
-        return center
+        reply(center)
 
     getRadius:
-        return radius
+        reply(radius)
 
 //    move: action (xOffset, yOffset)
 //        center.x += xOffset
@@ -32,6 +32,4 @@ circle += [
 
     draw:
         receive screen
-]
-
-return circle
+])

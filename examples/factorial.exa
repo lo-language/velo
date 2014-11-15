@@ -10,6 +10,12 @@ if num < 0
 if num <= 1
     reply(1)
 
-__(num - 1) => prev
+//result = 1
+//
+//2..num >>
+//    receive x
+//    result *= x
+
+recur(num - 1) => prev
 
 reply(num * prev)

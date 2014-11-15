@@ -16,9 +16,10 @@
  * @param action
  * @private
  */
-var __ = function (params, body) {
+var __ = function (params, vars, body) {
 
     this.params = params;
+    this.vars = vars;
     this.body = body;
 };
 
@@ -29,7 +30,7 @@ var __ = function (params, body) {
 __.prototype.getCode = function () {
 
     var self = this;
-    var params = this.action.params.map(function (name) {
+    var params = this.params.map(function (name) {
         return '$' + name;
     });
 
@@ -46,11 +47,9 @@ __.prototype.getCode = function () {
         js += '\n\tvar ' + vars.join(', ') + ';\n';
     }
 
-    // compile statements
+    // render compile statements
 
-    var compiled = this.action.compile(self);
-
-    js += '\n' + compiled.map(function (stmt) {
+    js += '\n' + this.body.map(function (stmt) {
         return stmt.getCode();
     }).join('\n');
 
