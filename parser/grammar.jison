@@ -57,7 +57,7 @@ id                          [_a-zA-Z][-_a-zA-Z0-9]*
 \s+                     /* ignore all other whitespace */
 "true"|"false"          return 'BOOLEAN'
 {number}                return 'NUMBER'
-\".*\"                  yytext = yytext.substr(1, yyleng-2); return 'STRING';
+\"[^\"]*\"              yytext = yytext.substr(1, yyleng-2); return 'STRING';
 "["                     return '['
 "]"                     return ']'
 "("                     return '('
@@ -98,6 +98,7 @@ id                          [_a-zA-Z][-_a-zA-Z0-9]*
     indents = [''];
 
     ast = require('../ast');
+    util = require('util');
 %}
 
 /* enable EBNF grammar syntax */
@@ -109,33 +110,42 @@ id                          [_a-zA-Z][-_a-zA-Z0-9]*
 
 ////////////////////////////////////////////////////////////////////////////////
 // STRUCTURE
+// we only want () at the end of a statement
+// no general expr statements
+// only foo() is both an expr and a statement
 
 program
-    : stmt* EOF
+    : stmt* EOF -> console.log(util.inspect($1, {depth: null, colors: true}))
     ;
 
 stmt
-    : expr ';'
+    : request ';'
     ;
 
 literal
-    : BOOLEAN
-    | NUMBER
-    | STRING
-    | '[' (expr ',')* expr? ']'
-    | '{' (dyad ',')* dyad? '}'
+    : BOOLEAN -> $1 == 'true'
+    | NUMBER -> parseFloat($1)
+    | STRING -> '"' + $1 + '"';
+    | '[' (expr ',')* expr? ']' -> ["list", $2 ? $2.concat($3): $3]
+    | '{' (dyad ',')* dyad? '}' -> ["set", $2 ? $2.concat($3): $3]
     ;
 
 dyad
-    : literal (':' expr)?
+    : expr
+    | literal ':' expr -> ["dyad", $1, $3]
     ;
 
 atom
-    : ID
+    : ID -> ["ID", $1];
     | literal
-    | atom '[' expr ']'
-    | atom '.' ID
+    | atom '[' expr ']' -> ["subscript", $1, $3]
+    | atom '.' ID -> ["access", $1, $3]
     | '(' expr ')'
+    | request
+    ;
+
+request
+    : atom '(' (expr ',')* expr? ')' -> ["request", $1, $4]
     ;
 
 expr
