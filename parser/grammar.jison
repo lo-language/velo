@@ -113,24 +113,33 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 %left '+' '-'
 %left '*' '/' '%'
+%left '<' '>' '<=' '>='
+%left '==' '!='
 
 %%
 
 ////////////////////////////////////////////////////////////////////////////////
 // STRUCTURE
-// we only want () at the end of a statement
-// no general expr statements
-// only foo() is both an expr and a statement
 
 program
-    : stmt* EOF -> console.log(util.inspect($1, {depth: null, colors: true}))
+    : statement* EOF -> console.log(util.inspect($1, {depth: null, colors: true}))
     ;
 
-stmt
-    : request ';'
-    | atom '++' ';' -> ["inc", $1]
-    | atom '--' ';' -> ["dec", $1]
-    | atom assignment_op expr ';' -> ["assign", $1, $2, $3]
+block
+    : BEGIN statement* END -> $2
+    ;
+
+statement
+    : RECEIVE (expr ',')* expr? ';'
+    | request ';'
+    | assignment ';'
+    | selection
+    ;
+
+assignment
+    : atom '++' -> ["inc", $1]
+    | atom '--' -> ["dec", $1]
+    | atom assignment_op expr -> ["assign", $1, $2, $3]
     ;
 
 // assignments are not expressions
@@ -141,6 +150,12 @@ assignment_op
     | '*='
     | '/='
     | '%='
+    ;
+
+selection
+    : IF expr block
+    | IF expr block ELSE block
+    | IF expr block ELSE selection
     ;
 
 atom
@@ -165,6 +180,7 @@ dyad
     | expr ':' expr -> ["dyad", $1, $3]
     ;
 
+// requests are the only expressions that can also be statements
 request
     : atom '(' (expr ',')* expr? ')' -> ["request", $1, $4]
     ;
@@ -182,4 +198,10 @@ expr
     | expr '*' expr
     | expr '/' expr
     | expr '%' expr
+    | expr '<' expr
+    | expr '>' expr
+    | expr '<=' expr
+    | expr '>=' expr
+    | expr '==' expr
+    | expr '!=' expr
     ;
