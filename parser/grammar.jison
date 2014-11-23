@@ -169,7 +169,7 @@ selection
 atom
     : ID -> ["ID", $1];
     | literal
-    | atom '[' expr ']' -> ["subscript", $1, $3]
+    | atom '[' expr? ']' -> ["subscript", $1, $3]
     | atom '.' ID -> ["access", $1, $3]
     | '(' expr ')'
     | message
