@@ -5,7 +5,7 @@
 
 digit                       [0-9]
 number                      {digit}+("."{digit}+)?\b
-id                          [_a-zA-Z][-_a-zA-Z0-9]*
+id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 %%
 
@@ -74,14 +74,14 @@ id                          [_a-zA-Z][-_a-zA-Z0-9]*
 ">"                     return '>'
 "<="                    return '<='
 ">="                    return '>='
+"++"                    return '++'
+"--"                    return '--'
 "+"                     return '+'
 "-"                     return '-'
 "*"                     return '*'
 "/"                     return '/'
 "%"                     return '%'
 "="                     return '='
-"++"                    return '++'
-"--"                    return '--'
 "?"                     return '?'
 "#"                     return '#'
 "if"                    return 'IF'
@@ -123,18 +123,28 @@ program
 
 stmt
     : request ';'
-    | assignment ';'
+    | atom '++' ';' -> ["inc", $1]
+    | atom '--' ';' -> ["dec", $1]
+    | atom assignment_op expr ';' -> ["assign", $1, $2, $3]
     ;
 
-assignment
-    : atom '=' expr
-    | atom '+=' expr
-    | atom '-=' expr
-    | atom '*=' expr
-    | atom '/=' expr
-    | atom '%=' expr
-    | atom '++'
-    | atom '--'
+// assignments are not expressions
+assignment_op
+    : '='
+    | '+='
+    | '-='
+    | '*='
+    | '/='
+    | '%='
+    ;
+
+atom
+    : ID -> ["ID", $1];
+    | literal
+    | atom '[' expr ']' -> ["subscript", $1, $3]
+    | atom '.' ID -> ["access", $1, $3]
+    | '(' expr ')'
+    | request
     ;
 
 literal
@@ -150,21 +160,18 @@ dyad
     | expr ':' expr -> ["dyad", $1, $3]
     ;
 
-atom
-    : ID -> ["ID", $1];
-    | literal
-    | atom '[' expr ']' -> ["subscript", $1, $3]
-    | atom '.' ID -> ["access", $1, $3]
-    | '(' expr ')'
-    | request
-    ;
-
 request
     : atom '(' (expr ',')* expr? ')' -> ["request", $1, $4]
     ;
 
-expr
+unary_expr
     : atom
+    | '#' atom
+    | '!' atom
+    ;
+
+expr
+    : unary_expr
     | expr '+' expr
     | expr '-' expr
     | expr '*' expr
