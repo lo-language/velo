@@ -58,6 +58,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "true"|"false"          return 'BOOLEAN'
 {number}                return 'NUMBER'
 \"[^\"]*\"              yytext = yytext.substr(1, yyleng-2); return 'STRING';
+\'[^\']*\'              yytext = yytext.substr(1, yyleng-2); return 'STRING';
 "["                     return '['
 "]"                     return ']'
 "("                     return '('
@@ -67,13 +68,12 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 ","                     return ','
 ":"                     return ':'
 ";"                     return ';'
+".."                    return '..'
 "."                     return '.'
-"=="                    return '=='
-"!="                    return '!='
-"<"                     return '<'
-">"                     return '>'
 "<="                    return '<='
 ">="                    return '>='
+"=="                    return '=='
+"!="                    return '!='
 "++"                    return '++'
 "--"                    return '--'
 "+="                    return '+='
@@ -81,14 +81,21 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "*="                    return '*='
 "/="                    return '/='
 "%="                    return '%='
+"->"                    return '->'
+">>"                    return '>>'
+"=>"                    return '=>'
+"><"                    return '><'
 "+"                     return '+'
 "-"                     return '-'
 "*"                     return '*'
 "/"                     return '/'
 "%"                     return '%'
+"<"                     return '<'
+">"                     return '>'
 "="                     return '='
 "?"                     return '?'
 "#"                     return '#'
+"!"                     return '!'
 "if"                    return 'IF'
 "else"                  return 'ELSE'
 "receive"               return 'RECEIVE'
@@ -130,10 +137,11 @@ block
     ;
 
 statement
-    : RECEIVE (expr ',')* expr? ';'
-    | request ';'
+    : RECEIVE ID (',' ID)* ';' -> ["receive", $3 ? [$2].concat($3): [$2]]
+    | message ';'
     | assignment ';'
     | selection
+    | source '>>' block -> ["pipe", $1, $3]
     ;
 
 assignment
@@ -164,7 +172,7 @@ atom
     | atom '[' expr ']' -> ["subscript", $1, $3]
     | atom '.' ID -> ["access", $1, $3]
     | '(' expr ')'
-    | request
+    | message
     ;
 
 literal
@@ -180,9 +188,14 @@ dyad
     | expr ':' expr -> ["dyad", $1, $3]
     ;
 
-// requests are the only expressions that can also be statements
-request
-    : atom '(' (expr ',')* expr? ')' -> ["request", $1, $4]
+// messages are the only expressions that can also be statements
+message
+    : atom '(' (expr ',')* expr? ')' -> ["message", $1, $4]
+    ;
+
+// regexes too, probably
+source
+    : expr '..' expr -> ["count", $1, $3]
     ;
 
 unary_expr
