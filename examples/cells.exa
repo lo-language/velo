@@ -5,39 +5,39 @@
  * @param address  rand        address of a random number generator
  */
 
-receive numCells, rand
+receive numCells, rand;
 
 // start the SVG doc
-doc = \\
-<svg version="1.1"
-     baseProfile="full"
-     width="300" height="200"
-     xmlns="http://www.w3.org/2000/svg">
-\\
+//doc = \\
+//<svg version="1.1"
+//     baseProfile="full"
+//     width="300" height="200"
+//     xmlns="http://www.w3.org/2000/svg">
+//\\
 
-repeat numCells // or should this be count numCells? recite numCells >> ?
+1..numCells >>
 
-    receive cellNum // within a repeat you can use receive but there are no response channels provided
+    receive cellNum; // within a repeat you can use receive but there are no response channels provided
 
     // pick a random color for the cell
 
     // create a cell at random coords
-    centerX = rand()
-    centerY = rand()
+    centerX = rand();
+    centerY = rand();
 
     // draw the cell wall
-    doc += '<circle cx="__centerX__" cy="__centerY__" r="50" />\n'
+    doc += '<circle cx="__centerX__" cy="__centerY__" r="50" />\n';
 
     // todo offset the color for the nucleus slightly
 
     // draw the nucleus at a random offset
-    centerX += rand()
-    centerY += rand()
-    doc += '<circle cx="__centerX__" cy="__centerY__" r="5" fill="green" />\n\n'
+    centerX += rand();
+    centerY += rand();
+    doc += '<circle cx="__centerX__" cy="__centerY__" r="5" fill="green" />\n\n';
 
     // todo draw the rays from the border of the nucleus to the border of the cell
 
 // finish up the doc
-doc += '</svg>'
+doc += "</svg>";
 
-reply(doc)
+reply(doc);

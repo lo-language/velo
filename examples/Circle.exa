@@ -7,29 +7,29 @@
  * be handed to a different process. Where do actions live? How do they hop threads?
  */
 
-receive center, radius, lib
+receive center, radius, lib;
 
-shape = lib.createShape([center.x - radius, center.y - radius], radius)
+shape = lib.createShape([center.x - radius, center.y - radius], radius);
 
-reply (shape += [
+reply (shape + {
 
-    getCenter:
-        reply(center)
+getCenter:
+    reply(center);
 
-    getRadius:
-        reply(radius)
+getRadius:
+    reply(radius);
 
 //    move: action (xOffset, yOffset)
 //        center.x += xOffset
 //        center.y += yOffset
 
-    resize:
-        receive newRadius
-        radius = newRadius
+resize:
+    receive newRadius;
+    radius = newRadius;
 
-    getArea:
-        return lib.PI * radius^2
+getArea:
+    return lib.PI * radius^2;
 
-    draw:
-        receive screen
-])
+draw:
+    receive screen;
+});

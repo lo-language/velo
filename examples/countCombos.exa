@@ -4,41 +4,54 @@ calculates all possible combinations for the android lockscreen
 
 the path is a list of nodes
 
+how do "conversations" work? e.g., a loop where you pull an item from a stream
+and are these loops sync or async? should you have to get through the loop body entirely
+before pulling the next item? can we determine this implicitly, or does it have to be explicit?
+
+could easily have an event mode where something just dumps events on you
+could also have a coroutine mode where you don't get the next event until you signal for it
+because it's single threaded you'll get through the loop body, but there might be responses pending
+
+feed <collection>   // feeds a collection through an action
+
+count NUM
+
+repeat(NUM) >>
+count(NUM) >>
+
 */
 
-receive path
+receive path;
 
 // base case - only one possibility left
 if # path == 8
-    reply(1)
+    reply(1);
 
 // declare just to put in scope - can we make this unnecessary?
-combos = 0
+combos = 0;
 
-// go through all nodes
-repeat 9
+// count through the nodes
+0..8 >>
 
-    receive node
+    receive node;
 
     if node in path // could also say "if path has node" or "contains node" - unless we use has for maps
-        skip
+        skip;
 
     // node is novel in the path; see if it's a legal next step
 
-    if path[] == 0 && node == 2 && 1 in path == false
-        skip
+    if path[] == 0
 
-    if path[] == 0 && node == 6 && 3 in path == false
-        skip
-
-    if path[] == 0 && node == 8 && 4 in path == false
-        skip
+        if (node == 2 and 1 in path == false) or
+        (node == 6 and 3 in path == false) or
+        (node == 8 and 4 in path == false)
+            skip;
 
     // todo fill in the rest of these - 3 per corner node, 1 per edge node, 16 cases total
 
     // how do we know to not call the iter block action? does it not apply to non-root actions?
     // and how does this interact with the traversal?
-    combos += recur(path + node)
+    combos += recur(path + node);
 
 // should this usage be enough to declare the var in this scope? i think it should
-reply(combos)
+reply(combos);

@@ -181,6 +181,7 @@ atom
     | atom '.' ID -> ["access", $1, $3]
     | '(' expr ')'
     | message
+    | block
     ;
 
 literal

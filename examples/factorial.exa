@@ -1,14 +1,15 @@
 /*
  recursive factorial calculator
+ todo iterative version
 */
 
-receive num
+receive num;
 
 if num < 0
-    fail()
+    fail();
 
 if num <= 1
-    reply(1)
+    reply(1);
 
 //result = 1
 //
@@ -16,6 +17,4 @@ if num <= 1
 //    receive x
 //    result *= x
 
-recur(num - 1) => prev
-
-reply(num * prev)
+reply(num * recur(num - 1));

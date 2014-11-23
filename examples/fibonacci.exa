@@ -1,12 +1,9 @@
-receive index
+receive index;
 
 if index < 0
-    fail("whatsamatta, you?")
+    fail("whatsamatta, you?");
 
-if index in 0,1
-    reply(index)
+if index in [0, 1]
+    reply(index);
 
-__(index - 1) => oneBefore
-__(index - 2) => twoBefore
-
-reply(oneBefore + twoBefore)
+reply(recur(index - 1) + recur(index - 2));
