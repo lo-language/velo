@@ -106,6 +106,9 @@ id                          [_a-zA-Z][-_a-zA-Z0-9]*
 
 %options token-stack
 
+%left '+' '-'
+%left '*' '/' '%'
+
 %%
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -150,4 +153,9 @@ request
 
 expr
     : atom
+    | expr '+' expr
+    | expr '-' expr
+    | expr '*' expr
+    | expr '/' expr
+    | expr '%' expr
     ;
