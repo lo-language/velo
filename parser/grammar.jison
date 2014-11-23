@@ -74,6 +74,8 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 ">="                    return '>='
 "=="                    return '=='
 "!="                    return '!='
+"&&"|"and"              return 'AND'
+"||"|"or"               return 'OR'
 "++"                    return '++'
 "--"                    return '--'
 "+="                    return '+='
@@ -101,6 +103,8 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "receive"               return 'RECEIVE'
 "skip"                  return 'SKIP'
 "break"                 return 'BREAK'
+"try"                   return 'TRY'
+"in"                    return 'IN'
 {id}                    return 'ID'
 .                       return 'INVALID'
 
@@ -122,6 +126,8 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 %left '*' '/' '%'
 %left '<' '>' '<=' '>='
 %left '==' '!='
+%nonassoc IN
+%left 'AND' 'OR'
 
 %%
 
@@ -142,6 +148,8 @@ statement
     | assignment ';'
     | selection
     | source '>>' block -> ["pipe", $1, $3]
+    | TRY block '>>' block -> ["try", $2, $4]
+    | SKIP ';' -> ["skip"]
     ;
 
 assignment
@@ -217,4 +225,7 @@ expr
     | expr '>=' expr
     | expr '==' expr
     | expr '!=' expr
+    | expr IN expr
+    | expr AND expr
+    | expr OR expr
     ;
