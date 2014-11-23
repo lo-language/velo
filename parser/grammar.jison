@@ -11,6 +11,7 @@ id                          [_a-zA-Z][-_a-zA-Z0-9]*
 
 "//".*                  /* line comment */
 "/*"                    this.begin("comment");
+<comment><<EOF>>        throw new Error("unclosed block comment");
 <comment>"*/"           this.popState();
 <comment>.              /* skip comment */
 \s*<<EOF>>              %{
@@ -64,6 +65,8 @@ id                          [_a-zA-Z][-_a-zA-Z0-9]*
 "{"                     return '{'
 "}"                     return '}'
 ","                     return ','
+":"                     return ':'
+";"                     return ';'
 "."                     return '.'
 "=="                    return '=='
 "!="                    return '!='
@@ -108,13 +111,33 @@ id                          [_a-zA-Z][-_a-zA-Z0-9]*
 // STRUCTURE
 
 program
-    : literal* EOF
+    : stmt* EOF
+    ;
+
+stmt
+    : expr ';'
     ;
 
 literal
     : BOOLEAN
     | NUMBER
     | STRING
-    | '[' (literal ',')* literal? ']'
-    | '{' (literal ',')* literal? '}'
+    | '[' (expr ',')* expr? ']'
+    | '{' (dyad ',')* dyad? '}'
+    ;
+
+dyad
+    : literal (':' expr)?
+    ;
+
+atom
+    : ID
+    | literal
+    | atom '[' expr ']'
+    | atom '.' ID
+    | '(' expr ')'
+    ;
+
+expr
+    : atom
     ;
