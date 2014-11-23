@@ -131,6 +131,16 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 %%
 
+/**
+
+grammar to-dos
+
+blocks need to be generally assignable - currently only allowed in dyads
+chains need to be built out
+would like semicolons to be replaced with newlines
+would like commas in list & set literals to be optional
+*/
+
 ////////////////////////////////////////////////////////////////////////////////
 // STRUCTURE
 
@@ -139,7 +149,7 @@ program
     ;
 
 block
-    : BEGIN statement* END -> $2
+    : BEGIN statement* END -> console.log("block: " + util.inspect($2))
     ;
 
 statement
@@ -148,7 +158,7 @@ statement
     | assignment ';'
     | selection
     | source '>>' block -> ["pipe", $1, $3]
-    | TRY block '>>' block -> ["try", $2, $4]
+    | TRY block '><' block -> ["try", $2, $4]
     | SKIP ';' -> ["skip"]
     ;
 
@@ -181,7 +191,6 @@ atom
     | atom '.' ID -> ["access", $1, $3]
     | '(' expr ')'
     | message
-    | block
     ;
 
 literal
@@ -189,12 +198,15 @@ literal
     | NUMBER -> parseFloat($1)
     | STRING -> '"' + $1 + '"';
     | '[' (expr ',')* expr? ']' -> ["list", $2 ? $2.concat($3): $3]
+    | '[' BEGIN (expr ',')* expr? END ']' -> ["list", $2 ? $2.concat($3): $3]
     | '{' (dyad ',')* dyad? '}' -> ["set", $2 ? $2.concat($3): $3]
+    | '{' BEGIN (dyad ',')* dyad? END '}' -> ["set", $2 ? $2.concat($3): $3]
     ;
 
 dyad
     : expr
-    | expr ':' expr -> ["dyad", $1, $3]
+    | expr ':' expr -> ["dyad", $1, $3];
+    | expr ':' block -> ["dyad", $1, $3];
     ;
 
 // messages are the only expressions that can also be statements

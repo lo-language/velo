@@ -1,0 +1,33 @@
+// literals and assignments
+
+foo = "hello";
+foo = true;
+foo = false;
+foo = 10;
+
+foo++;
+foo--;
+
+foo += 5;
+foo -= 7;
+foo *= 10;
+foo /= 4;
+foo %= 360;
+
+doSomething();
+
+foo[] = 17;
+
+try
+    foo = doSomething();
+    foo = bar(17, 19/4, [25]) + 18;
+><
+    [a, b, c][0] = 42 + bar({"a"});
+
+monkeys["chickens"][15].wow({ true: 72, 89: 42 })[17](57);
+
+{"whale": 57, foo: 52, 42: 7, "porkchop", buttercup}();
+
+/* comment */
+
+monkeys = 72;

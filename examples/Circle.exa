@@ -11,25 +11,27 @@ receive center, radius, lib;
 
 shape = lib.createShape([center.x - radius, center.y - radius], radius);
 
-reply (shape + {
+circle = shape + {
 
-getCenter:
-    reply(center);
+    getCenter:
+        reply(center);
+    ,
+    getRadius:
+        reply(radius);
 
-getRadius:
-    reply(radius);
+    //    move: action (xOffset, yOffset)
+    //        center.x += xOffset
+    //        center.y += yOffset
+    ,
+    resize:
+        receive newRadius;  // is there an elegant way we could only have the one line here?
+        radius = newRadius;
+    ,
+    getArea:
+        reply(lib.PI * radius * radius);
+    ,
+    draw:
+        receive screen;
+};
 
-//    move: action (xOffset, yOffset)
-//        center.x += xOffset
-//        center.y += yOffset
-
-resize:
-    receive newRadius;
-    radius = newRadius;
-
-getArea:
-    return lib.PI * radius^2;
-
-draw:
-    receive screen;
-});
+reply(circle);
