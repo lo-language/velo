@@ -123,6 +123,18 @@ program
 
 stmt
     : request ';'
+    | assignment ';'
+    ;
+
+assignment
+    : atom '=' expr
+    | atom '+=' expr
+    | atom '-=' expr
+    | atom '*=' expr
+    | atom '/=' expr
+    | atom '%=' expr
+    | atom '++'
+    | atom '--'
     ;
 
 literal
@@ -135,7 +147,7 @@ literal
 
 dyad
     : expr
-    | literal ':' expr -> ["dyad", $1, $3]
+    | expr ':' expr -> ["dyad", $1, $3]
     ;
 
 atom
