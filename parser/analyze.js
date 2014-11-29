@@ -11,4 +11,4 @@ var source = fs.readFileSync(process.argv[2], 'utf8');
 
 var ast = parser.parse(source);
 
-console.log(util.inspect(ast, {depth: null}));
+console.log(util.inspect(ast, {depth: null, colors: true}));

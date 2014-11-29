@@ -137,6 +137,7 @@ grammar to-dos
 
 blocks need to be generally assignable - currently only allowed in dyads
 chains need to be built out
+
 would like semicolons to be replaced with newlines
 would like commas in list & set literals to be optional
 */
@@ -145,12 +146,16 @@ would like commas in list & set literals to be optional
 // STRUCTURE
 
 program
-    : statement* EOF -> console.log(util.inspect($1, {depth: null, colors: true}))
+    : statement* EOF
+        { $$ = $1; return $$; }
     ;
 
 block
-    : BEGIN statement* END -> console.log("block: " + util.inspect($2))
+    : BEGIN statement* END -> $2
     ;
+
+////////////////////////////////////////////////////////////////////////////////
+// STATEMENTS
 
 statement
     : RECEIVE ID (',' ID)* ';' -> ["receive", $3 ? [$2].concat($3): [$2]]
@@ -179,10 +184,13 @@ assignment_op
     ;
 
 selection
-    : IF expr block
-    | IF expr block ELSE block
-    | IF expr block ELSE selection
+    : IF expr block -> ["select", $2, $3]
+    | IF expr block ELSE block -> ["select", $2, $3, $5]
+    | IF expr block ELSE selection -> ["select", $2, $3, $5]
     ;
+
+////////////////////////////////////////////////////////////////////////////////
+// EXPRESSIONS
 
 atom
     : ID -> ["ID", $1];
@@ -206,12 +214,12 @@ literal
 dyad
     : expr
     | expr ':' expr -> ["dyad", $1, $3];
-    | expr ':' block -> ["dyad", $1, $3];
+    | expr ':' block -> ["dyad", $1, $3]; // this isn't general enough
     ;
 
 // messages are the only expressions that can also be statements
 message
-    : atom '(' (expr ',')* expr? ')' -> ["message", $1, $4]
+    : atom '(' (expr ',')* expr? ')' -> ["send", $1, $4 ? $3.concat([$4]) : [$3]]
     ;
 
 // regexes too, probably
@@ -227,18 +235,18 @@ unary_expr
 
 expr
     : unary_expr
-    | expr '+' expr
-    | expr '-' expr
-    | expr '*' expr
-    | expr '/' expr
-    | expr '%' expr
-    | expr '<' expr
-    | expr '>' expr
-    | expr '<=' expr
-    | expr '>=' expr
-    | expr '==' expr
-    | expr '!=' expr
-    | expr IN expr
-    | expr AND expr
-    | expr OR expr
+    | expr '+' expr -> ["arith", $2, $1, $3]
+    | expr '-' expr -> ["arith", $2, $1, $3]
+    | expr '*' expr -> ["arith", $2, $1, $3]
+    | expr '/' expr -> ["arith", $2, $1, $3]
+    | expr '%' expr -> ["arith", $2, $1, $3]
+    | expr '<' expr -> ["compare", $2, $1, $3]
+    | expr '>' expr -> ["compare", $2, $1, $3]
+    | expr '<=' expr -> ["compare", $2, $1, $3]
+    | expr '>=' expr -> ["compare", $2, $1, $3]
+    | expr '==' expr -> ["compare", $2, $1, $3]
+    | expr '!=' expr -> ["compare", $2, $1, $3]
+    | expr IN expr -> ["search", $1, $3]
+    | expr AND expr -> ["logical", $2, $1, $3]
+    | expr OR expr -> ["logical", $2, $1, $3]
     ;

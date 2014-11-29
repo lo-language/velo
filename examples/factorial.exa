@@ -6,7 +6,7 @@
 receive num;
 
 if num < 0
-    fail();
+    fail("hi", "there", 47);
 
 if num <= 1
     reply(1);

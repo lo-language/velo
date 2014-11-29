@@ -18,10 +18,10 @@ doSomething();
 
 foo[] = 17;
 
-try
+try // syntactic sugar for ( block )() ? allow try(2) for num times to try?
     foo = doSomething();
     foo = bar(17, 19/4, [25]) + 18;
-><
+~>
     [a, b, c][0] = 42 + bar({"a"});
 
 monkeys["chickens"][15].wow({ true: 72, 89: 42 })[17](57);
@@ -31,3 +31,32 @@ monkeys["chickens"][15].wow({ true: 72, 89: 42 })[17](57);
 /* comment */
 
 monkeys = 72;
+
+result = foo() ~> handler
+
+/*
+ is the whole chain one expression? with a value of the final reply?
+ or do we not need chains?
+ */
+
+/*
+ is an error handler sent a request or a response??
+ the calling function can take the response and make a pseudo-request out of it by adding on some channels
+*/
+
+result = foo() ~>
+    receive err
+    log(err)
+    reply(fixed)
+
+
+// generator - the outer process is one entry point; it creates and returns *another* entry point
+// getIterator
+
+index = 0;
+
+iterator =
+    reply(items[index]);
+    index++;
+
+reply(iterator);
