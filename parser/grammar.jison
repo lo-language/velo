@@ -163,7 +163,7 @@ block
 // STATEMENTS
 
 statement
-    : RECEIVE ID (',' ID)* ';' -> {type: "receive", names: $3 ? [$2].concat($3): [$2]}
+    : RECEIVE (ID ',')* ID ';' -> {type: "receive", names: $2.concat($3)}
     | message ';'
     | assignment ';'
     | selection
@@ -224,7 +224,7 @@ dyad
 
 // messages are the only expressions that can also be statements
 message
-    : atom '(' (expr ',')* expr? ')' -> {type: "send", to: $1, message: $4 ? $3.concat([$4]) : [$3]}
+    : atom '(' (expr ',')* expr? ')' -> {type: "send", to: $1, message: $4 ? $3.concat([$4]) : []}
     ;
 
 // regexes too, probably

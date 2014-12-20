@@ -3,11 +3,13 @@
  todo iterative version
 */
 
-receive num;
+receive num, chickens;
 
-foo = recur(4);
+foo = 4;
+bar = recur();
 
-if num < (foo + bar)
+Q.when(bar, fn (bar_v) {})
+if num < (foo + bar_v)
     fail("I pity the fool!");
 
 if num <= 1
