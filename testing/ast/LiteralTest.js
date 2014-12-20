@@ -36,7 +36,7 @@ module.exports["json"] = {
     }
 };
 
-module.exports["compile"] = {
+module.exports["analyze"] = {
 
     "number": function (test) {
 

@@ -22,7 +22,7 @@ module.exports["json"] = {
     }
 };
 
-module.exports["compile"] = {
+module.exports["analyze"] = {
 
     "add literals": function (test) {
 

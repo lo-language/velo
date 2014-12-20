@@ -5,8 +5,10 @@
 
 receive num;
 
-if num < 0
-    fail("hi", "there", 47);
+foo = recur(4);
+
+if num < (foo + bar)
+    fail("I pity the fool!");
 
 if num <= 1
     reply(1);
@@ -18,3 +20,44 @@ if num <= 1
 //    result *= x
 
 reply(num * recur(num - 1));
+
+/*
+
+new context
+num = immediate, from message
+if usage(immediate val) < usage(immediate val)
+    fail
+if num <= 1
+    reply
+reply
+
+
+///
+to compile: explore down, render up
+
+create context
+add num to context symbol table as immediate
+render select statement:
+
+    fail = function () {};
+    reply = function () {};
+    recur = function () {};
+
+    if ($_num < 0) {
+        fail("I pity the fool!");
+    }
+
+    if ($_num <= 1) {
+        reply(1);
+    }
+
+    recur(num - 1).then(function (val) {
+        reply(num * val);
+    });
+
+    send();
+
+render select statement
+render reply statement
+
+*/

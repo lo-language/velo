@@ -140,6 +140,11 @@ chains need to be built out
 
 would like semicolons to be replaced with newlines
 would like commas in list & set literals to be optional
+
+have an "is" keyword for testing whether two ref sheets point to the same object?
+this is tough, since it would break the abstraction of facades etc. and two action
+pointers may be different but call the same action. this is the problem with
+actually having a totally black box system.
 */
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,7 +152,7 @@ would like commas in list & set literals to be optional
 
 program
     : statement* EOF
-        { $$ = $1; return $$; }
+        { return {type: 'program', statements: $1}; }
     ;
 
 block
@@ -158,7 +163,7 @@ block
 // STATEMENTS
 
 statement
-    : RECEIVE ID (',' ID)* ';' -> ["receive", $3 ? [$2].concat($3): [$2]]
+    : RECEIVE ID (',' ID)* ';' -> {type: "receive", names: $3 ? [$2].concat($3): [$2]}
     | message ';'
     | assignment ';'
     | selection
@@ -170,7 +175,7 @@ statement
 assignment
     : atom '++' -> ["inc", $1]
     | atom '--' -> ["dec", $1]
-    | atom assignment_op expr -> ["assign", $1, $2, $3]
+    | atom assignment_op expr -> {type: "assign", op: $2, left: $1, right: $3}
     ;
 
 // assignments are not expressions
@@ -184,8 +189,8 @@ assignment_op
     ;
 
 selection
-    : IF expr block -> ["select", $2, $3]
-    | IF expr block ELSE block -> ["select", $2, $3, $5]
+    : IF expr block -> {type: "select", cond: $2, block: $3}
+    | IF expr block ELSE block -> {type: "select", cond: $2, block: $3, else: $5}
     | IF expr block ELSE selection -> ["select", $2, $3, $5]
     ;
 
@@ -193,18 +198,18 @@ selection
 // EXPRESSIONS
 
 atom
-    : ID -> ["ID", $1];
+    : ID -> {type: "id", name: $1};
     | literal
     | atom '[' expr? ']' -> ["subscript", $1, $3]
     | atom '.' ID -> ["access", $1, $3]
-    | '(' expr ')'
+    | '(' expr ')' -> $2
     | message
     ;
 
 literal
     : BOOLEAN -> $1 == 'true'
-    | NUMBER -> parseFloat($1)
-    | STRING -> '"' + $1 + '"';
+    | NUMBER -> {type: 'number', val: parseFloat($1)}
+    | STRING -> {type: 'string', val: $1}
     | '[' (expr ',')* expr? ']' -> ["list", $2 ? $2.concat($3): $3]
     | '[' BEGIN (expr ',')* expr? END ']' -> ["list", $2 ? $2.concat($3): $3]
     | '{' (dyad ',')* dyad? '}' -> ["set", $2 ? $2.concat($3): $3]
@@ -219,7 +224,7 @@ dyad
 
 // messages are the only expressions that can also be statements
 message
-    : atom '(' (expr ',')* expr? ')' -> ["send", $1, $4 ? $3.concat([$4]) : [$3]]
+    : atom '(' (expr ',')* expr? ')' -> {type: "send", to: $1, message: $4 ? $3.concat([$4]) : [$3]}
     ;
 
 // regexes too, probably
@@ -229,24 +234,24 @@ source
 
 unary_expr
     : atom
-    | '#' atom
-    | '!' atom
+    | '#' atom -> {type: "unary_op", op: $1, right: $2}
+    | '!' atom -> {type: "unary_op", op: $1, right: $2}
     ;
 
 expr
     : unary_expr
-    | expr '+' expr -> ["arith", $2, $1, $3]
-    | expr '-' expr -> ["arith", $2, $1, $3]
-    | expr '*' expr -> ["arith", $2, $1, $3]
-    | expr '/' expr -> ["arith", $2, $1, $3]
-    | expr '%' expr -> ["arith", $2, $1, $3]
-    | expr '<' expr -> ["compare", $2, $1, $3]
-    | expr '>' expr -> ["compare", $2, $1, $3]
-    | expr '<=' expr -> ["compare", $2, $1, $3]
-    | expr '>=' expr -> ["compare", $2, $1, $3]
-    | expr '==' expr -> ["compare", $2, $1, $3]
-    | expr '!=' expr -> ["compare", $2, $1, $3]
-    | expr IN expr -> ["search", $1, $3]
-    | expr AND expr -> ["logical", $2, $1, $3]
-    | expr OR expr -> ["logical", $2, $1, $3]
+    | expr '+' expr -> {type: "op", op: $2, left: $1, right: $3}
+    | expr '-' expr -> {type: "op", op: $2, left: $1, right: $3}
+    | expr '*' expr -> {type: "op", op: $2, left: $1, right: $3}
+    | expr '/' expr -> {type: "op", op: $2, left: $1, right: $3}
+    | expr '%' expr -> {type: "op", op: $2, left: $1, right: $3}
+    | expr '<' expr -> {type: "op", op: $2, left: $1, right: $3}
+    | expr '>' expr -> {type: "op", op: $2, left: $1, right: $3}
+    | expr '<=' expr -> {type: "op", op: $2, left: $1, right: $3}
+    | expr '>=' expr -> {type: "op", op: $2, left: $1, right: $3}
+    | expr '==' expr -> {type: "op", op: $2, left: $1, right: $3}
+    | expr '!=' expr -> {type: "op", op: $2, left: $1, right: $3}
+    | expr IN expr -> {type: "op", op: $2, left: $1, right: $3}
+    | expr AND expr -> {type: "op", op: $2, left: $1, right: $3}
+    | expr OR expr -> {type: "op", op: $2, left: $1, right: $3}
     ;

@@ -1,23 +1,28 @@
-/**
+receive args, io, env
 
-    // this gets turned into a function with sig: args, next
-    handler = action (err) { x = 42; };
+logger = create('Http/Logger/ELF', io.log);
 
-    _handler = function (args, next) {
+handler =
+    receive request;
+    '\n' -> request.rawResponse;
 
-        var _repeat = _handler;
-        _x = 42;
-    };
- */
-action (args, system, shop) {
+server = obtain('Http/Server', io.port, handler, logger);
 
-    port is 8080
+// \XXXX syntax converts ASCII to an int value - max 4 or 8 chars?
+server.start() ->
+    log(\info, "server running on port \_port_");
+~>
+    receive err;
+    log(\err, "failed to start server on port \_port_: \_err_");
 
-    port -> out
+env.trap('SIGINT') ->
+    log(\info, "received SIGINT");
+    server.stop() ->
+        log(\err, "server stopped");
 
 /*
 
-    a sequence is a bunch of nonce functions
+    a chain is a bunch of nonce functions
 
     // define the sequences
     // how to build this?
@@ -102,26 +107,6 @@ action (args, system, shop) {
         }
     ).then(out);
 
-
-    lib.get('Http/Logger/ELF', system.stderr) => log;
-    lib.get('Http/Server', log) => server;
-
-    server.onRequest >> (request) {
-
-        '\n' -> request.rawResponse
-    }
-
-    server.listen(port) -> {
-        log.info("server running on port _port_")
-    }
-    ~ (err) {
-        log.err("failed to open port _port_: ")
-    }
-
-    system.trap('SIGINT') -> {
-        log.info("received SIGINT")
-        server.stop()
-    }
 
     */
 }

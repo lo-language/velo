@@ -18,7 +18,7 @@ module.exports["json"] = {
     }
 };
 
-module.exports["compile"] = {
+module.exports["analyze"] = {
 
     "single param": function (test) {
 
