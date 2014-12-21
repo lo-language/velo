@@ -102,7 +102,8 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "else"                  return 'ELSE'
 "receive"               return 'RECEIVE'
 "skip"                  return 'SKIP'
-"break"                 return 'BREAK'
+"fail"                  return 'FAIL'
+"reply"                 return 'REPLY'
 "try"                   return 'TRY'
 "in"                    return 'IN'
 {id}                    return 'ID'
@@ -165,11 +166,17 @@ block
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: "receive", names: $2.concat($3)}
     | message ';'
+    | result ';'    // to prevent usage of fail() and reply() in expressions
     | assignment ';'
     | selection
     | source '>>' block -> ["pipe", $1, $3]
     | TRY block '><' block -> ["try", $2, $4]
     | SKIP ';' -> ["skip"]
+    ;
+
+result
+    : REPLY '(' (expr ',')* expr? ')' -> {type: "reply", message: $4 ? $3.concat([$4]) : []}
+    | FAIL '(' (expr ',')* expr? ')' -> {type: "fail", message: $4 ? $3.concat([$4]) : []}
     ;
 
 assignment
