@@ -5,8 +5,6 @@
 
 receive num;
 
-num = foo();
-
 if num < 0
     fail("I pity the fool!");
 
@@ -22,6 +20,13 @@ if num <= 1
 reply(num * recur(num - 1));
 
 /*
+
+have each ast node have a type - promise or ready
+
+on the way up, if a statement contains promises, insert a new AST node to resolve them
+has to happen at the statement level - the lowest statement that needs a promise resolved
+
+a statement needs all its pieces to be ready, unless it's an isolated message stmt
 
 manage needs by making blocks a tree rather than a list?
 

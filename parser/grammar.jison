@@ -115,7 +115,6 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 %{
     indents = [''];
 
-    ast = require('../ast');
     util = require('util');
 %}
 
