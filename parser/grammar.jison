@@ -104,6 +104,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "skip"                  return 'SKIP'
 "fail"                  return 'FAIL'
 "reply"                 return 'REPLY'
+"stop"                  return 'STOP'
 "try"                   return 'TRY'
 "in"                    return 'IN'
 {id}                    return 'ID'

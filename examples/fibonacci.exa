@@ -1,9 +1,9 @@
-receive index;
+receive n;
 
-if index < 0
+if n < 0
     fail("whatsamatta, you?");
 
-if index in [0, 1]
-    reply(index);
+if n <= 1
+    reply(n);
 
-reply(recur(index - 1) + recur(index - 2));
+reply(recur(n - 1) + recur(n - 2));

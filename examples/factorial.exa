@@ -5,6 +5,8 @@
 
 receive num;
 
+num = foo();
+
 if num < 0
     fail("I pity the fool!");
 
@@ -21,13 +23,20 @@ reply(num * recur(num - 1));
 
 /*
 
-new context
-num = immediate, from message
-if usage(immediate val) < usage(immediate val)
-    fail
-if num <= 1
-    reply
-reply
+manage needs by making blocks a tree rather than a list?
+
+every send returns a promise in JS-land
+
+
+x = foo();
+
+if 4
+    a = bar(x);
+    b = bar(a);
+
+if 4
+    a = Q.when(x, fn(x_v) {bar(x_v);}
+    b = Q.when(a, fn(a_v) {bar(a_v);}
 
 
 ///
