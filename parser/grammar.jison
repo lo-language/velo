@@ -171,13 +171,13 @@ termination
     : CHANNEL '(' (expr ',')* expr? ')' -> {type: "termination", channel: $1, message: $4 ? $3.concat([$4]) : []}
     ;
 
+// assignments are not expressions
 assignment
-    : atom '++' -> ["inc", $1]
-    | atom '--' -> ["dec", $1]
+    : atom '++' -> {type: "assign", op: $2, left: $1}
+    | atom '--' -> {type: "assign", op: $2, left: $1}
     | atom assignment_op expr -> {type: "assign", op: $2, left: $1, right: $3}
     ;
 
-// assignments are not expressions
 assignment_op
     : '='
     | '+='
@@ -209,8 +209,8 @@ literal
     : BOOLEAN -> {type: 'boolean', val: $1 == 'true'}
     | NUMBER -> {type: 'number', val: parseFloat($1)}
     | STRING -> {type: 'string', val: $1}
-    | '[' (expr ',')* expr? ']' -> {type: "list", elements: $2 ? $2.concat($3): $3}
-    | '{' (dyad ',')* dyad? '}' -> {type: "set", members: $2 ? $2.concat($3): $3}
+    | '[' (expr ',')* expr? ']' -> {type: "list", elements: $3 ? $2.concat([$3]): []}
+    | '{' (dyad ',')* dyad? '}' -> {type: "set", members: $3 ? $2.concat([$3]): []}
     | block -> {type: "block", statements: $1}
     ;
 
