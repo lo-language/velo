@@ -132,7 +132,7 @@ var compile = function (node, context) {
             break;
 
         // can be part of an expression or a stand-alone statement
-        case 'send':
+        case 'request':
 
             node.code = compileChild(node, node.to, context) + '(';
 

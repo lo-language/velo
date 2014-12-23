@@ -34,7 +34,7 @@ monkeys["chickens"][15].wow({ true: 72, 89: 42 })[17](57);
 
 monkeys = 72;
 
-result = foo() >< handler;
+//result = foo() -> handler;
 
 /*
  is the whole chain one expression? with a value of the final reply?
@@ -46,10 +46,13 @@ result = foo() >< handler;
  the calling function can take the response and make a pseudo-request out of it by adding on some channels
 */
 
-result = foo() ><
+result = foo() ~>
     receive err;
     log(err);
     reply(fixed);
+->
+    receive result;
+;
 
 
 // generator - the outer process is one entry point; it creates and returns *another* entry point
@@ -60,5 +63,7 @@ index = 0;
 iterator =
     reply(items[index]);
     index++;
+;
 
 reply(iterator);
+

@@ -84,9 +84,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "/="                    return '/='
 "%="                    return '%='
 "->"                    return '->'
-">>"                    return '>>'
-"=>"                    return '=>'
-"><"                    return '><'
+"~>"                    return '~>'
 "+"                     return '+'
 "-"                     return '-'
 "*"                     return '*'
@@ -126,6 +124,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 %left '==' '!='
 %nonassoc IN
 %left 'AND' 'OR'
+%left '->' '~>'
 
 %%
 
@@ -161,7 +160,7 @@ block
 
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: "receive", names: $2.concat($3)}
-    | interaction ';'
+    | expr ';'
     | termination ';'    // to prevent usage of fail() and reply() in expressions - might want to change this, though
     | assignment ';'
     | conditional
@@ -198,12 +197,12 @@ conditional
 // EXPRESSIONS
 
 atom
-    : ID -> {type: "id", name: $1};
-    | literal
+    : literal
+    | ID -> {type: "id", name: $1}
     | atom '[' expr? ']' -> {type: "subscript", list: $1, index: $3}
     | atom '.' ID -> {type: "select", set: $1, member: $3}
     | '(' expr ')' -> $2
-    | interaction
+    | request
     ;
 
 literal
@@ -212,7 +211,7 @@ literal
     | STRING -> {type: 'string', val: $1}
     | '[' (expr ',')* expr? ']' -> {type: "list", elements: $2 ? $2.concat($3): $3}
     | '{' (dyad ',')* dyad? '}' -> {type: "set", members: $2 ? $2.concat($3): $3}
-    | block
+    | block -> {type: "block", statements: $1}
     ;
 
 dyad
@@ -220,15 +219,10 @@ dyad
     | expr ':' expr -> ["dyad", $1, $3];
     ;
 
-// communications are the only expressions that can also be stand-alone statements
+// requests are the only expressions that can also be stand-alone statements
 // or are they the only statements that can be expressions?
-interaction
+request
     : atom '(' (expr ',')* expr? ')' -> {type: "send", to: $1, message: $4 ? $3.concat([$4]) : []}
-    ;
-
-// regexes too, probably
-source
-    : expr '..' expr -> ["count", $1, $3]
     ;
 
 unary_expr
@@ -253,4 +247,10 @@ expr
     | expr IN expr -> {type: "op", op: $2, left: $1, right: $3}
     | expr AND expr -> {type: "op", op: $2, left: $1, right: $3}
     | expr OR expr -> {type: "op", op: $2, left: $1, right: $3}
+    | interaction
+    ;
+
+interaction
+    : expr '->' expr -> {type: "flow", filter: $2, source: $1, sink: $3}
+    | expr '~>' expr -> {type: "flow", filter: $2, source: $1, sink: $3}
     ;
