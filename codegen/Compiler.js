@@ -21,6 +21,8 @@ var __ = function () {
 // chain statements as nesting, because each statement kind of defines the context for lower statements?
 // then do we not need a separate context idea besides the enclosing node??
 
+var compilers = {};
+
 var compile = function (node, context) {
 
     if (context == undefined) {
@@ -28,140 +30,191 @@ var compile = function (node, context) {
     }
 
 //    console.error('compiling ' + node.type + '; context = ' + util.inspect(context));
+    compilers[node.type](node, context);
+};
 
-    switch (node.type) {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ * @param context
+ */
+compilers['program'] = function (node, context) {
 
-        case 'program':
+    node.code = 'function (args, $_recur, $_reply, $_fail) {\n\n';
 
-            node.code = 'function (args, $_recur, $_reply, $_fail) {\n\n';
+    node.statements.forEach(function (stmt) {
 
-            node.statements.forEach(function (stmt) {
+        var code = compileChildStatement(node, stmt, context);
 
-                var code = compileChildStatement(node, stmt, context);
+        if (code !== undefined) {
+            node.code += code + '\n';
+        }
+    });
 
-                if (code !== undefined) {
-                    node.code += code + '\n';
-                }
-            });
+    node.code += '}\n';
+};
 
-            node.code += '}\n';
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ * @param context
+ */
+compilers['receive'] = function (node, context) {
 
-            break;
+    node.code = '';
 
-        case 'receive':
+    node.names.forEach(function (id, index) {
+        context['$_' + id] = true;
+        node.code += 'var $_' + id + ' = args[' + index + '];\n';
+    });
+};
 
-            node.code = '';
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ * @param context
+ */
+compilers['conditional'] = function (node, context) {
 
-            node.names.forEach(function (id, index) {
-                context['$_' + id] = true;
-                node.code += 'var $_' + id + ' = args[' + index + '];\n';
-            });
+    // select needs cond to be ready
 
-            break;
+    compileChild(node, node.predicate, context);
 
-        case 'conditional':
+    node.code = 'if (' + node.predicate.code + ') {\n';
 
-            // select needs cond to be ready
+    node.positive.forEach(function (stmt) {
+        var code = compileChildStatement(node, stmt, context);
+        node.code += indent(code) + '\n';
+    });
 
-            compileChild(node, node.predicate, context);
+    node.code += '}\n';
+};
 
-            node.code = 'if (' + node.predicate.code + ') {\n';
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ * @param context
+ */
+compilers['op'] = function (node, context) {
 
-            node.positive.forEach(function (stmt) {
-                var code = compileChildStatement(node, stmt, context);
-                node.code += indent(code) + '\n';
-            });
+    // op needs left and right to be ready
+    // so if the context has them as 'not ready', then it needs to record its needs for the next level up to provide them
+    // and it also needs to use temp vars for its immediate needs
 
-            node.code += '}\n';
+    var leftCode = compileChild(node, node.left, context);
+    var rightCode = compileChild(node, node.right, context);
 
-            break;
+    node.code = '(' + leftCode + ' ' + node.op + ' ' + rightCode + ')';
+};
 
-        case 'op':
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ * @param context
+ */
+compilers['id'] = function (node, context) {
 
-            // op needs left and right to be ready
-            // so if the context has them as 'not ready', then it needs to record its needs for the next level up to provide them
-            // and it also needs to use temp vars for its immediate needs
+    // atom - no children
+    node.code = '$_' + node.name;
 
-            var leftCode = compileChild(node, node.left, context);
-            var rightCode = compileChild(node, node.right, context);
-
-            node.code = '(' + leftCode + ' ' + node.op + ' ' + rightCode + ')';
-
-            break;
-
-        // atom - no children
-        case 'id':
-            node.code = '$_' + node.name;
-
-            if (context['$_' + node.name] === undefined) {
+    if (context['$_' + node.name] === undefined) {
 //                throw new Error(node.name + " is undefined at line");
-            }
-            else if (context['$_' + node.name] === true) {
-                node.ready = true;
-            }
-            else {
-                node.ready = false;
-            }
-
-            break;
-
-        // atom - no children
-        case 'number':
-            node.code = node.val;
-            node.ready = true;
-            break;
-
-        // atom - no children
-        case 'string':
-            node.code = "'" + node.val + "'";
-            node.ready = true;
-            break;
-
-        // guaranteed to be statements
-        case 'termination':
-
-            node.code = '$_' + node.channel + '(';
-
-            var args = node.message.map(function (arg) {
-                return compileChild(node, arg, context);
-            });
-
-            node.code += args.join(',') + ');\nreturn';
-            node.ready = true;
-
-            break;
-
-        // can be part of an expression or a stand-alone statement
-        case 'request':
-
-            node.code = compileChild(node, node.to, context) + '(';
-
-            node.message.forEach(function (arg) {
-                node.code += compileChild(node, arg, context);
-            });
-
-            node.code += ')';
-            node.ready = false; // for if this send is used in an expression
-
-            break;
-
-        // this is guaranteed to be a statement
-        case 'assign':
-
-            compileChild(node, node.left, context);
-            compileChild(node, node.right, context);
-
-            if (node.left.type == 'id') {
-                context['$_' + node.left.name] = node.right.ready;
-            }
-
-            node.code = node.left.code + ' ' + node.op + ' ' + node.right.code;
-
-            break;
-
-        default:
-            break;
     }
+    else if (context['$_' + node.name] === true) {
+        node.ready = true;
+    }
+    else {
+        node.ready = false;
+    }
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ * @param context
+ */
+compilers['number'] = function (node, context) {
+
+    // atom - no children
+    node.code = node.val;
+    node.ready = true;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ * @param context
+ */
+compilers['string'] = function (node, context) {
+
+    // atom - no children
+    node.code = "'" + node.val + "'";
+    node.ready = true;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ * @param context
+ */
+compilers['termination'] = function (node, context) {
+
+    // guaranteed to be statements
+
+    node.code = '$_' + node.channel + '(';
+
+    var args = node.message.map(function (arg) {
+        return compileChild(node, arg, context);
+    });
+
+    node.code += args.join(',') + ');\nreturn';
+    node.ready = true;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ * @param context
+ */
+compilers['request'] = function (node, context) {
+
+    // can be part of an expression or a stand-alone statement
+    node.code = compileChild(node, node.to, context) + '(';
+
+    node.message.forEach(function (arg) {
+        node.code += compileChild(node, arg, context);
+    });
+
+    node.code += ')';
+    node.ready = false; // for if this send is used in an expression
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ * @param context
+ */
+compilers['assign'] = function (node, context) {
+
+    // this is guaranteed to be a statement
+    compileChild(node, node.left, context);
+    compileChild(node, node.right, context);
+
+    if (node.left.type == 'id') {
+        context['$_' + node.left.name] = node.right.ready;
+    }
+
+    node.code = node.left.code + ' ' + node.op + ' ' + node.right.code;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

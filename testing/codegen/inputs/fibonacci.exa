@@ -1,0 +1,9 @@
+receive n;
+
+if n < 0
+    fail("whatsamatta, you?");
+
+if n <= 1
+    reply(n);
+
+reply(recur(n - 1) + recur(n - 2));

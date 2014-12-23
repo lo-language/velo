@@ -12,13 +12,13 @@
         {"type":"assign","op":"*=","left":{"type":"id","name":"foo"},"right":{"type":"number","val":10}},
         {"type":"assign","op":"/=","left":{"type":"id","name":"foo"},"right":{"type":"number","val":4}},
         {"type":"assign","op":"%=","left":{"type":"id","name":"foo"},"right":{"type":"number","val":360}},
-        {"type":"send","to":{"type":"id","name":"doSomething"},"message":[]},
+        {"type":"request","to":{"type":"id","name":"doSomething"},"message":[]},
         {"type":"assign","op":"=","left":{"type":"subscript","list":{"type":"id","name":"foo"}},"right":{"type":"number","val":17}},
-        {"type":"send",
+        {"type":"request",
             "to":{
                 "type":"subscript",
                 "list":{
-                    "type":"send",
+                    "type":"request",
                     "to":{
                         "type":"select",
                         "set":{
@@ -36,7 +36,7 @@
                             ["dyad",{"type":"number","val":89},{"type":"number","val":42}]]}]},
                     "index":{"type":"number","val":17}},
             "message":[{"type":"number","val":57}]},
-        {"type":"send",
+        {"type":"request",
             "to":{"type":"set","members":[
                 ["dyad",{"type":"string","val":"whale"},{"type":"number","val":57}],
                 ["dyad",{"type":"id","name":"foo"},{"type":"number","val":52}],
@@ -51,10 +51,10 @@
             "source":{
                 "type":"flow",
                 "filter":"~>",
-                "source":{"type":"send","to":{"type":"id","name":"foo"},"message":[]},
+                "source":{"type":"request","to":{"type":"id","name":"foo"},"message":[]},
                 "sink":{"type":"block","statements":[
                     {"type":"receive","names":["err"]},
-                    {"type":"send","to":{"type":"id","name":"log"},"message":[{"type":"id","name":"err"}]},
+                    {"type":"request","to":{"type":"id","name":"log"},"message":[{"type":"id","name":"err"}]},
                     {"type":"termination","channel":"reply","message":[{"type":"id","name":"fixed"}]}]}},
             "sink":{"type":"block","statements":[
                 {"type":"receive","names":["result"]}]}}},

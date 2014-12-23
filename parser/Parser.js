@@ -126,7 +126,7 @@ case 33:this.$ = {type: "block", statements: $$[$0]};
 break;
 case 35:this.$ = ["dyad", $$[$0-2], $$[$0]];;
 break;
-case 36:this.$ = {type: "send", to: $$[$0-4], message: $$[$0-1] ? $$[$0-2].concat([$$[$0-1]]) : []};
+case 36:this.$ = {type: "request", to: $$[$0-4], message: $$[$0-1] ? $$[$0-2].concat([$$[$0-1]]) : []};
 break;
 case 38:this.$ = {type: "unary_op", op: $$[$0-1], right: $$[$0]};
 break;

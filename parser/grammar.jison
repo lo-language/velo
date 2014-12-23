@@ -222,7 +222,7 @@ dyad
 // requests are the only expressions that can also be stand-alone statements
 // or are they the only statements that can be expressions?
 request
-    : atom '(' (expr ',')* expr? ')' -> {type: "send", to: $1, message: $4 ? $3.concat([$4]) : []}
+    : atom '(' (expr ',')* expr? ')' -> {type: "request", to: $1, message: $4 ? $3.concat([$4]) : []}
     ;
 
 unary_expr
