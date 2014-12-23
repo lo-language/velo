@@ -1,27 +1,36 @@
-[
-    {
-        "op": "assign",
-        "left": ["id","qux"],
+{
+    "type": "program",
+    "statements": [{
+        "type": "assign",
+        "op": "=",
+        "left": {"type": "id","name":"qux"},
         "right": {
-            "op": "add",
+            "type": "op",
+            "op": "+",
             "left": {
-                "op": "add",
-                "left": 2,
+                "type": "op",
+                "op": "+",
+                "left": {"type":"number", "val":2},
                 "right": {
-                    "op": "div",
+                    "type": "op",
+                    "op": "/",
                     "left": {
-                        "op": "mult",
-                        "left": ["id","foo"],
-                        "right": ["id","bar"]},
-                    "right": 2}},
+                        "type": "op",
+                        "op": "*",
+                        "left": {"type":"id","name":"foo"},
+                        "right": {"type":"id","name":"bar"}},
+                    "right": {"type":"number", "val":2}
+                }},
             "right": {
-                "op":"mod",
-                "left": ["id","baz"],
+                "type":"op",
+                "op":"%",
+                "left": {"type":"id","name":"baz"},
                 "right": {
-                    "op": "sub",
-                    "left": ["id","age"],
-                    "right": 4
+                    "type": "op",
+                    "op": "-",
+                    "left": {"type":"id","name":"age"},
+                    "right": {"type":"number", "val":4}
                 }}
             }
-    }
-]
+    }]
+}

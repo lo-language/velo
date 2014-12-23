@@ -18,11 +18,13 @@ doSomething();
 
 foo[] = 17;
 
+/*
 try // syntactic sugar for ( block )() ? allow try(2) for num times to try?
     foo = doSomething();
     foo = bar(17, 19/4, [25]) + 18;
-~>
+><
     [a, b, c][0] = 42 + bar({"a"});
+*/
 
 monkeys["chickens"][15].wow({ true: 72, 89: 42 })[17](57);
 
@@ -32,7 +34,7 @@ monkeys["chickens"][15].wow({ true: 72, 89: 42 })[17](57);
 
 monkeys = 72;
 
-result = foo() ~> handler
+result = foo() >< handler;
 
 /*
  is the whole chain one expression? with a value of the final reply?
@@ -44,10 +46,10 @@ result = foo() ~> handler
  the calling function can take the response and make a pseudo-request out of it by adding on some channels
 */
 
-result = foo() ~>
-    receive err
-    log(err)
-    reply(fixed)
+result = foo() ><
+    receive err;
+    log(err);
+    reply(fixed);
 
 
 // generator - the outer process is one entry point; it creates and returns *another* entry point

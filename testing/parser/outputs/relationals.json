@@ -1,20 +1,29 @@
-[
-    { "op": "assign",
-        "left": [ "id", "result" ],
-        "right": [ "equality", [ "id", "foo" ], [ "id", "bar" ] ] },
-    { "op": "assign",
-        "left": [ "id", "result" ],
-        "right": [ "inequality", [ "id", "foo" ], [ "id", "bar" ] ] },
-    { "op": "assign",
-        "left": [ "id", "result" ],
-        "right": [ "lt", [ "id", "foo" ], [ "id", "bar" ] ] },
-    { "op": "assign",
-        "left": [ "id", "result" ],
-        "right": [ "gt", [ "id", "foo" ], [ "id", "bar" ] ] },
-    { "op": "assign",
-        "left": [ "id", "result" ],
-        "right": [ "le", [ "id", "foo" ], [ "id", "bar" ] ] },
-    { "op": "assign",
-        "left": [ "id", "result" ],
-        "right": [ "ge", [ "id", "foo" ], [ "id", "bar" ] ] }
-]
+{
+    "type":"program",
+    "statements":[
+        {
+            "type":"assign","op":"=",
+            "left":{"type":"id","name":"result"},
+            "right":{"type":"op","op":"==","left":{"type":"id","name":"foo"},"right":{"type":"id","name":"bar"}}},
+        {
+            "type":"assign","op":"=",
+            "left":{"type":"id","name":"result"},
+            "right":{"type":"op","op":"!=","left":{"type":"id","name":"foo"},"right":{"type":"id","name":"bar"}}},
+        {
+            "type":"assign","op":"=",
+            "left":{"type":"id","name":"result"},
+            "right":{"type":"op","op":"<","left":{"type":"id","name":"foo"},"right":{"type":"id","name":"bar"}}},
+        {
+            "type":"assign","op":"=",
+            "left":{"type":"id","name":"result"},
+            "right":{"type":"op","op":">","left":{"type":"id","name":"foo"},"right":{"type":"id","name":"bar"}}},
+        {
+            "type":"assign","op":"=",
+            "left":{"type":"id","name":"result"},
+            "right":{"type":"op","op":"<=","left":{"type":"id","name":"foo"},"right":{"type":"id","name":"bar"}}},
+        {
+            "type":"assign","op":"=",
+            "left":{"type":"id","name":"result"},
+            "right":{"type":"op","op":">=","left":{"type":"id","name":"foo"},"right":{"type":"id","name":"bar"}}}
+    ]
+}

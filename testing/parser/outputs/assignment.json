@@ -1,8 +1,12 @@
-[
-    { "op": "assign", "left": [ "id", "bar" ], "right": [ "id", "baz" ] },
-    { "op": "assign", "left": [ "id", "binky" ], "right": 64 },
-    { "op": "assign",
-        "left": [ "id", "message" ],
-        "right": "hi there" },
-    { "op": "assign", "left": [ "id", "foo" ], "right": true }
-]
+{
+    "type":"program",
+    "statements":
+    [
+        { "type":"assign","op": "=", "left": {"type":"id","name":"bar"}, "right": {"type":"id","name":"baz"} },
+        { "type":"assign","op": "=", "left": {"type":"id","name":"binky"}, "right": {"type":"number","val":64} },
+        { "type":"assign","op": "=",
+            "left": {"type":"id","name":"message"},
+            "right": {"type":"string","val":"hi there"}},
+        { "type":"assign","op": "=", "left": {"type":"id","name":"foo"}, "right": {"type":"boolean","val":true} }
+    ]
+}

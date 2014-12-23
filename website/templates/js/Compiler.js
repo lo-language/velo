@@ -7,9 +7,6 @@
 
 'use strict';
 
-var Q = require('q');
-var util = require('util');
-
 var __ = function () {
 
 };
@@ -59,15 +56,15 @@ var compile = function (node, context) {
 
             break;
 
-        case 'conditional':
+        case 'select':
 
             // select needs cond to be ready
 
-            compileChild(node, node.predicate, context);
+            compileChild(node, node.cond, context);
 
-            node.code = 'if (' + node.predicate.code + ') {\n';
+            node.code = 'if (' + node.cond.code + ') {\n';
 
-            node.positive.forEach(function (stmt) {
+            node.block.forEach(function (stmt) {
                 var code = compileChildStatement(node, stmt, context);
                 node.code += indent(code) + '\n';
             });
@@ -118,9 +115,10 @@ var compile = function (node, context) {
             break;
 
         // guaranteed to be statements
-        case 'termination':
+        case 'reply':
+        case 'fail':
 
-            node.code = '$_' + node.channel + '(';
+            node.code = '$_' + node.type + '(';
 
             var args = node.message.map(function (arg) {
                 return compileChild(node, arg, context);
@@ -244,7 +242,3 @@ function indent(code) {
 
     return '    ' + code;
 }
-
-module.exports = {
-    compile: compile
-};

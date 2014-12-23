@@ -102,8 +102,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "else"                  return 'ELSE'
 "receive"               return 'RECEIVE'
 "skip"                  return 'SKIP'
-"fail"                  return 'FAIL'
-"reply"                 return 'REPLY'
+"reply"|"fail"          return 'CHANNEL'
 "stop"                  return 'STOP'
 "try"                   return 'TRY'
 "in"                    return 'IN'
@@ -114,8 +113,6 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 %{
     indents = [''];
-
-    util = require('util');
 %}
 
 /* enable EBNF grammar syntax */
@@ -136,7 +133,6 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 grammar to-dos
 
-blocks need to be generally assignable - currently only allowed in dyads
 chains need to be built out
 
 would like semicolons to be replaced with newlines
@@ -165,18 +161,15 @@ block
 
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: "receive", names: $2.concat($3)}
-    | message ';'
-    | result ';'    // to prevent usage of fail() and reply() in expressions
+    | interaction ';'
+    | termination ';'    // to prevent usage of fail() and reply() in expressions - might want to change this, though
     | assignment ';'
-    | selection
-    | source '>>' block -> ["pipe", $1, $3]
-    | TRY block '><' block -> ["try", $2, $4]
+    | conditional
     | SKIP ';' -> ["skip"]
     ;
 
-result
-    : REPLY '(' (expr ',')* expr? ')' -> {type: "reply", message: $4 ? $3.concat([$4]) : []}
-    | FAIL '(' (expr ',')* expr? ')' -> {type: "fail", message: $4 ? $3.concat([$4]) : []}
+termination
+    : CHANNEL '(' (expr ',')* expr? ')' -> {type: "termination", channel: $1, message: $4 ? $3.concat([$4]) : []}
     ;
 
 assignment
@@ -195,10 +188,10 @@ assignment_op
     | '%='
     ;
 
-selection
-    : IF expr block -> {type: "select", cond: $2, block: $3}
-    | IF expr block ELSE block -> {type: "select", cond: $2, block: $3, else: $5}
-    | IF expr block ELSE selection -> ["select", $2, $3, $5]
+conditional
+    : IF expr block -> {type: "conditional", predicate: $2, positive: $3}
+    | IF expr block ELSE block -> {type: "conditional", predicate: $2, positive: $3, negative: $5}
+    | IF expr block ELSE conditional -> {type: "conditional", predicate: $2, positive: $3, negative: $5}
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -207,30 +200,29 @@ selection
 atom
     : ID -> {type: "id", name: $1};
     | literal
-    | atom '[' expr? ']' -> ["subscript", $1, $3]
-    | atom '.' ID -> ["access", $1, $3]
+    | atom '[' expr? ']' -> {type: "subscript", list: $1, index: $3}
+    | atom '.' ID -> {type: "select", set: $1, member: $3}
     | '(' expr ')' -> $2
-    | message
+    | interaction
     ;
 
 literal
-    : BOOLEAN -> $1 == 'true'
+    : BOOLEAN -> {type: 'boolean', val: $1 == 'true'}
     | NUMBER -> {type: 'number', val: parseFloat($1)}
     | STRING -> {type: 'string', val: $1}
-    | '[' (expr ',')* expr? ']' -> ["list", $2 ? $2.concat($3): $3]
-    | '[' BEGIN (expr ',')* expr? END ']' -> ["list", $2 ? $2.concat($3): $3]
-    | '{' (dyad ',')* dyad? '}' -> ["set", $2 ? $2.concat($3): $3]
-    | '{' BEGIN (dyad ',')* dyad? END '}' -> ["set", $2 ? $2.concat($3): $3]
+    | '[' (expr ',')* expr? ']' -> {type: "list", elements: $2 ? $2.concat($3): $3}
+    | '{' (dyad ',')* dyad? '}' -> {type: "set", members: $2 ? $2.concat($3): $3}
+    | block
     ;
 
 dyad
     : expr
     | expr ':' expr -> ["dyad", $1, $3];
-    | expr ':' block -> ["dyad", $1, $3]; // this isn't general enough
     ;
 
-// messages are the only expressions that can also be statements
-message
+// communications are the only expressions that can also be stand-alone statements
+// or are they the only statements that can be expressions?
+interaction
     : atom '(' (expr ',')* expr? ')' -> {type: "send", to: $1, message: $4 ? $3.concat([$4]) : []}
     ;
 

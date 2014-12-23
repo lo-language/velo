@@ -1,19 +1,13 @@
-[
-    { "invoke": [ "id", "foo" ], "args": [] },
-    { "invoke": [ "id", [ "id", "foo" ], "bar" ], "args": [] },
-    [ "=>",
-        { "invoke": [ "id", "foo" ], "args": [] },
-        [ "id", "baz" ] ],
-    [ "=>",
-        [ "->",
-            [ "=>",
-                { "invoke": [ "id", "foo" ], "args": [ [ "id", "bar" ] ] },
-                [ "id", "baz" ] ],
-            [ "id", "foobar" ] ],
-        [ "id", "bazzle" ] ],
-    [ "=>",
+{
+    "type":"program",
+    "statements":[
         {
-            "invoke": [ "id", "foo" ],
-            "args": [ [ "id", "bar" ], [ "id", "baz" ] ] },
-        [ "id", "foobar" ] ]
-]
+            "type":"send",
+            "to":{"type":"id","name":"foo"},
+            "message":[]},
+        {
+            "type":"send",
+            "to":{"type":"select","set":{"type":"id","name":"foo"},"member":"bar"},
+            "message":[]}
+    ]
+}
