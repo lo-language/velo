@@ -85,6 +85,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "%="                    return '%='
 "->"                    return '->'
 "~>"                    return '~>'
+">>"                    return '>>'
 "+"                     return '+'
 "-"                     return '-'
 "*"                     return '*'
@@ -124,7 +125,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 %left '==' '!='
 %nonassoc IN
 %left 'AND' 'OR'
-%left '->' '~>'
+%left '->' '~>' '>>'
 
 %%
 
@@ -253,4 +254,5 @@ expr
 interaction
     : expr '->' expr -> {type: "flow", filter: $2, source: $1, sink: $3}
     | expr '~>' expr -> {type: "flow", filter: $2, source: $1, sink: $3}
+    | expr '>>' expr -> {type: "flow", filter: $2, source: $1, sink: $3}
     ;
