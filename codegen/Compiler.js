@@ -21,7 +21,7 @@ var __ = function () {
 // chain statements as nesting, because each statement kind of defines the context for lower statements?
 // then do we not need a separate context idea besides the enclosing node??
 
-var compilers = {};
+var handlers = {};
 
 var compile = function (node, context) {
 
@@ -30,7 +30,7 @@ var compile = function (node, context) {
     }
 
 //    console.error('compiling ' + node.type + '; context = ' + util.inspect(context));
-    compilers[node.type](node, context);
+    handlers[node.type](node, context);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,7 +39,7 @@ var compile = function (node, context) {
  * @param node
  * @param context
  */
-compilers['program'] = function (node, context) {
+handlers['program'] = function (node, context) {
 
     node.code = 'function (args, $_recur, $_reply, $_fail) {\n\n';
 
@@ -61,7 +61,7 @@ compilers['program'] = function (node, context) {
  * @param node
  * @param context
  */
-compilers['receive'] = function (node, context) {
+handlers['receive'] = function (node, context) {
 
     node.code = '';
 
@@ -77,7 +77,7 @@ compilers['receive'] = function (node, context) {
  * @param node
  * @param context
  */
-compilers['conditional'] = function (node, context) {
+handlers['conditional'] = function (node, context) {
 
     // select needs cond to be ready
 
@@ -99,7 +99,7 @@ compilers['conditional'] = function (node, context) {
  * @param node
  * @param context
  */
-compilers['op'] = function (node, context) {
+handlers['op'] = function (node, context) {
 
     // op needs left and right to be ready
     // so if the context has them as 'not ready', then it needs to record its needs for the next level up to provide them
@@ -117,13 +117,13 @@ compilers['op'] = function (node, context) {
  * @param node
  * @param context
  */
-compilers['id'] = function (node, context) {
+handlers['id'] = function (node, context) {
 
     // atom - no children
     node.code = '$_' + node.name;
 
     if (context['$_' + node.name] === undefined) {
-//                throw new Error(node.name + " is undefined at line");
+        node.status = 'undefined';
     }
     else if (context['$_' + node.name] === true) {
         node.ready = true;
@@ -139,7 +139,7 @@ compilers['id'] = function (node, context) {
  * @param node
  * @param context
  */
-compilers['number'] = function (node, context) {
+handlers['boolean'] = function (node, context) {
 
     // atom - no children
     node.code = node.val;
@@ -152,7 +152,20 @@ compilers['number'] = function (node, context) {
  * @param node
  * @param context
  */
-compilers['string'] = function (node, context) {
+handlers['number'] = function (node, context) {
+
+    // atom - no children
+    node.code = node.val;
+    node.ready = true;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ * @param context
+ */
+handlers['string'] = function (node, context) {
 
     // atom - no children
     node.code = "'" + node.val + "'";
@@ -165,7 +178,7 @@ compilers['string'] = function (node, context) {
  * @param node
  * @param context
  */
-compilers['termination'] = function (node, context) {
+handlers['termination'] = function (node, context) {
 
     // guaranteed to be statements
 
@@ -185,7 +198,7 @@ compilers['termination'] = function (node, context) {
  * @param node
  * @param context
  */
-compilers['request'] = function (node, context) {
+handlers['request'] = function (node, context) {
 
     // can be part of an expression or a stand-alone statement
     node.code = compileChild(node, node.to, context) + '(';
@@ -200,21 +213,40 @@ compilers['request'] = function (node, context) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * An assignment may alter the current context by creating a variable in the context - if the LHS of the assign
+ * is a simple identifier.
  *
  * @param node
  * @param context
  */
-compilers['assign'] = function (node, context) {
+handlers['assign'] = function (node, context) {
 
     // this is guaranteed to be a statement
     compileChild(node, node.left, context);
     compileChild(node, node.right, context);
 
     if (node.left.type == 'id') {
-        context['$_' + node.left.name] = node.right.ready;
+        context['$_' + node.left.name] = node.right.ready || 'unknown';
     }
 
     node.code = node.left.code + ' ' + node.op + ' ' + node.right.code;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * An assignment may alter the current context by creating a variable in the context - if the LHS of the assign
+ * is a simple identifier.
+ *
+ * @param node
+ * @param context
+ */
+handlers['subscript'] = function (node, context) {
+
+    // this is guaranteed to be a statement
+    compileChild(node, node.list, context);
+    compileChild(node, node.index, context);
+
+    node.code = node.list.code + '[' + node.index.code + ']';
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -299,5 +331,6 @@ function indent(code) {
 }
 
 module.exports = {
-    compile: compile
+    compile: compile,
+    handlers: handlers
 };
