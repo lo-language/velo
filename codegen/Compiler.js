@@ -1,8 +1,8 @@
 /**
  * The Exa-to-Node compiler/VM
  *
- * we need the ability to compile dynamically loaded files
- * compiles provided source file, evals it to create an object
+ * the design of this language is predicated on automated testing -
+ * errors that could conceivably be detected at compile-time ARE NOT
  */
 
 'use strict';
@@ -13,7 +13,17 @@ var util = require('util');
 var __ = function () {
 
 };
+/*
 
+have each node record whether it's an expression or has one or more statements
+in general, have each node record its *requirements*, and then gather the requirements to write the code
+also, save codegen for last - construct a JS AST?
+
+optimization idea: detect synchronous functions at their first invocation and short-circuit the promise check?
+only works if we don't switch fn ptrs around
+
+
+ */
 // forget about JS initially, transform into an exa program description, with explicit sequencing
 // semantic phase I guess
 // then compile into js?
@@ -31,6 +41,8 @@ var compile = function (node, context) {
 
 //    console.error('compiling ' + node.type + '; context = ' + util.inspect(context));
     handlers[node.type](node, context);
+
+    return node.code;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,7 +53,10 @@ var compile = function (node, context) {
  */
 handlers['program'] = function (node, context) {
 
-    node.code = 'function (args, $_recur, $_reply, $_fail) {\n\n';
+    // load the user arguments into args
+    node.code = 'var args = Array.prototype.slice.call(arguments, 2);\n';
+    node.code += 'var result = Q.defer();\n';
+//    node.code += 'console.log(arguments);\n';
 
     node.statements.forEach(function (stmt) {
 
@@ -52,7 +67,7 @@ handlers['program'] = function (node, context) {
         }
     });
 
-    node.code += '}\n';
+    node.code += 'return result.promise;\n'
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,6 +123,7 @@ handlers['op'] = function (node, context) {
     var leftCode = compileChild(node, node.left, context);
     var rightCode = compileChild(node, node.right, context);
 
+    // use parens to be safe
     node.code = '(' + leftCode + ' ' + node.op + ' ' + rightCode + ')';
 };
 
@@ -178,26 +194,6 @@ handlers['string'] = function (node, context) {
  * @param node
  * @param context
  */
-handlers['termination'] = function (node, context) {
-
-    // guaranteed to be statements
-
-    node.code = '$_' + node.channel + '(';
-
-    var args = node.message.map(function (arg) {
-        return compileChild(node, arg, context);
-    });
-
-    node.code += args.join(',') + ');\nreturn';
-    node.ready = true;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param node
- * @param context
- */
 handlers['request'] = function (node, context) {
 
     // can be part of an expression or a stand-alone statement
@@ -209,6 +205,31 @@ handlers['request'] = function (node, context) {
 
     node.code += ')';
     node.ready = false; // for if this send is used in an expression
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ * @param context
+ */
+handlers['termination'] = function (node, context) {
+
+    // guaranteed to be statements
+
+    if (node.channel === 'reply') {
+        node.code = 'result.resolve('
+    }
+    else {
+        node.code = 'result.reject('
+    }
+
+    var args = node.message.map(function (arg) {
+        return compileChild(node, arg, context);
+    });
+
+    node.code += args.join(',') + ');\nreturn result.promise';
+    node.ready = true;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -305,11 +326,25 @@ function compileChildStatement(parent, child, context) {
             return child.preCond[tempVar];
         });
 
-        return 'Q.spread([' + promises.join(',') + '], function (' + args.join(',') + ') {\n\n' + child.code + '}, $_fail);'
+        // could alternatively create a new rejection handler here, rather than reusing the parent context's
+        return 'Q.spread([' + promises.join(',') + '], function (' + args.join(',') + ') {\n\n' + child.code + '}, result.reject);'
     }
 
     return child.code;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Pretty-prints the given JS code.
+ *
+ * @param code
+ * @return {String}
+ */
+__.prototype.prettyPrint = function (code) {
+
+    // parse the JS
+
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
