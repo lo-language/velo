@@ -26,7 +26,7 @@ module.exports["program"] = {
 
         var result = compiler.handlers["program"](node);
 
-        test.equal(node.code, 'function (args, $_recur, $_reply, $_fail) {\n\n$_foo = $_bar\n}\n');
+        test.equal(node.code, 'var args = Array.prototype.slice.call(arguments, 2);\nvar result = Q.defer();\n$_foo = $_bar\nreturn result.promise;\n');
         test.done();
     }
 };
@@ -171,7 +171,7 @@ module.exports["termination"] = {
 
         var result = compiler.handlers["termination"](node);
 
-        test.equal(node.code, "$_reply(42);\nreturn");
+        test.equal(node.code, "result.resolve(42);\nreturn result.promise");
         test.done();
     },
 
@@ -183,7 +183,7 @@ module.exports["termination"] = {
 
         var result = compiler.handlers["termination"](node);
 
-        test.equal(node.code, "$_fail(42);\nreturn");
+        test.equal(node.code, "result.reject(42);\nreturn result.promise");
         test.done();
     }
 };

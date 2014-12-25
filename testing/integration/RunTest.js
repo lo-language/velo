@@ -13,6 +13,7 @@
 var ExaModule = require('../../loader/ExaModule');
 var util = require('util');
 var fs = require('fs');
+var programDir = __dirname +  '/../programs';
 
 module.exports['factorial'] = {
 
@@ -20,7 +21,7 @@ module.exports['factorial'] = {
 
         var self = this;
 
-        fs.readFile(__dirname +  '/../../examples/factorial.exa', 'utf8', function (err, source) {
+        fs.readFile(programDir + '/factorial.exa', 'utf8', function (err, source) {
 
             self.module = new ExaModule(source);
 
@@ -60,7 +61,7 @@ module.exports['fibonacci'] = {
 
         var self = this;
 
-        fs.readFile(__dirname +  '/../../examples/fibonacci.exa', 'utf8', function (err, source) {
+        fs.readFile(programDir +  '/fibonacci.exa', 'utf8', function (err, source) {
 
             self.module = new ExaModule(source);
 
@@ -87,7 +88,57 @@ module.exports['fibonacci'] = {
                 test.done();
             },
             function (err) {
-                test.equal(err, 'whatsamatta, you?');
+                test.equal(err, 'Whatsamatta, you?');
+                test.done();
+            }
+        );
+    }
+};
+
+module.exports['conditionals'] = {
+
+    "setUp": function (cb) {
+
+        var self = this;
+
+        fs.readFile(programDir +  '/conditionals.exa', 'utf8', function (err, source) {
+
+            self.module = new ExaModule(source);
+
+            cb();
+        });
+    },
+
+    'neg': function (test) {
+
+        this.module.run(-1).then(
+            function (result) {
+
+                test.equal(result, 'negative');
+                test.done();
+            }
+        );
+    },
+
+    'zero': function (test) {
+
+        this.module.compile();
+        console.log(this.module.js);
+        this.module.run(0).then(
+            function (result) {
+
+                test.equal(result, 'zero');
+                test.done();
+            }
+        );
+    },
+
+    'pos': function (test) {
+
+        this.module.run(1).then(
+            function (result) {
+
+                test.equal(result, 'positive');
                 test.done();
             }
         );

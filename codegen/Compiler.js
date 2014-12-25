@@ -39,7 +39,10 @@ var compile = function (node, context) {
         context = {$_recur: true, $_reply: true, $_fail: true, temps: 0};
     }
 
-//    console.error('compiling ' + node.type + '; context = ' + util.inspect(context));
+    if (handlers[node.type] === undefined) {
+        throw new Error("don't know how to compile node type '" + node.type + "'");
+    }
+
     handlers[node.type](node, context);
 
     return node.code;
@@ -94,7 +97,7 @@ handlers['receive'] = function (node, context) {
  */
 handlers['conditional'] = function (node, context) {
 
-    // select needs cond to be ready
+    // needs predicate to be ready
 
     compileChild(node, node.predicate, context);
 
