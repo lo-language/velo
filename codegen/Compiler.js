@@ -161,7 +161,7 @@ handlers['id'] = function (node, context) {
 handlers['boolean'] = function (node, context) {
 
     // atom - no children
-    node.code = node.val;
+    node.code = node.val ? 'true' : 'false';
     node.ready = true;
 };
 

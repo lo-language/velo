@@ -235,7 +235,7 @@ module.exports["literals"] = {
 
         var result = compiler.handlers["boolean"](node);
 
-        test.equal(node.code, true);
+        test.equal(node.code, 'true');
         test.equal(node.ready, true);
         test.done();
     },
