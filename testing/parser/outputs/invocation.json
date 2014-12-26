@@ -4,10 +4,10 @@
         {
             "type":"request",
             "to":{"type":"id","name":"foo"},
-            "message":[]},
+            "args":[]},
         {
             "type":"request",
             "to":{"type":"select","set":{"type":"id","name":"foo"},"member":"bar"},
-            "message":[]}
+            "args":[]}
     ]
 }

@@ -12,7 +12,7 @@
         {"type":"assign","op":"*=","left":{"type":"id","name":"foo"},"right":{"type":"number","val":10}},
         {"type":"assign","op":"/=","left":{"type":"id","name":"foo"},"right":{"type":"number","val":4}},
         {"type":"assign","op":"%=","left":{"type":"id","name":"foo"},"right":{"type":"number","val":360}},
-        {"type":"request","to":{"type":"id","name":"doSomething"},"message":[]},
+        {"type":"request","to":{"type":"id","name":"doSomething"},"args":[]},
         {"type":"assign","op":"=","left":{"type":"subscript","list":{"type":"id","name":"foo"}},"right":{"type":"number","val":17}},
         {"type":"request",
             "to":{
@@ -29,13 +29,13 @@
                                 "index":{"type":"string","val":"chickens"}},
                             "index":{"type":"number","val":15}},
                         "member":"wow"},
-                    "message":[{
+                    "args":[{
                         "type":"set",
                         "members":[
                             ["dyad",{"type":"boolean","val":true},{"type":"number","val":72}],
                             ["dyad",{"type":"number","val":89},{"type":"number","val":42}]]}]},
                     "index":{"type":"number","val":17}},
-            "message":[{"type":"number","val":57}]},
+            "args":[{"type":"number","val":57}]},
         {"type":"request",
             "to":{"type":"set","members":[
                 ["dyad",{"type":"string","val":"whale"},{"type":"number","val":57}],
@@ -43,7 +43,7 @@
                 ["dyad",{"type":"number","val":42},{"type":"number","val":7}],
                 {"type":"string","val":"porkchop"},
                 {"type":"id","name":"buttercup"}]},
-            "message":[]},
+            "args":[]},
         {"type":"assign","op":"=","left":{"type":"id","name":"monkeys"},"right":{"type":"number","val":72}},
         {"type":"assign","op":"=","left":{"type":"id","name":"result"},"right":{
             "type":"flow",
@@ -51,11 +51,11 @@
             "source":{
                 "type":"flow",
                 "filter":"~>",
-                "source":{"type":"request","to":{"type":"id","name":"foo"},"message":[]},
+                "source":{"type":"request","to":{"type":"id","name":"foo"},"args":[]},
                 "sink":{"type":"block","statements":[
                     {"type":"receive","names":["err"]},
-                    {"type":"request","to":{"type":"id","name":"log"},"message":[{"type":"id","name":"err"}]},
-                    {"type":"termination","channel":"reply","message":[{"type":"id","name":"fixed"}]}]}},
+                    {"type":"request","to":{"type":"id","name":"log"},"args":[{"type":"id","name":"err"}]},
+                    {"type":"termination","channel":"reply","args":[{"type":"id","name":"fixed"}]}]}},
             "sink":{"type":"block","statements":[
                 {"type":"receive","names":["result"]}]}}},
         {"type":"assign","op":"=","left":{"type":"id","name":"index"},"right":{"type":"number","val":0}},
@@ -63,9 +63,9 @@
             "op":"=",
             "left":{"type":"id","name":"iterator"},
             "right":{"type":"block","statements":[
-                {"type":"termination","channel":"reply","message":[
+                {"type":"termination","channel":"reply","args":[
                     {"type":"subscript","list":{"type":"id","name":"items"},"index":{"type":"id","name":"index"}}]},
                 {"type":"assign","op":"++","left":{"type":"id","name":"index"}}]}},
-        {"type":"termination","channel":"reply","message":[{"type":"id","name":"iterator"}]}
+        {"type":"termination","channel":"reply","args":[{"type":"id","name":"iterator"}]}
     ]
 }

@@ -161,7 +161,7 @@ block
 
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: "receive", names: $2.concat($3)}
-    | expr ';'
+    | expr ';' -> {type: 'exprStatement', expr: $1}
     | termination ';'    // to prevent usage of fail() and reply() in expressions - might want to change this, though
     | assignment ';'
     | conditional
@@ -169,7 +169,7 @@ statement
     ;
 
 termination
-    : CHANNEL '(' (expr ',')* expr? ')' -> {type: "termination", channel: $1, message: $4 ? $3.concat([$4]) : []}
+    : CHANNEL '(' (expr ',')* expr? ')' -> {type: "termination", channel: $1, args: $4 ? $3.concat([$4]) : []}
     ;
 
 // assignments are not expressions
@@ -223,7 +223,7 @@ dyad
 // requests are the only expressions that can also be stand-alone statements
 // or are they the only statements that can be expressions?
 request
-    : atom '(' (expr ',')* expr? ')' -> {type: "request", to: $1, message: $4 ? $3.concat([$4]) : []}
+    : atom '(' (expr ',')* expr? ')' -> {type: "request", to: $1, args: $4 ? $3.concat([$4]) : []}
     ;
 
 unary_expr
