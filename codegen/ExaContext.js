@@ -14,40 +14,44 @@ var __ = function () {
     // map of defined names
     this.vars = {};
 
-    // temp var counter for creating unique names
-    this.temps = 0;
+    this.numArgs = 0;
 
-    this.defineValue('recur');
-    this.defineValue('reply');
-    this.defineValue('fail');
+    this.define('recur', true);
+    this.define('reply', true);
+    this.define('fail', true);
 };
 
-__.prototype.makeTempVar = function () {
+/**
+ * Defines a variable and marks it as ready iff it's being set to a literal or argument
+ * or an expression of exclusively the same.
+ *
+ * @param name
+ * @param status
+ */
+__.prototype.define = function (name, status) {
 
-    var tempVarName = 'tmp_' + this.temps;
-    this.temps++;
-
-    return tempVarName;
+    this.vars[name] = status;
 };
 
-__.prototype.defineValue = function (name) {
+/**
+ *
+ * @param name
+ * @return {Number} the number of this argument
+ */
+__.prototype.defineArg = function (name) {
 
-    this.vars[name] = 'val';
+    this.define(name, 'ready');
+
+    var argNum = this.numArgs;
+
+    this.numArgs++;
+
+    return argNum;
 };
 
-__.prototype.definePromise = function (name) {
+__.prototype.getStatus = function (name) {
 
-    this.vars[name] = 'promise';
-};
-
-__.prototype.isValue = function (name) {
-
-    return (this.vars[name] === 'val');
-};
-
-__.prototype.isPromise = function (name) {
-
-    return (this.vars[name] === 'promise');
+    return this.vars[name];
 };
 
 module.exports = __;

@@ -9,26 +9,17 @@
 
 var JsContext = require('./JsContext');
 
-var __ = function (expr) {
+var __ = function (stmt) {
 
-    this.expr = expr;
-};
-
-__.prototype.renderExpr = function () {
-
-    throw new Error("statement can't be used as expression");
+    this.stmt = stmt;
 };
 
 __.prototype.renderStmt = function () {
 
-    // each stmt gets its own context for now
-    // merge stmt and context?
+    // should we merge stmt and context?
+    // since each stmt gets its own jscontext (or is a passthrough)
 
-    var jsContext = new JsContext();
-
-    var stmt = this.expr.renderStmt(jsContext);
-
-    return jsContext.render(stmt);
+    return this.stmt;
 };
 
 module.exports = __;

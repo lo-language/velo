@@ -24,13 +24,14 @@
 "use strict";
 
 var parser = require('./../parser/Parser');
-var compiler = require('./../codegen/Compiler');
+var Compiler = require('./../codegen/Compiler');
 var Q = require('q');
 var util = require('util');
 
 var __ = function (source) {
 
     this.source = source;
+    this.compiler = new Compiler();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,8 +56,10 @@ __.prototype.parse = function () {
 __.prototype.compile = function () {
 
     if (this.js === undefined) {
-        this.js = compiler.compile(this.parse());
+        this.js = this.compiler.compile(this.parse()).renderBody();
     }
+
+    console.error(this.js);
 
     return this.js;
 };
@@ -90,9 +93,7 @@ __.prototype.run = function () {
     }
 
     var recur = this.fn.bind(null, Q, function () {
-
-//        console.log('recurrence');
-//        console.log(util.inspect(arguments));
+//        console.log('recurring: ' + util.inspect(arguments));
         return recur.apply(null, arguments);
     });
 

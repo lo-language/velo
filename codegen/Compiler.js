@@ -3,6 +3,8 @@
  *
  * the design of this language is predicated on automated testing -
  * errors that could conceivably be detected at compile-time ARE NOT
+ *
+ * ॐ मणिपद्मे हूं
  */
 
 'use strict';
@@ -11,8 +13,11 @@ var Q = require('q');
 var Context = require('./ExaContext');
 var JsExpr = require('./JsExpr');
 var JsCall = require('./JsCall');
-var JsOp = require('./JsOp');
+var JsOp = require('./JsOpExpr');
 var JsStmt = require('./JsStmt');
+var JsAssignment = require('./JsAssignment');
+var JsConditional = require('./JsConditional');
+var JsFunction = require('./JsFunction');
 var util = require('util');
 
 var __ = function () {
@@ -47,6 +52,13 @@ only works if we don't switch fn ptrs around
 // chain statements as nesting, because each statement kind of defines the context for lower statements?
 // then do we not need a separate context idea besides the enclosing node??
 
+/**
+ * Takes an Exa AST node and returns a JS AST node. Code isn't generated until renderStmt is called on
+ * JS nodes.
+ *
+ * @param node
+ * @return {*}
+ */
 __.prototype.compile = function (node) {
 
     if (this[node.type] === undefined) {
@@ -64,7 +76,7 @@ __.prototype.compile = function (node) {
 __.prototype['boolean'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return new JsExpr(node.val ? 'true' : 'false');
+    return new JsExpr(node.val ? 'true' : 'false', 'ready');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,7 +87,7 @@ __.prototype['boolean'] = function (node) {
 __.prototype['number'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return new JsExpr("" + node.val);
+    return new JsExpr("" + node.val, 'ready');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +98,7 @@ __.prototype['number'] = function (node) {
 __.prototype['string'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return new JsExpr("'" + node.val + "'");
+    return new JsExpr("'" + node.val + "'", 'ready');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,22 +108,7 @@ __.prototype['string'] = function (node) {
  */
 __.prototype['id'] = function (node) {
 
-    // an ID has no effects but may have preconditions if it's not ready in the context
-
-    // see if the ID has been defined as ready - literal or argument
-    if (this.context.isValue(node.name)) {
-
-        // ID is ready
-        return new JsExpr('$_' + node.name);
-    }
-    else if (this.context.isPromise(node.name)) {
-
-        // ID is not ready - subscribe to the pending value
-        return new JsExpr('$val_' + node.name);
-//        node.needs = [node.name];
-    }
-
-    return new JsExpr();
+    return new JsExpr('$_' + node.name, this.context.getStatus(node.name));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,108 +162,89 @@ __.prototype['op'] = function (node) {
  *
  * @param node
  */
-//__.prototype['program'] = function (node) {
-//
-//    // load the user arguments into args
-//    node.code = 'var args = Array.prototype.slice.call(arguments, 2);\n';
-//    node.code += 'var result = Q.defer();\n';
-////    node.code += 'console.log(arguments);\n';
-//
-//    node.statements.forEach(function (stmt) {
-//
-//        var code = compileChildStatement(node, stmt, context);
-//
-//        if (code !== undefined) {
-//            node.code += code + '\n';
-//        }
-//    });
-//
-//    node.code += 'return result.promise;\n'
-//};
+__.prototype['program'] = function (node) {
+
+    var self = this;
+
+    var stmts = node.statements.map(function (stmt) {
+        return self.compile(stmt);
+    });
+
+    return new JsFunction(stmts);
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
  * @param node
  */
-//__.prototype['receive'] = function (node) {
-//
-//    var statements = node.names.map(function (id, index) {
-//
-//        // alter the context for following statements
-//        context.defineValue(id);
-//
-//        return 'var $_' + id + ' = args[' + index + '];';
-//    });
-//
-//    // receive has no value, just side effects
-//    node.js = {statements: statements};
-//};
+__.prototype['receive'] = function (node) {
+
+    var self = this;
+
+    var vars = [];
+
+    node.names.forEach(function (name) {
+
+        // alter the context for following statements
+        var argNum = self.context.defineArg(name);
+
+        vars.push('$_' + name + ' = ' + 'args[' + argNum + ']');
+    });
+
+    var stmt = 'var ' + vars.join(',\n') + ';';
+
+    return new JsStmt(stmt);
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
  * @param node
  */
-//__.prototype['conditional'] = function (node) {
-//
-//    // needs predicate to be ready
-//
-//    compileChild(node, node.predicate, context);
-//
-//    node.code = 'if (' + node.predicate.code + ') {\n';
-//
-//    node.positive.forEach(function (stmt) {
-//        var code = compileChildStatement(node, stmt, context);
-//        node.code += indent(code) + '\n';
-//    });
-//
-//    node.code += '}\n';
-//};
+__.prototype['conditional'] = function (node) {
+
+    var self = this;
+
+    // needs predicate to be ready
+
+    var predicate = this.compile(node.predicate);
+
+    var posBlock = node.positive.map(function (stmt) {
+        return self.compile(stmt);
+    });
+
+    if (node.negative !== undefined) {
+
+        var negBlock = node.negative.map(function (stmt) {
+            return self.compile(stmt);
+        });
+    }
+
+    return new JsConditional(predicate, posBlock, negBlock);
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
  * @param node
  */
-//__.prototype['termination'] = function (node) {
-//
-//    // guaranteed to be statements
-//
-//    if (node.channel === 'reply') {
-//        node.code = 'result.resolve('
-//    }
-//    else {
-//        node.code = 'result.reject('
-//    }
-//
-//    var args = node.args.map(function (arg) {
-//        return compileChild(node, arg, context);
-//    });
-//
-//    node.code += args.join(',') + ');\nreturn result.promise';
-//    node.ready = true;
-//};
+__.prototype['termination'] = function (node) {
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * An assignment may alter the current context by creating a variable in the context - if the LHS of the assign
- * is a simple identifier.
- *
- * @param node
- */
-//__.prototype['assign'] = function (node) {
-//
-//    // this is guaranteed to be a statement
-//    compileChild(node, node.left, context);
-//    compileChild(node, node.right, context);
-//
-//    if (node.left.type == 'id') {
-//        context['$_' + node.left.name] = node.right.ready || 'unknown';
-//    }
-//
-//    node.code = node.left.code + ' ' + node.op + ' ' + node.right.code;
-//};
+    var name = 'result.resolve';
+
+    if (node.channel === 'fail') {
+        name = 'result.reject';
+    }
+
+    var self = this;
+
+    var args = node.args.map(function (arg) {
+        return self.compile(arg);
+    });
+
+    return new JsCall(new JsExpr(name), args);
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -275,14 +253,43 @@ __.prototype['op'] = function (node) {
  *
  * @param node
  */
-//__.prototype['subscript'] = function (node) {
-//
-//    // this is guaranteed to be a statement
-//    compileChild(node, node.list, context);
-//    compileChild(node, node.index, context);
-//
-//    node.code = node.list.code + '[' + node.index.code + ']';
-//};
+__.prototype['assign'] = function (node) {
+
+    // this is guaranteed to be a statement
+
+    var left = this.compile(node.left);
+    var right = this.compile(node.right);
+
+    // is being ready a property of an AST node + exa context?
+    // is tracking ready state just an optimization? or do we need it to not have turtles all the way down?
+    // can we 'ask' the ast node if it's ready?
+    // the compilation result should know that already, right?
+
+    // modify the exa context
+
+    if (node.left.type == 'id') {
+        this.context.define(node.left.name, right.getStatus());
+    }
+
+    return new JsAssignment(node.op, left, right);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * An assignment may alter the current context by creating a variable in the context - if the LHS of the assign
+ * is a simple identifier.
+ *
+ * @param node
+ */
+__.prototype['subscript'] = function (node) {
+
+    // this is guaranteed to be a statement
+
+    var left = this.compile(node.list);
+    var right = this.compile(node.index);
+
+    return new JsOp('subscript', left, right);
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**

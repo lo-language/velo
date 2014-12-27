@@ -8,13 +8,16 @@
 var JsExpr = require('./JsExpr');
 var JsContext = require('./JsContext');
 
-var __ = function (fnId, args) {
+var __ = function (fnVar, args) {
 
-    this.fnId = fnId;
+    this.fn = fnVar;
     this.args = args;
 };
 
-__.prototype = Object.create(JsExpr);
+__.prototype.getStatus = function () {
+
+    return 'promise';
+};
 
 /**
  * Renders a JS function call.
@@ -24,7 +27,7 @@ __.prototype = Object.create(JsExpr);
  */
 __.prototype.renderCall = function (jsContext) {
 
-    var nameExpr = this.fnId.renderExpr(jsContext);
+    var nameExpr = this.fn.renderExpr(jsContext);
     var argsExpr = this.args.map(
         function (arg) {
             return arg.renderExpr(jsContext);
@@ -53,7 +56,11 @@ __.prototype.renderExpr = function (jsContext) {
  */
 __.prototype.renderStmt = function (jsContext) {
 
-    return this.renderCall(jsContext) + ';';
+    var jsContext = new JsContext();
+
+    var stmt = this.renderCall(jsContext) + ';';
+
+    return jsContext.render(stmt);
 };
 
 module.exports = __;

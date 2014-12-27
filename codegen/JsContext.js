@@ -49,8 +49,8 @@ __.prototype.render = function (stmt) {
     });
 
     // could alternatively create a new rejection handler here, rather than reusing the parent context's
-    return nested.render('Q.spread([' + promises.join(',') + '], function (' + args.join(',') + ') {\n\n'
-        + stmt + '}, result.reject);');
+    return nested.render('\nQ.spread([' + promises.join(',') + '], function (' + args.join(',') + ') {\n    '
+        + stmt + '\n}, result.reject);');
 };
 
 module.exports = __;

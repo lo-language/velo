@@ -5,8 +5,6 @@
 
 "use strict";
 
-var JsExpr = require('./JsExpr');
-
 var __ = function (op, left, right) {
 
     this.op = op;
@@ -19,10 +17,10 @@ var __ = function (op, left, right) {
  * @param jsContext
  * @return {String}
  */
-__.prototype.renderExpr = function (jsContext) {
+__.prototype.renderStmt = function (jsContext) {
 
     // use parens to be safe
-    return '(' + this.left.renderExpr(jsContext) + ' ' + this.op + ' ' + this.right.renderExpr(jsContext) + ')';
+    return this.left.renderExpr(jsContext) + ' ' + this.op + ' ' + this.right.renderExpr(jsContext) + ';';
 };
 
 module.exports = __;

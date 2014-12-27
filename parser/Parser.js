@@ -88,8 +88,6 @@ case 2:this.$ = $$[$0-1];
 break;
 case 3:this.$ = {type: "receive", names: $$[$0-2].concat($$[$0-1])};
 break;
-case 4:this.$ = {type: 'statement', stmt: $$[$0-1]};
-break;
 case 8:this.$ = ["skip"];
 break;
 case 9:this.$ = {type: "termination", channel: $$[$0-4], args: $$[$0-1] ? $$[$0-2].concat([$$[$0-1]]) : []};

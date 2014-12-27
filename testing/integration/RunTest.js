@@ -31,10 +31,14 @@ module.exports['factorial'] = {
 
     'success': function (test) {
 
-        this.module.run(10).then(
+        this.module.run(-1).then(
             function (result) {
 
                 test.equal(result, 3628800);
+                test.done();
+            },
+            function (err) {
+                test.equal(err, 'I pity the fool!');
                 test.done();
             }
         );

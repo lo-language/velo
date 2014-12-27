@@ -161,7 +161,7 @@ block
 
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: "receive", names: $2.concat($3)}
-    | expr ';' -> {type: 'exprStatement', expr: $1}
+    | expr ';'
     | termination ';'    // to prevent usage of fail() and reply() in expressions - might want to change this, though
     | assignment ';'
     | conditional
