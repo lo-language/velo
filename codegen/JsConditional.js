@@ -25,7 +25,7 @@ __.prototype.renderStmt = function () {
 
     var jsContext = new JsContext();
 
-    var cond = '\nif (' + this.predicate.renderExpr(jsContext) + ') {\n';
+    var cond = 'if (' + this.predicate.renderExpr(jsContext) + ') {\n';
 
     this.posBlock.forEach(function (stmt) {
         cond += '    ' + stmt.renderStmt() + '\n';
@@ -35,13 +35,21 @@ __.prototype.renderStmt = function () {
 
     if (this.negBlock !== undefined) {
 
-        cond += '\nelse {\n';
+        cond += '\nelse ';
 
-        this.negBlock.forEach(function (stmt) {
-            cond += '    ' + stmt.renderStmt() + '\n';
-        });
+        if (Array.isArray(this.negBlock)) {
 
-        cond += '}';
+            cond += '{\n';
+
+            this.negBlock.forEach(function (stmt) {
+                cond += '    ' + stmt.renderStmt() + '\n';
+            });
+
+            cond += '}';
+        }
+        else {
+            cond += this.negBlock.renderStmt();
+        }
     }
 
     return jsContext.render(cond);

@@ -470,7 +470,7 @@ module.exports["conditional"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.renderStmt(), '\nif ($_foo) {\n    $_bar = 42;\n}');
+        test.equal(result.renderStmt(), 'if ($_foo) {\n    $_bar = 42;\n}');
         test.done();
     },
 
@@ -490,7 +490,32 @@ module.exports["conditional"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.renderStmt(), '\nif ($_foo) {\n    $_bar = 42;\n}\nelse {\n    $_bar = 32;\n}');
+        test.equal(result.renderStmt(), 'if ($_foo) {\n    $_bar = 42;\n}\nelse {\n    $_bar = 32;\n}');
+        test.done();
+    },
+
+    "with else if": function (test) {
+
+        // should create a context
+        // should call compile on each statement
+
+        var node = {
+            type: 'conditional',
+            predicate: {type: 'id', name: 'foo'},
+            positive: [{type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: 42}}],
+            negative: {
+                type: 'conditional',
+                predicate: {type: 'id', name: 'bar'},
+                positive: [{type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: 32}}],
+                negative: [{type: 'assign', op: '=', left: {type: 'id', name: 'baz'}, right: {type: 'number', val: 82}}]}
+        };
+
+        // patch sub nodes?
+
+        var result = this.compiler.compile(node);
+
+        test.equal(result.renderStmt(),
+            'if ($_foo) {\n    $_bar = 42;\n}\nelse if ($_bar) {\n    $_bar = 32;\n}\nelse {\n    $_baz = 82;\n}');
         test.done();
     }
 };

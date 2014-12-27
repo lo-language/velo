@@ -215,11 +215,18 @@ __.prototype['conditional'] = function (node) {
         return self.compile(stmt);
     });
 
+    var negBlock;
+
     if (node.negative !== undefined) {
 
-        var negBlock = node.negative.map(function (stmt) {
-            return self.compile(stmt);
-        });
+        if (Array.isArray(node.negative)) {
+            negBlock = node.negative.map(function (stmt) {
+                return self.compile(stmt);
+            });
+        }
+        else {
+            negBlock = this.compile(node.negative);
+        }
     }
 
     return new JsConditional(predicate, posBlock, negBlock);

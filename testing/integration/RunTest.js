@@ -131,7 +131,7 @@ module.exports['conditionals'] = {
         this.module.run(0).then(
             function (result) {
 
-                test.equal(result, 'zero');
+                test.equal(result, 'zero!');
                 test.done();
             }
         );

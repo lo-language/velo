@@ -59,8 +59,6 @@ __.prototype.compile = function () {
         this.js = this.compiler.compile(this.parse()).renderBody();
     }
 
-    console.error(this.js);
-
     return this.js;
 };
 
