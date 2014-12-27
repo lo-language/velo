@@ -615,7 +615,7 @@ module.exports["termination"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.renderStmt(), "result.resolve(42);");
+        test.equal(result.renderStmt(), "\nresult.resolve(42);\nreturn result.promise;");
         test.done();
     },
 
@@ -630,7 +630,7 @@ module.exports["termination"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.renderStmt(), "result.reject(42);");
+        test.equal(result.renderStmt(), "\nresult.reject(42);\nreturn result.promise;");
         test.done();
     }
 };

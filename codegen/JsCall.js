@@ -5,7 +5,6 @@
 
 "use strict";
 
-var JsExpr = require('./JsExpr');
 var JsContext = require('./JsContext');
 
 var __ = function (fnVar, args) {
@@ -15,7 +14,6 @@ var __ = function (fnVar, args) {
 };
 
 __.prototype.getStatus = function () {
-
     return 'promise';
 };
 

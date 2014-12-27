@@ -31,7 +31,7 @@ module.exports['factorial'] = {
 
     'success': function (test) {
 
-        this.module.run(-1).then(
+        this.module.run(10).then(
             function (result) {
 
                 test.equal(result, 3628800);

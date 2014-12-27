@@ -1,13 +1,11 @@
 /**
- * Wraps a JS statement with async needs in a Q.spread to make its needs available.
+ * Wraps a JS statement.
  *
  * Created by: spurcell
  * 12/25/14
  */
 
 "use strict";
-
-var JsContext = require('./JsContext');
 
 var __ = function (stmt) {
 

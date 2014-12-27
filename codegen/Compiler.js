@@ -18,6 +18,7 @@ var JsStmt = require('./JsStmt');
 var JsAssignment = require('./JsAssignment');
 var JsConditional = require('./JsConditional');
 var JsFunction = require('./JsFunction');
+var JsStmtList = require('./JsStmtList');
 var util = require('util');
 
 var __ = function () {
@@ -243,7 +244,7 @@ __.prototype['termination'] = function (node) {
         return self.compile(arg);
     });
 
-    return new JsCall(new JsExpr(name), args);
+    return new JsStmtList([new JsCall(new JsExpr(name), args), 'return result.promise;']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
