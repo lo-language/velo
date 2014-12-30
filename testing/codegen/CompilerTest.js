@@ -6,7 +6,7 @@
 "use strict";
 
 var Compiler = require('../../codegen/Compiler');
-var JsContext = require('../../codegen/JsContext');
+var JsStmt = require('../../codegen/JsStmt');
 var util = require('util');
 
 
@@ -109,11 +109,10 @@ module.exports["request"] = {
 
         var result = this.compiler.compile(node);
 
-        var jsContext = new JsContext();
-        test.equal(result.renderExpr(jsContext), 'tmp_0');
+        var stmtContext = new JsStmt();
+        test.equal(result.renderExpr(stmtContext), 'tmp_0');
 
-        jsContext = new JsContext();
-        test.equal(result.renderStmt(jsContext), '$_foo();');
+        test.equal(result.renderStmt(), '$_foo();');
         test.done();
     },
 
@@ -128,11 +127,10 @@ module.exports["request"] = {
 
         var result = this.compiler.compile(node);
 
-        var jsContext = new JsContext();
-        test.equal(result.renderExpr(jsContext), 'tmp_0');
+        var stmtContext = new JsStmt();
+        test.equal(result.renderExpr(stmtContext), 'tmp_0');
 
-        jsContext = new JsContext();
-        test.equal(result.renderStmt(jsContext), '$_foo(42);');
+        test.equal(result.renderStmt(), '$_foo(42);');
         test.done();
     },
 
@@ -148,11 +146,10 @@ module.exports["request"] = {
 
         var result = this.compiler.compile(node);
 
-        var jsContext = new JsContext();
-        test.equal(result.renderExpr(jsContext), 'tmp_0');
+        var stmtContext = new JsStmt();
+        test.equal(result.renderExpr(stmtContext), 'tmp_0');
 
-        jsContext = new JsContext();
-        test.equal(result.renderStmt(jsContext), "$_foo(42,'hi there');");
+        test.equal(result.renderStmt(), "$_foo(42,'hi there');");
         test.done();
     },
 
@@ -176,11 +173,10 @@ module.exports["request"] = {
 
         var result = this.compiler.compile(node);
 
-        var jsContext = new JsContext();
-        test.equal(result.renderExpr(jsContext), 'tmp_0');
+        var stmtContext = new JsStmt();
+        test.equal(result.renderExpr(stmtContext), 'tmp_0');
 
-        jsContext = new JsContext();
-        test.equal(result.renderStmt(jsContext), "\nQ.spread([$_foo(),$_bar()], function (tmp_0,tmp_1) {\n    $_baz(tmp_0,tmp_1);\n}, result.reject);");
+        test.equal(result.renderStmt(), "Q.spread([$_foo(),$_bar()], function (tmp_0,tmp_1) {\n    $_baz(tmp_0,tmp_1);\n}, result.reject);");
         test.done();
     }
 };
@@ -208,8 +204,8 @@ module.exports["op"] = {
 
         var result = this.compiler.compile(node);
 
-        var jsContext = new JsContext();
-        test.equal(result.renderExpr(), '(1 + 2)');
+        var stmtContext = new JsStmt();
+        test.equal(result.renderExpr(stmtContext), '(1 + 2)');
         test.done();
     },
 
@@ -230,8 +226,8 @@ module.exports["op"] = {
 
         var result = this.compiler.compile(node);
 
-        var jsContext = new JsContext();
-        test.equal(result.renderExpr(jsContext), '(1 + tmp_0)');
+        var stmtContext = new JsStmt();
+        test.equal(result.renderExpr(stmtContext), '(1 + tmp_0)');
         test.done();
     },
 
@@ -256,8 +252,8 @@ module.exports["op"] = {
 
         var result = this.compiler.compile(node);
 
-        var jsContext = new JsContext();
-        test.equal(result.renderExpr(jsContext), '(tmp_0 + tmp_1)');
+        var stmtContext = new JsStmt();
+        test.equal(result.renderExpr(stmtContext), '(tmp_0 + tmp_1)');
         test.done();
     },
 
@@ -329,8 +325,7 @@ module.exports["statements"] = {
 
         var result = this.compiler.compile(node);
 
-        var jsContext = new JsContext();
-        test.equal(result.renderStmt(jsContext), '$_foo(42);');
+        test.equal(result.renderStmt(), '$_foo(42);');
         test.done();
     },
 
@@ -358,9 +353,8 @@ module.exports["statements"] = {
 
         var result = this.compiler.compile(node);
 
-        var jsContext = new JsContext();
-        test.equal(result.renderStmt(jsContext),
-            '\nQ.spread([$_foo(),$_bar()], function (tmp_0,tmp_1) {\n    $_baz((tmp_0 + tmp_1));\n}, result.reject);');
+        test.equal(result.renderStmt(),
+            'Q.spread([$_foo(),$_bar()], function (tmp_0,tmp_1) {\n    $_baz((tmp_0 + tmp_1));\n}, result.reject);');
         test.done();
     },
 
@@ -391,9 +385,8 @@ module.exports["statements"] = {
 
         var result = this.compiler.compile(node);
 
-        var jsContext = new JsContext();
-        test.equal(result.renderStmt(jsContext),
-            '\nQ.spread([$_foo(),$_bar()], function (tmp_0,tmp_1) {\n    \nQ.spread([$_baz((tmp_0 + tmp_1))], function (tmp_0) {\n    $_quux(tmp_0);\n}, result.reject);\n}, result.reject);');
+        test.equal(result.renderStmt(),
+            'Q.spread([$_foo(),$_bar()], function (tmp_0,tmp_1) {\n    Q.spread([$_baz((tmp_0 + tmp_1))], function (tmp_0) {\n    $_quux(tmp_0);\n}, result.reject);\n}, result.reject);');
         test.done();
     }
 };
@@ -464,9 +457,9 @@ module.exports["cardinality"] = {
 
         var result = this.compiler.compile(node);
 
-        var jsContext = new JsContext();
+        var stmtContext = new JsStmt();
 
-        test.equal(result.renderExpr(jsContext), "function (val) {if (typeof val === 'string') return val.length;else if (Array.isArray(val)) return val.length;else if (typeof val === 'object') return Object.keys(val).length;}($_foo)");
+        test.equal(result.renderExpr(stmtContext), "function (val) {if (typeof val === 'string') return val.length;else if (Array.isArray(val)) return val.length;else if (typeof val === 'object') return Object.keys(val).length;}($_foo)");
         test.done();
     }
 };
@@ -487,9 +480,9 @@ module.exports["complement"] = {
 
         var result = this.compiler.compile(node);
 
-        var jsContext = new JsContext();
+        var stmtContext = new JsStmt();
 
-        test.equal(result.renderExpr(jsContext), "!$_foo");
+        test.equal(result.renderExpr(stmtContext), "!$_foo");
         test.done();
     }
 };
@@ -583,9 +576,8 @@ module.exports["assignment"] = {
         };
 
         var result = this.compiler.compile(node);
-        var jsContext = new JsContext();
-        test.throws(function () {result.renderExpr(jsContext);});
-        test.equal(result.renderStmt(jsContext), '$_foo = 57;');
+
+        test.equal(result.renderStmt(), '$_foo = 57;');
         test.equal(this.compiler.context.getStatus('foo'), 'ready');
         test.done();
     },
@@ -600,8 +592,8 @@ module.exports["assignment"] = {
         };
 
         var result = this.compiler.compile(node);
-        var jsContext = new JsContext();
-        test.equal(result.renderStmt(jsContext), '$_foo[$_bar] = 57;');
+
+        test.equal(result.renderStmt(), '$_foo[$_bar] = 57;');
 
         // context isn't modified by this
         test.equal(this.compiler.context.getStatus('foo'), undefined);
@@ -620,8 +612,8 @@ module.exports["assignment"] = {
         this.compiler.context.define('bar', 'ready');
 
         var result = this.compiler.compile(node);
-        var jsContext = new JsContext();
-        test.equal(result.renderStmt(jsContext), '$_foo = $_bar;');
+
+        test.equal(result.renderStmt(), '$_foo = $_bar;');
 
         test.equal(this.compiler.context.getStatus('foo'), 'ready');
         test.done();
@@ -637,10 +629,8 @@ module.exports["assignment"] = {
         };
 
         var result = this.compiler.compile(node);
-        var jsContext = new JsContext();
-//        test.equal(result.renderStmt(jsContext), '$_foo = $_bar();');
-        test.equal(result.renderStmt(jsContext), '$_foo = tmp_0;');
-        test.equal(this.compiler.context.getStatus('foo'), 'promise');
+
+        test.equal(result.renderStmt(), 'Q.spread([$_bar()], function (tmp_0) {\n    $_foo = tmp_0;\n}, result.reject);');
         test.done();
     }
 };
@@ -662,83 +652,83 @@ module.exports["subscript"] = {
 
         var result = this.compiler.compile(node);
 
-        var jsContext = new JsContext();
-        test.equal(result.renderExpr(jsContext), '$_foo[1]');
+        var stmtContext = new JsStmt();
+        test.equal(result.renderExpr(stmtContext), '$_foo[1]');
         test.done();
     }
 };
 
-module.exports["sequence"] = {
-
-    "setUp": function (cb) {
-        this.compiler = new Compiler();
-        cb();
-    },
-
-    "basic": function (test) {
-
-        var node = {
-            type: 'sequence',
-            first: {type: 'number', val: '2'},
-            last: {type: 'id', name: 'n'}
-        };
-
-        var result = this.compiler.compile(node);
-
-        test.equal(result.renderExpr(), 'function (first, last, action) {for (var num = first; num <= last; num++) {action(num);}}.bind(null,2,$_n)');
-        test.done();
-    }
-};
-
-module.exports["closure"] = {
-
-    "setUp": function (cb) {
-        this.compiler = new Compiler();
-        cb();
-    },
-
-    "basic": function (test) {
-
-        var node = {
-            type: 'closure',
-            statements: [
-                { type: 'receive', names: [ 'next' ] },
-                { type: 'assign',
-                    op: '*=',
-                    left: { type: 'id', name: 'result' },
-                    right: { type: 'id', name: 'next' } } ] };
-
-        var result = this.compiler.compile(node);
-
-        var jsContext = new JsContext();
-
-        test.equal(result.renderExpr(jsContext), 'function () {var $_next = args[0];\n$_result *= $_next;}');
-        test.done();
-    }
-};
-
-module.exports["connection"] = {
-
-    "setUp": function (cb) {
-        this.compiler = new Compiler();
-        cb();
-    },
-
-    "basic": function (test) {
-
-        var node = {
-            type: 'connection',
-            connector: '>>',
-            source: {type: 'id', name: 'foo'},
-            sink: {type: 'id', name: 'bar'}
-        };
-
-        var result = this.compiler.compile(node);
-
-        test.equal(result.renderStmt(), '$_foo.call(null,$_bar);');
-        test.done();
-    }
-};
+//module.exports["sequence"] = {
+//
+//    "setUp": function (cb) {
+//        this.compiler = new Compiler();
+//        cb();
+//    },
+//
+//    "basic": function (test) {
+//
+//        var node = {
+//            type: 'sequence',
+//            first: {type: 'number', val: '2'},
+//            last: {type: 'id', name: 'n'}
+//        };
+//
+//        var result = this.compiler.compile(node);
+//
+//        test.equal(result.renderExpr(), 'function (first, last, action) {for (var num = first; num <= last; num++) {action(num);}}.bind(null,2,$_n)');
+//        test.done();
+//    }
+//};
+//
+//module.exports["closure"] = {
+//
+//    "setUp": function (cb) {
+//        this.compiler = new Compiler();
+//        cb();
+//    },
+//
+//    "basic": function (test) {
+//
+//        var node = {
+//            type: 'closure',
+//            statements: [
+//                { type: 'receive', names: [ 'next' ] },
+//                { type: 'assign',
+//                    op: '*=',
+//                    left: { type: 'id', name: 'result' },
+//                    right: { type: 'id', name: 'next' } } ] };
+//
+//        var result = this.compiler.compile(node);
+//
+//        var jsContext = new JsContext();
+//
+//        test.equal(result.renderExpr(jsContext), 'function () {var $_next = args[0];\n$_result *= $_next;}');
+//        test.done();
+//    }
+//};
+//
+//module.exports["connection"] = {
+//
+//    "setUp": function (cb) {
+//        this.compiler = new Compiler();
+//        cb();
+//    },
+//
+//    "basic": function (test) {
+//
+//        var node = {
+//            type: 'connection',
+//            connector: '>>',
+//            source: {type: 'id', name: 'foo'},
+//            sink: {type: 'id', name: 'bar'}
+//        };
+//
+//        var result = this.compiler.compile(node);
+//
+//        test.equal(result.renderStmt(), '$_foo.call(null,$_bar);');
+//        test.done();
+//    }
+//};
 
 module.exports["termination"] = {
 

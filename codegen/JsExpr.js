@@ -27,15 +27,17 @@ __.prototype.getStatus = function () {
     return this.status;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * Renders the expression in the given statement context.
  *
- * @param jsContext
+ * @param stmtContext
  * @return {String}
  */
-__.prototype.renderExpr = function (jsContext) {
+__.prototype.renderExpr = function (stmtContext) {
 
     if (typeof this.expr === 'function') {
-        return this.expr(jsContext);
+        return this.expr(stmtContext);
     }
 
     return this.expr;

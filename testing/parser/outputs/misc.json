@@ -52,17 +52,17 @@
                 "type":"connection",
                 "connector":"~>",
                 "source":{"type":"request","to":{"type":"id","name":"foo"},"args":[]},
-                "sink":{"type":"block","statements":[
+                "sink":{"type":"closure","statements":[
                     {"type":"receive","names":["err"]},
                     {"type":"request","to":{"type":"id","name":"log"},"args":[{"type":"id","name":"err"}]},
                     {"type":"termination","channel":"reply","args":[{"type":"id","name":"fixed"}]}]}},
-            "sink":{"type":"block","statements":[
+            "sink":{"type":"closure","statements":[
                 {"type":"receive","names":["result"]}]}}},
         {"type":"assign","op":"=","left":{"type":"id","name":"index"},"right":{"type":"number","val":0}},
         {"type":"assign",
             "op":"=",
             "left":{"type":"id","name":"iterator"},
-            "right":{"type":"block","statements":[
+            "right":{"type":"closure","statements":[
                 {"type":"termination","channel":"reply","args":[
                     {"type":"subscript","list":{"type":"id","name":"items"},"index":{"type":"id","name":"index"}}]},
                 {"type":"assign","op":"++","left":{"type":"id","name":"index"}}]}},

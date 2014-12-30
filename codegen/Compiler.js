@@ -12,14 +12,12 @@
 var Q = require('q');
 var Context = require('./ExaContext');
 var JsExpr = require('./JsExpr');
-var JsCall = require('./JsCall');
-var JsOp = require('./JsOpExpr');
 var JsStmt = require('./JsStmt');
-var JsAssignment = require('./JsAssignment');
+var JsOp = require('./JsOpExpr');
 var JsConditional = require('./JsConditional');
 var JsFunction = require('./JsFunction');
 var JsStmtList = require('./JsStmtList');
-var JsListLiteral = require('./JsListLiteral');
+var JsCall = require('./JsCall');
 var util = require('util');
 
 var __ = function () {
@@ -292,12 +290,9 @@ __.prototype['closure'] = function (node) {
  */
 __.prototype['request'] = function (node) {
 
-    // when rendering needs, can think of that as defining a context in JS-land, with new vars in it
-
     var fnId = this.compile(node.to);
 
     var self = this;
-
     var args = node.args.map(function (arg) {
         return self.compile(arg);
     });
@@ -451,7 +446,9 @@ __.prototype['assign'] = function (node) {
         this.context.define(node.left.name, right.getStatus());
     }
 
-    return new JsAssignment(node.op, left, right);
+    return new JsStmt(function (stmtContext) {
+        return left.renderExpr(stmtContext) + ' ' + node.op + ' ' + right.renderExpr(stmtContext) + ';';
+    });
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

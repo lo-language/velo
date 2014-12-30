@@ -1,11 +1,14 @@
 /**
+ * Wraps an async function call in a way that can render a statement or an expression.
+ *
  * Created by: spurcell
  * 12/25/14
  */
 
 "use strict";
 
-var JsContext = require('./JsContext');
+var JsStmt = require('./JsStmt');
+var JsExpr = require('./JsExpr');
 
 var __ = function (fnVar, args) {
 
@@ -14,51 +17,66 @@ var __ = function (fnVar, args) {
 };
 
 __.prototype.getStatus = function () {
+
     return 'promise';
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Renders a JS function call.
  *
- * @param jsContext
+ * @param stmtContext
  * @return {String}
  */
-__.prototype.renderCall = function (jsContext) {
+__.prototype.renderCall = function (stmtContext) {
 
-    var nameExpr = this.fn.renderExpr(jsContext);
+    var nameExpr = this.fn.renderExpr(stmtContext);
     var argsExpr = this.args.map(
         function (arg) {
-            return arg.renderExpr(jsContext);
+            return arg.renderExpr(stmtContext);
         }).join(',');
 
     return nameExpr + '(' + argsExpr + ')';
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * Returns the expression value of this call.
  *
  * @param jsContext
  * @return {String}
  */
-__.prototype.renderExpr = function (jsContext) {
+__.prototype.renderExpr = function (stmtContext) {
 
-    // to use an async call as an expression, it needs to be replaced by a temp var and
-    // wrapped in a callback context
+    // to use an async call as an expression, we need to define a promise prereq in the context
 
-    return jsContext.addPromise(this);
+    var self = this;
+
+    // create a promise prereq in the current context; when this prereq is rendered, it may push
+    // prereqs of its own into the context (which will be different from the one defined for this invocation)
+
+    return stmtContext.definePrereq(new JsExpr(
+        function (stmtContext) {
+            return self.renderCall(stmtContext);
+        }
+    ), true);
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Renders the call as a standalone statement.
  *
  * @return {String}
  */
-__.prototype.renderStmt = function (jsContext) {
+__.prototype.renderStmt = function () {
 
-    var jsContext = new JsContext();
+    var self = this;
 
-    var stmt = this.renderCall(jsContext) + ';';
+    var stmt = new JsStmt(function (stmtContext) {
+        return self.renderCall(stmtContext) + ';';
+    });
 
-    return jsContext.render(stmt);
+    return stmt.renderStmt();
 };
 
 module.exports = __;

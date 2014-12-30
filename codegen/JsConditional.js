@@ -7,7 +7,7 @@
 
 "use strict";
 
-var JsContext = require('./JsContext');
+var JsStmt = require('./JsStmt');
 
 var __ = function (predicate, posBlock, negBlock) {
 
@@ -16,43 +16,48 @@ var __ = function (predicate, posBlock, negBlock) {
     this.negBlock = negBlock; // or else if stmt
 };
 
-__.prototype.renderExpr = function () {
-
-    throw new Error("conditional statement can't be used as expression");
-};
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @return {*}
+ */
 __.prototype.renderStmt = function () {
 
-    var jsContext = new JsContext();
+    var self = this;
 
-    var cond = 'if (' + this.predicate.renderExpr(jsContext) + ') {\n';
+    var stmt = new JsStmt(function (stmtContext) {
 
-    this.posBlock.forEach(function (stmt) {
-        cond += '    ' + stmt.renderStmt() + '\n';
+        var cond = 'if (' + self.predicate.renderExpr(stmtContext) + ') {\n';
+
+        self.posBlock.forEach(function (stmt) {
+            cond += '    ' + stmt.renderStmt() + '\n';
+        });
+
+        cond += '}';
+
+        if (self.negBlock !== undefined) {
+
+            cond += '\nelse ';
+
+            if (Array.isArray(self.negBlock)) {
+
+                cond += '{\n';
+
+                self.negBlock.forEach(function (stmt) {
+                    cond += '    ' + stmt.renderStmt() + '\n';
+                });
+
+                cond += '}';
+            }
+            else {
+                cond += self.negBlock.renderStmt();
+            }
+        }
+
+        return cond;
     });
 
-    cond += '}';
-
-    if (this.negBlock !== undefined) {
-
-        cond += '\nelse ';
-
-        if (Array.isArray(this.negBlock)) {
-
-            cond += '{\n';
-
-            this.negBlock.forEach(function (stmt) {
-                cond += '    ' + stmt.renderStmt() + '\n';
-            });
-
-            cond += '}';
-        }
-        else {
-            cond += this.negBlock.renderStmt();
-        }
-    }
-
-    return jsContext.render(cond);
+    return stmt.renderStmt();
 };
 
 module.exports = __;
