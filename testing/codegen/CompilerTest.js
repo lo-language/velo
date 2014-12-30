@@ -668,6 +668,78 @@ module.exports["subscript"] = {
     }
 };
 
+module.exports["sequence"] = {
+
+    "setUp": function (cb) {
+        this.compiler = new Compiler();
+        cb();
+    },
+
+    "basic": function (test) {
+
+        var node = {
+            type: 'sequence',
+            first: {type: 'number', val: '2'},
+            last: {type: 'id', name: 'n'}
+        };
+
+        var result = this.compiler.compile(node);
+
+        test.equal(result.renderExpr(), 'function (first, last, action) {for (var num = first; num <= last; num++) {action(num);}}.bind(null,2,$_n)');
+        test.done();
+    }
+};
+
+module.exports["closure"] = {
+
+    "setUp": function (cb) {
+        this.compiler = new Compiler();
+        cb();
+    },
+
+    "basic": function (test) {
+
+        var node = {
+            type: 'closure',
+            statements: [
+                { type: 'receive', names: [ 'next' ] },
+                { type: 'assign',
+                    op: '*=',
+                    left: { type: 'id', name: 'result' },
+                    right: { type: 'id', name: 'next' } } ] };
+
+        var result = this.compiler.compile(node);
+
+        var jsContext = new JsContext();
+
+        test.equal(result.renderExpr(jsContext), 'function () {var $_next = args[0];\n$_result *= $_next;}');
+        test.done();
+    }
+};
+
+module.exports["connection"] = {
+
+    "setUp": function (cb) {
+        this.compiler = new Compiler();
+        cb();
+    },
+
+    "basic": function (test) {
+
+        var node = {
+            type: 'connection',
+            connector: '>>',
+            source: {type: 'id', name: 'foo'},
+            sink: {type: 'id', name: 'bar'}
+        };
+
+        var result = this.compiler.compile(node);
+
+        test.equal(result.renderStmt(), '$_foo.call(null,$_bar);');
+        test.done();
+    }
+};
+
 module.exports["termination"] = {
 
     "setUp": function (cb) {

@@ -83,9 +83,9 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "*="                    return '*='
 "/="                    return '/='
 "%="                    return '%='
-"->"                    return '->'
-"~>"                    return '~>'
-">>"                    return '>>'
+"->"                    return '->' // success connector
+"~>"                    return '~>' // failure connector
+">>"                    return '>>' // sequence connector
 "+"                     return '+'
 "-"                     return '-'
 "*"                     return '*'
@@ -121,10 +121,10 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 %left '->' '~>' '>>'
 %left 'SEQ' 'AND' 'OR' 'IN'
+%left '==' '!=' '<' '>' '<=' '>='
 %left '+' '-'
 %left '*' '/' '%'
-%left '<' '>' '<=' '>='
-%left '==' '!='
+%nonassoc '#' '!'
 
 %%
 
@@ -211,7 +211,7 @@ literal
     | STRING -> {type: 'string', val: $1}
     | '[' (expr ',')* expr? ']' -> {type: "list", elements: $3 ? $2.concat([$3]): []}
     | '{' (dyad ',')* dyad? '}' -> {type: "set", members: $3 ? $2.concat([$3]): []}
-    | block -> {type: "block", statements: $1}
+    | block -> {type: "closure", statements: $1}
     ;
 
 dyad
@@ -247,7 +247,7 @@ expr
     | expr AND expr -> {type: "op", op: $2, left: $1, right: $3}
     | expr OR expr -> {type: "op", op: $2, left: $1, right: $3}
     | expr IN expr -> {type: "in", left: $1, right: $3}
-    | expr SEQ expr -> {type: "sequence", left: $1, right: $3}
+    | expr SEQ expr -> {type: "sequence", first: $1, last: $3}
     | connection
     ;
 

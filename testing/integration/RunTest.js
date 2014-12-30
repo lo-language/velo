@@ -143,3 +143,24 @@ module.exports['collections'] = {
         this.runner.success(test);
     }
 };
+
+module.exports['factorial2'] = {
+
+    "setUp": function (cb) {
+
+        this.runner = new TestRunner('factorial2');
+
+        this.runner.load(cb);
+    },
+
+    'success': function (test) {
+
+        console.error(this.runner.getJs());
+        this.runner.success(test, 10, 3628800);
+    },
+
+    'failure': function (test) {
+
+        this.runner.failure(test, -1, "I pity the fool!");
+    }
+};

@@ -222,11 +222,65 @@ __.prototype['in'] = function (node) {
  */
 __.prototype['sequence'] = function (node) {
 
-    var right = this.compile(node.operand);
+    var first = this.compile(node.first);
+    var last = this.compile(node.last);
+
+    // renders an expression that is a function that takes a single arg -
+    // the action to be performed
 
     return new JsExpr(
         function (jsContext) {
-            return '!' + right.renderExpr(jsContext)
+
+            // inject a var into the context
+            return jsContext.define(
+                'function (first, last, action) {' +
+                "for (var num = first; num <= last; num++) {" +
+                "action(num);" +
+                "}}.bind(null," + first.renderExpr(jsContext) + ',' + last.renderExpr(jsContext) + ")");
+        });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ */
+__.prototype['connection'] = function (node) {
+
+    // how to handle multiple connectors?
+
+    // sources and sinks are like calls in that they generate both statements and expressions
+    // they have expressions but inject statements into the context
+
+    var source = this.compile(node.source);
+    var sink = this.compile(node.sink);
+
+    return new JsStmt(function (jsContext) {
+        return source.renderExpr(jsContext) + '.call(null,' + sink.renderExpr(jsContext) + ')'
+    });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ */
+__.prototype['closure'] = function (node) {
+
+    var self = this;
+
+    var stmts = node.statements.map(function (stmt) {
+        return self.compile(stmt);
+    });
+
+    return new JsExpr(
+        function (jsContext) {
+
+            // inject a var into the context
+            return jsContext.define(
+                'function () {' + stmts.map(function (stmt) {
+                    return stmt.renderStmt(jsContext);
+                }).join('\n') + '}');
         });
 };
 

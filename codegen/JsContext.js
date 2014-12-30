@@ -11,9 +11,26 @@
 
 var __ = function () {
 
-    this.subs = [];
+    this.promises = [];
+    this.expressions = [];
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Defines a new variable in this context with the given value.
+ *
+ * @param expr - a JS expression
+ */
+__.prototype.defineExpr = function (expr) {
+
+    var subVarName = 'exp_' + this.expressions.length;
+
+    this.expressions.push(expr);
+
+    return subVarName;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Pushes a JsCall node into the context.
  *
@@ -23,15 +40,24 @@ __.prototype.addPromise = function (call) {
 
     var subVarName = 'tmp_' + this.subs.length;
 
-    this.subs.push(call);
+    this.promises.push(call);
 
     return subVarName;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Renders the given statement in this context.
  */
 __.prototype.render = function (stmt) {
+
+    // render the requirements
+    // we have two kinds of requirements - prereqs that need to be above, and promises that need to be resolved
+
+    var prereqs = this.expressions.map(function (expr, index) {
+
+        return expr.render(nested);
+    });
 
     // return the bare statement if there's no reason to wrap it
     if (this.subs.length == 0) {
@@ -41,7 +67,7 @@ __.prototype.render = function (stmt) {
     var nested = new __();  // the inner expr context becomes the OUTER function
 
     var args = [];
-    var promises = this.subs.map(function (sub, index) {
+    var promises = this.promises.map(function (sub, index) {
 
         args.push('tmp_' + index);
 

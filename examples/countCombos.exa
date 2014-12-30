@@ -35,7 +35,7 @@ combos = 0;
 
     receive node;
 
-    if path holds node
+    if node in path
         skip;
 
     // node is novel in the path; see if it's a legal next step
@@ -43,9 +43,9 @@ combos = 0;
     if path[] == 0
 
         if
-        (node == 2 and !(path holds 1)) or
-        (node == 6 and !(path holds 3)) or
-        (node == 8 and !(path holds 4))
+        (node == 2 and !(1 in path)) or
+        (node == 6 and !(3 in path)) or
+        (node == 8 and !(4 in path))
             skip;
 
     // todo fill in the rest of these - 3 per corner node, 1 per edge node, 16 cases total
