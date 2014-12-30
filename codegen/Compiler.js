@@ -200,7 +200,7 @@ __.prototype['complement'] = function (node) {
  *
  * @param node
  */
-__.prototype['holds'] = function (node) {
+__.prototype['in'] = function (node) {
 
     // should holds apply to strings? maybe as 'contains'? or some non-word operator?
 
@@ -209,10 +209,25 @@ __.prototype['holds'] = function (node) {
 
     return new JsExpr(
         function (jsContext) {
-            return 'function (collection, item) {' +
+            return 'function (item, collection) {' +
                 "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
                 "else if (typeof val === 'object') return collection.hasOwnProperty(item);" +
                 "}(" + left.renderExpr(jsContext) + ',' + right.renderExpr(jsContext) + ")"});
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ */
+__.prototype['sequence'] = function (node) {
+
+    var right = this.compile(node.operand);
+
+    return new JsExpr(
+        function (jsContext) {
+            return '!' + right.renderExpr(jsContext)
+        });
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

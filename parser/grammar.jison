@@ -100,7 +100,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "if"                    return 'IF'
 "else"                  return 'ELSE'
 "receive"               return 'RECEIVE'
-"holds"                 return 'HOLDS'
+"in"                    return 'IN'
 "skip"                  return 'SKIP'
 "reply"|"fail"          return 'CHANNEL'
 "stop"                  return 'STOP'
@@ -120,7 +120,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 %options token-stack
 
 %left '->' '~>' '>>'
-%left 'SEQ' 'AND' 'OR' 'HOLDS'
+%left 'SEQ' 'AND' 'OR' 'IN'
 %left '+' '-'
 %left '*' '/' '%'
 %left '<' '>' '<=' '>='
@@ -246,7 +246,7 @@ expr
     | expr '!=' expr -> {type: "op", op: $2, left: $1, right: $3}
     | expr AND expr -> {type: "op", op: $2, left: $1, right: $3}
     | expr OR expr -> {type: "op", op: $2, left: $1, right: $3}
-    | expr HOLDS expr -> {type: "holds", left: $1, right: $3}
+    | expr IN expr -> {type: "in", left: $1, right: $3}
     | expr SEQ expr -> {type: "sequence", left: $1, right: $3}
     | connection
     ;

@@ -33,10 +33,10 @@ if #dudes < 3
 // test membership
 // or should these be a in b?
 
-if list holds 'om'
+if 'om' in list
     fail('oops');
 
-if dudes holds 'trillian'
+if 'trillian' in dudes
     fail('not a dude');
 
 // shouldn't be necessary but is for now; otherwise we never conclude
