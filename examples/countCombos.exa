@@ -12,19 +12,19 @@ could easily have an event mode where something just dumps events on you
 could also have a coroutine mode where you don't get the next event until you signal for it
 because it's single threaded you'll get through the loop body, but there might be responses pending
 
-feed <collection>   // feeds a collection through an action
+foo =
+    yield(x);   // if yield is called rather than produce, sets up 2-way chat
 
-count NUM
+foo() >>
 
-repeat(NUM) >>
-count(NUM) >>
+    yield(z);
 
 */
 
 receive path;
 
 // base case - only one possibility left
-if # path == 8
+if #path == 8
     reply(1);
 
 // declare just to put in scope - can we make this unnecessary?
@@ -35,16 +35,17 @@ combos = 0;
 
     receive node;
 
-    if node in path // could also say "if path has node" or "contains node" - unless we use has for maps
+    if path holds node
         skip;
 
     // node is novel in the path; see if it's a legal next step
 
     if path[] == 0
 
-        if (node == 2 and 1 in path == false) or
-        (node == 6 and 3 in path == false) or
-        (node == 8 and 4 in path == false)
+        if
+        (node == 2 and !(path holds 1)) or
+        (node == 6 and !(path holds 3)) or
+        (node == 8 and !(path holds 4))
             skip;
 
     // todo fill in the rest of these - 3 per corner node, 1 per edge node, 16 cases total
@@ -52,6 +53,9 @@ combos = 0;
     // how do we know to not call the iter block action? does it not apply to non-root actions?
     // and how does this interact with the traversal?
     combos += recur(path + node);
+
+// this pisses me right off
+;
 
 // should this usage be enough to declare the var in this scope? i think it should
 reply(combos);

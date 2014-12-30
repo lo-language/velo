@@ -21,20 +21,9 @@ __.prototype.renderBody = function () {
 
     // maybe we should render statements INTO the js context? let it decide how to wrap them?
 
-    var body = [
-
-        // load the user arguments into args
-        'var args = Array.prototype.slice.call(arguments, 2);',
-        'var result = Q.defer();'
-    ];
-
-    this.stmts.forEach(function (stmt) {
-        body.push(stmt.renderStmt());
-    });
-
-    body.push('\nreturn result.promise;');
-
-    return body.join('\n') + '\n';
+    return this.stmts.reduce(function (prev, stmt) {
+        return prev + stmt.renderStmt() + '\n';
+    }, '');
 };
 
 module.exports = __;

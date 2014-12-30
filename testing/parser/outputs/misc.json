@@ -46,11 +46,11 @@
             "args":[]},
         {"type":"assign","op":"=","left":{"type":"id","name":"monkeys"},"right":{"type":"number","val":72}},
         {"type":"assign","op":"=","left":{"type":"id","name":"result"},"right":{
-            "type":"flow",
-            "filter":"->",
+            "type":"connection",
+            "connector":"->",
             "source":{
-                "type":"flow",
-                "filter":"~>",
+                "type":"connection",
+                "connector":"~>",
                 "source":{"type":"request","to":{"type":"id","name":"foo"},"args":[]},
                 "sink":{"type":"block","statements":[
                     {"type":"receive","names":["err"]},

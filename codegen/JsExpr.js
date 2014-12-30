@@ -18,6 +18,10 @@ var __ = function (expr, status) {
     this.status = status;
 };
 
+__.READY = 2;
+__.PENDING = 1;
+__.UNKNOWN = 0;
+
 // could alternatively have different expr classes for the different statuses
 __.prototype.getStatus = function () {
     return this.status;
@@ -29,6 +33,11 @@ __.prototype.getStatus = function () {
  * @return {String}
  */
 __.prototype.renderExpr = function (jsContext) {
+
+    if (typeof this.expr === 'function') {
+        return this.expr(jsContext);
+    }
+
     return this.expr;
 };
 

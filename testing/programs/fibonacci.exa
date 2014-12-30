@@ -1,5 +1,5 @@
 /*
- * recursive fibonacci number calculator
+ * Calculates the nth fibonacci number using näive binary recursion
  */
 
 receive n;

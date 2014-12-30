@@ -422,7 +422,7 @@ module.exports["program"] = {
         var result = this.compiler.compile(node);
 
         test.equal(result.renderBody(),
-            'var args = Array.prototype.slice.call(arguments, 2);\nvar result = Q.defer();\n$_foo = $_bar;\n\nreturn result.promise;\n');
+            '$_foo = $_bar;\n');
         test.done();
     }
 };
@@ -444,6 +444,52 @@ module.exports["receive"] = {
         var result = this.compiler.compile(node);
 
         test.equal(result.renderStmt(), 'var $_foo = args[0],\n$_mani = args[1],\n$_padme = args[2],\n$_hum = args[3];');
+        test.done();
+    }
+};
+
+module.exports["cardinality"] = {
+
+    "setUp": function (cb) {
+        this.compiler = new Compiler();
+        cb();
+    },
+
+    "generates js expression": function (test) {
+
+        var node = {
+            type: 'cardinality',
+            operand: {type: 'id', name: 'foo'}
+        };
+
+        var result = this.compiler.compile(node);
+
+        var jsContext = new JsContext();
+
+        test.equal(result.renderExpr(jsContext), "function (val) {if (typeof val === 'string') return val.length;else if (Array.isArray(val)) return val.length;else if (typeof val === 'object') return Object.keys(val).length;}($_foo)");
+        test.done();
+    }
+};
+
+module.exports["complement"] = {
+
+    "setUp": function (cb) {
+        this.compiler = new Compiler();
+        cb();
+    },
+
+    "generates js expression": function (test) {
+
+        var node = {
+            type: 'complement',
+            operand: {type: 'id', name: 'foo'}
+        };
+
+        var result = this.compiler.compile(node);
+
+        var jsContext = new JsContext();
+
+        test.equal(result.renderExpr(jsContext), "!$_foo");
         test.done();
     }
 };

@@ -1,0 +1,46 @@
+/**
+ * Created by: spurcell
+ * 12/25/14
+ */
+
+// list literal
+list = ['foo', 'mani', 'padme', 'hum'];
+
+// set literal with intentional repetition
+dudes = {'zaphod', 'ford', 'arthur', 'ford'};
+
+// map literal
+// support block syntax (no braces)?
+//map = {'manhattan': 'new york', 'brooklyn': 'kings', 'queens': 'queens'};
+
+// test cardinality
+
+name = "snooks";
+
+if #name < 6
+    fail("WHAT?!");
+
+if #list != 4
+    fail("what the deuce?!");
+
+if #dudes < 3
+    fail("not very froody");
+
+// todo throw an error on undefined identifiers
+//if #set != 3
+//    fail("surely you're joking");
+
+// test membership
+// or should these be a in b?
+
+if list holds 'om'
+    fail('oops');
+
+if dudes holds 'trillian'
+    fail('not a dude');
+
+// shouldn't be necessary but is for now; otherwise we never conclude
+reply();
+
+//if #map != 3
+//    fail("a most unpleasant situation, captain");

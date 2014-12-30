@@ -68,7 +68,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 ","                     return ','
 ":"                     return ':'
 ";"                     return ';'
-".."                    return '..'
+".."                    return 'SEQ'
 "."                     return '.'
 "<="                    return '<='
 ">="                    return '>='
@@ -100,11 +100,11 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "if"                    return 'IF'
 "else"                  return 'ELSE'
 "receive"               return 'RECEIVE'
+"holds"                 return 'HOLDS'
 "skip"                  return 'SKIP'
 "reply"|"fail"          return 'CHANNEL'
 "stop"                  return 'STOP'
 "try"                   return 'TRY'
-"in"                    return 'IN'
 {id}                    return 'ID'
 .                       return 'INVALID'
 
@@ -119,13 +119,12 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 %options token-stack
 
+%left '->' '~>' '>>'
+%left 'SEQ' 'AND' 'OR' 'HOLDS'
 %left '+' '-'
 %left '*' '/' '%'
 %left '<' '>' '<=' '>='
 %left '==' '!='
-%nonassoc IN
-%left 'AND' 'OR'
-%left '->' '~>' '>>'
 
 %%
 
@@ -228,8 +227,8 @@ request
 
 unary_expr
     : atom
-    | '#' atom -> {type: "unary_op", op: $1, right: $2}
-    | '!' atom -> {type: "unary_op", op: $1, right: $2}
+    | '#' atom -> {type: "cardinality", operand: $2}
+    | '!' atom -> {type: "complement", operand: $2}
     ;
 
 expr
@@ -245,14 +244,15 @@ expr
     | expr '>=' expr -> {type: "op", op: $2, left: $1, right: $3}
     | expr '==' expr -> {type: "op", op: $2, left: $1, right: $3}
     | expr '!=' expr -> {type: "op", op: $2, left: $1, right: $3}
-    | expr IN expr -> {type: "op", op: $2, left: $1, right: $3}
     | expr AND expr -> {type: "op", op: $2, left: $1, right: $3}
     | expr OR expr -> {type: "op", op: $2, left: $1, right: $3}
-    | interaction
+    | expr HOLDS expr -> {type: "holds", left: $1, right: $3}
+    | expr SEQ expr -> {type: "sequence", left: $1, right: $3}
+    | connection
     ;
 
-interaction
-    : expr '->' expr -> {type: "flow", filter: $2, source: $1, sink: $3}
-    | expr '~>' expr -> {type: "flow", filter: $2, source: $1, sink: $3}
-    | expr '>>' expr -> {type: "flow", filter: $2, source: $1, sink: $3}
+connection
+    : expr '->' expr -> {type: "connection", connector: $2, source: $1, sink: $3}
+    | expr '~>' expr -> {type: "connection", connector: $2, source: $1, sink: $3}
+    | expr '>>' expr -> {type: "connection", connector: $2, source: $1, sink: $3}
     ;

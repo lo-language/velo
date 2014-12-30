@@ -12,13 +12,12 @@ var __ = function (op, left, right) {
     this.op = op;
     this.left = left;
     this.right = right;
-    this.isReady = left.isReady && right.isReady;
 };
 
 __.prototype.getStatus = function () {
 
-    var leftStatus = left.getStatus();
-    var rightStatus = right.getStatus();
+    var leftStatus = this.left.getStatus();
+    var rightStatus = this.right.getStatus();
 
     if (leftStatus === 'ready' && rightStatus === 'ready') {
         return 'ready';

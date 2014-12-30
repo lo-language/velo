@@ -39,5 +39,5 @@ num = 1;
     num = j + k;
     j = k;
     k = num;
-
-reply(num);
+->
+    reply(num);

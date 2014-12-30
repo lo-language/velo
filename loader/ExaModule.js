@@ -74,7 +74,17 @@ __.prototype.load = function () {
         // this doesn't leak the local scope, but doesn't hide globals, either
         // but name wrapping should make the globals unaddressable - unless there's one that starts with $_
 
-        this.fn = new Function('Q, $_recur', this.compile());
+        var header = [
+
+            // load the user arguments into args
+            'var args = Array.prototype.slice.call(arguments, 3);',
+            'var result = Q.defer();'
+
+        ].join('\n') + '\n';
+
+        var footer = 'return result.promise;\n';
+
+        this.fn = new Function('Q, $_info, $_recur', header + this.compile() + footer);
     }
 };
 
@@ -90,7 +100,7 @@ __.prototype.run = function () {
         this.load();
     }
 
-    var recur = this.fn.bind(null, Q, function () {
+    var recur = this.fn.bind(null, Q, console.error, function () {
 //        console.log('recurring: ' + util.inspect(arguments));
         return recur.apply(null, arguments);
     });

@@ -19,6 +19,7 @@ var JsAssignment = require('./JsAssignment');
 var JsConditional = require('./JsConditional');
 var JsFunction = require('./JsFunction');
 var JsStmtList = require('./JsStmtList');
+var JsListLiteral = require('./JsListLiteral');
 var util = require('util');
 
 var __ = function () {
@@ -99,7 +100,51 @@ __.prototype['number'] = function (node) {
 __.prototype['string'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return new JsExpr("'" + node.val + "'", 'ready');
+    return new JsExpr("'" + node.val.replace(/'/g, "\\'") + "'", 'ready');
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ */
+__.prototype['list'] = function (node) {
+
+    // list literals might have members that need to be resolved
+
+    var self = this;
+
+    var items = node.elements.map(function (item) {
+        return self.compile(item);
+    });
+
+    return new JsExpr(function (jsContext) {
+        return '[' + items.map(function (item) {
+            return item.renderExpr(jsContext)
+        }).join(',') + ']';
+    });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ */
+__.prototype['set'] = function (node) {
+
+    // list literals might have members that need to be resolved
+
+    var self = this;
+
+    var members = node.members.map(function (member) {
+        return self.compile(member);
+    });
+
+    return new JsExpr(function (jsContext) {
+        return '{' + members.map(function (member) {
+            return member.renderExpr(jsContext) + ': true'
+        }).join(',') + '}';
+    });
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,6 +155,64 @@ __.prototype['string'] = function (node) {
 __.prototype['id'] = function (node) {
 
     return new JsExpr('$_' + node.name, this.context.getStatus(node.name));
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ */
+__.prototype['cardinality'] = function (node) {
+
+    var right = this.compile(node.operand);
+
+    // wrap in small function? inspects type then gets size?
+
+    // make a general JS code class? that can hold string and expr parts?
+    // do we really need the JS AST level? or could we compile directly in one pass?
+
+    return new JsExpr(
+        function (jsContext) {
+            return 'function (val) {' +
+            "if (typeof val === 'string') return val.length;" +
+            "else if (Array.isArray(val)) return val.length;" +
+            "else if (typeof val === 'object') return Object.keys(val).length;" +
+            "}(" + right.renderExpr(jsContext) + ")"});
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ */
+__.prototype['complement'] = function (node) {
+
+    var right = this.compile(node.operand);
+
+    return new JsExpr(
+        function (jsContext) {
+            return '!' + right.renderExpr(jsContext)
+        });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ */
+__.prototype['holds'] = function (node) {
+
+    // should holds apply to strings? maybe as 'contains'? or some non-word operator?
+
+    var left = this.compile(node.left);
+    var right = this.compile(node.right);
+
+    return new JsExpr(
+        function (jsContext) {
+            return 'function (collection, item) {' +
+                "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
+                "else if (typeof val === 'object') return collection.hasOwnProperty(item);" +
+                "}(" + left.renderExpr(jsContext) + ',' + right.renderExpr(jsContext) + ")"});
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
