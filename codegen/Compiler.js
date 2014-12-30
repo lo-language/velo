@@ -1,10 +1,5 @@
 /**
- * The Exa-to-Node compiler/VM
- *
- * the design of this language is predicated on automated testing -
- * errors that could conceivably be detected at compile-time ARE NOT
- *
- * ॐ मणिपद्मे हूं
+ * The Exa-to-JS compiler
  */
 
 'use strict';
@@ -13,7 +8,6 @@ var Q = require('q');
 var Context = require('./ExaContext');
 var JsExpr = require('./JsExpr');
 var JsStmt = require('./JsStmt');
-var JsOp = require('./JsOpExpr');
 var JsConditional = require('./JsConditional');
 var JsFunction = require('./JsFunction');
 var JsStmtList = require('./JsStmtList');
@@ -227,14 +221,14 @@ __.prototype['sequence'] = function (node) {
     // the action to be performed
 
     return new JsExpr(
-        function (jsContext) {
+        function (stmtContext) {
 
             // inject a var into the context
-            return jsContext.define(
+            return stmtContext.definePrereq(
                 'function (first, last, action) {' +
                 "for (var num = first; num <= last; num++) {" +
                 "action(num);" +
-                "}}.bind(null," + first.renderExpr(jsContext) + ',' + last.renderExpr(jsContext) + ")");
+                "}}.bind(null," + first.renderExpr(stmtContext) + ',' + last.renderExpr(stmtContext) + ")");
         });
 };
 
@@ -253,8 +247,8 @@ __.prototype['connection'] = function (node) {
     var source = this.compile(node.source);
     var sink = this.compile(node.sink);
 
-    return new JsStmt(function (jsContext) {
-        return source.renderExpr(jsContext) + '.call(null,' + sink.renderExpr(jsContext) + ')'
+    return new JsExpr(function (stmtContext) {
+        return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
     });
 };
 
@@ -272,12 +266,12 @@ __.prototype['closure'] = function (node) {
     });
 
     return new JsExpr(
-        function (jsContext) {
+        function (stmtContext) {
 
             // inject a var into the context
-            return jsContext.define(
+            return stmtContext.definePrereq(
                 'function () {' + stmts.map(function (stmt) {
-                    return stmt.renderStmt(jsContext);
+                    return stmt.renderStmt(stmtContext);
                 }).join('\n') + '}');
         });
 };
@@ -322,7 +316,11 @@ __.prototype['op'] = function (node) {
 //        throw new Error("right operand not defined");
 //    }
 
-    return new JsOp(node.op, left, right);
+    return new JsExpr(function (stmtContext) {
+
+        // use parens to be safe
+        return '(' + left.renderExpr(stmtContext) + ' ' + node.op + ' ' + right.renderExpr(stmtContext) + ')';
+    });
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -465,21 +463,9 @@ __.prototype['subscript'] = function (node) {
     var left = this.compile(node.list);
     var right = this.compile(node.index);
 
-    return new JsOp('subscript', left, right);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Renders a child node as a statement, including its needs, assuming it has been compiled.
- *
- * @param node
- * @return {String}
- */
-__.prototype['exprStatement'] = function(node) {
-
-    var expr = this.compile(node.expr);
-
-    return new JsStmt(expr);
+    return new JsExpr(function (stmtContext) {
+        return left.renderExpr(stmtContext) + '[' + right.renderExpr(stmtContext) + ']';
+    });
 };
 
 module.exports = __;

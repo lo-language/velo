@@ -11,8 +11,6 @@
 
 "use strict";
 
-var JsExpr = require('./JsExpr');
-
 var __ = function (stmt) {
 
     this.numPrereqs = 0;
@@ -65,11 +63,11 @@ __.prototype.renderStmt = function () {
     var stmt = (typeof this.stmt === 'function' ? this.stmt(this) : this.stmt);
 
     // render the prereqs
-    // todo figure out if this works if they're nested
+    // todo figure out if this works if they're nested - I think it does not
 
     var self = this;
     var prereqs = Object.keys(this.prereqs).reduce(function (prev, varName) {
-        return prev + 'var ' + varName + ' = ' + self.prereqs[varName].renderExpr(this) + ';\n';
+        return prev + 'var ' + varName + ' = ' + self.prereqs[varName].renderExpr(self) + ';\n';
     }, '');
 
     stmt = prereqs + stmt;
@@ -104,3 +102,4 @@ __.prototype.renderStmt = function () {
 
 module.exports = __;
 
+var JsExpr = require('./JsExpr');

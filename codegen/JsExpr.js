@@ -10,7 +10,7 @@
 /**
  *
  * @param expr
- * @param isReady   true if this expression can immediately resolve to a value (contains no potential promises)
+ * @param status
  * @private
  */
 var __ = function (expr, status) {
@@ -36,6 +36,10 @@ __.prototype.getStatus = function () {
  */
 __.prototype.renderExpr = function (stmtContext) {
 
+    if (stmtContext === undefined) {
+        throw new Error("missing statement context");
+    }
+
     if (typeof this.expr === 'function') {
         return this.expr(stmtContext);
     }
@@ -43,5 +47,23 @@ __.prototype.renderExpr = function (stmtContext) {
     return this.expr;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Renders the expression as a standalone statement.
+ *
+ * @return {String}
+ */
+__.prototype.renderStmt = function () {
+
+    var self = this;
+
+    var stmt = new JsStmt(function (stmtContext) {
+        return self.renderExpr(stmtContext) + ';';
+    });
+
+    return stmt.renderStmt();
+};
+
 module.exports = __;
 
+var JsStmt = require('./JsStmt');
