@@ -7,6 +7,7 @@
 
 var Compiler = require('../../codegen/Compiler');
 var JsStmt = require('../../codegen/JsStmt');
+var Scope = require('../../codegen/Scope');
 var util = require('util');
 
 
@@ -23,7 +24,7 @@ module.exports["literals"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.getStatus(), 'ready');
+        test.ok(result.isReady());
 
         var stmtContext = new JsStmt();
         test.equal(result.renderExpr(stmtContext), 'true');
@@ -36,7 +37,7 @@ module.exports["literals"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.getStatus(), 'ready');
+        test.ok(result.isReady());
 
         var stmtContext = new JsStmt();
         test.equal(result.renderExpr(stmtContext), '42');
@@ -49,7 +50,7 @@ module.exports["literals"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.getStatus(), 'ready');
+        test.ok(result.isReady());
 
         var stmtContext = new JsStmt();
         test.equal(result.renderExpr(stmtContext), "'turanga leela'");
@@ -78,7 +79,7 @@ module.exports["identifiers"] = {
 
         var node = {type: 'id', name: 'foo'};
 
-        this.compiler.context.define('foo', true);
+        this.compiler.scope.define('foo', true);
 
         var result = this.compiler.compile(node);
 
@@ -585,7 +586,7 @@ module.exports["assignment"] = {
         var result = this.compiler.compile(node);
 
         test.equal(result.renderStmt(), '$_foo = 57;');
-        test.equal(this.compiler.context.getStatus('foo'), 'ready');
+        test.ok(this.compiler.scope.getStatus('foo'));
         test.done();
     },
 
@@ -603,7 +604,7 @@ module.exports["assignment"] = {
         test.equal(result.renderStmt(), '$_foo[$_bar] = 57;');
 
         // context isn't modified by this
-        test.equal(this.compiler.context.getStatus('foo'), undefined);
+        test.throws(function () {this.compiler.scope.isReady('foo')});
         test.done();
     },
 
@@ -616,13 +617,13 @@ module.exports["assignment"] = {
             right: {type: 'id', name: 'bar'}
         };
 
-        this.compiler.context.define('bar', 'ready');
+        this.compiler.scope.define('bar', true);
 
         var result = this.compiler.compile(node);
 
         test.equal(result.renderStmt(), '$_foo = $_bar;');
 
-        test.equal(this.compiler.context.getStatus('foo'), 'ready');
+//        test.ok(this.compiler.scope.getStatus('foo'));
         test.done();
     },
 

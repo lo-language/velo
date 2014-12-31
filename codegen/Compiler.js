@@ -5,7 +5,7 @@
 'use strict';
 
 var Q = require('q');
-var Context = require('./ExaContext');
+var Scope = require('./Scope');
 var JsExpr = require('./JsExpr');
 var JsStmt = require('./JsStmt');
 var JsConditional = require('./JsConditional');
@@ -16,9 +16,7 @@ var util = require('util');
 
 var __ = function () {
 
-    // just merge context into this class?
-    // should we call compile on a context or on an AST node? going with context for now
-    this.context = new Context();
+    this.scope = new Scope();
 };
 
 /*
@@ -70,7 +68,7 @@ __.prototype.compile = function (node) {
 __.prototype['boolean'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return new JsExpr(node.val ? 'true' : 'false', 'ready');
+    return new JsExpr(node.val ? 'true' : 'false', true);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,7 +79,7 @@ __.prototype['boolean'] = function (node) {
 __.prototype['number'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return new JsExpr("" + node.val, 'ready');
+    return new JsExpr("" + node.val, true);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,7 +90,7 @@ __.prototype['number'] = function (node) {
 __.prototype['string'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return new JsExpr("'" + node.val.replace(/'/g, "\\'") + "'", 'ready');
+    return new JsExpr("'" + node.val.replace(/'/g, "\\'") + "'", true);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -110,9 +108,9 @@ __.prototype['list'] = function (node) {
         return self.compile(item);
     });
 
-    return new JsExpr(function (jsContext) {
+    return new JsExpr(function (stmtContext) {
         return '[' + items.map(function (item) {
-            return item.renderExpr(jsContext)
+            return item.renderExpr(stmtContext)
         }).join(',') + ']';
     });
 };
@@ -132,9 +130,9 @@ __.prototype['set'] = function (node) {
         return self.compile(member);
     });
 
-    return new JsExpr(function (jsContext) {
+    return new JsExpr(function (stmtContext) {
         return '{' + members.map(function (member) {
-            return member.renderExpr(jsContext) + ': true'
+            return member.renderExpr(stmtContext) + ': true'
         }).join(',') + '}';
     });
 };
@@ -146,7 +144,7 @@ __.prototype['set'] = function (node) {
  */
 __.prototype['id'] = function (node) {
 
-    return new JsExpr('$_' + node.name, this.context.getStatus(node.name));
+    return new JsExpr('$_' + node.name);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -164,12 +162,12 @@ __.prototype['cardinality'] = function (node) {
     // do we really need the JS AST level? or could we compile directly in one pass?
 
     return new JsExpr(
-        function (jsContext) {
+        function (stmtContext) {
             return 'function (val) {' +
             "if (typeof val === 'string') return val.length;" +
             "else if (Array.isArray(val)) return val.length;" +
             "else if (typeof val === 'object') return Object.keys(val).length;" +
-            "}(" + right.renderExpr(jsContext) + ")"});
+            "}(" + right.renderExpr(stmtContext) + ")"});
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -182,8 +180,8 @@ __.prototype['complement'] = function (node) {
     var right = this.compile(node.operand);
 
     return new JsExpr(
-        function (jsContext) {
-            return '!' + right.renderExpr(jsContext)
+        function (stmtContext) {
+            return '!' + right.renderExpr(stmtContext)
         });
 };
 
@@ -200,11 +198,11 @@ __.prototype['in'] = function (node) {
     var right = this.compile(node.right);
 
     return new JsExpr(
-        function (jsContext) {
+        function (stmtContext) {
             return 'function (item, collection) {' +
                 "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
                 "else if (typeof val === 'object') return collection.hasOwnProperty(item);" +
-                "}(" + left.renderExpr(jsContext) + ',' + right.renderExpr(jsContext) + ")"});
+                "}(" + left.renderExpr(stmtContext) + ',' + right.renderExpr(stmtContext) + ")"});
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -261,16 +259,28 @@ __.prototype['closure'] = function (node) {
 
     var self = this;
 
+    // create a child scope for the closure
+    var child = this.scope.bud();
+
+    // todo - fix this atrocity
+    var parent = this.scope;
+    this.scope = child;
+
+    // compile the statements in the child scope
     var stmts = node.statements.map(function (stmt) {
         return self.compile(stmt);
     });
+
+    this.scope = parent;
 
     return new JsExpr(
         function (stmtContext) {
 
             // inject a var into the context
             return stmtContext.definePrereq(
-                'function () {' + stmts.map(function (stmt) {
+                'function () {\n' +
+                    'var args = Array.prototype.slice.call(arguments);' +
+                    stmts.map(function (stmt) {
                     return stmt.renderStmt(stmtContext);
                 }).join('\n') + '}');
         });
@@ -352,8 +362,8 @@ __.prototype['receive'] = function (node) {
 
     node.names.forEach(function (name) {
 
-        // alter the context for following statements
-        var argNum = self.context.defineArg(name);
+        // alter the scope for following statements
+        var argNum = self.scope.defineArg(name);
 
         vars.push('$_' + name + ' = ' + 'args[' + argNum + ']');
     });
@@ -421,7 +431,7 @@ __.prototype['termination'] = function (node) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * An assignment may alter the current context by creating a variable in the context - if the LHS of the assign
+ * An assignment may alter the current scope by defining a variable in it if the LHS of the assign
  * is a simple identifier.
  *
  * @param node
@@ -433,15 +443,15 @@ __.prototype['assign'] = function (node) {
     var left = this.compile(node.left);
     var right = this.compile(node.right);
 
-    // is being ready a property of an AST node + exa context?
+    // is being ready a property of an AST node + exa scope?
     // is tracking ready state just an optimization? or do we need it to not have turtles all the way down?
     // can we 'ask' the ast node if it's ready?
     // the compilation result should know that already, right?
 
-    // modify the exa context
+    // modify the exa scope
 
     if (node.left.type == 'id') {
-        this.context.define(node.left.name, right.getStatus());
+        this.scope.define(node.left.name, right.isReady());
     }
 
     return new JsStmt(function (stmtContext) {
@@ -451,8 +461,6 @@ __.prototype['assign'] = function (node) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * An assignment may alter the current context by creating a variable in the context - if the LHS of the assign
- * is a simple identifier.
  *
  * @param node
  */

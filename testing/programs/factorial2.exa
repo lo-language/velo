@@ -21,7 +21,7 @@ result = 1;
 // they're handling responses, after all, which might have empty envelopes
 
 // should have a compiler warning if you only attach -> to a sequence
-2..n >>
+2..num >>
     receive next;
     result *= next;
 // this tears at my very soul

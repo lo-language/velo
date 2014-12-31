@@ -7,24 +7,29 @@
 
 "use strict";
 
+var Scope = require('./Scope');
+
 /**
  *
  * @param expr
- * @param status
+ * @param ready
  * @private
  */
-var __ = function (expr, status) {
+var __ = function (expr, ready) {
+
     this.expr = expr;
-    this.status = status;
+    this.ready = ready;
 };
 
-__.READY = 2;
-__.PENDING = 1;
-__.UNKNOWN = 0;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns true if this expression is "ready" (not a promise), false otherwise.
+ *
+ * @return {boolean}
+ */
+__.prototype.isReady = function () {
 
-// could alternatively have different expr classes for the different statuses
-__.prototype.getStatus = function () {
-    return this.status;
+    return this.ready;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

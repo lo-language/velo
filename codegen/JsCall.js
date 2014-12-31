@@ -16,9 +16,8 @@ var __ = function (fnVar, args) {
     this.args = args;
 };
 
-__.prototype.getStatus = function () {
-
-    return 'promise';
+__.prototype.isReady = function () {
+    return false;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
