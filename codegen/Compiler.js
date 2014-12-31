@@ -395,11 +395,7 @@ __.prototype['receive'] = function (node, scope) {
     // todo - shift args off instead of tracking count
 
     node.names.forEach(function (name) {
-
-        // alter the scope for following statements
-        var argNum = scope.defineArg(name);
-
-        vars.push('$_' + name + ' = ' + 'args[' + argNum + ']');
+        vars.push('$_' + name + ' = ' + 'args.shift()');
     });
 
     var stmt = 'var ' + vars.join(',\n') + ';';

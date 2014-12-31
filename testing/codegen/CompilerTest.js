@@ -464,7 +464,7 @@ module.exports["receive"] = {
 
         var result = this.compiler.compile(node, new Scope());
 
-        test.equal(result.renderStmt(), 'var $_foo = args[0],\n$_mani = args[1],\n$_padme = args[2],\n$_hum = args[3];');
+        test.equal(result.renderStmt(), 'var $_foo = args.shift(),\n$_mani = args.shift(),\n$_padme = args.shift(),\n$_hum = args.shift();');
         test.done();
     }
 };
@@ -760,7 +760,7 @@ module.exports["closure"] = {
 
         test.equal(result.renderExpr(stmtContext), 'tmp_0');
         test.equal(stmtContext.prereqs['tmp_0'].renderExpr(stmtContext),
-            "function () {\nvar args = Array.prototype.slice.call(arguments);var $_next = args[0];\n$_result *= $_next;}");
+            "function () {\nvar args = Array.prototype.slice.call(arguments);var $_next = args.shift();\n$_result *= $_next;}");
         test.done();
     }
 };

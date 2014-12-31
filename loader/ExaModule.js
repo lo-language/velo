@@ -89,7 +89,7 @@ __.prototype.load = function () {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Runs the program, returning a promise for the result.
+ * Runs the program, passing in the arguments we're given, returning a promise for the result.
  *
  * @return {promise}
  */
@@ -118,13 +118,6 @@ __.prototype.writeExe = function (path) {
     source += '$_recur([]).then(console.log, console.error);\n'
 
     fs.writeFileSync(path, source);
-
-//    var recur = this.fn.bind(null, Q, console.error, function () {
-////        console.log('recurring: ' + util.inspect(arguments));
-//        return recur.apply(null, arguments);
-//    });
-//
-//    return recur.apply(null, arguments);
 };
 
 module.exports = __;
