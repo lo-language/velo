@@ -14,27 +14,6 @@ j = 0;
 k = 1;
 num = 1;
 
-// we want a count function that emits, don't want to generate a huge array and scan it
-// count(x, y, z) counts from x to y by z
-// don't like having a new keyword/special function, but this is just doing what for does
-// is it a problem that it looks like a request??
-// should we take the parens away?
-// could we do this recursively?
-
-//(0,1) ->
-//    receive j, k
-//
-//    if
-//
-//    else
-//        recur();
-
-// calling it count could imply like counting elements in a collection
-//count 2, n >>
-//    num = j + k;
-//    j = k;
-//    k = num;
-
 2..n >>
     num = j + k;
     j = k;

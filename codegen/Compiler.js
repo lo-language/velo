@@ -16,7 +16,6 @@ var util = require('util');
 
 var __ = function () {
 
-    this.scope = new Scope();
 };
 
 /*
@@ -49,20 +48,22 @@ only works if we don't switch fn ptrs around
  * JS nodes.
  *
  * @param node
+ * @param scope
  * @return {*}
  */
-__.prototype.compile = function (node) {
+__.prototype.compile = function (node, scope) {
 
     if (this[node.type] === undefined) {
         throw new Error("don't know how to compile node type '" + node.type + "'");
     }
 
-    return this[node.type](node);
+    return this[node.type](node, scope);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
 __.prototype['boolean'] = function (node) {
@@ -74,6 +75,7 @@ __.prototype['boolean'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
 __.prototype['number'] = function (node) {
@@ -85,6 +87,7 @@ __.prototype['number'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
 __.prototype['string'] = function (node) {
@@ -96,16 +99,17 @@ __.prototype['string'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
-__.prototype['list'] = function (node) {
+__.prototype['list'] = function (node, scope) {
 
     // list literals might have members that need to be resolved
 
     var self = this;
 
     var items = node.elements.map(function (item) {
-        return self.compile(item);
+        return self.compile(item, scope);
     });
 
     return new JsExpr(function (stmtContext) {
@@ -118,16 +122,17 @@ __.prototype['list'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
-__.prototype['set'] = function (node) {
+__.prototype['set'] = function (node, scope) {
 
     // list literals might have members that need to be resolved
 
     var self = this;
 
     var members = node.members.map(function (member) {
-        return self.compile(member);
+        return self.compile(member, scope);
     });
 
     return new JsExpr(function (stmtContext) {
@@ -140,6 +145,7 @@ __.prototype['set'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
 __.prototype['id'] = function (node) {
@@ -150,11 +156,12 @@ __.prototype['id'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
-__.prototype['cardinality'] = function (node) {
+__.prototype['cardinality'] = function (node, scope) {
 
-    var right = this.compile(node.operand);
+    var right = this.compile(node.operand, scope);
 
     // wrap in small function? inspects type then gets size?
 
@@ -173,11 +180,12 @@ __.prototype['cardinality'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
-__.prototype['complement'] = function (node) {
+__.prototype['complement'] = function (node, scope) {
 
-    var right = this.compile(node.operand);
+    var right = this.compile(node.operand, scope);
 
     return new JsExpr(
         function (stmtContext) {
@@ -188,14 +196,15 @@ __.prototype['complement'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
-__.prototype['in'] = function (node) {
+__.prototype['in'] = function (node, scope) {
 
     // should holds apply to strings? maybe as 'contains'? or some non-word operator?
 
-    var left = this.compile(node.left);
-    var right = this.compile(node.right);
+    var left = this.compile(node.left, scope);
+    var right = this.compile(node.right, scope);
 
     return new JsExpr(
         function (stmtContext) {
@@ -208,12 +217,13 @@ __.prototype['in'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
-__.prototype['sequence'] = function (node) {
+__.prototype['sequence'] = function (node, scope) {
 
-    var first = this.compile(node.first);
-    var last = this.compile(node.last);
+    var first = this.compile(node.first, scope);
+    var last = this.compile(node.last, scope);
 
     // renders an expression that is a function that takes a single arg -
     // the action to be performed
@@ -233,17 +243,18 @@ __.prototype['sequence'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
-__.prototype['connection'] = function (node) {
+__.prototype['connection'] = function (node, scope) {
 
     // how to handle multiple connectors?
 
     // sources and sinks are like calls in that they generate both statements and expressions
     // they have expressions but inject statements into the context
 
-    var source = this.compile(node.source);
-    var sink = this.compile(node.sink);
+    var source = this.compile(node.source, scope);
+    var sink = this.compile(node.sink, scope);
 
     return new JsExpr(function (stmtContext) {
         return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
@@ -253,25 +264,19 @@ __.prototype['connection'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
-__.prototype['closure'] = function (node) {
+__.prototype['closure'] = function (node, scope) {
 
     var self = this;
 
-    // create a child scope for the closure
-    var child = this.scope.bud();
+    // create a nested scope for the closure's statements
+    var localScope = scope.bud();
 
-    // todo - fix this atrocity
-    var parent = this.scope;
-    this.scope = child;
-
-    // compile the statements in the child scope
     var stmts = node.statements.map(function (stmt) {
-        return self.compile(stmt);
+        return self.compile(stmt, localScope);
     });
-
-    this.scope = parent;
 
     return new JsExpr(
         function (stmtContext) {
@@ -290,15 +295,16 @@ __.prototype['closure'] = function (node) {
 /**
  * A request can be part of an expression or a standalone statement.
  *
+ * @param scope
  * @param node
  */
-__.prototype['request'] = function (node) {
+__.prototype['request'] = function (node, scope) {
 
-    var fnId = this.compile(node.to);
+    var fnId = this.compile(node.to, scope);
 
     var self = this;
     var args = node.args.map(function (arg) {
-        return self.compile(arg);
+        return self.compile(arg, scope);
     });
 
     return new JsCall(fnId, args);
@@ -307,12 +313,29 @@ __.prototype['request'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
-__.prototype['op'] = function (node) {
+__.prototype['op'] = function (node, scope) {
 
-    var left = this.compile(node.left);
-    var right = this.compile(node.right);
+    var left = this.compile(node.left, scope);
+    var right = this.compile(node.right, scope);
+
+    var op = node.op;
+
+    if (op === 'and') {
+        op = '&&';
+    }
+    else if (op === 'or') {
+        op = '||';
+    }
+    else if (op == '+') {
+
+        return new JsExpr(function (stmtContext) {
+            return 'function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {' +
+            'return left.concat(right);} else return left + right;}(' +
+            left.renderExpr(stmtContext) + ',' + right.renderExpr(stmtContext) + ')'});
+    }
 
     // make sure both sides are defined
     // could relax this if we want to allow declaration after usage
@@ -329,21 +352,32 @@ __.prototype['op'] = function (node) {
     return new JsExpr(function (stmtContext) {
 
         // use parens to be safe
-        return '(' + left.renderExpr(stmtContext) + ' ' + node.op + ' ' + right.renderExpr(stmtContext) + ')';
+        return '(' + left.renderExpr(stmtContext) + ' ' + op + ' ' + right.renderExpr(stmtContext) + ')';
     });
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
 __.prototype['program'] = function (node) {
 
     var self = this;
 
+    // the root scope for this program
+    var scope = new Scope();
+
+    // define the envelope args - might not want to do this statically, btw
+    // since we might not get them with each request
+
+    scope.define('recur', true);
+    scope.define('reply', true);
+    scope.define('fail', true);
+
     var stmts = node.statements.map(function (stmt) {
-        return self.compile(stmt);
+        return self.compile(stmt, scope);
     });
 
     return new JsFunction(stmts);
@@ -351,19 +385,19 @@ __.prototype['program'] = function (node) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- *
+ * @param scope
  * @param node
  */
-__.prototype['receive'] = function (node) {
-
-    var self = this;
+__.prototype['receive'] = function (node, scope) {
 
     var vars = [];
+
+    // todo - shift args off instead of tracking count
 
     node.names.forEach(function (name) {
 
         // alter the scope for following statements
-        var argNum = self.scope.defineArg(name);
+        var argNum = scope.defineArg(name);
 
         vars.push('$_' + name + ' = ' + 'args[' + argNum + ']');
     });
@@ -376,9 +410,10 @@ __.prototype['receive'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
-__.prototype['conditional'] = function (node) {
+__.prototype['conditional'] = function (node, scope) {
 
     var self = this;
 
@@ -387,7 +422,7 @@ __.prototype['conditional'] = function (node) {
     var predicate = this.compile(node.predicate);
 
     var posBlock = node.positive.map(function (stmt) {
-        return self.compile(stmt);
+        return self.compile(stmt, scope);
     });
 
     var negBlock;
@@ -396,11 +431,11 @@ __.prototype['conditional'] = function (node) {
 
         if (Array.isArray(node.negative)) {
             negBlock = node.negative.map(function (stmt) {
-                return self.compile(stmt);
+                return self.compile(stmt, scope);
             });
         }
         else {
-            negBlock = this.compile(node.negative);
+            negBlock = this.compile(node.negative, scope);
         }
     }
 
@@ -410,9 +445,12 @@ __.prototype['conditional'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
-__.prototype['termination'] = function (node) {
+__.prototype['termination'] = function (node, scope) {
+
+    // should this node type be renamed response?
 
     var name = 'result.resolve';
 
@@ -423,7 +461,7 @@ __.prototype['termination'] = function (node) {
     var self = this;
 
     var args = node.args.map(function (arg) {
-        return self.compile(arg);
+        return self.compile(arg, scope);
     });
 
     return new JsStmtList([new JsCall(new JsExpr(name), args), 'return result.promise;']);
@@ -434,24 +472,26 @@ __.prototype['termination'] = function (node) {
  * An assignment may alter the current scope by defining a variable in it if the LHS of the assign
  * is a simple identifier.
  *
+ * @param scope
  * @param node
  */
-__.prototype['assign'] = function (node) {
+__.prototype['assign'] = function (node, scope) {
 
     // this is guaranteed to be a statement
 
-    var left = this.compile(node.left);
-    var right = this.compile(node.right);
+    var left = this.compile(node.left, scope);
+    var right = this.compile(node.right, scope);
 
     // is being ready a property of an AST node + exa scope?
     // is tracking ready state just an optimization? or do we need it to not have turtles all the way down?
     // can we 'ask' the ast node if it's ready?
     // the compilation result should know that already, right?
 
-    // modify the exa scope
-
+    // modify the local scope
+    // todo we can't really do this, since we might be inside a conditional!
+    // maybe we could track if we're in a conditional scope??
     if (node.left.type == 'id') {
-        this.scope.define(node.left.name, right.isReady());
+        scope.define(node.left.name, right.isReady());
     }
 
     return new JsStmt(function (stmtContext) {
@@ -462,18 +502,39 @@ __.prototype['assign'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
+ * @param scope
  * @param node
  */
-__.prototype['subscript'] = function (node) {
+__.prototype['subscript'] = function (node, scope) {
 
     // this is guaranteed to be a statement
 
-    var left = this.compile(node.list);
-    var right = this.compile(node.index);
+    var list = this.compile(node.list, scope);
+    var index = undefined;
+
+    if (node.index !== undefined) {
+        index = this.compile(node.index, scope);
+    }
+
+    // todo - what if the list expression is a request or somesuch? can't resolve it twice
+    // wrap it in a helper function?
 
     return new JsExpr(function (stmtContext) {
-        return left.renderExpr(stmtContext) + '[' + right.renderExpr(stmtContext) + ']';
+
+        return list.renderExpr(stmtContext) + '[' +
+            (index === undefined ? list.renderExpr(stmtContext) + '.length - 1' : index.renderExpr(stmtContext)) + ']';
     });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['skip'] = function (node, scope) {
+
+    return new JsStmt('return;');
 };
 
 module.exports = __;

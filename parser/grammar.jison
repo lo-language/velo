@@ -164,7 +164,7 @@ statement
     | termination ';'    // to prevent usage of fail() and reply() in expressions - might want to change this, though
     | assignment ';'
     | conditional
-    | SKIP ';' -> ["skip"]
+    | SKIP ';' -> {type: 'skip'}
     ;
 
 termination

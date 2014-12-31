@@ -79,7 +79,9 @@ module.exports["identifiers"] = {
 
         var node = {type: 'id', name: 'foo'};
 
-        this.compiler.scope.define('foo', true);
+        var scope = new Scope();
+
+        scope.define('foo', true);
 
         var result = this.compiler.compile(node);
 
@@ -203,7 +205,7 @@ module.exports["op"] = {
 
         var node = {
             type: 'op',
-            op: '+',
+            op: '*',
             left: {type: 'number', val: '1'},
             right: {type: 'number', val: '2'}
         };
@@ -213,7 +215,7 @@ module.exports["op"] = {
         var result = this.compiler.compile(node);
 
         var stmtContext = new JsStmt();
-        test.equal(result.renderExpr(stmtContext), '(1 + 2)');
+        test.equal(result.renderExpr(stmtContext), '(1 * 2)');
         test.done();
     },
 
@@ -221,7 +223,7 @@ module.exports["op"] = {
 
         var node = {
             type: 'op',
-            op: '+',
+            op: '*',
             left: {type: 'number', val: '1'},
             right: {
                 type: 'request',
@@ -235,7 +237,7 @@ module.exports["op"] = {
         var result = this.compiler.compile(node);
 
         var stmtContext = new JsStmt();
-        test.equal(result.renderExpr(stmtContext), '(1 + tmp_0)');
+        test.equal(result.renderExpr(stmtContext), '(1 * tmp_0)');
         test.done();
     },
 
@@ -243,7 +245,7 @@ module.exports["op"] = {
 
         var node = {
             type: 'op',
-            op: '+',
+            op: '*',
             left: {
                 type: 'request',
                 to: {type: 'id', name: 'foo'},
@@ -261,9 +263,56 @@ module.exports["op"] = {
         var result = this.compiler.compile(node);
 
         var stmtContext = new JsStmt();
-        test.equal(result.renderExpr(stmtContext), '(tmp_0 + tmp_1)');
+        test.equal(result.renderExpr(stmtContext), '(tmp_0 * tmp_1)');
         test.done();
     },
+
+    "translates and/or": function (test) {
+
+        // should create a context
+        // should call compile on each statement
+
+        var node = {
+            type: 'op',
+            op: 'or',
+            left:{
+                type: 'op',
+                op: 'and',
+                left: {type: 'number', val: '1'},
+                right: {type: 'number', val: '2'}
+            },
+            right: {type: 'number', val: '3'}
+        };
+
+        // patch sub nodes?
+
+        var result = this.compiler.compile(node);
+
+        var stmtContext = new JsStmt();
+        test.equal(result.renderExpr(stmtContext), '((1 && 2) || 3)');
+        test.done();
+    },
+
+    "addition handles lists": function (test) {
+
+        // should create a context
+        // should call compile on each statement
+
+        var node = {
+            type: 'op',
+            op: '+',
+            left: {type: 'id', name: 'foo'},
+            right: {type: 'id', name: 'bar'}
+        };
+
+        // patch sub nodes?
+
+        var result = this.compiler.compile(node);
+
+        var stmtContext = new JsStmt();
+        test.equal(result.renderExpr(stmtContext), "function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {return left.concat(right);} else return left + right;}($_foo,$_bar)");
+        test.done();
+    }
 
 //    "with promises": function (test) {
 //
@@ -284,35 +333,6 @@ module.exports["op"] = {
 //        test.deepEqual(node.js, {value: '(1 + 2)'});
 //        test.done();
 //    },
-
-    "catches undefined operands": function (test) {
-
-        var node = {
-            type: 'op',
-            op: '+',
-            left: {type: 'id', name: 'foo'},
-            right: {type: 'number', val: '2'}
-        };
-
-        var self = this;
-
-//        test.throws(function () {
-//            self.compiler.compile(node);
-//        }, Error, 'left operand not defined');
-
-        node = {
-            type: 'op',
-            op: '+',
-            left: {type: 'number', val: '2'},
-            right: {type: 'id', name: 'foo'}
-        };
-
-//        test.throws(function () {
-//            self.compiler.compile(node);
-//        }, Error, 'right operand not defined');
-
-        test.done();
-    }
 };
 
 module.exports["statements"] = {
@@ -344,7 +364,7 @@ module.exports["statements"] = {
                 to: {type: 'id', name: 'baz'},
                 args: [{
                     type: 'op',
-                    op: '+',
+                    op: '-',
                     left: {
                         type: 'request',
                         to: {type: 'id', name: 'foo'},
@@ -362,7 +382,7 @@ module.exports["statements"] = {
         var result = this.compiler.compile(node);
 
         test.equal(result.renderStmt(),
-            'Q.spread([$_foo(),$_bar()], function (tmp_0,tmp_1) {\n    $_baz((tmp_0 + tmp_1));\n}, result.reject);');
+            'Q.spread([$_foo(),$_bar()], function (tmp_0,tmp_1) {\n    $_baz((tmp_0 - tmp_1));\n}, result.reject);');
         test.done();
     },
 
@@ -376,7 +396,7 @@ module.exports["statements"] = {
                 to: {type: 'id', name: 'baz'},
                 args: [{
                     type: 'op',
-                    op: '+',
+                    op: '-',
                     left: {
                         type: 'request',
                         to: {type: 'id', name: 'foo'},
@@ -394,7 +414,7 @@ module.exports["statements"] = {
         var result = this.compiler.compile(node);
 
         test.equal(result.renderStmt(),
-            'Q.spread([$_foo(),$_bar()], function (tmp_0,tmp_1) {\n    Q.spread([$_baz((tmp_0 + tmp_1))], function (tmp_0) {\n    $_quux(tmp_0);\n}, result.reject);\n}, result.reject);');
+            'Q.spread([$_foo(),$_bar()], function (tmp_0,tmp_1) {\n    Q.spread([$_baz((tmp_0 - tmp_1))], function (tmp_0) {\n    $_quux(tmp_0);\n}, result.reject);\n}, result.reject);');
         test.done();
     }
 };
@@ -442,7 +462,7 @@ module.exports["receive"] = {
             names: ['foo', 'mani', 'padme', 'hum']
         };
 
-        var result = this.compiler.compile(node);
+        var result = this.compiler.compile(node, new Scope());
 
         test.equal(result.renderStmt(), 'var $_foo = args[0],\n$_mani = args[1],\n$_padme = args[2],\n$_hum = args[3];');
         test.done();
@@ -515,9 +535,11 @@ module.exports["conditional"] = {
 
         // patch sub nodes?
 
-        var result = this.compiler.compile(node);
+        var scope = new Scope();
+        var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), 'if ($_foo) {\n    $_bar = 42;\n}');
+        test.ok(scope.getStatus('bar'));
         test.done();
     },
 
@@ -535,9 +557,11 @@ module.exports["conditional"] = {
 
         // patch sub nodes?
 
-        var result = this.compiler.compile(node);
+        var scope = new Scope();
+        var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), 'if ($_foo) {\n    $_bar = 42;\n}\nelse {\n    $_bar = 32;\n}');
+        test.ok(scope.getStatus('bar'));
         test.done();
     },
 
@@ -559,7 +583,8 @@ module.exports["conditional"] = {
 
         // patch sub nodes?
 
-        var result = this.compiler.compile(node);
+        var scope = new Scope();
+        var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(),
             'if ($_foo) {\n    $_bar = 42;\n}\nelse if ($_bar) {\n    $_bar = 32;\n}\nelse {\n    $_baz = 82;\n}');
@@ -583,10 +608,11 @@ module.exports["assignment"] = {
             right: {type: 'number', val: '57'}
         };
 
-        var result = this.compiler.compile(node);
+        var scope = new Scope();
+        var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), '$_foo = 57;');
-        test.ok(this.compiler.scope.getStatus('foo'));
+        test.ok(scope.getStatus('foo'));
         test.done();
     },
 
@@ -599,12 +625,13 @@ module.exports["assignment"] = {
             right: {type: 'number', val: '57'}
         };
 
-        var result = this.compiler.compile(node);
+        var scope = new Scope();
+        var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), '$_foo[$_bar] = 57;');
 
         // context isn't modified by this
-        test.throws(function () {this.compiler.scope.isReady('foo')});
+        test.throws(function () {scope.getStatus('foo')});
         test.done();
     },
 
@@ -617,13 +644,12 @@ module.exports["assignment"] = {
             right: {type: 'id', name: 'bar'}
         };
 
-        this.compiler.scope.define('bar', true);
+        var scope = new Scope();
+        var result = this.compiler.compile(node, scope);
 
-        var result = this.compiler.compile(node);
+        scope.define('bar', true);
 
         test.equal(result.renderStmt(), '$_foo = $_bar;');
-
-//        test.ok(this.compiler.scope.getStatus('foo'));
         test.done();
     },
 
@@ -636,7 +662,8 @@ module.exports["assignment"] = {
             right: {type: 'request', to: {type: 'id', name: 'bar'}, args: []}
         };
 
-        var result = this.compiler.compile(node);
+        var scope = new Scope();
+        var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), 'Q.spread([$_bar()], function (tmp_0) {\n    $_foo = tmp_0;\n}, result.reject);');
         test.done();
@@ -658,10 +685,26 @@ module.exports["subscript"] = {
             index: {type: 'number', val: 1}
         };
 
-        var result = this.compiler.compile(node);
+        var scope = new Scope();
+        var result = this.compiler.compile(node, scope);
 
         var stmtContext = new JsStmt();
         test.equal(result.renderExpr(stmtContext), '$_foo[1]');
+        test.done();
+    },
+
+    "last element shortcut": function (test) {
+
+        var node = {
+            type: 'subscript',
+            list: { type: 'id', name: 'foo' },
+            index: undefined };
+
+        var scope = new Scope();
+        var result = this.compiler.compile(node, scope);
+
+        var stmtContext = new JsStmt();
+        test.equal(result.renderExpr(stmtContext), '$_foo[$_foo.length - 1]');
         test.done();
     }
 };
@@ -710,13 +753,33 @@ module.exports["closure"] = {
                     left: { type: 'id', name: 'result' },
                     right: { type: 'id', name: 'next' } } ] };
 
-        var result = this.compiler.compile(node);
+        var scope = new Scope();
+        var result = this.compiler.compile(node, scope);
 
         var stmtContext = new JsStmt();
 
         test.equal(result.renderExpr(stmtContext), 'tmp_0');
         test.equal(stmtContext.prereqs['tmp_0'].renderExpr(stmtContext),
-            'function () {var $_next = args[0];\n$_result *= $_next;}');
+            "function () {\nvar args = Array.prototype.slice.call(arguments);var $_next = args[0];\n$_result *= $_next;}");
+        test.done();
+    }
+};
+
+module.exports["skip"] = {
+
+    "setUp": function (cb) {
+        this.compiler = new Compiler();
+        cb();
+    },
+
+    "basic": function (test) {
+
+        var node = {type: 'skip'};
+
+        var scope = new Scope();
+        var result = this.compiler.compile(node, scope);
+
+        test.equal(result.renderStmt(), 'return;');
         test.done();
     }
 };

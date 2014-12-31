@@ -20,11 +20,6 @@ var __ = function (parent) {
     this.vars = {};
 
     this.numArgs = 0;
-
-    // todo move this to where it belongs - not here
-    this.define('recur', true);
-    this.define('reply', true);
-    this.define('fail', true);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

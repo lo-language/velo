@@ -26,6 +26,11 @@ TestRunner.prototype.load = function (cb) {
 
     fs.readFile(this.file, 'utf8', function (err, source) {
 
+        if (err) {
+            cb(err);
+            return;
+        }
+
         self.module = new ExaModule(source);
 
         cb();
@@ -183,3 +188,19 @@ module.exports['fibonacci2'] = {
         this.runner.failure(test, -1, "Whatsamatta, you?");
     }
 };
+
+//module.exports['count combos'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.runner = new TestRunner('countCombos');
+//
+//        this.runner.load(cb);
+//    },
+//
+//    'success': function (test) {
+//
+//        console.error(this.runner.getJs());
+//        this.runner.success(test, [], 55);
+//    }
+//};

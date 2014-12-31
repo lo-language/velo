@@ -12,7 +12,7 @@ if num <= 1
 
 result = 1;
 
-// could we auto-dect result is changing in here and hold off reply until this block is done?
+// could we auto-detect result is changing in here and hold off reply until this block is done?
 // - reply waits on result
 // - result is a promise because it is *modified* in an item closure
 // - how would we know when to resolve the promise? implicit success callback I guess
