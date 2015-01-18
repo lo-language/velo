@@ -7,7 +7,7 @@
 
 var Compiler = require('../../codegen/Compiler');
 var JsStmt = require('../../codegen/JsStmt');
-var Scope = require('../../codegen/Scope');
+var Frame = require('../../codegen/Frame');
 var util = require('util');
 
 
@@ -79,7 +79,7 @@ module.exports["identifiers"] = {
 
         var node = {type: 'id', name: 'foo'};
 
-        var scope = new Scope();
+        var scope = new Frame();
 
         scope.define('foo', true);
 
@@ -462,7 +462,7 @@ module.exports["receive"] = {
             names: ['foo', 'mani', 'padme', 'hum']
         };
 
-        var result = this.compiler.compile(node, new Scope());
+        var result = this.compiler.compile(node, new Frame());
 
         test.equal(result.renderStmt(), 'var $_foo = args.shift(),\n$_mani = args.shift(),\n$_padme = args.shift(),\n$_hum = args.shift();');
         test.done();
@@ -535,7 +535,7 @@ module.exports["conditional"] = {
 
         // patch sub nodes?
 
-        var scope = new Scope();
+        var scope = new Frame();
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), 'if ($_foo) {\n    $_bar = 42;\n}');
@@ -557,7 +557,7 @@ module.exports["conditional"] = {
 
         // patch sub nodes?
 
-        var scope = new Scope();
+        var scope = new Frame();
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), 'if ($_foo) {\n    $_bar = 42;\n}\nelse {\n    $_bar = 32;\n}');
@@ -583,7 +583,7 @@ module.exports["conditional"] = {
 
         // patch sub nodes?
 
-        var scope = new Scope();
+        var scope = new Frame();
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(),
@@ -608,7 +608,7 @@ module.exports["assignment"] = {
             right: {type: 'number', val: '57'}
         };
 
-        var scope = new Scope();
+        var scope = new Frame();
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), '$_foo = 57;');
@@ -625,7 +625,7 @@ module.exports["assignment"] = {
             right: {type: 'number', val: '57'}
         };
 
-        var scope = new Scope();
+        var scope = new Frame();
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), '$_foo[$_bar] = 57;');
@@ -644,7 +644,7 @@ module.exports["assignment"] = {
             right: {type: 'id', name: 'bar'}
         };
 
-        var scope = new Scope();
+        var scope = new Frame();
         var result = this.compiler.compile(node, scope);
 
         scope.define('bar', true);
@@ -662,7 +662,7 @@ module.exports["assignment"] = {
             right: {type: 'request', to: {type: 'id', name: 'bar'}, args: []}
         };
 
-        var scope = new Scope();
+        var scope = new Frame();
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), 'Q.spread([$_bar()], function (tmp_0) {\n    $_foo = tmp_0;\n}, result.reject);');
@@ -685,7 +685,7 @@ module.exports["subscript"] = {
             index: {type: 'number', val: 1}
         };
 
-        var scope = new Scope();
+        var scope = new Frame();
         var result = this.compiler.compile(node, scope);
 
         var stmtContext = new JsStmt();
@@ -700,7 +700,7 @@ module.exports["subscript"] = {
             list: { type: 'id', name: 'foo' },
             index: undefined };
 
-        var scope = new Scope();
+        var scope = new Frame();
         var result = this.compiler.compile(node, scope);
 
         var stmtContext = new JsStmt();
@@ -753,7 +753,7 @@ module.exports["closure"] = {
                     left: { type: 'id', name: 'result' },
                     right: { type: 'id', name: 'next' } } ] };
 
-        var scope = new Scope();
+        var scope = new Frame();
         var result = this.compiler.compile(node, scope);
 
         var stmtContext = new JsStmt();
@@ -776,7 +776,7 @@ module.exports["skip"] = {
 
         var node = {type: 'skip'};
 
-        var scope = new Scope();
+        var scope = new Frame();
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), 'return;');

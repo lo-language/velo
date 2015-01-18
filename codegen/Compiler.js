@@ -5,7 +5,7 @@
 'use strict';
 
 var Q = require('q');
-var Scope = require('./Scope');
+var Frame = require('./Frame');
 var JsExpr = require('./JsExpr');
 var JsStmt = require('./JsStmt');
 var JsConditional = require('./JsConditional');
@@ -367,7 +367,7 @@ __.prototype['program'] = function (node) {
     var self = this;
 
     // the root scope for this program
-    var scope = new Scope();
+    var scope = new Frame();
 
     // define the envelope args - might not want to do this statically, btw
     // since we might not get them with each request

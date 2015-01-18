@@ -4,43 +4,84 @@ calculates all possible combinations for the android lockscreen
 
 the path is a list of nodes
 
+this procedure makes heavy use of skip, which is like a return in a response context
+
 */
 
-receive path;
+receive int* path;
 
-numNodes = 2;
+numNodes = 2; // use 'is' to declare const here. or use 'is' instead of is? maybe a synonym?
 
 // base case - only one possibility left
+// we don't know if these guys are available, so we have to wait on them
+// but if we do a Q.spread here, this line becomes async
+// if one of these is a promise, we might go on past this line and keep executing! is that terrible?
+// given that we have a reply, we could auto-wait
+// or maybe a usage like this, that feels sync, should be sync
 if #path == numNodes
     reply(1);
 
-// declare just to put in scope - can we make this unnecessary?
+// initialize just to put in scope - can we make this unnecessary?
 combos = 0;
 
 // count through the nodes
 0..numNodes >>
 
-    receive node;
+    receive nextNode;
 
-    if node in path
+    if nextNode in path
         skip;
 
-    // node is novel in the path; see if it's a legal next step
+    curNode = path[];
 
-    if path[] == 0
+    // nextNode is novel in the path; see if it's a legal next step
 
-        if
-        (node == 2 and !(1 in path)) or
-        (node == 6 and !(3 in path)) or
-        (node == 8 and !(4 in path))
-            skip;
+    // check the corners
 
-    // todo fill in the rest of these - 3 per corner node, 1 per edge node, 16 cases total
+    if
+    curNode is 0 and (
+    (nextNode is 2 and !(1 in path)) or
+    (nextNode is 6 and !(3 in path)) or
+    (nextNode is 8 and !(4 in path)))
+        skip;
 
-    combos += recur(path + [node]);
+    if curNode is 2 and (
+    (nextNode is 0 and !(1 in path)) or
+    (nextNode is 6 and !(4 in path)) or
+    (nextNode is 8 and !(5 in path)))
+        skip;
+
+    if curNode is 6 and (
+    (nextNode is 2 and !(4 in path)) or
+    (nextNode is 0 and !(3 in path)) or
+    (nextNode is 8 and !(7 in path)))
+        skip;
+
+    if curNode is 8 and (
+    (nextNode is 2 and !(5 in path)) or
+    (nextNode is 6 and !(7 in path)) or
+    (nextNode is 0 and !(4 in path)))
+        skip;
+
+    // check the side midpoints
+
+    if curNode is 1 and nextNode is 7 and !(4 in path)
+        skip;
+
+    if curNode is 3 and nextNode is 5 and !(4 in path)
+        skip;
+
+    if curNode is 5 and nextNode is 3 and !(4 in path)
+        skip;
+
+    if curNode is 7 and nextNode is 1 and !(4 in path)
+        skip;
+
+    combos += recur(path + [nextNode]);
 
 // this pisses me right off
 ;
 
 // should this usage be enough to declare the var in this scope? i think it should
+// doesn't need to return the "final" promise, just the promise when it gets called (which is probably the same thing)
 reply(combos);

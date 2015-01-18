@@ -5,13 +5,13 @@
 
 "use strict";
 
-var Scope = require('../../codegen/Scope');
+var Frame = require('../../codegen/Frame');
 
 module.exports["basics"] = {
 
     'define var': function (test) {
 
-        var scope = new Scope();
+        var scope = new Frame();
 
         scope.define('foo', true);
 
@@ -23,7 +23,7 @@ module.exports["basics"] = {
 
     'define arg': function (test) {
 
-        var scope = new Scope();
+        var scope = new Frame();
 
         scope.defineArg('foo');
 
@@ -38,7 +38,7 @@ module.exports["child scope"] = {
 
     'define var in parent': function (test) {
 
-        var parent = new Scope();
+        var parent = new Frame();
 
         parent.define('foo', true);
 

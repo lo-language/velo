@@ -11,3 +11,17 @@ if num <= 1
     reply(1);
 
 reply(num * recur(num - 1));
+
+
+
+
+//iter =
+//    receive product, counter;
+//
+//    if counter > n
+//        reply product;
+//
+//    reply(iter(counter * product, counter + 1));
+//
+//reply(iter(1,1));
+//

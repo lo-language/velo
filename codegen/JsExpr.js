@@ -7,8 +7,6 @@
 
 "use strict";
 
-var Scope = require('./Scope');
-
 /**
  *
  * @param expr
