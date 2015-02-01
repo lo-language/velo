@@ -67,3 +67,8 @@ iterator =
 
 reply(iterator);
 
+complete foo;
+
+complete foo();
+
+complete a, b, c, d;

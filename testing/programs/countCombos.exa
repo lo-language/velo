@@ -99,6 +99,23 @@ result = reduce(items, start,
     reply(prev + #item);
 );
 
+
+// can we do async streams and filters like so?
+// how can we wire them up in a pipeline??
+
+0..2^88 >>
+
+    // do something here
+
+    next(); // pull from source
+
+    emit(); // send to the next guy?
+
+>>
+    // do something here
+
+
+
 // walk the nodes as a *stream*
 // let's say this is a sync callback
 // do we queue them all up? i think not - what if it's a search through 2^64? this lets us be lazy!

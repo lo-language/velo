@@ -101,6 +101,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "else"                  return 'ELSE'
 "receive"               return 'RECEIVE'
 "while"                 return 'WHILE'
+"complete"              return 'COMPLETE'
 "in"                    return 'IN'
 "skip"                  return 'SKIP'
 "reply"|"fail"          return 'CHANNEL'
@@ -180,11 +181,12 @@ block
 
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: "receive", names: $2.concat($3)}
-    | expr ';'
+    | expr ';'  // to support standalone invocations
     | termination ';'    // to prevent usage of fail() and reply() in expressions - might want to change this, though
     | assignment ';'
     | conditional
     | loop
+    | COMPLETE (expr ',')* expr ';' -> {type: "complete", promises: $2.concat($3)}
     | SKIP ';' -> {type: 'skip'}
     ;
 
