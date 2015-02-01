@@ -417,21 +417,21 @@ __.prototype['conditional'] = function (node, scope) {
 
     var predicate = this.compile(node.predicate);
 
-    var posBlock = node.affirmative.map(function (stmt) {
+    var posBlock = node.consequent.map(function (stmt) {
         return self.compile(stmt, scope);
     });
 
     var negBlock;
 
-    if (node.negative !== undefined) {
+    if (node.otherwise !== undefined) {
 
-        if (Array.isArray(node.negative)) {
-            negBlock = node.negative.map(function (stmt) {
+        if (Array.isArray(node.otherwise)) {
+            negBlock = node.otherwise.map(function (stmt) {
                 return self.compile(stmt, scope);
             });
         }
         else {
-            negBlock = this.compile(node.negative, scope);
+            negBlock = this.compile(node.otherwise, scope);
         }
     }
 

@@ -99,7 +99,7 @@ result = reduce(items, start,
     reply(prev + #item);
 );
 
-// walk the nodes
+// walk the nodes as a *stream*
 // let's say this is a sync callback
 // do we queue them all up? i think not - what if it's a search through 2^64? this lets us be lazy!
 // if it's firing a sequence message, it has no idea when the handler completes, so you need to call next()

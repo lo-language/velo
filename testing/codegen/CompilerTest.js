@@ -530,7 +530,7 @@ module.exports["conditional"] = {
         var node = {
             type: 'conditional',
             predicate: {type: 'id', name: 'foo'},
-            positive: [{type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: 42}}]
+            consequent: [{type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: 42}}]
         };
 
         // patch sub nodes?
@@ -551,8 +551,8 @@ module.exports["conditional"] = {
         var node = {
             type: 'conditional',
             predicate: {type: 'id', name: 'foo'},
-            positive: [{type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: 42}}],
-            negative: [{type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: 32}}]
+            consequent: [{type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: 42}}],
+            otherwise: [{type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: 32}}]
         };
 
         // patch sub nodes?
@@ -573,12 +573,12 @@ module.exports["conditional"] = {
         var node = {
             type: 'conditional',
             predicate: {type: 'id', name: 'foo'},
-            positive: [{type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: 42}}],
-            negative: {
+            consequent: [{type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: 42}}],
+            otherwise: {
                 type: 'conditional',
                 predicate: {type: 'id', name: 'bar'},
-                positive: [{type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: 32}}],
-                negative: [{type: 'assign', op: '=', left: {type: 'id', name: 'baz'}, right: {type: 'number', val: 82}}]}
+                consequent: [{type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: 32}}],
+                otherwise: [{type: 'assign', op: '=', left: {type: 'id', name: 'baz'}, right: {type: 'number', val: 82}}]}
         };
 
         // patch sub nodes?

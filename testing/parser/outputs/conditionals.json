@@ -13,7 +13,7 @@
                 "val":2
             }
         },
-        "affirmative":[
+        "consequent":[
             {
                 "type":"assign",
                 "op":"++",
@@ -38,7 +38,7 @@
                 "val":4
             }
         },
-        "affirmative":[
+        "consequent":[
             {
                 "type":"assign",
                 "op":"--",
@@ -48,7 +48,7 @@
                 }
             }
         ],
-        "negative":[
+        "otherwise":[
             {
                 "type":"assign",
                 "op":"++",
@@ -73,7 +73,7 @@
                 "val":42
             }
         },
-        "affirmative":[
+        "consequent":[
             {
                 "type":"assign",
                 "op":"++",
@@ -83,7 +83,7 @@
                 }
             }
         ],
-        "negative":{
+        "otherwise":{
             "type":"conditional",
             "predicate":{
                 "type":"op",
@@ -97,7 +97,7 @@
                     "val":15
                 }
             },
-            "affirmative":[
+            "consequent":[
                 {
                     "type":"skip"
                 }
@@ -118,7 +118,7 @@
                 "val":42
             }
         },
-        "affirmative":[
+        "consequent":[
             {
                 "type":"assign",
                 "op":"++",
@@ -128,7 +128,7 @@
                 }
             }
         ],
-        "negative":{
+        "otherwise":{
             "type":"conditional",
             "predicate":{
                 "type":"op",
@@ -142,12 +142,12 @@
                     "val":15
                 }
             },
-            "affirmative":[
+            "consequent":[
                 {
                     "type":"skip"
                 }
             ],
-            "negative":[
+            "otherwise":[
                 {
                     "type":"skip"
                 }

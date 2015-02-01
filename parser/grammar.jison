@@ -209,9 +209,9 @@ assignment_op
     ;
 
 conditional
-    : IF expr ':' block -> {type: "conditional", predicate: $2, affirmative: $4}
-    | IF expr ':' block ELSE ':' block -> {type: "conditional", predicate: $2, affirmative: $4, negative: $7}
-    | IF expr ':' block ELSE conditional -> {type: "conditional", predicate: $2, affirmative: $4, negative: $6}
+    : IF expr ':' block -> {type: "conditional", predicate: $2, consequent: $4}
+    | IF expr ':' block ELSE ':' block -> {type: "conditional", predicate: $2, consequent: $4, otherwise: $7}
+    | IF expr ':' block ELSE conditional -> {type: "conditional", predicate: $2, consequent: $4, otherwise: $6}
     ;
 
 loop
