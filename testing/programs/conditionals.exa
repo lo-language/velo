@@ -5,9 +5,9 @@
 
 receive x;
 
-if x < 0
+if x < 0:
     reply('negative');
-else if x == 0
+else if x == 0:
     reply('zero!');
-else
+else:
     reply('positive');

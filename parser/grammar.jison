@@ -100,6 +100,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "if"                    return 'IF'
 "else"                  return 'ELSE'
 "receive"               return 'RECEIVE'
+"while"                 return 'WHILE'
 "in"                    return 'IN'
 "skip"                  return 'SKIP'
 "reply"|"fail"          return 'CHANNEL'
@@ -130,17 +131,36 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 /**
 
-grammar to-dos
+grammar to-dos:
 
 chains need to be built out
 
 would like semicolons to be replaced with newlines
 would like commas in list & set literals to be optional
 
-have an "is" keyword for testing whether two ref sheets point to the same object?
-this is tough, since it would break the abstraction of facades etc. and two action
-pointers may be different but call the same action. this is the problem with
-actually having a totally black box system.
+if/else could be followed by colons or commas, like:
+if parent, do something;
+else, do some other thing;
+
+is keyword:
+- could assign constant values
+- could be a synonym for ==
+- could test undefined
+
+receive:
+- if we can call receive multiple times, and in a loop, does that make it feel like we're
+receiving multiple messages?
+
+testing binding:
+- could use "no" or "missing", e.g.:
+
+     if no parent, do something;
+     if missing parent
+         fail();
+
+- could use "exists", e.g.:
+    if parent exists:
+
 */
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -164,6 +184,7 @@ statement
     | termination ';'    // to prevent usage of fail() and reply() in expressions - might want to change this, though
     | assignment ';'
     | conditional
+    | loop
     | SKIP ';' -> {type: 'skip'}
     ;
 
@@ -188,9 +209,13 @@ assignment_op
     ;
 
 conditional
-    : IF expr block -> {type: "conditional", predicate: $2, positive: $3}
-    | IF expr block ELSE block -> {type: "conditional", predicate: $2, positive: $3, negative: $5}
-    | IF expr block ELSE conditional -> {type: "conditional", predicate: $2, positive: $3, negative: $5}
+    : IF expr ':' block -> {type: "conditional", predicate: $2, affirmative: $4}
+    | IF expr ':' block ELSE ':' block -> {type: "conditional", predicate: $2, affirmative: $4, negative: $7}
+    | IF expr ':' block ELSE conditional -> {type: "conditional", predicate: $2, affirmative: $4, negative: $6}
+    ;
+
+loop
+    : WHILE expr ':' block -> {type: "loop", condition: $2, statements: $4}
     ;
 
 ////////////////////////////////////////////////////////////////////////////////

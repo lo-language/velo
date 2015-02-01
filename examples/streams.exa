@@ -1,0 +1,105 @@
+/**
+ * Created by: spurcell
+ * 1/25/15
+ */
+
+// here's how we do async streams/iterators
+
+a = stream.start() >>
+
+    receive chunk;
+
+    // do stuff in here
+
+    // the response is unusual in including a callback bound to next
+    // this sends a message back to the responder saying 'send the next chunk to the original callback'
+    // so we don't need to attach a new callback - it loops around
+    next();
+
+// synchronization barrier
+complete a;
+
+
+
+start =
+
+    // hang onto reply callback
+    emit = reply
+
+    // what happens when there are no more chunks?
+    // should next() trigger a different callback?
+
+    sendNextChunk =
+
+        if nextChunk:
+            emit('next chunk') -> sendNextChunk;
+        else:
+            reply('nothing left');
+
+    // here's a little trick - we provide a callback with our *response*
+    emit('first chunk') -> sendNextChunk;
+
+
+// this is an async iterator
+// it 'returns' a closure for getting the next item - bound to 'next' for simplicity
+// how do we know when we're done? call next - it returns nothing?
+
+complete list.walk() >>
+
+    receive item;
+
+    // process item here
+
+    next();
+~>
+    // handle the error
+
+
+// parser
+
+lexer.start() >>
+
+    // handle token here
+
+    next();
+
+
+// lexer
+
+
+start =
+
+    emit = reply;
+
+    // sets up a loop by capturing the reply channel
+
+    getNextToken =
+        emit('next token') -> getNextToken;
+
+    emit('first token') -> getNextToken;
+
+/////////////////////////////////////////////////////////////
+
+next = list.getIterator();
+
+next() >>
+
+    receive item;
+
+    // do something
+
+    next();
+
+
+getIterator =
+
+    item = 0;
+
+    next =
+
+        if nextItem:
+            reply(nextItem);
+        else:
+
+
+    reply(next);

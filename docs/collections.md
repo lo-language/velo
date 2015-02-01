@@ -37,16 +37,24 @@ A list is an ordered collection of values of any type.
 
 A list can easily be scanned to access each of its elements in order.
 
-	list >> (item, index) {
-	
+	list >>
+	    receive item, index;
 		// do something for each item
-	}
+		next();
 
-## Records
+#### Functional helpers
 
-A record is a set of named values (fields) which can be of any type, including records. Field names can be any valid character string.
+map(list, fn);
+reduce(list, fn);
+any(list, fn);
+every(list, fn);
+filter();
 
-	// create a record
+## Maps
+
+A map is a set of named values (fields) which can be of any type, including records. Field names can be any valid character string.
+
+	// create a map
 	student =
 		name:
 			first: "Alyssa" 
@@ -82,17 +90,22 @@ An important use of records is as a handle to an object.
 	
 #### Scanning Records
 
-The fields of a record can easily be scanned to access each field (in no particular order).
+The fields of a map can easily be scanned to access each field (in no particular order).
 
 	env >> (name, value) {
 	}
 	
-#### Filtering Records
+#### Functional helpers
 
-Records can be filtered by lists.
+keys(map) // produces a set
+values(map) // produces a list
+filter()
+
+Maps can be filtered by lists.
 
 	// blacklist fields
 	properties -= []
 	
 	// whitelist fields
 	properties &= []
+

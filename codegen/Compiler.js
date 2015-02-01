@@ -417,7 +417,7 @@ __.prototype['conditional'] = function (node, scope) {
 
     var predicate = this.compile(node.predicate);
 
-    var posBlock = node.positive.map(function (stmt) {
+    var posBlock = node.affirmative.map(function (stmt) {
         return self.compile(stmt, scope);
     });
 

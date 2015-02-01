@@ -1,0 +1,78 @@
+/**
+ * Models an Exa frame.
+ *
+ * Created by: spurcell
+ * 1/24/15
+ */
+
+/**
+ * @param parent    optional parent frame
+ */
+
+receive parent;
+
+vars = {};
+
+
+/**
+ * Defines a variable and marks it as ready iff it's being set to a literal or argument
+ * or an expression of exclusively the same.
+ *
+ * @param name
+ * @param status
+ */
+
+define =
+    receive name, status;
+    vars[name] = status;
+
+
+/**
+ * Returns the status of the named variable.
+ *
+ * @param name
+ * @return {*}
+ */
+
+getStatus =
+    receive name;
+
+    if vars[name] exists:
+        reply(vars[name]);
+
+    if parent exists:
+        reply(parent.getStatus(name));
+
+    fail("symbol '" + name + "' is not defined in this scope");
+
+
+/**
+ * Defines an argument in the frame.
+ *
+ * @param name
+ * @return {Number} the number of this argument
+ */
+
+defineArg =
+    receive name;
+    define(name, true);
+
+
+/**
+ * Creates and returns a new child context. The child knows its parent, but the parent has no record of the child.
+ *
+ * @return {*}
+ */
+
+extend =
+    reply(recur({getStatus: getStatus}));
+
+
+// what the hell - let's make everybody public
+
+reply({
+    define: define,
+    getStatus: getStatus,
+    defineArg: defineArg,
+    extend: extend
+});

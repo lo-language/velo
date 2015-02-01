@@ -4,10 +4,10 @@
 
 receive n;
 
-if n < 0
+if n < 0:
     fail("Whatsamatta, you?");
 
-if n <= 1
+if n <= 1:
     reply(n);
 
 reply(recur(n - 1) + recur(n - 2));

@@ -8,29 +8,107 @@ this procedure makes heavy use of skip, which is like a return in a response con
 
 */
 
-receive int* path;
+receive path;
 
 numNodes = 2; // use 'is' to declare const here. or use 'is' instead of is? maybe a synonym?
 
 // base case - only one possibility left
-// we don't know if these guys are available, so we have to wait on them
-// but if we do a Q.spread here, this line becomes async
-// if one of these is a promise, we might go on past this line and keep executing! is that terrible?
-// given that we have a reply, we could auto-wait
-// or maybe a usage like this, that feels sync, should be sync
-if #path == numNodes
+if #path == numNodes:
     reply(1);
 
 // initialize just to put in scope - can we make this unnecessary?
 combos = 0;
 
-// count through the nodes
+// here's some simple iteration for you - just repeats block while condition holds
+// can do skip in these blocks to skip the rest of the block
+// can also do break in these blocks to break out of the loop
+
+// sync version - won't repeat until request completes
+while x < 15:
+    complete request('apple.com');
+
+// async version - will fire off requests without waiting for completion
+while x < 15:
+    request('apple.com');
+
+// another async version - lets you kick off the requests in quick succession
+// but then wait for them all to complete before moving on
+// elements in reqs are 'transparent promises' because they're just held onto via an assignment - not used
+// if they were used, they'd need to be resolved
+reqs = [];
+
+while x < 10:
+    reqs = request('apple.com');
+
+complete reqs;
+
+
+// another async version - lets you say what to do when each response comes back
+while x < 10:
+    request('www.apple.com') ->
+        receive response;
+        io.out.writeLine(response.body);
+    ~>
+        receive err;
+        io.err.writeLine('request failed: \_err_');
+
+// another sync version
+while x < 10:
+    io.out.writeLine(request('www.apple.com'));
+
+
+// need a way to bail out of sequences - escape()? abort()?
+// do a search for the first prime in a range using a generator
+// can we actually use refs to handlers if they expect a certain context?
+result = first..last >>
+
+    receive num, next;
+
+    if isPrime(num):
+        reply(num);
+
+    next(); // would be cool to pass args to next, e.g. chunksize while reading
+
+// can we do a map or a filter this way?
+// how do we do async collection map?
+// the arg to map needs to be a request handler that can be called multiple times
+// next is like mutual recursion - should next just be a synonym for reply?? then what's escape/abort?
+// maybe if you might want to abort, you can't use map/reduce?
+// maybe next == recur and abort == reply?? is it too sneaky to remap recur? i think so - but it's so close conceptually!
+// can we do sequences without a separate channel?
+// using >> puts you in sequence context
+
+// map/reduce are not sequences? they can't be aborted?
+
+// how can we do an async map? because we need to return a value but don't want to wait for it
+// WELL, if map doesn't need to wait for next(), it doesn't have to - it can do them all *without waiting for reply to be called*
+// and then its result will be a promise until it gets all the replies back
+// can we return promises? or would reply() wait for them?
+
+// *** that's an important point: in what situations does the next item wait for next to be called,
+// and in what situations does it not?? because we definitely want to support both
+
+result = map(items,
+    receive item;
+    reply(request(item));    // this triggers the next item, as well?
+);
+
+// async reduce
+result = reduce(items, start,
+    receive item, prev;
+    reply(prev + #item);
+);
+
+// walk the nodes
+// let's say this is a sync callback
+// do we queue them all up? i think not - what if it's a search through 2^64? this lets us be lazy!
+// if it's firing a sequence message, it has no idea when the handler completes, so you need to call next()
 0..numNodes >>
 
-    receive nextNode;
+    receive nextNode, next;
 
-    if nextNode in path
-        skip;
+    if nextNode in path:
+        next();
 
     curNode = path[];
 
@@ -43,45 +121,48 @@ combos = 0;
     (nextNode is 2 and !(1 in path)) or
     (nextNode is 6 and !(3 in path)) or
     (nextNode is 8 and !(4 in path)))
-        skip;
+        next();
 
     if curNode is 2 and (
     (nextNode is 0 and !(1 in path)) or
     (nextNode is 6 and !(4 in path)) or
     (nextNode is 8 and !(5 in path)))
-        skip;
+        next();
 
     if curNode is 6 and (
     (nextNode is 2 and !(4 in path)) or
     (nextNode is 0 and !(3 in path)) or
     (nextNode is 8 and !(7 in path)))
-        skip;
+        next();
 
     if curNode is 8 and (
     (nextNode is 2 and !(5 in path)) or
     (nextNode is 6 and !(7 in path)) or
     (nextNode is 0 and !(4 in path)))
-        skip;
+        next();
 
     // check the side midpoints
 
     if curNode is 1 and nextNode is 7 and !(4 in path)
-        skip;
+        next();
 
     if curNode is 3 and nextNode is 5 and !(4 in path)
-        skip;
+        next();
 
     if curNode is 5 and nextNode is 3 and !(4 in path)
-        skip;
+        next();
 
     if curNode is 7 and nextNode is 1 and !(4 in path)
-        skip;
+        next();
 
     combos += recur(path + [nextNode]);
+    next();
 
 // this pisses me right off
 ;
 
 // should this usage be enough to declare the var in this scope? i think it should
 // doesn't need to return the "final" promise, just the promise when it gets called (which is probably the same thing)
+//complete walk;
+
 reply(combos);
