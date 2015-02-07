@@ -735,7 +735,7 @@ module.exports["sequence"] = {
     }
 };
 
-module.exports["closure"] = {
+module.exports["procedure"] = {
 
     "setUp": function (cb) {
         this.compiler = new Compiler();
@@ -745,7 +745,7 @@ module.exports["closure"] = {
     "basic": function (test) {
 
         var node = {
-            type: 'closure',
+            type: 'procedure',
             statements: [
                 { type: 'receive', names: [ 'next' ] },
                 { type: 'assign',

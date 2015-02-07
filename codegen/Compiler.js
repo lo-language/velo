@@ -267,7 +267,23 @@ __.prototype['connection'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['closure'] = function (node, scope) {
+__.prototype['iteration'] = function (node, scope) {
+
+    var condition = this.compile(node.condition, scope);
+//    var statements = this.compile(node.statements, scope);
+
+    return new JsStmt(function (stmtContext) {
+//        return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
+    });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['procedure'] = function (node, scope) {
 
     var self = this;
 
@@ -294,6 +310,13 @@ __.prototype['closure'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * A request can be part of an expression or a standalone statement.
+ *
+ * Requests always compile to async calls:
+ *
+ * - if result ignored, we don't do anything
+ * - if result directly asssigned, we can return a promise
+ * - if part of any other expression, we need to invert the parse tree to do the call first
+ * - if handed a callback, wire it up to the promise
  *
  * @param scope
  * @param node

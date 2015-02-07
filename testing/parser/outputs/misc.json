@@ -280,7 +280,7 @@
                     "args":[]
                 },
                 "sink":{
-                    "type":"closure",
+                    "type":"procedure",
                     "statements":[
                         {
                             "type":"receive",
@@ -313,7 +313,7 @@
                 }
             },
             "sink":{
-                "type":"closure",
+                "type":"procedure",
                 "statements":[
                     {
                         "type":"receive",
@@ -343,7 +343,7 @@
             "name":"iterator"
         },
         "right":{
-            "type":"closure",
+            "type":"procedure",
             "statements":[
                 {
                     "type":"termination",

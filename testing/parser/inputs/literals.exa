@@ -4,3 +4,8 @@ answer = 42;
 age = 63.4;
 message = "hello, world!";
 greeting = 'howdy, pardner';
+
+// procedure literal
+HardyRamanujan =
+    reply(1729);
+;

@@ -1,0 +1,66 @@
+/**
+ * Created by: spurcell
+ * 2/7/15
+ */
+
+x = 55;
+
+foo =
+    reply(x);
+;
+
+reply(foo());
+
+/**
+while foo() < 5:
+    x++;
+
+reply(x);
+
+//since foo is async, this should compile to
+
+var x = 0;
+
+var foo = function () {
+
+    return(x);
+};
+
+function loop() {
+
+    // resolve condition promises here
+
+    foo().then(function (val) {
+
+        if (val < 5) {
+
+            // do loop body
+            x++;
+
+            // recur on a fresh stack
+            process.nextTick(loop);
+        }
+        else {
+
+            continue();
+        }
+    });
+}
+
+
+
+
+
+x = 0;
+
+foo =
+    reply(x);
+;
+
+bar =
+    reply(x);
+;
+
+while foo() + bar() < 5:
+    x++;
+*/

@@ -149,58 +149,58 @@ module.exports['collections'] = {
     }
 };
 
-module.exports['factorial2'] = {
-
-    "setUp": function (cb) {
-
-        this.runner = new TestRunner('factorial2');
-
-        this.runner.load(cb);
-    },
-
-    'success': function (test) {
-
-        this.runner.success(test, 10, 3628800);
-    },
-
-    'failure': function (test) {
-
-        this.runner.failure(test, -1, "I pity the fool!");
-    }
-};
-
-module.exports['fibonacci2'] = {
-
-    "setUp": function (cb) {
-
-        this.runner = new TestRunner('fibonacci2');
-
-        this.runner.load(cb);
-    },
-
-    'success': function (test) {
-
-        this.runner.success(test, 10, 55);
-    },
-
-    'failure': function (test) {
-
-        this.runner.failure(test, -1, "Whatsamatta, you?");
-    }
-};
-
-//module.exports['count combos'] = {
+//module.exports['factorial2'] = {
 //
 //    "setUp": function (cb) {
 //
-//        this.runner = new TestRunner('countCombos');
+//        this.runner = new TestRunner('factorial2');
 //
 //        this.runner.load(cb);
 //    },
 //
 //    'success': function (test) {
 //
-//        console.error(this.runner.getJs());
-//        this.runner.success(test, [], 55);
+//        this.runner.success(test, 10, 3628800);
+//    },
+//
+//    'failure': function (test) {
+//
+//        this.runner.failure(test, -1, "I pity the fool!");
 //    }
 //};
+//
+//module.exports['fibonacci2'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.runner = new TestRunner('fibonacci2');
+//
+//        this.runner.load(cb);
+//    },
+//
+//    'success': function (test) {
+//
+//        this.runner.success(test, 10, 55);
+//    },
+//
+//    'failure': function (test) {
+//
+//        this.runner.failure(test, -1, "Whatsamatta, you?");
+//    }
+//};
+
+module.exports['procedure'] = {
+
+    "setUp": function (cb) {
+
+        this.runner = new TestRunner('procedure');
+
+        this.runner.load(cb);
+    },
+
+    'success': function (test) {
+
+        console.error(this.runner.getJs());
+        this.runner.success(test, [], 55);
+    }
+};

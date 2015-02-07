@@ -155,7 +155,7 @@
         }
     },
     {
-        "type":"loop",
+        "type":"iteration",
         "condition":{
             "type":"op",
             "op":"<",

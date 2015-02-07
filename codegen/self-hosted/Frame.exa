@@ -43,7 +43,7 @@ getStatus =
     if parent exists:
         reply(parent.getStatus(name));
 
-    fail("symbol '" + name + "' is not defined in this scope");
+    fail('symbol "\_name_" is not defined in this scope');
 
 
 /**

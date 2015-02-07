@@ -1,0 +1,12 @@
+/**
+ * Created by: spurcell
+ * 2/7/15
+ */
+
+x = 25;
+
+foo =
+    reply(x);
+;
+
+reply(foo() + 30);

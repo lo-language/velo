@@ -76,6 +76,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "!="                    return '!='
 "&&"|"and"              return 'AND'
 "||"|"or"               return 'OR'
+"!"|"not"               return 'NOT'
 "++"                    return '++'
 "--"                    return '--'
 "+="                    return '+='
@@ -97,7 +98,6 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "="                     return '='
 "?"                     return '?'
 "#"                     return '#'
-"!"                     return '!'
 "if"                    return 'IF'
 "else"                  return 'ELSE'
 "receive"               return 'RECEIVE'
@@ -127,7 +127,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 %left '==' '!=' '<' '>' '<=' '>='
 %left '+' '-'
 %left '*' '/' '%'
-%nonassoc '#' '!'
+%nonassoc '#' 'NOT'
 
 %%
 
@@ -186,7 +186,7 @@ statement
     | termination ';'    // to prevent usage of fail() and reply() in expressions - might want to change this, though
     | assignment ';'
     | conditional
-    | loop
+    | iteration
     | COMPLETE (expr ',')* expr ';' -> {type: "complete", promises: $2.concat($3)}
     | SKIP ';' -> {type: 'skip'}
     ;
@@ -217,8 +217,8 @@ conditional
     | IF expr ':' block ELSE conditional -> {type: "conditional", predicate: $2, consequent: $4, otherwise: $6}
     ;
 
-loop
-    : WHILE expr ':' block -> {type: "loop", condition: $2, statements: $4}
+iteration
+    : WHILE expr ':' block -> {type: "iteration", condition: $2, statements: $4}
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -239,7 +239,7 @@ literal
     | STRING -> {type: 'string', val: $1}
     | '[' (expr ',')* expr? ']' -> {type: "list", elements: $3 ? $2.concat([$3]): []}
     | '{' (dyad ',')* dyad? '}' -> {type: "set", members: $3 ? $2.concat([$3]): []}
-    | block -> {type: "closure", statements: $1}
+    | block -> {type: "procedure", statements: $1}
     ;
 
 dyad
@@ -256,7 +256,7 @@ request
 unary_expr
     : atom
     | '#' atom -> {type: "cardinality", operand: $2}
-    | '!' atom -> {type: "complement", operand: $2}
+    | 'NOT' atom -> {type: "complement", operand: $2}
     ;
 
 expr
