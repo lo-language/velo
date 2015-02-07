@@ -1,7 +1,16 @@
+// async by default
+
 foo();           // where foo holds an action address
 foo.bar();       // where bar is an action address on record foo
-//foo() -> x[3] + 5;
 
-//foo() => baz    // capture output of foo
-//foo(bar) => baz -> foobar => bazzle
-//foo(bar, baz) => foobar
+// promise form
+
+x = foo();
+
+foo() => x;
+
+// sync form in expression
+
+foo(bar());
+
+x = foo() + 7;

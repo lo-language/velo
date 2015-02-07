@@ -85,7 +85,8 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "%="                    return '%='
 "->"                    return '->' // success connector
 "~>"                    return '~>' // failure connector
-">>"                    return '>>' // sequence connector
+"=>"                    return '=>' // capture connector
+">>"                    return '>>' // stream connector
 "+"                     return '+'
 "-"                     return '-'
 "*"                     return '*'
@@ -121,7 +122,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 %options token-stack
 
-%left '->' '~>' '>>'
+%left '->' '~>' '=>'
 %left 'SEQ' 'AND' 'OR' 'IN'
 %left '==' '!=' '<' '>' '<=' '>='
 %left '+' '-'
@@ -281,5 +282,5 @@ expr
 connection
     : expr '->' expr -> {type: "connection", connector: $2, source: $1, sink: $3}
     | expr '~>' expr -> {type: "connection", connector: $2, source: $1, sink: $3}
-    | expr '>>' expr -> {type: "connection", connector: $2, source: $1, sink: $3}
+    | expr '=>' expr -> {type: "connection", connector: $2, source: $1, sink: $3}
     ;

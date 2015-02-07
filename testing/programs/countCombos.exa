@@ -103,16 +103,21 @@ result = reduce(items, start,
 // can we do async streams and filters like so?
 // how can we wire them up in a pipeline??
 
-0..2^88 >>
+// sieve of you know who
 
-    // do something here
+2..2^88 >>
 
+    reply(num);
+
+    reply(recur(num / num));
+
+    // can we do next in a loop?? but then it would be reentrant
     next(); // pull from source
 
-    emit(); // send to the next guy?
-
 >>
-    // do something here
+
+    receive prime;
+
 
 
 
