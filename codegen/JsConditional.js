@@ -9,11 +9,11 @@
 
 var JsStmt = require('./JsStmt');
 
-var __ = function (predicate, posBlock, negBlock) {
+var __ = function (predicate, consequent, otherwise) {
 
     this.predicate = predicate;
-    this.posBlock = posBlock;
-    this.negBlock = negBlock; // or else if stmt
+    this.consequent = consequent;
+    this.otherwise = otherwise; // or else if stmt
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,30 +28,30 @@ __.prototype.renderStmt = function () {
 
     var stmt = new JsStmt(function (stmtContext) {
 
-        var cond = 'if (' + self.predicate.renderExpr(stmtContext) + ') {\n';
+        var cond = 'if (' + self.predicate.renderExpr(stmtContext) + ') {\n\t';
 
-        self.posBlock.forEach(function (stmt) {
-            cond += '    ' + stmt.renderStmt() + '\n';
+        self.consequent.forEach(function (stmt) {
+            cond += stmt.renderStmt().replace(/\n/g, '\n\t') + '\n';
         });
 
         cond += '}';
 
-        if (self.negBlock !== undefined) {
+        if (self.otherwise !== undefined) {
 
             cond += '\nelse ';
 
-            if (Array.isArray(self.negBlock)) {
+            if (Array.isArray(self.otherwise)) {
 
                 cond += '{\n';
 
-                self.negBlock.forEach(function (stmt) {
-                    cond += '    ' + stmt.renderStmt() + '\n';
+                self.otherwise.forEach(function (stmt) {
+                    cond += '    ' + stmt.renderStmt().replace(/\n/g, '\n\t') + '\n';
                 });
 
                 cond += '}';
             }
             else {
-                cond += self.negBlock.renderStmt();
+                cond += self.otherwise.renderStmt();
             }
         }
 

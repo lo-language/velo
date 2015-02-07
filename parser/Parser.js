@@ -74,7 +74,7 @@
 var parser = (function(){
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"program":3,"program_repetition0":4,"EOF":5,"block":6,"BEGIN":7,"block_repetition0":8,"END":9,"statement":10,"RECEIVE":11,"statement_repetition0":12,"ID":13,";":14,"expr":15,"termination":16,"assignment":17,"conditional":18,"iteration":19,"IS":20,":":21,"COMPLETE":22,"statement_repetition1":23,"SKIP":24,"REPLY":25,"termination_repetition0":26,"termination_option0":27,"FAIL":28,"termination_repetition1":29,"termination_option1":30,"atom":31,"++":32,"--":33,"assignment_op":34,"=":35,"+=":36,"-=":37,"*=":38,"/=":39,"%=":40,"IF":41,"ELSE":42,"WHILE":43,"literal":44,"[":45,"atom_option0":46,"]":47,".":48,"(":49,")":50,"request":51,"BOOLEAN":52,"NUMBER":53,"STRING":54,"literal_repetition0":55,"literal_option0":56,"{":57,"literal_repetition1":58,"literal_option1":59,"}":60,"dyad":61,"request_repetition0":62,"request_option0":63,"unary_expr":64,"#":65,"NOT":66,"+":67,"-":68,"*":69,"/":70,"%":71,"<":72,">":73,"<=":74,">=":75,"==":76,"!=":77,"AND":78,"OR":79,"IN":80,"SEQ":81,"connection":82,"->":83,"~>":84,"=>":85,",":86,"$accept":0,"$end":1},
+symbols_: {"error":2,"program":3,"program_repetition0":4,"EOF":5,"block":6,"BEGIN":7,"block_repetition0":8,"END":9,"statement":10,"RECEIVE":11,"statement_repetition0":12,"ID":13,";":14,"expr":15,"result":16,"assignment":17,"conditional":18,"iteration":19,"IS":20,":":21,"COMPLETE":22,"statement_repetition1":23,"SKIP":24,"REPLY":25,"result_repetition0":26,"result_option0":27,"FAIL":28,"result_repetition1":29,"result_option1":30,"atom":31,"++":32,"--":33,"assignment_op":34,"=":35,"+=":36,"-=":37,"*=":38,"/=":39,"%=":40,"IF":41,"ELSE":42,"WHILE":43,"literal":44,"[":45,"atom_option0":46,"]":47,".":48,"(":49,")":50,"request":51,"BOOLEAN":52,"NUMBER":53,"STRING":54,"literal_repetition0":55,"literal_option0":56,"{":57,"literal_repetition1":58,"literal_option1":59,"}":60,"dyad":61,"request_repetition0":62,"request_option0":63,"unary_expr":64,"#":65,"NOT":66,"+":67,"-":68,"*":69,"/":70,"%":71,"<":72,">":73,"<=":74,">=":75,"==":76,"!=":77,"AND":78,"OR":79,"IN":80,"SEQ":81,"connection":82,"->":83,"~>":84,"=>":85,",":86,"$accept":0,"$end":1},
 terminals_: {2:"error",5:"EOF",7:"BEGIN",9:"END",11:"RECEIVE",13:"ID",14:";",20:"IS",21:":",22:"COMPLETE",24:"SKIP",25:"REPLY",28:"FAIL",32:"++",33:"--",35:"=",36:"+=",37:"-=",38:"*=",39:"/=",40:"%=",41:"IF",42:"ELSE",43:"WHILE",45:"[",47:"]",48:".",49:"(",50:")",52:"BOOLEAN",53:"NUMBER",54:"STRING",57:"{",60:"}",65:"#",66:"NOT",67:"+",68:"-",69:"*",70:"/",71:"%",72:"<",73:">",74:"<=",75:">=",76:"==",77:"!=",78:"AND",79:"OR",80:"IN",81:"SEQ",83:"->",84:"~>",85:"=>",86:","},
 productions_: [0,[3,2],[6,3],[10,4],[10,2],[10,2],[10,2],[10,1],[10,1],[10,4],[10,4],[10,2],[16,3],[16,3],[17,2],[17,2],[17,3],[34,1],[34,1],[34,1],[34,1],[34,1],[34,1],[18,4],[18,7],[18,6],[19,4],[31,1],[31,1],[31,4],[31,3],[31,3],[31,1],[44,1],[44,1],[44,1],[44,4],[44,4],[44,1],[61,1],[61,3],[51,5],[64,1],[64,2],[64,2],[15,1],[15,3],[15,3],[15,3],[15,3],[15,3],[15,3],[15,3],[15,3],[15,3],[15,3],[15,3],[15,3],[15,3],[15,3],[15,3],[15,1],[82,3],[82,3],[82,3],[4,0],[4,2],[8,0],[8,2],[12,0],[12,3],[23,0],[23,3],[26,0],[26,3],[27,0],[27,1],[29,0],[29,3],[30,0],[30,1],[46,0],[46,1],[55,0],[55,3],[56,0],[56,1],[58,0],[58,3],[59,0],[59,1],[62,0],[62,3],[63,0],[63,1]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
@@ -94,9 +94,9 @@ case 10:this.$ = {type: 'complete', promises: $$[$0-2].concat($$[$0-1])};
 break;
 case 11:this.$ = {type: 'skip'};
 break;
-case 12:this.$ = {type: 'termination', channel: $$[$0-2], args: $$[$0] ? $$[$0-1].concat([$$[$0]]) : []};
+case 12:this.$ = {type: 'result', channel: $$[$0-2], args: $$[$0] ? $$[$0-1].concat([$$[$0]]) : []};
 break;
-case 13:this.$ = {type: 'termination', channel: $$[$0-2], args: $$[$0] ? $$[$0-1].concat([$$[$0]]) : []};
+case 13:this.$ = {type: 'result', channel: $$[$0-2], args: $$[$0] ? $$[$0-1].concat([$$[$0]]) : []};
 break;
 case 14:this.$ = {type: 'assign', op: $$[$0], left: $$[$0-1]};
 break;

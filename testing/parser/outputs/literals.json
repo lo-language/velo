@@ -82,7 +82,7 @@
             "type":"procedure",
             "statements":[
                 {
-                    "type":"termination",
+                    "type":"result",
                     "channel":"reply",
                     "args":[
                         {

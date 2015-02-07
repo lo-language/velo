@@ -80,6 +80,7 @@ module.exports['conditionals'] = {
 
     'neg': function (test) {
 
+//        console.error(this.runner.getJs());
         this.runner.success(test, -1, 'negative');
     },
 
@@ -201,6 +202,6 @@ module.exports['procedure'] = {
     'success': function (test) {
 
         console.error(this.runner.getJs());
-        this.runner.success(test, [], 55);
+        this.runner.success(test, [], 60);
     }
 };

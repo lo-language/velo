@@ -196,7 +196,7 @@ block
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: 'receive', names: $2.concat($3)}
     | expr ';'  // to support standalone invocations
-    | termination ';'    // to prevent usage of fail() and reply() in expressions - might want to change this, though
+    | result ';'
     | assignment ';'
     | conditional
     | iteration
@@ -205,9 +205,9 @@ statement
     | SKIP ';' -> {type: 'skip'}
     ;
 
-termination
-    : REPLY (expr ',')* expr? -> {type: 'termination', channel: $1, args: $3 ? $2.concat([$3]) : []}
-    | FAIL (expr ',')* expr? -> {type: 'termination', channel: $1, args: $3 ? $2.concat([$3]) : []}
+result
+    : REPLY (expr ',')* expr? -> {type: 'result', channel: $1, args: $3 ? $2.concat([$3]) : []}
+    | FAIL (expr ',')* expr? -> {type: 'result', channel: $1, args: $3 ? $2.concat([$3]) : []}
     ;
 
 // assignments are not expressions

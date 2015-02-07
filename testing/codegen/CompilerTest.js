@@ -7,7 +7,7 @@
 
 var Compiler = require('../../codegen/Compiler');
 var JsStmt = require('../../codegen/JsStmt');
-var Frame = require('../../codegen/Frame');
+var Scope = require('../../codegen/Scope');
 var util = require('util');
 
 
@@ -79,7 +79,7 @@ module.exports["identifiers"] = {
 
         var node = {type: 'id', name: 'foo'};
 
-        var scope = new Frame();
+        var scope = new Scope();
 
         scope.define('foo', true);
 
@@ -462,7 +462,7 @@ module.exports["receive"] = {
             names: ['foo', 'mani', 'padme', 'hum']
         };
 
-        var result = this.compiler.compile(node, new Frame());
+        var result = this.compiler.compile(node, new Scope());
 
         test.equal(result.renderStmt(), 'var $_foo = args.shift(),\n$_mani = args.shift(),\n$_padme = args.shift(),\n$_hum = args.shift();');
         test.done();
@@ -535,7 +535,7 @@ module.exports["conditional"] = {
 
         // patch sub nodes?
 
-        var scope = new Frame();
+        var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), 'if ($_foo) {\n    $_bar = 42;\n}');
@@ -557,7 +557,7 @@ module.exports["conditional"] = {
 
         // patch sub nodes?
 
-        var scope = new Frame();
+        var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), 'if ($_foo) {\n    $_bar = 42;\n}\nelse {\n    $_bar = 32;\n}');
@@ -583,7 +583,7 @@ module.exports["conditional"] = {
 
         // patch sub nodes?
 
-        var scope = new Frame();
+        var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(),
@@ -608,7 +608,7 @@ module.exports["assignment"] = {
             right: {type: 'number', val: '57'}
         };
 
-        var scope = new Frame();
+        var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), '$_foo = 57;');
@@ -625,7 +625,7 @@ module.exports["assignment"] = {
             right: {type: 'number', val: '57'}
         };
 
-        var scope = new Frame();
+        var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), '$_foo[$_bar] = 57;');
@@ -644,7 +644,7 @@ module.exports["assignment"] = {
             right: {type: 'id', name: 'bar'}
         };
 
-        var scope = new Frame();
+        var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
         scope.define('bar', true);
@@ -662,7 +662,7 @@ module.exports["assignment"] = {
             right: {type: 'request', to: {type: 'id', name: 'bar'}, args: []}
         };
 
-        var scope = new Frame();
+        var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), 'Q.spread([$_bar()], function (tmp_0) {\n    $_foo = tmp_0;\n}, result.reject);');
@@ -685,7 +685,7 @@ module.exports["subscript"] = {
             index: {type: 'number', val: 1}
         };
 
-        var scope = new Frame();
+        var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
         var stmtContext = new JsStmt();
@@ -700,7 +700,7 @@ module.exports["subscript"] = {
             list: { type: 'id', name: 'foo' },
             index: undefined };
 
-        var scope = new Frame();
+        var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
         var stmtContext = new JsStmt();
@@ -753,13 +753,13 @@ module.exports["procedure"] = {
                     left: { type: 'id', name: 'result' },
                     right: { type: 'id', name: 'next' } } ] };
 
-        var scope = new Frame();
+        var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
         var stmtContext = new JsStmt();
 
         test.equal(result.renderExpr(stmtContext),
-            "function () {\n\nvar args = Array.prototype.slice.call(arguments);\nvar result = Q.defer();\n\nvar $_next = args.shift();\n$_result *= $_next;\n\nreturn result.promise;\n}\n");
+            "function () {\n\nvar args = Array.prototype.slice.call(arguments);\nvar result = Q.defer();\n\nvar $_next = args.shift();\n$_result *= $_next;\n\nreturn result.promise;\n}");
         test.done();
     }
 };
@@ -775,7 +775,7 @@ module.exports["skip"] = {
 
         var node = {type: 'skip'};
 
-        var scope = new Frame();
+        var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(), 'return;');
@@ -806,7 +806,7 @@ module.exports["connection"] = {
     }
 };
 
-module.exports["termination"] = {
+module.exports["result"] = {
 
     "setUp": function (cb) {
         this.compiler = new Compiler();
@@ -816,7 +816,7 @@ module.exports["termination"] = {
     "reply": function (test) {
 
         var node = {
-            type: 'termination',
+            type: 'result',
             channel: 'reply',
             args: [
                 {type: 'number', val: 42}
@@ -824,14 +824,14 @@ module.exports["termination"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.renderStmt(), "\nresult.resolve(42);\nreturn result.promise;");
+        test.equal(result.renderStmt(), "result.resolve(42);\nreturn result.promise;");
         test.done();
     },
 
     "fail": function (test) {
 
         var node = {
-            type: 'termination',
+            type: 'result',
             channel: 'fail',
             args: [
                 {type: 'number', val: 42}
@@ -839,7 +839,7 @@ module.exports["termination"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.renderStmt(), "\nresult.reject(42);\nreturn result.promise;");
+        test.equal(result.renderStmt(), "result.reject(42);\nreturn result.promise;");
         test.done();
     }
 };

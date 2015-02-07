@@ -7,6 +7,8 @@
 
 "use strict";
 
+var JsResult = require('./JsResult');
+
 var __ = function (stmts) {
 
     this.stmts = stmts;
@@ -36,10 +38,9 @@ __.prototype.renderExpr = function (stmtContext) {
     }
 
     this.expr = 'function () {\n\n'+
-        'var args = Array.prototype.slice.call(arguments);\n' +
-        'var result = Q.defer();\n\n' +
-        this.renderBody() + '\n' +
-        'return result.promise;\n}\n';
+        '\tvar args = Array.prototype.slice.call(arguments);\n' +
+        '\tvar result = Q.defer();\n\n\t' +
+        this.renderBody().replace(/\n/g, '\n\t') + '\n}';
 
     return this.expr;
 };
@@ -54,9 +55,16 @@ __.prototype.renderBody = function () {
 
     // maybe we should render statements INTO the js context? let it decide how to wrap them?
 
-    return this.stmts.reduce(function (prev, stmt) {
-        return prev + stmt.renderStmt() + '\n';
-    }, '');
+    var body = this.stmts.map(function (stmt) {
+        return stmt.renderStmt();
+    }).join('\n');
+
+    // if the last statement isn't a result, add a return
+    if (this.stmts[this.stmts.length - 1] instanceof JsResult == false) {
+        body += '\n\treturn result.promise;';
+    }
+
+    return body;
 };
 
 module.exports = __;

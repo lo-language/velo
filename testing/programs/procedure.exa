@@ -3,9 +3,13 @@
  * 2/7/15
  */
 
-x = 25;
+fact is:
 
-foo is:
-    reply x;
+    receive num;
 
-reply foo() + 30;
+    if num <= 1:
+        reply num;
+
+    reply num * fact(num - 1);
+
+reply fact(5) / 2;

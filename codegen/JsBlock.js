@@ -15,7 +15,7 @@ var __ = function (stmts) {
 __.prototype.renderStmt = function () {
 
     return this.stmts.reduce(function (prev, cur, index) {
-        return prev + '\n' + (typeof cur == 'string' ? cur : cur.renderStmt());
+        return prev + (typeof cur == 'string' ? cur : cur.renderStmt()) + '\n';
     }, '');
 };
 
