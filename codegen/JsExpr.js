@@ -26,7 +26,6 @@ var __ = function (expr, ready) {
  * @return {boolean}
  */
 __.prototype.isReady = function () {
-
     return this.ready;
 };
 

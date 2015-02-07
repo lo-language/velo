@@ -1,5 +1,5 @@
 {
-    "type":"program",
+    "type":"procedure",
     "statements": [
         { "type": "assign", "op":"=", "left": {"type":"id","name":"foo"}, "right": {"type":"number","val":4} },
         { "type": "assign", "op":"=",

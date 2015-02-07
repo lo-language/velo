@@ -419,7 +419,7 @@ module.exports["statements"] = {
     }
 };
 
-module.exports["program"] = {
+module.exports["root procedure"] = {
 
     "setUp": function (cb) {
         this.compiler = new Compiler();
@@ -432,7 +432,7 @@ module.exports["program"] = {
         // should call compile on each statement
 
         var node = {
-            type: 'program',
+            type: 'procedure',
             statements: [
                 {type: 'assign', op: '=', left: {type: 'id', name: 'foo'}, right: {type: 'id', name: 'bar'}}
             ]
@@ -758,9 +758,8 @@ module.exports["procedure"] = {
 
         var stmtContext = new JsStmt();
 
-        test.equal(result.renderExpr(stmtContext), 'tmp_0');
-        test.equal(stmtContext.prereqs['tmp_0'].renderExpr(stmtContext),
-            "function () {\nvar args = Array.prototype.slice.call(arguments);var $_next = args.shift();\n$_result *= $_next;}");
+        test.equal(result.renderExpr(stmtContext),
+            "function () {\n\nvar args = Array.prototype.slice.call(arguments);\nvar result = Q.defer();\n\nvar $_next = args.shift();\n$_result *= $_next;\n\nreturn result.promise;\n}\n");
         test.done();
     }
 };

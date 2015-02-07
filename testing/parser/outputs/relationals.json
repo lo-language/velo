@@ -1,5 +1,5 @@
 {
-    "type":"program",
+    "type":"procedure",
     "statements":[
         {
             "type":"assign","op":"=",

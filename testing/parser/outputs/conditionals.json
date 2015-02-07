@@ -1,4 +1,4 @@
-{"type":"program", "statements":[
+{"type":"procedure", "statements":[
     {
         "type":"conditional",
         "predicate":{

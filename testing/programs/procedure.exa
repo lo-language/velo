@@ -6,6 +6,6 @@
 x = 25;
 
 foo is:
-    reply(x);
+    reply x;
 
 reply foo() + 30;

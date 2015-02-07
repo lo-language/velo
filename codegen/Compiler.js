@@ -12,7 +12,6 @@ var JsConditional = require('./JsConditional');
 var JsFunction = require('./JsFunction');
 var JsStmtList = require('./JsStmtList');
 var JsCall = require('./JsCall');
-var util = require('util');
 
 var __ = function () {
 
@@ -48,22 +47,97 @@ only works if we don't switch fn ptrs around
  * JS nodes.
  *
  * @param node
- * @param scope
+ * @param frame
  * @return {*}
  */
-__.prototype.compile = function (node, scope) {
+__.prototype.compile = function (node, frame) {
 
     if (this[node.type] === undefined) {
         throw new Error("don't know how to compile node type '" + node.type + "'");
     }
 
-    return this[node.type](node, scope);
+//    console.error('compiling ' + node.type);
+    return this[node.type](node, frame);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
+ * @param node
+ */
+__.prototype['procedure'] = function (node, frame) {
+
+    var self = this;
+    var localFrame;
+
+    // if there's no enclosing frame, we're at the root of the frame tree
+    if (frame === undefined) {
+        localFrame = new Frame();
+    }
+    else {
+        // create a nested frame for the procedure's statements
+        localFrame = frame.bud();
+    }
+
+    // define the envelope args - might not want to do this statically, btw
+    // since we might not get them with each request
+
+    localFrame.defineArg('recur');
+    localFrame.defineArg('__reply');
+    localFrame.defineArg('__fail');
+
+    // compile the statements in the context of the local frame
+    var stmts = node.statements.map(function (stmt) {
+        return self.compile(stmt, localFrame);
+    });
+
+    return new JsFunction(stmts);
+
+//    return new JsExpr(
+//        function (stmtContext) {
+//
+//            // inject a var into the context
+//            return stmtContext.definePrereq(
+//                'function () {\n' +
+//                    'var args = Array.prototype.slice.call(arguments);' +
+//                    stmts.map(function (stmt) {
+//                        return stmt.renderStmt(stmtContext);
+//                    }).join('\n') + '}');
+//        });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param frame
+ * @param node
+ */
+//__.prototype['procedure'] = function (node) {
+//
+//    var self = this;
+//
+//    // the root frame for this program
+//    var frame = new Frame();
+//
+//    // define the envelope args - might not want to do this statically, btw
+//    // since we might not get them with each request
+//
+//    frame.define('recur', true);
+//    frame.define('reply', true);
+//    frame.define('fail', true);
+//
+//    var stmts = node.statements.map(function (stmt) {
+//        return self.compile(stmt, frame);
+//    });
+//
+//    return new JsFunction(stmts);
+//};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param frame
  * @param node
  */
 __.prototype['boolean'] = function (node) {
@@ -75,7 +149,7 @@ __.prototype['boolean'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
 __.prototype['number'] = function (node) {
@@ -87,7 +161,7 @@ __.prototype['number'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
 __.prototype['string'] = function (node) {
@@ -99,17 +173,17 @@ __.prototype['string'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['list'] = function (node, scope) {
+__.prototype['list'] = function (node, frame) {
 
     // list literals might have members that need to be resolved
 
     var self = this;
 
     var items = node.elements.map(function (item) {
-        return self.compile(item, scope);
+        return self.compile(item, frame);
     });
 
     return new JsExpr(function (stmtContext) {
@@ -122,17 +196,17 @@ __.prototype['list'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['set'] = function (node, scope) {
+__.prototype['set'] = function (node, frame) {
 
     // list literals might have members that need to be resolved
 
     var self = this;
 
     var members = node.members.map(function (member) {
-        return self.compile(member, scope);
+        return self.compile(member, frame);
     });
 
     return new JsExpr(function (stmtContext) {
@@ -145,7 +219,7 @@ __.prototype['set'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
 __.prototype['id'] = function (node) {
@@ -156,12 +230,12 @@ __.prototype['id'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['cardinality'] = function (node, scope) {
+__.prototype['cardinality'] = function (node, frame) {
 
-    var right = this.compile(node.operand, scope);
+    var right = this.compile(node.operand, frame);
 
     // wrap in small function? inspects type then gets size?
 
@@ -180,12 +254,12 @@ __.prototype['cardinality'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['complement'] = function (node, scope) {
+__.prototype['complement'] = function (node, frame) {
 
-    var right = this.compile(node.operand, scope);
+    var right = this.compile(node.operand, frame);
 
     return new JsExpr(
         function (stmtContext) {
@@ -196,15 +270,15 @@ __.prototype['complement'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['in'] = function (node, scope) {
+__.prototype['in'] = function (node, frame) {
 
     // should holds apply to strings? maybe as 'contains'? or some non-word operator?
 
-    var left = this.compile(node.left, scope);
-    var right = this.compile(node.right, scope);
+    var left = this.compile(node.left, frame);
+    var right = this.compile(node.right, frame);
 
     return new JsExpr(
         function (stmtContext) {
@@ -217,13 +291,13 @@ __.prototype['in'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['sequence'] = function (node, scope) {
+__.prototype['sequence'] = function (node, frame) {
 
-    var first = this.compile(node.first, scope);
-    var last = this.compile(node.last, scope);
+    var first = this.compile(node.first, frame);
+    var last = this.compile(node.last, frame);
 
     // renders an expression that is a function that takes a single arg -
     // the action to be performed
@@ -243,18 +317,18 @@ __.prototype['sequence'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['connection'] = function (node, scope) {
+__.prototype['connection'] = function (node, frame) {
 
     // how to handle multiple connectors?
 
     // sources and sinks are like calls in that they generate both statements and expressions
     // they have expressions but inject statements into the context
 
-    var source = this.compile(node.source, scope);
-    var sink = this.compile(node.sink, scope);
+    var source = this.compile(node.source, frame);
+    var sink = this.compile(node.sink, frame);
 
     return new JsExpr(function (stmtContext) {
         return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
@@ -264,47 +338,17 @@ __.prototype['connection'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['iteration'] = function (node, scope) {
+__.prototype['iteration'] = function (node, frame) {
 
-    var condition = this.compile(node.condition, scope);
-//    var statements = this.compile(node.statements, scope);
+    var condition = this.compile(node.condition, frame);
+//    var statements = this.compile(node.statements, frame);
 
     return new JsStmt(function (stmtContext) {
 //        return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
     });
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param scope
- * @param node
- */
-__.prototype['procedure'] = function (node, scope) {
-
-    var self = this;
-
-    // create a nested scope for the closure's statements
-    var localScope = scope.bud();
-
-    var stmts = node.statements.map(function (stmt) {
-        return self.compile(stmt, localScope);
-    });
-
-    return new JsExpr(
-        function (stmtContext) {
-
-            // inject a var into the context
-            return stmtContext.definePrereq(
-                'function () {\n' +
-                    'var args = Array.prototype.slice.call(arguments);' +
-                    stmts.map(function (stmt) {
-                    return stmt.renderStmt(stmtContext);
-                }).join('\n') + '}');
-        });
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -318,16 +362,16 @@ __.prototype['procedure'] = function (node, scope) {
  * - if part of any other expression, we need to invert the parse tree to do the call first
  * - if handed a callback, wire it up to the promise
  *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['request'] = function (node, scope) {
+__.prototype['request'] = function (node, frame) {
 
-    var fnId = this.compile(node.to, scope);
+    var fnId = this.compile(node.to, frame);
 
     var self = this;
     var args = node.args.map(function (arg) {
-        return self.compile(arg, scope);
+        return self.compile(arg, frame);
     });
 
     return new JsCall(fnId, args);
@@ -336,13 +380,13 @@ __.prototype['request'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['op'] = function (node, scope) {
+__.prototype['op'] = function (node, frame) {
 
-    var left = this.compile(node.left, scope);
-    var right = this.compile(node.right, scope);
+    var left = this.compile(node.left, frame);
+    var right = this.compile(node.right, frame);
 
     var op = node.op;
 
@@ -381,37 +425,10 @@ __.prototype['op'] = function (node, scope) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['program'] = function (node) {
-
-    var self = this;
-
-    // the root scope for this program
-    var scope = new Frame();
-
-    // define the envelope args - might not want to do this statically, btw
-    // since we might not get them with each request
-
-    scope.define('recur', true);
-    scope.define('reply', true);
-    scope.define('fail', true);
-
-    var stmts = node.statements.map(function (stmt) {
-        return self.compile(stmt, scope);
-    });
-
-    return new JsFunction(stmts);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * @param scope
- * @param node
- */
-__.prototype['receive'] = function (node, scope) {
+__.prototype['receive'] = function (node, frame) {
 
     var vars = [];
 
@@ -429,10 +446,10 @@ __.prototype['receive'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['conditional'] = function (node, scope) {
+__.prototype['conditional'] = function (node, frame) {
 
     var self = this;
 
@@ -441,7 +458,7 @@ __.prototype['conditional'] = function (node, scope) {
     var predicate = this.compile(node.predicate);
 
     var posBlock = node.consequent.map(function (stmt) {
-        return self.compile(stmt, scope);
+        return self.compile(stmt, frame);
     });
 
     var negBlock;
@@ -450,11 +467,11 @@ __.prototype['conditional'] = function (node, scope) {
 
         if (Array.isArray(node.otherwise)) {
             negBlock = node.otherwise.map(function (stmt) {
-                return self.compile(stmt, scope);
+                return self.compile(stmt, frame);
             });
         }
         else {
-            negBlock = this.compile(node.otherwise, scope);
+            negBlock = this.compile(node.otherwise, frame);
         }
     }
 
@@ -464,10 +481,10 @@ __.prototype['conditional'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['termination'] = function (node, scope) {
+__.prototype['termination'] = function (node, frame) {
 
     // should this node type be renamed response?
 
@@ -480,7 +497,7 @@ __.prototype['termination'] = function (node, scope) {
     var self = this;
 
     var args = node.args.map(function (arg) {
-        return self.compile(arg, scope);
+        return self.compile(arg, frame);
     });
 
     return new JsStmtList([new JsCall(new JsExpr(name), args), 'return result.promise;']);
@@ -488,29 +505,29 @@ __.prototype['termination'] = function (node, scope) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * An assignment may alter the current scope by defining a variable in it if the LHS of the assign
+ * An assignment may alter the current frame by defining a variable in it if the LHS of the assign
  * is a simple identifier.
  *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['assign'] = function (node, scope) {
+__.prototype['assign'] = function (node, frame) {
 
     // this is guaranteed to be a statement
 
-    var left = this.compile(node.left, scope);
-    var right = this.compile(node.right, scope);
+    var left = this.compile(node.left, frame);
+    var right = this.compile(node.right, frame);
 
-    // is being ready a property of an AST node + exa scope?
+    // is being ready a property of an AST node + exa frame?
     // is tracking ready state just an optimization? or do we need it to not have turtles all the way down?
     // can we 'ask' the ast node if it's ready?
     // the compilation result should know that already, right?
 
-    // modify the local scope
+    // modify the local frame
     // todo we can't really do this, since we might be inside a conditional!
-    // maybe we could track if we're in a conditional scope??
+    // maybe we could track if we're in a conditional frame??
     if (node.left.type == 'id') {
-        scope.define(node.left.name, right.isReady());
+        frame.define(node.left.name, right.isReady());
     }
 
     return new JsStmt(function (stmtContext) {
@@ -521,18 +538,18 @@ __.prototype['assign'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['subscript'] = function (node, scope) {
+__.prototype['subscript'] = function (node, frame) {
 
     // this is guaranteed to be a statement
 
-    var list = this.compile(node.list, scope);
+    var list = this.compile(node.list, frame);
     var index = undefined;
 
     if (node.index !== undefined) {
-        index = this.compile(node.index, scope);
+        index = this.compile(node.index, frame);
     }
 
     // todo - what if the list expression is a request or somesuch? can't resolve it twice
@@ -548,10 +565,10 @@ __.prototype['subscript'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
+ * @param frame
  * @param node
  */
-__.prototype['skip'] = function (node, scope) {
+__.prototype['skip'] = function (node, frame) {
 
     return new JsStmt('return;');
 };
