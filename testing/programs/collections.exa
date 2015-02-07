@@ -3,8 +3,8 @@
  * 12/25/14
  */
 
-// list literal
-list = ['foo', 'mani', 'padme', 'hum'];
+// words literal
+words = ['foo', 'mani', 'padme', 'hum'];
 
 // set literal with intentional repetition
 dudes = {'zaphod', 'ford', 'arthur', 'ford'};
@@ -18,13 +18,13 @@ dudes = {'zaphod', 'ford', 'arthur', 'ford'};
 name = "snooks";
 
 if #name < 6:
-    fail("WHAT?!");
+    fail "WHAT?!";
 
-if #list != 4:
-    fail("what the deuce?!");
+if #words != 4:
+    fail "what the deuce?!";
 
 if #dudes < 3:
-    fail("not very froody");
+    fail "not very froody";
 
 // todo throw an error on undefined identifiers
 //if #set != 3
@@ -33,14 +33,14 @@ if #dudes < 3:
 // test membership
 // or should these be a in b?
 
-if 'om' in list:
-    fail('oops');
+if 'om' in words:
+    fail 'oops';
 
 if 'trillian' in dudes:
-    fail('not a dude');
+    fail 'not a dude';
 
 // shouldn't be necessary but is for now; otherwise we never conclude
-reply();
+reply;
 
 //if #map != 3
 //    fail("a most unpleasant situation, captain");

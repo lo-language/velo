@@ -4,7 +4,8 @@
  */
 
 producer:
-
+    // push some items onto the queue
 
 
 consumer:
+    // consume until empty

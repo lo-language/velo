@@ -105,7 +105,8 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "complete"              return 'COMPLETE'
 "in"                    return 'IN'
 "skip"                  return 'SKIP'
-"reply"|"fail"          return 'CHANNEL'
+"reply"                 return 'REPLY'
+"fail"                  return 'FAIL'
 "stop"                  return 'STOP'
 "try"                   return 'TRY'
 {id}                    return 'ID'
@@ -165,8 +166,8 @@ testing binding:
 
 ideas:
 
-define procedures with foo: block syntax instead of foo = block syntax?
-start procedures with @ or $ or /\  or \\?
+separate reply() and fail() from the addresses since these calls terminate execution
+maybe the addresses are __reply and __fail or __out and __err?
 
 */
 
@@ -198,7 +199,8 @@ statement
     ;
 
 termination
-    : CHANNEL '(' (expr ',')* expr? ')' -> {type: "termination", channel: $1, args: $4 ? $3.concat([$4]) : []}
+    : REPLY (expr ',')* expr? -> {type: "termination", channel: $1, args: $3 ? $2.concat([$3]) : []}
+    | FAIL (expr ',')* expr? -> {type: "termination", channel: $1, args: $3 ? $2.concat([$3]) : []}
     ;
 
 // assignments are not expressions

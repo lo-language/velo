@@ -140,41 +140,41 @@ result = reduce(items, start,
 
     if
     curNode is 0 and (
-    (nextNode is 2 and !(1 in path)) or
-    (nextNode is 6 and !(3 in path)) or
-    (nextNode is 8 and !(4 in path)))
+    (nextNode is 2 and 1 not in path) or
+    (nextNode is 6 and 3 not in path) or
+    (nextNode is 8 and 4 not in path)):
         next();
 
     if curNode is 2 and (
-    (nextNode is 0 and !(1 in path)) or
-    (nextNode is 6 and !(4 in path)) or
-    (nextNode is 8 and !(5 in path)))
+    (nextNode is 0 and 1 not in path) or
+    (nextNode is 6 and 4 not in path) or
+    (nextNode is 8 and 5 not in path)):
         next();
 
     if curNode is 6 and (
-    (nextNode is 2 and !(4 in path)) or
-    (nextNode is 0 and !(3 in path)) or
-    (nextNode is 8 and !(7 in path)))
+    (nextNode is 2 and 4 not in path) or
+    (nextNode is 0 and 3 not in path) or
+    (nextNode is 8 and 7 not in path)):
         next();
 
     if curNode is 8 and (
-    (nextNode is 2 and !(5 in path)) or
-    (nextNode is 6 and !(7 in path)) or
-    (nextNode is 0 and !(4 in path)))
+    (nextNode is 2 and 5 not in path) or
+    (nextNode is 6 and 7 not in path) or
+    (nextNode is 0 and 4 not in path)):
         next();
 
     // check the side midpoints
 
-    if curNode is 1 and nextNode is 7 and !(4 in path)
+    if curNode is 1 and nextNode is 7 and 4 not in path:
         next();
 
-    if curNode is 3 and nextNode is 5 and !(4 in path)
+    if curNode is 3 and nextNode is 5 and 4 not in path:
         next();
 
-    if curNode is 5 and nextNode is 3 and !(4 in path)
+    if curNode is 5 and nextNode is 3 and 4 not in path:
         next();
 
-    if curNode is 7 and nextNode is 1 and !(4 in path)
+    if curNode is 7 and nextNode is 1 and 4 not in path:
         next();
 
     combos += recur(path + [nextNode]);

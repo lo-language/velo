@@ -5,8 +5,7 @@
 
 x = 25;
 
-foo =
+foo:
     reply(x);
-;
 
 reply(foo() + 30);
