@@ -5,11 +5,10 @@
 
 x = 55;
 
-foo =
-    reply(x);
-;
+foo:
+    reply x;
 
-reply(foo());
+reply foo();
 
 /**
 while foo() < 5:

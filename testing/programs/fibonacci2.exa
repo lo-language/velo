@@ -5,10 +5,10 @@
 receive n;
 
 if n < 0:
-    fail("Whatsamatta, you?");
+    fail "Whatsamatta, you?";
 
 if n <= 1:
-    reply(n);
+    reply n;
 
 j = 0;
 k = 1;
@@ -20,4 +20,4 @@ num = 1;
     k = num;
 ;
 
-reply(num);
+reply num;

@@ -6,5 +6,5 @@ message = "hello, world!";
 greeting = 'howdy, pardner';
 
 // procedure literal
-HardyRamanujan:
+HardyRamanujan is:
     reply(1729);

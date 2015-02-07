@@ -5,10 +5,10 @@
 receive num;
 
 if num < 0:
-    fail("I pity the fool!");
+    fail "I pity the fool!";
 
 if num <= 1:
-    reply(1);
+    reply 1;
 
 result = 1;
 
@@ -27,4 +27,4 @@ result = 1;
 // this tears at my very soul
 ;
 
-reply(result);
+reply result;

@@ -5,7 +5,7 @@
 
 x = 25;
 
-foo:
+foo is:
     reply(x);
 
-reply(foo() + 30);
+reply foo() + 30;

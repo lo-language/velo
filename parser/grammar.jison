@@ -98,9 +98,10 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "="                     return '='
 "?"                     return '?'
 "#"                     return '#'
+'is'                    return 'IS'
+"receive"               return 'RECEIVE'
 "if"                    return 'IF'
 "else"                  return 'ELSE'
-"receive"               return 'RECEIVE'
 "while"                 return 'WHILE'
 "complete"              return 'COMPLETE'
 "in"                    return 'IN'
@@ -169,6 +170,11 @@ ideas:
 separate reply() and fail() from the addresses since these calls terminate execution
 maybe the addresses are __reply and __fail or __out and __err?
 
+for defining+assigning procedures: ':' instead of 'is' would be consistent with the map syntax so it
+would look the same to define procedures in maps, but is that something we want?? or would that just confuse noobs?
+we could also have 'to' ID ':' which could be nice - to getItems: to splitResults: but is more opinionated, because
+to work your procname needs to be a verb, but I like the "teaching" connotations of "to x, ..."
+
 */
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -193,7 +199,7 @@ statement
     | assignment ';'
     | conditional
     | iteration
-    | ID ':' block -> {type: "assign", op: '=', left: {type: "id", name: $1}, right: {type: "procedure", statements: $3}}
+    | ID 'IS' ':' block -> {type: "assign", op: '=', left: {type: "id", name: $1}, right: {type: "procedure", statements: $4}}
     | COMPLETE (expr ',')* expr ';' -> {type: "complete", promises: $2.concat($3)}
     | SKIP ';' -> {type: 'skip'}
     ;

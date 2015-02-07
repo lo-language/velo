@@ -49,7 +49,7 @@ monkeys = 72;
 result = foo() ~>
     receive err;
     log(err);
-    reply(fixed);
+    reply fixed;
 ->
     receive result;
 ;
@@ -60,12 +60,11 @@ result = foo() ~>
 
 index = 0;
 
-iterator =
+iterator is:
     reply(items[index]);
     index++;
-;
 
-reply(iterator);
+reply iterator;
 
 complete foo;
 
