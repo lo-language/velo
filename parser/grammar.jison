@@ -163,6 +163,11 @@ testing binding:
 - could use "exists", e.g.:
     if parent exists:
 
+ideas:
+
+define procedures with foo: block syntax instead of foo = block syntax?
+start procedures with @ or $ or /\  or \\?
+
 */
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -187,6 +192,7 @@ statement
     | assignment ';'
     | conditional
     | iteration
+    | ID ':' block -> {type: "assign", op: '=', left: {type: "id", name: $1}, right: {type: "procedure", statements: $3}}
     | COMPLETE (expr ',')* expr ';' -> {type: "complete", promises: $2.concat($3)}
     | SKIP ';' -> {type: 'skip'}
     ;
