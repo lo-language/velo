@@ -3,13 +3,22 @@
  * 2/7/15
  */
 
-fact is:
 
-    receive num;
+foo is:
 
-    if num <= 1:
-        reply num;
+    receive x;
 
-    reply num * fact(num - 1);
+    factorial is:
 
-reply fact(5) / 2;
+        receive num;
+
+        if num <= 1:
+            reply num;
+
+        reply num * recur(num - 1);
+
+    reply factorial(x) / 2;
+
+
+reply foo(5);
+

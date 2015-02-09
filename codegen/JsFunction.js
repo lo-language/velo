@@ -28,43 +28,25 @@ __.prototype.isReady = function () {
 /**
  * Renders the expression in the given statement context.
  *
- * @param stmtContext
  * @return {String}
  */
-__.prototype.renderExpr = function (stmtContext) {
-
-    if (stmtContext === undefined) {
-        throw new Error("missing statement context");
-    }
-
-    this.expr = 'function () {\n\n'+
-        '\tvar args = Array.prototype.slice.call(arguments);\n' +
-        '\tvar result = Q.defer();\n\n\t' +
-        this.renderBody().replace(/\n/g, '\n\t') + '\n}';
-
-    return this.expr;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Renders the function body for use with new Function();
- *
- * @return {String}
- */
-__.prototype.renderBody = function () {
+__.prototype.renderExpr = function () {
 
     // maybe we should render statements INTO the js context? let it decide how to wrap them?
 
-    var body = this.stmts.map(function (stmt) {
-        return stmt.renderStmt();
-    }).join('\n');
+    var body =
+        '\n\tvar result = Q.defer();\n\n\t' +
+            this.stmts.map(function (stmt) {
+                return stmt.renderStmt();
+            }).join('\n');
 
-    // if the last statement isn't a result, add a return
+    // if the last statement isn't a result, add a return statement
     if (this.stmts[this.stmts.length - 1] instanceof JsResult == false) {
         body += '\n\treturn result.promise;';
     }
 
-    return body;
+    return 'function ($_recur, args) {'+
+        body.replace(/\n/g, '\n\t') + '\n}';
 };
 
 module.exports = __;

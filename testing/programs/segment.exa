@@ -1,0 +1,28 @@
+/**
+ * Created by: spurcell
+ * 2/8/15
+ */
+
+findWords is:
+
+    receive s; // could declare s constant here
+
+    length = #s;
+    i = 0;
+
+    // scan s
+
+    while i < length:
+
+        word = s[:i];
+
+        if dict has word:
+
+            rest = recur();
+
+            if rest != null:
+                reply cons(word, rest); // fuse
+
+    reply null; // is this the default?
+
+reply findWords('hitheresignpost');

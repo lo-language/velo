@@ -79,19 +79,15 @@ module.exports['conditionals'] = {
     },
 
     'neg': function (test) {
-
-//        console.error(this.runner.getJs());
-        this.runner.success(test, -1, 'negative');
+        this.runner.success(test, [-1], 'negative');
     },
 
     'zero': function (test) {
-
-        this.runner.success(test, 0, 'zero!');
+        this.runner.success(test, [0], 'zero!');
     },
 
     'pos': function (test) {
-
-        this.runner.success(test, 1, 'positive');
+        this.runner.success(test, [1], 'positive');
     }
 };
 
@@ -105,13 +101,11 @@ module.exports['factorial'] = {
     },
 
     'success': function (test) {
-
-        this.runner.success(test, 10, 3628800);
+        this.runner.success(test, [10], 3628800);
     },
 
     'failure': function (test) {
-
-        this.runner.failure(test, -1, 'I pity the fool!');
+        this.runner.failure(test, [-1], 'I pity the fool!');
     }
 };
 
@@ -126,12 +120,12 @@ module.exports['fibonacci'] = {
 
     'success': function (test) {
 
-        this.runner.success(test, 10, 55);
+        this.runner.success(test, [10], 55);
     },
 
     'failure': function (test) {
 
-        this.runner.failure(test, -1, 'Whatsamatta, you?');
+        this.runner.failure(test, [-1], 'Whatsamatta, you?');
     }
 };
 
@@ -201,7 +195,6 @@ module.exports['procedure'] = {
 
     'success': function (test) {
 
-        console.error(this.runner.getJs());
         this.runner.success(test, [], 60);
     }
 };

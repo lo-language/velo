@@ -335,7 +335,16 @@ __.prototype['request'] = function (node, scope) {
         return self.compile(arg, scope);
     });
 
-    return new JsCall(fnId, args);
+    var argExpr = {
+
+        renderExpr: function (stmtContext) {
+            return '[' + args.map(function (arg) {
+                return arg.renderExpr(stmtContext);
+            }).join(',') + ']';
+        }
+    };
+
+    return new JsCall(fnId, [fnId, argExpr]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

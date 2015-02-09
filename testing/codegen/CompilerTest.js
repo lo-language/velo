@@ -122,7 +122,7 @@ module.exports["request"] = {
         var stmtContext = new JsStmt();
         test.equal(result.renderExpr(stmtContext), 'tmp_0');
 
-        test.equal(result.renderStmt(), '$_foo();');
+        test.equal(result.renderStmt(), '$_foo($_foo,[]);');
         test.done();
     },
 
@@ -140,7 +140,7 @@ module.exports["request"] = {
         var stmtContext = new JsStmt();
         test.equal(result.renderExpr(stmtContext), 'tmp_0');
 
-        test.equal(result.renderStmt(), '$_foo(42);');
+        test.equal(result.renderStmt(), '$_foo($_foo,[42]);');
         test.done();
     },
 
@@ -159,7 +159,7 @@ module.exports["request"] = {
         var stmtContext = new JsStmt();
         test.equal(result.renderExpr(stmtContext), 'tmp_0');
 
-        test.equal(result.renderStmt(), "$_foo(42,'hi there');");
+        test.equal(result.renderStmt(), "$_foo($_foo,[42,'hi there']);");
         test.done();
     },
 
@@ -186,7 +186,7 @@ module.exports["request"] = {
         var stmtContext = new JsStmt();
         test.equal(result.renderExpr(stmtContext), 'tmp_0');
 
-        test.equal(result.renderStmt(), "Q.spread([$_foo(),$_bar()], function (tmp_0,tmp_1) {\n    $_baz(tmp_0,tmp_1);\n}, result.reject);");
+        test.equal(result.renderStmt(), "Q.spread([$_foo($_foo,[]),$_bar($_bar,[])], function (tmp_0,tmp_1) {\n    $_baz($_baz,[tmp_0,tmp_1]);\n}, result.reject);");
         test.done();
     }
 };
@@ -353,7 +353,7 @@ module.exports["statements"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.renderStmt(), '$_foo(42);');
+        test.equal(result.renderStmt(), '$_foo($_foo,[42]);');
         test.done();
     },
 
@@ -382,7 +382,7 @@ module.exports["statements"] = {
         var result = this.compiler.compile(node);
 
         test.equal(result.renderStmt(),
-            'Q.spread([$_foo(),$_bar()], function (tmp_0,tmp_1) {\n    $_baz((tmp_0 - tmp_1));\n}, result.reject);');
+            'Q.spread([$_foo($_foo,[]),$_bar($_bar,[])], function (tmp_0,tmp_1) {\n    $_baz($_baz,[(tmp_0 - tmp_1)]);\n}, result.reject);');
         test.done();
     },
 
@@ -414,36 +414,7 @@ module.exports["statements"] = {
         var result = this.compiler.compile(node);
 
         test.equal(result.renderStmt(),
-            'Q.spread([$_foo(),$_bar()], function (tmp_0,tmp_1) {\n    Q.spread([$_baz((tmp_0 - tmp_1))], function (tmp_0) {\n    $_quux(tmp_0);\n}, result.reject);\n}, result.reject);');
-        test.done();
-    }
-};
-
-module.exports["root procedure"] = {
-
-    "setUp": function (cb) {
-        this.compiler = new Compiler();
-        cb();
-    },
-
-    "compiles all statements": function (test) {
-
-        // should create a context
-        // should call compile on each statement
-
-        var node = {
-            type: 'procedure',
-            statements: [
-                {type: 'assign', op: '=', left: {type: 'id', name: 'foo'}, right: {type: 'id', name: 'bar'}}
-            ]
-        };
-
-        // patch sub nodes?
-
-        var result = this.compiler.compile(node);
-
-        test.equal(result.renderBody(),
-            '$_foo = $_bar;\n');
+            'Q.spread([$_foo($_foo,[]),$_bar($_bar,[])], function (tmp_0,tmp_1) {\n    Q.spread([$_baz($_baz,[(tmp_0 - tmp_1)])], function (tmp_0) {\n    $_quux($_quux,[tmp_0]);\n}, result.reject);\n}, result.reject);');
         test.done();
     }
 };
@@ -538,7 +509,7 @@ module.exports["conditional"] = {
         var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
-        test.equal(result.renderStmt(), 'if ($_foo) {\n    $_bar = 42;\n}');
+        test.equal(result.renderStmt(), 'if ($_foo) {\n\t$_bar = 42;\n}');
         test.ok(scope.getStatus('bar'));
         test.done();
     },
@@ -560,7 +531,7 @@ module.exports["conditional"] = {
         var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
-        test.equal(result.renderStmt(), 'if ($_foo) {\n    $_bar = 42;\n}\nelse {\n    $_bar = 32;\n}');
+        test.equal(result.renderStmt(), 'if ($_foo) {\n\t$_bar = 42;\n}\nelse {\n    $_bar = 32;\n}');
         test.ok(scope.getStatus('bar'));
         test.done();
     },
@@ -587,7 +558,7 @@ module.exports["conditional"] = {
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.renderStmt(),
-            'if ($_foo) {\n    $_bar = 42;\n}\nelse if ($_bar) {\n    $_bar = 32;\n}\nelse {\n    $_baz = 82;\n}');
+            'if ($_foo) {\n\t$_bar = 42;\n}\nelse if ($_bar) {\n\t$_bar = 32;\n}\nelse {\n    $_baz = 82;\n}');
         test.done();
     }
 };
@@ -665,7 +636,7 @@ module.exports["assignment"] = {
         var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
-        test.equal(result.renderStmt(), 'Q.spread([$_bar()], function (tmp_0) {\n    $_foo = tmp_0;\n}, result.reject);');
+        test.equal(result.renderStmt(), 'Q.spread([$_bar($_bar,[])], function (tmp_0) {\n    $_foo = tmp_0;\n}, result.reject);');
         test.done();
     }
 };
@@ -759,7 +730,7 @@ module.exports["procedure"] = {
         var stmtContext = new JsStmt();
 
         test.equal(result.renderExpr(stmtContext),
-            "function () {\n\nvar args = Array.prototype.slice.call(arguments);\nvar result = Q.defer();\n\nvar $_next = args.shift();\n$_result *= $_next;\n\nreturn result.promise;\n}");
+            "function ($_recur, args) {\n\t\tvar result = Q.defer();\n\t\n\t\tvar $_next = args.shift();\n\t$_result *= $_next;\n\t\treturn result.promise;\n}");
         test.done();
     }
 };

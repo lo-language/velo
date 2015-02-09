@@ -57,7 +57,7 @@ __.prototype.parse = function () {
 __.prototype.compile = function () {
 
     if (this.js === undefined) {
-        this.js = this.compiler.compile(this.parse()).renderBody();
+        this.js = this.compiler.compile(this.parse()).renderExpr();
     }
 
     return this.js;
@@ -67,23 +67,21 @@ __.prototype.compile = function () {
 /**
  * Loads the compiled code to be executed - NOT as a closure. This doesn't leak the local scope, but doesn't hide
  * globals, either. But name wrapping should make the globals unaddressable - unlless there's one that starts with $_.
+ *
+ * @return {Function}
  */
 __.prototype.load = function () {
 
     if (this.fn === undefined) {
 
-        // creates a function that defines a named function then immediately invokes it
+        // the function we create here won't have a name, so can't call itself recursively
+        // so we wrap the function we get by compiling the root procedure in another function
+        // that just gives that function a name and immediately calls it, passing through any args
 
-        // todo i'd probably like to get away from returning promises so we can just use return to abort fn and not
-        // worry about what it's actually returning
+        var body = 'var root = ' + this.compile() +
+            '\n\nreturn root(root, args);';
 
-        var body = 'return function $_recur() {\n\n'+
-            'var args = Array.prototype.slice.call(arguments);\n' +
-            'var result = Q.defer();\n\n' +
-            this.compile() + '\n' +
-            'return result.promise;\n}.apply(null, Array.prototype.slice.call(arguments, 2));\n';
-
-        this.fn = new Function('Q, $_info', body).bind(null, Q, console.error);
+        this.fn = new Function('Q, $_info, args', body).bind(null, Q, console.error);
     }
 };
 
@@ -91,15 +89,16 @@ __.prototype.load = function () {
 /**
  * Runs the program, passing in the arguments we're given, returning a promise for the result.
  *
+ * @param args  arguments array to pass into the procedure
  * @return {promise}
  */
-__.prototype.run = function () {
+__.prototype.run = function (args) {
 
     if (this.fn === undefined) {
         this.load();
     }
 
-    return this.fn.apply(null, arguments);
+    return this.fn.call(null, args);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
