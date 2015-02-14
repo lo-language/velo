@@ -93,5 +93,32 @@
                 }
             ]
         }
+    },
+    {
+        "type":"assign",
+        "op":"=",
+        "left":{
+            "type":"id",
+            "name":"pairs"
+        },
+        "right":{
+            "type":"set",
+            "members":[
+                ["dyad", {
+                    "type":"id",
+                    "name":"key1"
+                }, {
+                    "type":"symbol",
+                    "name":"blue"
+                }],
+                ["dyad", {
+                    "type":"id",
+                    "name":"key2"
+                }, {
+                    "type":"symbol",
+                    "name":"amber"
+                }]
+            ]
+        }
     }
 ]}

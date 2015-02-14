@@ -7,17 +7,19 @@
 foo is:
 
     receive x;
-
-    factorial is:
-
-        receive num;
-
-        if num <= 1:
-            reply num;
-
-        reply num * recur(num - 1);
-
     reply factorial(x) / 2;
+
+
+factorial is:
+
+    receive num;
+
+    again = recur;
+
+    if num <= 1:
+        reply num;
+
+    reply num * again(num - 1);
 
 
 reply foo(5);

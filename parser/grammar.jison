@@ -4,7 +4,7 @@
 %x indent
 
 digit                       [0-9]
-number                      {digit}+("."{digit}+)?\b
+number                      \-?{digit}+("."{digit}+)?\b
 id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 %%
@@ -55,6 +55,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
     }
                         %}
 \s+                     /* ignore all other whitespace */
+"`"                     return '`'
 "true"|"false"          return 'BOOLEAN'
 {number}                return 'NUMBER'
 \"[^\"]*\"              yytext = yytext.substr(1, yyleng-2); return 'STRING';
@@ -98,7 +99,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "="                     return '='
 "?"                     return '?'
 "#"                     return '#'
-'is'                    return 'IS'
+"is"                    return 'IS'
 "receive"               return 'RECEIVE'
 "if"                    return 'IF'
 "else"                  return 'ELSE'
@@ -111,6 +112,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "stop"                  return 'STOP'
 "try"                   return 'TRY'
 {id}                    return 'ID'
+"procedure"             return 'PROCEDURE'
 .                       return 'INVALID'
 
 /lex
@@ -195,6 +197,7 @@ block
 
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: 'receive', names: $2.concat($3)}
+    | ADOPT (ID ',')* ID ';' -> {type: 'adopt', names: $2.concat($3)}
     | expr ';'  // to support standalone invocations
     | result ';'
     | assignment ';'
@@ -249,12 +252,12 @@ atom
     ;
 
 literal
-    : BOOLEAN -> {type: 'boolean', val: $1 == 'true'}
+    : '<' ID '>' -> {type: 'symbol', name: $2}
+    | BOOLEAN -> {type: 'boolean', val: $1 == 'true'}
     | NUMBER -> {type: 'number', val: parseFloat($1)}
     | STRING -> {type: 'string', val: $1}
     | '[' (expr ',')* expr? ']' -> {type: 'list', elements: $3 ? $2.concat([$3]): []}
-    | '{' (dyad ',')* dyad? '}' -> {type: 'set', members: $3 ? $2.concat([$3]): []}
-    | block -> {type: 'procedure', statements: $1}
+    | '{' BEGIN* (dyad ',')* dyad? END* '}' -> {type: 'set', members: $4 ? $3.concat([$4]): []}
     ;
 
 dyad
@@ -295,7 +298,9 @@ expr
     ;
 
 connection
-    : expr '->' expr -> {type: 'connection', connector: $2, source: $1, sink: $3}
+    : expr '->' block -> {type: 'connection', connector: $2, source: $1, sink: {type: 'procedure', statements: $3}}
+    | expr '->' expr -> {type: 'connection', connector: $2, source: $1, sink: $3}
+    | expr '~>' block -> {type: 'connection', connector: $2, source: $1, sink: {type: 'procedure', statements: $3}}
     | expr '~>' expr -> {type: 'connection', connector: $2, source: $1, sink: $3}
     | expr '=>' expr -> {type: 'connection', connector: $2, source: $1, sink: $3}
     ;

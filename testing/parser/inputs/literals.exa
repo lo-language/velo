@@ -8,3 +8,9 @@ greeting = 'howdy, pardner';
 // procedure literal
 HardyRamanujan is:
     reply(1729);
+
+// map with indentation and symbols
+pairs = {
+    key1: <blue>,
+    key2: <amber>
+};

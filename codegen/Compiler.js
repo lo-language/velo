@@ -84,8 +84,8 @@ __.prototype['procedure'] = function (node, scope) {
     // since we might not get them with each request
 
     localScope.defineArg('recur');
-    localScope.defineArg('__reply');
-    localScope.defineArg('__fail');
+    localScope.defineArg('__out');
+    localScope.defineArg('__err');
 
     // compile the statements in the context of the local scope
     var stmts = node.statements.map(function (stmt) {

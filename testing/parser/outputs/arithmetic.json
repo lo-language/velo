@@ -19,7 +19,7 @@
                         "op": "*",
                         "left": {"type":"id","name":"foo"},
                         "right": {"type":"id","name":"bar"}},
-                    "right": {"type":"number", "val":2}
+                    "right": {"type":"number", "val":-2}
                 }},
             "right": {
                 "type":"op",
