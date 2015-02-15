@@ -735,25 +735,6 @@ module.exports["procedure"] = {
     }
 };
 
-module.exports["skip"] = {
-
-    "setUp": function (cb) {
-        this.compiler = new Compiler();
-        cb();
-    },
-
-    "basic": function (test) {
-
-        var node = {type: 'skip'};
-
-        var scope = new Scope();
-        var result = this.compiler.compile(node, scope);
-
-        test.equal(result.renderStmt(), 'return;');
-        test.done();
-    }
-};
-
 module.exports["connection"] = {
 
     "setUp": function (cb) {

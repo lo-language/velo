@@ -81,8 +81,33 @@ __.prototype.load = function () {
         var body = 'var root = ' + this.compile() +
             '\n\nreturn root(root, args);';
 
-        this.fn = new Function('Q, $_info, args', body).bind(null, Q, console.error);
+        // load and info are temporary here
+        this.fn = new Function('Q, $_info, $_load, args', body).bind(null, Q,
+
+            function (recur, args) {
+                console.error.apply(null, args);
+            },
+
+            function (recur, args) {
+
+                var path = args[0];
+
+                console.error("loading " + path);
+
+                return Q.nfcall(fs.readFile, "foo.txt", "utf-8").then(
+                    function (source) {
+
+                        var mod = new __(source);
+
+                        console.error("compiling " + source);
+                        return mod.load();
+                    }
+                );
+            }
+        );
     }
+
+    return this.fn;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

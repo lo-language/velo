@@ -56,7 +56,7 @@ __.prototype.compile = function (node, scope) {
         throw new Error("don't know how to compile node type '" + node.type + "'");
     }
 
-//    console.error('compiling ' + node.type);
+    console.error('compiling ' + node.type);
     return this[node.type](node, scope);
 };
 
@@ -172,8 +172,24 @@ __.prototype['set'] = function (node, scope) {
 
     return new JsExpr(function (stmtContext) {
         return '{' + members.map(function (member) {
-            return member.renderExpr(stmtContext) + ': true'
+            return member.renderExpr(stmtContext)
         }).join(',') + '}';
+    });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['dyad'] = function (node, scope) {
+
+    var key = this.compile(node.key, scope);
+    var value = this.compile(node.value, scope);
+
+    return new JsExpr(function (stmtContext) {
+        return key.renderExpr(stmtContext) + ':' + value.renderExpr(stmtContext);
     });
 };
 
@@ -186,6 +202,18 @@ __.prototype['set'] = function (node, scope) {
 __.prototype['id'] = function (node) {
 
     return new JsExpr('$_' + node.name);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Compiles a symbol into a string literal for now.
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['symbol'] = function (node) {
+
+    return new JsExpr("'<" + node.name + ">'");
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -343,6 +371,8 @@ __.prototype['request'] = function (node, scope) {
             }).join(',') + ']';
         }
     };
+
+    // pass everything below here too?
 
     return new JsCall(fnId, [fnId, argExpr]);
 };
@@ -530,17 +560,6 @@ __.prototype['subscript'] = function (node, scope) {
         return list.renderExpr(stmtContext) + '[' +
             (index === undefined ? list.renderExpr(stmtContext) + '.length - 1' : index.renderExpr(stmtContext)) + ']';
     });
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param scope
- * @param node
- */
-__.prototype['skip'] = function (node, scope) {
-
-    return new JsStmt('return;');
 };
 
 module.exports = __;

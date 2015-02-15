@@ -253,6 +253,7 @@ atom
 
 literal
     : '<' ID '>' -> {type: 'symbol', name: $2}
+    | '`' ID -> {type: 'symbol', name: $2}
     | BOOLEAN -> {type: 'boolean', val: $1 == 'true'}
     | NUMBER -> {type: 'number', val: parseFloat($1)}
     | STRING -> {type: 'string', val: $1}
@@ -261,8 +262,8 @@ literal
     ;
 
 dyad
-    : expr
-    | expr ':' expr -> ['dyad', $1, $3];
+    : expr -> {type: 'dyad', key: $1, value: {type: 'boolean', val: true}};
+    | expr ':' expr -> {type: 'dyad', key: $1, value: $3};
     ;
 
 // requests are the only expressions that can also be stand-alone statements

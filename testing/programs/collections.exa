@@ -6,8 +6,8 @@
 // words literal
 words = ['foo', 'mani', 'padme', 'hum'];
 
-// set literal with intentional repetition
-dudes = {'zaphod', 'ford', 'arthur', 'ford'};
+// set literal with symbols and intentional repetition
+dudes = { <zaphod>, <ford>, <arthur>, <ford> };
 
 // map literal
 // support block syntax (no braces)?
@@ -38,6 +38,14 @@ if 'om' in words:
 
 if 'trillian' in dudes:
     fail 'not a dude';
+
+doctor = <zoidberg>;
+
+if doctor == <zoidberg>:
+    doctor = `mccoy;
+
+if doctor == <zoidberg>:
+    fail "uh-oh";
 
 // shouldn't be necessary but is for now; otherwise we never conclude
 reply;

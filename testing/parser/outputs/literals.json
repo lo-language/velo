@@ -104,20 +104,28 @@
         "right":{
             "type":"set",
             "members":[
-                ["dyad", {
-                    "type":"id",
-                    "name":"key1"
-                }, {
-                    "type":"symbol",
-                    "name":"blue"
-                }],
-                ["dyad", {
-                    "type":"id",
-                    "name":"key2"
-                }, {
-                    "type":"symbol",
-                    "name":"amber"
-                }]
+                {
+                    "type":"dyad",
+                    "key":{
+                        "type":"id",
+                        "name":"key1"
+                    },
+                    "value":{
+                        "type":"symbol",
+                        "name":"blue"
+                    }
+                },
+                {
+                    "type":"dyad",
+                    "key":{
+                        "type":"id",
+                        "name":"key2"
+                    },
+                    "value":{
+                        "type":"symbol",
+                        "name":"amber"
+                    }
+                }
             ]
         }
     }

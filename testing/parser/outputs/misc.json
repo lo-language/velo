@@ -178,20 +178,28 @@
                     {
                         "type":"set",
                         "members":[
-                            ["dyad", {
-                                "type":"boolean",
-                                "val":true
-                            }, {
-                                "type":"number",
-                                "val":72
-                            }],
-                            ["dyad", {
-                                "type":"number",
-                                "val":89
-                            }, {
-                                "type":"number",
-                                "val":42
-                            }]
+                            {
+                                "type":"dyad",
+                                "key":{
+                                    "type":"boolean",
+                                    "val":true
+                                },
+                                "value":{
+                                    "type":"number",
+                                    "val":72
+                                }
+                            },
+                            {
+                                "type":"dyad",
+                                "key":{
+                                    "type":"number",
+                                    "val":89
+                                },
+                                "value":{
+                                    "type":"number",
+                                    "val":42
+                                }
+                            }
                         ]
                     }
                 ]
@@ -213,34 +221,60 @@
         "to":{
             "type":"set",
             "members":[
-                ["dyad", {
-                    "type":"string",
-                    "val":"whale"
-                }, {
-                    "type":"number",
-                    "val":57
-                }],
-                ["dyad", {
-                    "type":"id",
-                    "name":"foo"
-                }, {
-                    "type":"number",
-                    "val":52
-                }],
-                ["dyad", {
-                    "type":"number",
-                    "val":42
-                }, {
-                    "type":"number",
-                    "val":7
-                }],
                 {
-                    "type":"string",
-                    "val":"porkchop"
+                    "type":"dyad",
+                    "key":{
+                        "type":"string",
+                        "val":"whale"
+                    },
+                    "value":{
+                        "type":"number",
+                        "val":57
+                    }
                 },
                 {
-                    "type":"id",
-                    "name":"buttercup"
+                    "type":"dyad",
+                    "key":{
+                        "type":"id",
+                        "name":"foo"
+                    },
+                    "value":{
+                        "type":"number",
+                        "val":52
+                    }
+                },
+                {
+                    "type":"dyad",
+                    "key":{
+                        "type":"number",
+                        "val":42
+                    },
+                    "value":{
+                        "type":"number",
+                        "val":7
+                    }
+                },
+                {
+                    "type":"dyad",
+                    "key":{
+                        "type":"string",
+                        "val":"porkchop"
+                    },
+                    "value":{
+                        "type":"boolean",
+                        "val":true
+                    }
+                },
+                {
+                    "type":"dyad",
+                    "key":{
+                        "type":"id",
+                        "name":"buttercup"
+                    },
+                    "value":{
+                        "type":"boolean",
+                        "val":true
+                    }
                 }
             ]
         },

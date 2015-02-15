@@ -140,6 +140,7 @@ module.exports['collections'] = {
 
     'all': function (test) {
 
+        console.error(this.runner.getJs());
         this.runner.success(test);
     }
 };
