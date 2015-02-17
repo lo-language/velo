@@ -9,7 +9,8 @@ var Scope = require('./Scope');
 var JsExpr = require('./JsExpr');
 var JsStmt = require('./JsStmt');
 var JsConditional = require('./JsConditional');
-var JsFunction = require('./JsFunction');
+var Complete = require('./Complete');
+var ExprWrapper = require('./ExprWrapper');
 var JsResult = require('./JsResult');
 var JsCall = require('./JsCall');
 
@@ -56,7 +57,7 @@ __.prototype.compile = function (node, scope) {
         throw new Error("don't know how to compile node type '" + node.type + "'");
     }
 
-    console.error('compiling ' + node.type);
+//    console.error('compiling ' + node.type);
     return this[node.type](node, scope);
 };
 
@@ -68,7 +69,6 @@ __.prototype.compile = function (node, scope) {
  */
 __.prototype['procedure'] = function (node, scope) {
 
-    var self = this;
     var localScope;
 
     // if there's no enclosing scope, we're at the root of the scope tree
@@ -87,14 +87,426 @@ __.prototype['procedure'] = function (node, scope) {
     localScope.defineArg('__out');
     localScope.defineArg('__err');
 
-    // compile the statements in the context of the local scope
-    var stmts = node.statements.map(function (stmt) {
-        return self.compile(stmt, localScope);
-    });
+    // compile the statement(s) in the context of the local scope
+    return this.compile(node.body, localScope);
 
-    return new JsFunction(stmts);
+    // compile the statements in the context of the local scope
+//    var stmts = node.statements.map(function (stmt) {
+//        return self.compile(stmt, localScope);
+//    });
+
+//    return new JsFunction(stmts);
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['stmt_list'] = function (node, scope) {
+
+    // hooray for Lisp!
+    return this.compile(node.head, scope).continue(this.compile(node.tail, scope));
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Statements
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * @param scope
+ * @param node
+ */
+__.prototype['receive'] = function (node, scope) {
+
+    var vars = [];
+
+    // todo - shift args off instead of tracking count
+
+    node.names.forEach(function (name) {
+        vars.push('$_' + name + ' = ' + 'args.shift()');
+    });
+
+    var stmt = 'var ' + vars.join(',\n') + ';';
+
+    return new JsStmt(stmt);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['result'] = function (node, scope) {
+
+    // should this node type be renamed response?
+
+    var name = 'result.resolve';
+
+    if (node.channel === 'fail') {
+        name = 'result.reject';
+    }
+
+    var self = this;
+
+    var args = node.args.map(function (arg) {
+        return self.compile(arg, scope);
+    });
+
+    return new JsResult(new JsCall(new JsExpr(name), args));
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * An assignment may alter the current scope by defining a variable in it if the LHS of the assign
+ * is a simple identifier.
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['assign'] = function (node, scope) {
+
+    // this is guaranteed to be a statement
+
+    var left = this.compile(node.left, scope);
+    var right = this.compile(node.right, scope);
+
+    // is being ready a property of an AST node + exa scope?
+    // is tracking ready state just an optimization? or do we need it to not have turtles all the way down?
+    // can we 'ask' the ast node if it's ready?
+    // the compilation result should know that already, right?
+
+    // modify the local scope
+    // todo we can't really do this, since we might be inside a conditional!
+    // maybe we could track if we're in a conditional scope??
+    if (node.left.type == 'id') {
+        scope.define(node.left.name, right.isReady());
+    }
+
+    return new JsStmt(function (stmtContext) {
+        return left.renderExpr(stmtContext) + ' ' + node.op + ' ' + right.renderExpr(stmtContext) + ';';
+    });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['conditional'] = function (node, scope) {
+
+    var self = this;
+
+    // needs predicate to be ready
+
+    var predicate = this.compile(node.predicate);
+
+    var posBlock = node.consequent.map(function (stmt) {
+        return self.compile(stmt, scope);
+    });
+
+    var negBlock;
+
+    if (node.otherwise !== undefined) {
+
+        if (Array.isArray(node.otherwise)) {
+            negBlock = node.otherwise.map(function (stmt) {
+                return self.compile(stmt, scope);
+            });
+        }
+        else {
+            negBlock = this.compile(node.otherwise, scope);
+        }
+    }
+
+    return new JsConditional(predicate, posBlock, negBlock);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Loops while a condition is true.
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['iteration'] = function (node, scope) {
+
+    var condition = this.compile(node.condition, scope);
+//    var statements = this.compile(node.statements, scope);
+
+    return new JsStmt(function (stmtContext) {
+//        return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
+    });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Selective synchronization barrier.
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['complete'] = function (node, scope) {
+
+    // complete always needs to wrap its followers (children)
+
+    // should we pass each node a parse tree for it to subsume when we compile it?
+    // or should it pass back something that can subsume a node?
+
+    var self = this;
+
+    var promises = node.promises.map(function (expr) {
+        return self.compile(expr, scope);
+    });
+
+    return new Complete(promises);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Requests
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * A request can be part of an expression or a standalone statement.
+ *
+ * Requests always compile to async calls:
+ *
+ * - if result ignored, we don't do anything
+ * - if result directly asssigned, we can return a promise
+ * - if part of any other expression, we need to invert the parse tree to do the call first
+ * - if handed a callback, wire it up to the promise
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['request'] = function (node, scope) {
+
+    var target = this.compile(node.to, scope);
+    var self = this;
+
+    return new ExprWrapper(function (env) {
+
+        // call makeSync() once since it's not idempotent (probably should be)
+        var targetId = env.syncrify(target);
+
+        var args = node.args.map(function (arg) {
+            return env.syncrify(self.compile(arg, scope));
+        }).join(',');
+
+        return targetId + '(' + targetId + ',[' + args + '])';
+    }, true);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Expressions
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['id'] = function (node) {
+
+    return '$_' + node.name;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['cardinality'] = function (node, scope) {
+
+    var right = this.compile(node.operand, scope);
+
+    // wrap in small function? inspects type then gets size?
+
+    // make a general JS code class? that can hold string and expr parts?
+    // do we really need the JS AST level? or could we compile directly in one pass?
+
+    return new JsExpr(
+        function (stmtContext) {
+            return 'function (val) {' +
+                "if (typeof val === 'string') return val.length;" +
+                "else if (Array.isArray(val)) return val.length;" +
+                "else if (typeof val === 'object') return Object.keys(val).length;" +
+                "}(" + right.renderExpr(stmtContext) + ")"});
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['complement'] = function (node, scope) {
+
+    var right = this.compile(node.operand, scope);
+
+    return new JsExpr(
+        function (stmtContext) {
+            return '!' + right.renderExpr(stmtContext)
+        });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['subscript'] = function (node, scope) {
+
+    // this is guaranteed to be a statement
+
+    var list = this.compile(node.list, scope);
+    var index = undefined;
+
+    if (node.index !== undefined) {
+        index = this.compile(node.index, scope);
+    }
+
+    // todo - what if the list expression is a request or somesuch? can't resolve it twice
+    // wrap it in a helper function?
+
+    return new JsExpr(function (stmtContext) {
+
+        return list.renderExpr(stmtContext) + '[' +
+            (index === undefined ? list.renderExpr(stmtContext) + '.length - 1' : index.renderExpr(stmtContext)) + ']';
+    });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['in'] = function (node, scope) {
+
+    // should holds apply to strings? maybe as 'contains'? or some non-word operator?
+
+    var left = this.compile(node.left, scope);
+    var right = this.compile(node.right, scope);
+
+    return new JsExpr(
+        function (stmtContext) {
+            return 'function (item, collection) {' +
+                "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
+                "else if (typeof val === 'object') return collection.hasOwnProperty(item);" +
+                "}(" + left.renderExpr(stmtContext) + ',' + right.renderExpr(stmtContext) + ")"});
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['sequence'] = function (node, scope) {
+
+    var first = this.compile(node.first, scope);
+    var last = this.compile(node.last, scope);
+
+    // renders an expression that is a function that takes a single arg -
+    // the action to be performed
+
+    return new JsExpr(
+        function (stmtContext) {
+
+            // inject a var into the context
+            return stmtContext.definePrereq(
+                'function (first, last, action) {' +
+                    "for (var num = first; num <= last; num++) {" +
+                    "action(num);" +
+                    "}}.bind(null," + first.renderExpr(stmtContext) + ',' + last.renderExpr(stmtContext) + ")");
+        });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['connection'] = function (node, scope) {
+
+    // how to handle multiple connectors?
+
+    // sources and sinks are like calls in that they generate both statements and expressions
+    // they have expressions but inject statements into the context
+
+    var source = this.compile(node.source, scope);
+    var sink = this.compile(node.sink, scope);
+
+    return new JsExpr(function (stmtContext) {
+        return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
+    });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @param node
+ */
+__.prototype['op'] = function (node, scope) {
+
+    var left = this.compile(node.left, scope);
+    var right = this.compile(node.right, scope);
+
+    var op = node.op;
+
+    if (op === 'and') {
+        op = '&&';
+    }
+    else if (op === 'or') {
+        op = '||';
+    }
+
+    return new ExprWrapper(function (env) {
+
+        // use parens to be safe
+        return '(' + env.syncrify(left) + ' ' + op + ' ' + env.syncrify(right) + ')';
+    });
+
+//    if (op === 'and') {
+//        op = '&&';
+//    }
+//    else if (op === 'or') {
+//        op = '||';
+//    }
+//    else if (op == '+') {
+//
+//        return new JsExpr(function (stmtContext) {
+//            return 'function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {' +
+//                'return left.concat(right);} else return left + right;}(' +
+//                left.renderExpr(stmtContext) + ',' + right.renderExpr(stmtContext) + ')'});
+//    }
+
+    // make sure both sides are defined
+    // could relax this if we want to allow declaration after usage
+    // should also factor this out into a getValue() maybe
+
+//    if (node.left.jsVal === undefined) {
+//        throw new Error("left operand not defined");
+//    }
+//
+//    if (node.right.jsVal === undefined) {
+//        throw new Error("right operand not defined");
+//    }
+
+//    return new JsExpr(function (stmtContext) {
+//
+//        // use parens to be safe
+//        return '(' + left.renderExpr(stmtContext) + ' ' + op + ' ' + right.renderExpr(stmtContext) + ')';
+//    });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Literals
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
@@ -104,7 +516,7 @@ __.prototype['procedure'] = function (node, scope) {
 __.prototype['boolean'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return new JsExpr(node.val ? 'true' : 'false', true);
+    return node.val ? 'true' : 'false';
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +528,7 @@ __.prototype['boolean'] = function (node) {
 __.prototype['number'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return new JsExpr("" + node.val, true);
+    return node.val;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -128,7 +540,7 @@ __.prototype['number'] = function (node) {
 __.prototype['string'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return new JsExpr("'" + node.val.replace(/'/g, "\\'") + "'", true);
+    return "'" + node.val.replace(/'/g, "\\'") + "'";
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,17 +607,6 @@ __.prototype['dyad'] = function (node, scope) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- *
- * @param scope
- * @param node
- */
-__.prototype['id'] = function (node) {
-
-    return new JsExpr('$_' + node.name);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
  * Compiles a symbol into a string literal for now.
  *
  * @param scope
@@ -214,352 +615,6 @@ __.prototype['id'] = function (node) {
 __.prototype['symbol'] = function (node) {
 
     return new JsExpr("'<" + node.name + ">'");
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param scope
- * @param node
- */
-__.prototype['cardinality'] = function (node, scope) {
-
-    var right = this.compile(node.operand, scope);
-
-    // wrap in small function? inspects type then gets size?
-
-    // make a general JS code class? that can hold string and expr parts?
-    // do we really need the JS AST level? or could we compile directly in one pass?
-
-    return new JsExpr(
-        function (stmtContext) {
-            return 'function (val) {' +
-            "if (typeof val === 'string') return val.length;" +
-            "else if (Array.isArray(val)) return val.length;" +
-            "else if (typeof val === 'object') return Object.keys(val).length;" +
-            "}(" + right.renderExpr(stmtContext) + ")"});
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param scope
- * @param node
- */
-__.prototype['complement'] = function (node, scope) {
-
-    var right = this.compile(node.operand, scope);
-
-    return new JsExpr(
-        function (stmtContext) {
-            return '!' + right.renderExpr(stmtContext)
-        });
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param scope
- * @param node
- */
-__.prototype['in'] = function (node, scope) {
-
-    // should holds apply to strings? maybe as 'contains'? or some non-word operator?
-
-    var left = this.compile(node.left, scope);
-    var right = this.compile(node.right, scope);
-
-    return new JsExpr(
-        function (stmtContext) {
-            return 'function (item, collection) {' +
-                "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
-                "else if (typeof val === 'object') return collection.hasOwnProperty(item);" +
-                "}(" + left.renderExpr(stmtContext) + ',' + right.renderExpr(stmtContext) + ")"});
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param scope
- * @param node
- */
-__.prototype['sequence'] = function (node, scope) {
-
-    var first = this.compile(node.first, scope);
-    var last = this.compile(node.last, scope);
-
-    // renders an expression that is a function that takes a single arg -
-    // the action to be performed
-
-    return new JsExpr(
-        function (stmtContext) {
-
-            // inject a var into the context
-            return stmtContext.definePrereq(
-                'function (first, last, action) {' +
-                "for (var num = first; num <= last; num++) {" +
-                "action(num);" +
-                "}}.bind(null," + first.renderExpr(stmtContext) + ',' + last.renderExpr(stmtContext) + ")");
-        });
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param scope
- * @param node
- */
-__.prototype['connection'] = function (node, scope) {
-
-    // how to handle multiple connectors?
-
-    // sources and sinks are like calls in that they generate both statements and expressions
-    // they have expressions but inject statements into the context
-
-    var source = this.compile(node.source, scope);
-    var sink = this.compile(node.sink, scope);
-
-    return new JsExpr(function (stmtContext) {
-        return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
-    });
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param scope
- * @param node
- */
-__.prototype['iteration'] = function (node, scope) {
-
-    var condition = this.compile(node.condition, scope);
-//    var statements = this.compile(node.statements, scope);
-
-    return new JsStmt(function (stmtContext) {
-//        return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
-    });
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * A request can be part of an expression or a standalone statement.
- *
- * Requests always compile to async calls:
- *
- * - if result ignored, we don't do anything
- * - if result directly asssigned, we can return a promise
- * - if part of any other expression, we need to invert the parse tree to do the call first
- * - if handed a callback, wire it up to the promise
- *
- * @param scope
- * @param node
- */
-__.prototype['request'] = function (node, scope) {
-
-    var fnId = this.compile(node.to, scope);
-
-    var self = this;
-    var args = node.args.map(function (arg) {
-        return self.compile(arg, scope);
-    });
-
-    var argExpr = {
-
-        renderExpr: function (stmtContext) {
-            return '[' + args.map(function (arg) {
-                return arg.renderExpr(stmtContext);
-            }).join(',') + ']';
-        }
-    };
-
-    // pass everything below here too?
-
-    return new JsCall(fnId, [fnId, argExpr]);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param scope
- * @param node
- */
-__.prototype['op'] = function (node, scope) {
-
-    var left = this.compile(node.left, scope);
-    var right = this.compile(node.right, scope);
-
-    var op = node.op;
-
-    if (op === 'and') {
-        op = '&&';
-    }
-    else if (op === 'or') {
-        op = '||';
-    }
-    else if (op == '+') {
-
-        return new JsExpr(function (stmtContext) {
-            return 'function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {' +
-            'return left.concat(right);} else return left + right;}(' +
-            left.renderExpr(stmtContext) + ',' + right.renderExpr(stmtContext) + ')'});
-    }
-
-    // make sure both sides are defined
-    // could relax this if we want to allow declaration after usage
-    // should also factor this out into a getValue() maybe
-
-//    if (node.left.jsVal === undefined) {
-//        throw new Error("left operand not defined");
-//    }
-//
-//    if (node.right.jsVal === undefined) {
-//        throw new Error("right operand not defined");
-//    }
-
-    return new JsExpr(function (stmtContext) {
-
-        // use parens to be safe
-        return '(' + left.renderExpr(stmtContext) + ' ' + op + ' ' + right.renderExpr(stmtContext) + ')';
-    });
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * @param scope
- * @param node
- */
-__.prototype['receive'] = function (node, scope) {
-
-    var vars = [];
-
-    // todo - shift args off instead of tracking count
-
-    node.names.forEach(function (name) {
-        vars.push('$_' + name + ' = ' + 'args.shift()');
-    });
-
-    var stmt = 'var ' + vars.join(',\n') + ';';
-
-    return new JsStmt(stmt);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param scope
- * @param node
- */
-__.prototype['conditional'] = function (node, scope) {
-
-    var self = this;
-
-    // needs predicate to be ready
-
-    var predicate = this.compile(node.predicate);
-
-    var posBlock = node.consequent.map(function (stmt) {
-        return self.compile(stmt, scope);
-    });
-
-    var negBlock;
-
-    if (node.otherwise !== undefined) {
-
-        if (Array.isArray(node.otherwise)) {
-            negBlock = node.otherwise.map(function (stmt) {
-                return self.compile(stmt, scope);
-            });
-        }
-        else {
-            negBlock = this.compile(node.otherwise, scope);
-        }
-    }
-
-    return new JsConditional(predicate, posBlock, negBlock);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param scope
- * @param node
- */
-__.prototype['result'] = function (node, scope) {
-
-    // should this node type be renamed response?
-
-    var name = 'result.resolve';
-
-    if (node.channel === 'fail') {
-        name = 'result.reject';
-    }
-
-    var self = this;
-
-    var args = node.args.map(function (arg) {
-        return self.compile(arg, scope);
-    });
-
-    return new JsResult(new JsCall(new JsExpr(name), args));
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * An assignment may alter the current scope by defining a variable in it if the LHS of the assign
- * is a simple identifier.
- *
- * @param scope
- * @param node
- */
-__.prototype['assign'] = function (node, scope) {
-
-    // this is guaranteed to be a statement
-
-    var left = this.compile(node.left, scope);
-    var right = this.compile(node.right, scope);
-
-    // is being ready a property of an AST node + exa scope?
-    // is tracking ready state just an optimization? or do we need it to not have turtles all the way down?
-    // can we 'ask' the ast node if it's ready?
-    // the compilation result should know that already, right?
-
-    // modify the local scope
-    // todo we can't really do this, since we might be inside a conditional!
-    // maybe we could track if we're in a conditional scope??
-    if (node.left.type == 'id') {
-        scope.define(node.left.name, right.isReady());
-    }
-
-    return new JsStmt(function (stmtContext) {
-        return left.renderExpr(stmtContext) + ' ' + node.op + ' ' + right.renderExpr(stmtContext) + ';';
-    });
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param scope
- * @param node
- */
-__.prototype['subscript'] = function (node, scope) {
-
-    // this is guaranteed to be a statement
-
-    var list = this.compile(node.list, scope);
-    var index = undefined;
-
-    if (node.index !== undefined) {
-        index = this.compile(node.index, scope);
-    }
-
-    // todo - what if the list expression is a request or somesuch? can't resolve it twice
-    // wrap it in a helper function?
-
-    return new JsExpr(function (stmtContext) {
-
-        return list.renderExpr(stmtContext) + '[' +
-            (index === undefined ? list.renderExpr(stmtContext) + '.length - 1' : index.renderExpr(stmtContext)) + ']';
-    });
 };
 
 module.exports = __;

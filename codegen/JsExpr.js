@@ -31,19 +31,19 @@ __.prototype.isReady = function () {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Renders the expression in the given statement context.
+ * Renders the expression in context of the given statement.
  *
- * @param stmtContext
+ * @param stmt
  * @return {String}
  */
-__.prototype.renderExpr = function (stmtContext) {
+__.prototype.renderExpr = function (stmt) {
 
-    if (stmtContext === undefined) {
+    if (stmt === undefined) {
         throw new Error("missing statement context");
     }
 
     if (typeof this.expr === 'function') {
-        return this.expr(stmtContext);
+        return this.expr(stmt);
     }
 
     return this.expr;

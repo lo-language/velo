@@ -22,6 +22,19 @@ var __ = function (stmt) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ *
+ * @param stmt
+ */
+__.prototype.continue = function (stmt) {
+
+    this.child = stmt;
+
+    // fluent
+    return this;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
  * A prereq is an expression that must be defined before the statement can be executed, and which may be a promise.
  *
  * @param expr - bare string or JsExpr
@@ -70,7 +83,10 @@ __.prototype.renderStmt = function () {
         return prev + 'var ' + varName + ' = ' + self.prereqs[varName].renderExpr(self) + ';\n';
     }, '');
 
-    stmt = prereqs + stmt;
+
+    var continuation = this.child ? '\n' + this.child.renderStmt() : '';
+
+    stmt = prereqs + stmt + continuation;
 
     if (Object.keys(this.promises).length == 0) {
         return stmt;

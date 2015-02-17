@@ -184,28 +184,32 @@ could also be "on foo:"
 // STRUCTURE
 
 program
-    : statement* EOF
-        { return {type: 'procedure', statements: $1}; }
+    : statement_list EOF
+        { return {type: 'procedure', body: $1}; }
     ;
 
 block
-    : BEGIN statement* END -> $2
+    : BEGIN statement_list END -> $2
     ;
 
 ////////////////////////////////////////////////////////////////////////////////
 // STATEMENTS
 
+statement_list
+    : statement
+    | statement statement_list -> {type: 'stmt_list', head: $1, tail: $2}
+    ;
+
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: 'receive', names: $2.concat($3)}
-    | ADOPT (ID ',')* ID ';' -> {type: 'adopt', names: $2.concat($3)}
     | expr ';'  // to support standalone invocations
     | result ';'
     | assignment ';'
     | conditional
     | iteration
-    | ID 'IS' ':' block -> {type: 'assign', op: '=', left: {type: 'id', name: $1}, right: {type: 'procedure', statements: $4}}
-    | COMPLETE (expr ',')* expr ';' -> {type: 'complete', promises: $2.concat($3)}
-    | SKIP ';' -> {type: 'skip'}
+    | ID 'IS' ':' block -> {type: 'assign', op: '=', left: {type: 'id', name: $1}, right: {type: 'procedure', body: $4}}
+    | COMPLETE (expr ',')* expr ';' -> {type: 'complete', promises: $2.concat([$3])}
+    | STOP ';' -> {type: 'stop'}
     ;
 
 result
@@ -253,7 +257,6 @@ atom
 
 literal
     : '<' ID '>' -> {type: 'symbol', name: $2}
-    | '`' ID -> {type: 'symbol', name: $2}
     | BOOLEAN -> {type: 'boolean', val: $1 == 'true'}
     | NUMBER -> {type: 'number', val: parseFloat($1)}
     | STRING -> {type: 'string', val: $1}
@@ -299,9 +302,9 @@ expr
     ;
 
 connection
-    : expr '->' block -> {type: 'connection', connector: $2, source: $1, sink: {type: 'procedure', statements: $3}}
+    : expr '->' block -> {type: 'connection', connector: $2, source: $1, sink: {type: 'procedure', body: $3}}
     | expr '->' expr -> {type: 'connection', connector: $2, source: $1, sink: $3}
-    | expr '~>' block -> {type: 'connection', connector: $2, source: $1, sink: {type: 'procedure', statements: $3}}
+    | expr '~>' block -> {type: 'connection', connector: $2, source: $1, sink: {type: 'procedure', body: $3}}
     | expr '~>' expr -> {type: 'connection', connector: $2, source: $1, sink: $3}
     | expr '=>' expr -> {type: 'connection', connector: $2, source: $1, sink: $3}
     ;
