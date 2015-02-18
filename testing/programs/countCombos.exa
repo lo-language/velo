@@ -34,7 +34,7 @@ while x < 15:
 // another async version - lets you kick off the requests in quick succession
 // but then wait for them all to complete before moving on
 // elements in reqs are 'transparent promises' because they're just held onto via an assignment - not used
-// if they were used, they'd need to be resolved
+// if they were used, they'd need to be realized
 reqs = [];
 
 while x < 10:

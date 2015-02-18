@@ -5,13 +5,13 @@
 
 "use strict";
 
-var ExprWrapper = require('../../codegen/ExprWrapper');
+var JsWrapper = require('../../codegen/JsWrapper');
 
 module.exports["basics"] = {
 
     "no-op": function (test) {
 
-        var expr = new ExprWrapper(function () {
+        var expr = new JsWrapper(function () {
             return '42';
         });
 
@@ -21,8 +21,8 @@ module.exports["basics"] = {
 
     "simple passthrough": function (test) {
 
-        var expr = new ExprWrapper(function (env) {
-            return '(' + env.syncrify('42') + ')';
+        var expr = new JsWrapper(function (env) {
+            return '(' + env.realize('42') + ')';
         });
 
         test.equal(expr.render(), '(42)');
@@ -31,8 +31,8 @@ module.exports["basics"] = {
 
     "simple deferred": function (test) {
 
-        var expr = new ExprWrapper(function (env) {
-            return env.syncrify(new ExprWrapper(function (env) {
+        var expr = new JsWrapper(function (env) {
+            return env.realize(new JsWrapper(function (env) {
                 return 'foo()';
             }, true)) + ';';
         });
@@ -41,10 +41,22 @@ module.exports["basics"] = {
         test.done();
     },
 
+    "as statement": function (test) {
+
+        var expr = new JsWrapper(function (env) {
+            return 'bar(' + env.realize(new JsWrapper(function (env) {
+                    return 'foo()';
+                }, true)) + ')';
+        }, true);
+
+        test.equal(expr.asStatement().render(), 'Q.spread([foo()], function (tmp_0) {\nbar(tmp_0);\n}, result.reject);');
+        test.done();
+    },
+
     "nested deferred": function (test) {
 
-        var expr = new ExprWrapper(function (env) {
-            return 'foo([' + env.syncrify(new ExprWrapper(function (env) {
+        var expr = new JsWrapper(function (env) {
+            return 'foo([' + env.realize(new JsWrapper(function (env) {
                 return 'bar()';
             }, true)) + ']);';
         }, true);
@@ -57,9 +69,9 @@ module.exports["basics"] = {
 
     "complex deferred": function (test) {
 
-        var expr = new ExprWrapper(function (env) {
-            return env.syncrify(new ExprWrapper(function (env) {
-                return 'foo([' + env.syncrify(new ExprWrapper(function (env) {
+        var expr = new JsWrapper(function (env) {
+            return env.realize(new JsWrapper(function (env) {
+                return 'foo([' + env.realize(new JsWrapper(function (env) {
                     return 'bar()';
                 }, true)) + '])';
             }, true)) + ';';
@@ -73,11 +85,11 @@ module.exports["basics"] = {
 
     "multiple deferred": function (test) {
 
-        var expr = new ExprWrapper(function (env) {
-            return env.syncrify(new ExprWrapper(function (env) {
-                return 'baz(' + env.syncrify(new ExprWrapper(function (env) {
+        var expr = new JsWrapper(function (env) {
+            return env.realize(new JsWrapper(function (env) {
+                return 'baz(' + env.realize(new JsWrapper(function (env) {
                     return 'foo()';
-                }, true)) + ', ' + env.syncrify(new ExprWrapper(function (env) {
+                }, true)) + ', ' + env.realize(new JsWrapper(function (env) {
                     return 'bar()';
                 }, true)) +')';
             }, true)) + ';';
@@ -91,11 +103,11 @@ module.exports["basics"] = {
 
     "op with deferred": function (test) {
 
-        var expr = new ExprWrapper(function (env) {
-            return env.syncrify(new ExprWrapper(function (env) {
-                return '(' + env.syncrify(new ExprWrapper(function (env) {
+        var expr = new JsWrapper(function (env) {
+            return env.realize(new JsWrapper(function (env) {
+                return '(' + env.realize(new JsWrapper(function (env) {
                     return 'foo()';
-                }, true)) + ' - ' + env.syncrify(new ExprWrapper(function (env) {
+                }, true)) + ' - ' + env.realize(new JsWrapper(function (env) {
                     return 'bar()';
                 }, true)) +')';
             })) + ';';

@@ -196,19 +196,20 @@ block
 // STATEMENTS
 
 statement_list
-    : statement
+    : statement -> {type: 'stmt_list', head: $1, tail: null}
     | statement statement_list -> {type: 'stmt_list', head: $1, tail: $2}
     ;
 
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: 'receive', names: $2.concat($3)}
-    | expr ';'  // to support standalone invocations
+    | expr ';' -> {type: 'expr_stmt', expr: $1}  // to support standalone invocations as well as connections
     | result ';'
     | assignment ';'
     | conditional
     | iteration
     | ID 'IS' ':' block -> {type: 'assign', op: '=', left: {type: 'id', name: $1}, right: {type: 'procedure', body: $4}}
     | COMPLETE (expr ',')* expr ';' -> {type: 'complete', promises: $2.concat([$3])}
+    | SKIP ';' -> {type: 'skip'}
     | STOP ';' -> {type: 'stop'}
     ;
 

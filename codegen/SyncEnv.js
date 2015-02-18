@@ -12,12 +12,12 @@ var __ = function () {
 };
 
 /**
- * Returns a synchronous form of the given expression for use within this environment.
+ * Realizes the given expression (which may be a promise) into a form that can be used.
  *
  * @param expr
  * @return {String}
  */
-__.prototype.syncrify = function (expr) {
+__.prototype.realize = function (expr) {
 
     // if it's a literal JS expression, just pass through
 
@@ -36,12 +36,18 @@ __.prototype.syncrify = function (expr) {
         return temp;
     }
 
+    // convenience method
+    if (Array.isArray(expr)) {
+        var self = this;
+        return expr.map(function (item) { return self.realize(item); })
+    }
+
     // otherwise just render the expression in the env
     return expr.render(this);
 };
 
 /**
- * Wraps this environment.
+ * Wraps this environment in the given antecedent environment.
  *
  * @param env
  */

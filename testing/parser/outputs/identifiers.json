@@ -1,26 +1,161 @@
-{
-    "type":"procedure",
-    "statements": [
-        { "type": "assign", "op":"=", "left": {"type":"id","name":"foo"}, "right": {"type":"number","val":4} },
-        { "type": "assign", "op":"=",
-            "left": {"type":"id","name":"bar"},
-            "right": { "type": "subscript", "list": {"type":"id","name":"foo"}, "index": {"type":"id","name":"i"} } },
-        { "type": "assign", "op":"=",
-            "left": { "type": "subscript",
-                        "list": { "type": "subscript", "list": {"type":"id","name":"foo"}, "index": {"type":"id","name":"i"} },
-                        "index": {"type": "id", "name": "j" } },
-            "right": { "type": "select", "set": {"type":"id","name":"foo"}, "member": "bar" }},
-        { "type": "assign", "op":"=",
-            "left": {"type":"id","name":"foo"},
-            "right": { "type": "select", "set": { "type": "select", "set": {"type":"id","name":"boo"}, "member": "bar" }, "member": "baz" } },
-        { "type": "assign", "op":"=",
-            "left": {"type": "id", "name":"_qux" },
-            "right": { "type": "select", "set": { "type": "subscript", "list": {"type":"id","name":"foo"}, "index": {"type":"id","name":"i"} }, "member": "bar" } },
-        { "type": "assign", "op":"=",
-            "left": {"type": "id", "name": "quux" },
-            "right": { "type": "subscript", "list": { "type": "select", "set": {"type":"id","name":"foo"}, "member": "bar" }, "index": {"type":"id","name":"i"} } },
-        { "type": "assign", "op":"=",
-            "left": {"type": "id", "name": "moi" },
-            "right": {"type": "id", "name":"__" } }
-    ]
-}
+{"type":"procedure", "body":{
+    "type":"stmt_list",
+    "head":{
+        "type":"assign",
+        "op":"=",
+        "left":{
+            "type":"id",
+            "name":"foo"
+        },
+        "right":{
+            "type":"number",
+            "val":4
+        }
+    },
+    "tail":{
+        "type":"stmt_list",
+        "head":{
+            "type":"assign",
+            "op":"=",
+            "left":{
+                "type":"id",
+                "name":"bar"
+            },
+            "right":{
+                "type":"subscript",
+                "list":{
+                    "type":"id",
+                    "name":"foo"
+                },
+                "index":{
+                    "type":"id",
+                    "name":"i"
+                }
+            }
+        },
+        "tail":{
+            "type":"stmt_list",
+            "head":{
+                "type":"assign",
+                "op":"=",
+                "left":{
+                    "type":"subscript",
+                    "list":{
+                        "type":"subscript",
+                        "list":{
+                            "type":"id",
+                            "name":"foo"
+                        },
+                        "index":{
+                            "type":"id",
+                            "name":"i"
+                        }
+                    },
+                    "index":{
+                        "type":"id",
+                        "name":"j"
+                    }
+                },
+                "right":{
+                    "type":"select",
+                    "set":{
+                        "type":"id",
+                        "name":"foo"
+                    },
+                    "member":"bar"
+                }
+            },
+            "tail":{
+                "type":"stmt_list",
+                "head":{
+                    "type":"assign",
+                    "op":"=",
+                    "left":{
+                        "type":"id",
+                        "name":"foo"
+                    },
+                    "right":{
+                        "type":"select",
+                        "set":{
+                            "type":"select",
+                            "set":{
+                                "type":"id",
+                                "name":"boo"
+                            },
+                            "member":"bar"
+                        },
+                        "member":"baz"
+                    }
+                },
+                "tail":{
+                    "type":"stmt_list",
+                    "head":{
+                        "type":"assign",
+                        "op":"=",
+                        "left":{
+                            "type":"id",
+                            "name":"_qux"
+                        },
+                        "right":{
+                            "type":"select",
+                            "set":{
+                                "type":"subscript",
+                                "list":{
+                                    "type":"id",
+                                    "name":"foo"
+                                },
+                                "index":{
+                                    "type":"id",
+                                    "name":"i"
+                                }
+                            },
+                            "member":"bar"
+                        }
+                    },
+                    "tail":{
+                        "type":"stmt_list",
+                        "head":{
+                            "type":"assign",
+                            "op":"=",
+                            "left":{
+                                "type":"id",
+                                "name":"quux"
+                            },
+                            "right":{
+                                "type":"subscript",
+                                "list":{
+                                    "type":"select",
+                                    "set":{
+                                        "type":"id",
+                                        "name":"foo"
+                                    },
+                                    "member":"bar"
+                                },
+                                "index":{
+                                    "type":"id",
+                                    "name":"i"
+                                }
+                            }
+                        },
+                        "tail":{
+                            "type":"stmt_list",
+                            "head":{
+                                "type":"assign",
+                                "op":"=",
+                                "left":{
+                                    "type":"id",
+                                    "name":"moi"
+                                },
+                                "right":{
+                                    "type":"id",
+                                    "name":"__"
+                                }
+                            },
+                            "tail":null
+                        }
+                    }
+                }
+            }
+        }
+    }
+}}

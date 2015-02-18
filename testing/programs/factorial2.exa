@@ -15,7 +15,7 @@ result = 1;
 // could we auto-detect result is changing in here and hold off reply until this block is done?
 // - reply waits on result
 // - result is a promise because it is *modified* in an item closure
-// - how would we know when to resolve the promise? implicit success callback I guess
+// - how would we know when to realize the promise? implicit success callback I guess
 
 // should closures not receive recur or reply? or any envelope addresses?
 // they're handling responses, after all, which might have empty envelopes

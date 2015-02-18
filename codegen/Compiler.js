@@ -6,13 +6,7 @@
 
 var Q = require('q');
 var Scope = require('./Scope');
-var JsExpr = require('./JsExpr');
-var JsStmt = require('./JsStmt');
-var JsConditional = require('./JsConditional');
-var Complete = require('./Complete');
-var ExprWrapper = require('./ExprWrapper');
-var JsResult = require('./JsResult');
-var JsCall = require('./JsCall');
+var JsWrapper = require('./JsWrapper');
 
 var __ = function () {
 
@@ -107,7 +101,14 @@ __.prototype['procedure'] = function (node, scope) {
 __.prototype['stmt_list'] = function (node, scope) {
 
     // hooray for Lisp!
-    return this.compile(node.head, scope).continue(this.compile(node.tail, scope));
+
+    var head = this.compile(node.head, scope);
+
+    if (node.tail) {
+        return head.continue(this.compile(node.tail, scope));
+    }
+
+    return head;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -119,17 +120,16 @@ __.prototype['stmt_list'] = function (node, scope) {
  */
 __.prototype['receive'] = function (node, scope) {
 
-    var vars = [];
+    return 'var ' + node.names.map(function (name) {
+        return '$_' + name + ' = ' + 'args.shift()';
+    }).join(',\n') + ';';
+};
 
-    // todo - shift args off instead of tracking count
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    node.names.forEach(function (name) {
-        vars.push('$_' + name + ' = ' + 'args.shift()');
-    });
+__.prototype['expr_stmt'] = function (node, scope) {
 
-    var stmt = 'var ' + vars.join(',\n') + ';';
-
-    return new JsStmt(stmt);
+    return this.compile(node.expr, scope).asStatement();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +142,7 @@ __.prototype['result'] = function (node, scope) {
 
     // should this node type be renamed response?
 
-    var name = 'result.resolve';
+    var name = 'result.realize';
 
     if (node.channel === 'fail') {
         name = 'result.reject';
@@ -154,7 +154,10 @@ __.prototype['result'] = function (node, scope) {
         return self.compile(arg, scope);
     });
 
-    return new JsResult(new JsCall(new JsExpr(name), args));
+    return new JsWrapper(function (env) {
+        return name + '(' + env.realize(args).join(',') +
+            ');\nreturn result.promise;';
+    });
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,12 +183,12 @@ __.prototype['assign'] = function (node, scope) {
     // modify the local scope
     // todo we can't really do this, since we might be inside a conditional!
     // maybe we could track if we're in a conditional scope??
-    if (node.left.type == 'id') {
-        scope.define(node.left.name, right.isReady());
-    }
+//    if (node.left.type == 'id') {
+//        scope.define(node.left.name, right.isReady());
+//    }
 
-    return new JsStmt(function (stmtContext) {
-        return left.renderExpr(stmtContext) + ' ' + node.op + ' ' + right.renderExpr(stmtContext) + ';';
+    return new JsWrapper(function (env) {
+        return env.realize(left) + ' ' + node.op + ' ' + env.realize(right) + ';';
     });
 };
 
@@ -202,26 +205,26 @@ __.prototype['conditional'] = function (node, scope) {
     // needs predicate to be ready
 
     var predicate = this.compile(node.predicate);
+    var consequent = this.compile(node.consequent, scope);
+    var negBlock = false;
 
-    var posBlock = node.consequent.map(function (stmt) {
-        return self.compile(stmt, scope);
-    });
-
-    var negBlock;
-
-    if (node.otherwise !== undefined) {
-
-        if (Array.isArray(node.otherwise)) {
-            negBlock = node.otherwise.map(function (stmt) {
-                return self.compile(stmt, scope);
-            });
-        }
-        else {
-            negBlock = this.compile(node.otherwise, scope);
-        }
+    if (node.otherwise) {
+        negBlock = this.compile(node.otherwise, scope);
     }
 
-    return new JsConditional(predicate, posBlock, negBlock);
+    // todo we might want to rewrite this to only realize the blocks after evaluating the predicate
+
+    return new JsWrapper(function (env) {
+
+        var stmt = 'if (' + env.realize(predicate) + ') {\n' +
+            env.realize(consequent).replace(/\n/g, '\n') + '\n' + '}';
+
+        if (negBlock) {
+            stmt += '\nelse {\n' + env.realize(negBlock).replace(/\n/g, '\n') + '\n}';
+        }
+
+        return stmt;
+    });
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -236,7 +239,7 @@ __.prototype['iteration'] = function (node, scope) {
     var condition = this.compile(node.condition, scope);
 //    var statements = this.compile(node.statements, scope);
 
-    return new JsStmt(function (stmtContext) {
+    return new JsWrapper(function (stmtContext) {
 //        return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
     });
 };
@@ -285,16 +288,17 @@ __.prototype['request'] = function (node, scope) {
     var target = this.compile(node.to, scope);
     var self = this;
 
-    return new ExprWrapper(function (env) {
+    var args = node.args.map(function (arg) {
+        return self.compile(arg, scope);
+    });
 
-        // call makeSync() once since it's not idempotent (probably should be)
-        var targetId = env.syncrify(target);
+    return new JsWrapper(function (env) {
 
-        var args = node.args.map(function (arg) {
-            return env.syncrify(self.compile(arg, scope));
-        }).join(',');
+        // call realize() once since it's not idempotent (probably should be)
+        var targetId = env.realize(target);
 
-        return targetId + '(' + targetId + ',[' + args + '])';
+        return targetId + '(' + targetId + ',[' + env.realize(args).join(',') + '])';
+
     }, true);
 };
 
@@ -326,13 +330,13 @@ __.prototype['cardinality'] = function (node, scope) {
     // make a general JS code class? that can hold string and expr parts?
     // do we really need the JS AST level? or could we compile directly in one pass?
 
-    return new JsExpr(
-        function (stmtContext) {
+    return new JsWrapper(
+        function (env) {
             return 'function (val) {' +
                 "if (typeof val === 'string') return val.length;" +
                 "else if (Array.isArray(val)) return val.length;" +
                 "else if (typeof val === 'object') return Object.keys(val).length;" +
-                "}(" + right.renderExpr(stmtContext) + ")"});
+                "}(" + env.realize(right) + ")"});
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -345,9 +349,9 @@ __.prototype['complement'] = function (node, scope) {
 
     var right = this.compile(node.operand, scope);
 
-    return new JsExpr(
-        function (stmtContext) {
-            return '!' + right.renderExpr(stmtContext)
+    return new JsWrapper(
+        function (env) {
+            return '!' + env.realize(right)
         });
 };
 
@@ -368,13 +372,15 @@ __.prototype['subscript'] = function (node, scope) {
         index = this.compile(node.index, scope);
     }
 
-    // todo - what if the list expression is a request or somesuch? can't resolve it twice
+    // todo - what if the list expression is a request or somesuch? can't realize it twice
     // wrap it in a helper function?
 
-    return new JsExpr(function (stmtContext) {
+    return new JsWrapper(function (env) {
 
-        return list.renderExpr(stmtContext) + '[' +
-            (index === undefined ? list.renderExpr(stmtContext) + '.length - 1' : index.renderExpr(stmtContext)) + ']';
+        var listRef = env.realize(list); // realize should be idempotent...
+
+        return listRef + '[' +
+            (index === undefined ? listRef + '.length - 1' : env.realize(index)) + ']';
     });
 };
 
@@ -391,7 +397,7 @@ __.prototype['in'] = function (node, scope) {
     var left = this.compile(node.left, scope);
     var right = this.compile(node.right, scope);
 
-    return new JsExpr(
+    return new JsWrapper(
         function (stmtContext) {
             return 'function (item, collection) {' +
                 "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
@@ -413,15 +419,11 @@ __.prototype['sequence'] = function (node, scope) {
     // renders an expression that is a function that takes a single arg -
     // the action to be performed
 
-    return new JsExpr(
-        function (stmtContext) {
+    return new JsWrapper(function (env) {
 
-            // inject a var into the context
-            return stmtContext.definePrereq(
-                'function (first, last, action) {' +
-                    "for (var num = first; num <= last; num++) {" +
-                    "action(num);" +
-                    "}}.bind(null," + first.renderExpr(stmtContext) + ',' + last.renderExpr(stmtContext) + ")");
+        return 'function (first, last, action) {\n' +
+            'for (var num = first; num <= last; num++) { action(num); }' +
+        "}.bind(null," + env.realize(first) + ',' + env.realize(last) + ")";
         });
 };
 
@@ -441,8 +443,8 @@ __.prototype['connection'] = function (node, scope) {
     var source = this.compile(node.source, scope);
     var sink = this.compile(node.sink, scope);
 
-    return new JsExpr(function (stmtContext) {
-        return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
+    return new JsWrapper(function (env) {
+        return env.realize(source) + '.call(null,' + env.realize(sink) + ')'
     });
 };
 
@@ -465,30 +467,17 @@ __.prototype['op'] = function (node, scope) {
     else if (op === 'or') {
         op = '||';
     }
+    else if (op == '+') {
 
-    return new ExprWrapper(function (env) {
+        return new JsWrapper(function (env) {
+            return 'function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {' +
+                'return left.concat(right);} else return left + right;}(' +
+                env.realize(left) + ',' + env.realize(right) + ')'});
+    }
 
-        // use parens to be safe
-        return '(' + env.syncrify(left) + ' ' + op + ' ' + env.syncrify(right) + ')';
-    });
-
-//    if (op === 'and') {
-//        op = '&&';
-//    }
-//    else if (op === 'or') {
-//        op = '||';
-//    }
-//    else if (op == '+') {
-//
-//        return new JsExpr(function (stmtContext) {
-//            return 'function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {' +
-//                'return left.concat(right);} else return left + right;}(' +
-//                left.renderExpr(stmtContext) + ',' + right.renderExpr(stmtContext) + ')'});
-//    }
-
-    // make sure both sides are defined
-    // could relax this if we want to allow declaration after usage
-    // should also factor this out into a getValue() maybe
+//    make sure both sides are defined
+//    could relax this if we want to allow declaration after usage
+//    should also factor this out into a getValue() maybe
 
 //    if (node.left.jsVal === undefined) {
 //        throw new Error("left operand not defined");
@@ -498,11 +487,11 @@ __.prototype['op'] = function (node, scope) {
 //        throw new Error("right operand not defined");
 //    }
 
-//    return new JsExpr(function (stmtContext) {
-//
-//        // use parens to be safe
-//        return '(' + left.renderExpr(stmtContext) + ' ' + op + ' ' + right.renderExpr(stmtContext) + ')';
-//    });
+    return new JsWrapper(function (env) {
+
+        // use parens to be safe
+        return '(' + env.realize(left) + ' ' + op + ' ' + env.realize(right) + ')';
+    });
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -551,7 +540,7 @@ __.prototype['string'] = function (node) {
  */
 __.prototype['list'] = function (node, scope) {
 
-    // list literals might have members that need to be resolved
+    // list literals might have members that need to be realized
 
     var self = this;
 
@@ -559,7 +548,7 @@ __.prototype['list'] = function (node, scope) {
         return self.compile(item, scope);
     });
 
-    return new JsExpr(function (stmtContext) {
+    return new JsWrapper(function (stmtContext) {
         return '[' + items.map(function (item) {
             return item.renderExpr(stmtContext)
         }).join(',') + ']';
@@ -574,7 +563,7 @@ __.prototype['list'] = function (node, scope) {
  */
 __.prototype['set'] = function (node, scope) {
 
-    // list literals might have members that need to be resolved
+    // list literals might have members that need to be realized
 
     var self = this;
 
@@ -582,7 +571,7 @@ __.prototype['set'] = function (node, scope) {
         return self.compile(member, scope);
     });
 
-    return new JsExpr(function (stmtContext) {
+    return new JsWrapper(function (stmtContext) {
         return '{' + members.map(function (member) {
             return member.renderExpr(stmtContext)
         }).join(',') + '}';
@@ -600,7 +589,7 @@ __.prototype['dyad'] = function (node, scope) {
     var key = this.compile(node.key, scope);
     var value = this.compile(node.value, scope);
 
-    return new JsExpr(function (stmtContext) {
+    return new JsWrapper(function (stmtContext) {
         return key.renderExpr(stmtContext) + ':' + value.renderExpr(stmtContext);
     });
 };
@@ -614,7 +603,7 @@ __.prototype['dyad'] = function (node, scope) {
  */
 __.prototype['symbol'] = function (node) {
 
-    return new JsExpr("'<" + node.name + ">'");
+    return new JsWrapper("'<" + node.name + ">'");
 };
 
 module.exports = __;

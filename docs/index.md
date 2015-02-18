@@ -56,7 +56,7 @@ This example demonstrates some core concepts.
 
 #### Expressions
 
-Action calls are expressions? They resolve asynchronously to their first returned value, as in =>.
+Action calls are expressions? They realize asynchronously to their first returned value, as in =>.
 
 so x = y + doSomething() will call doSomething and then take the first result returned and add it to y and then set x to that. So to the extent it's "replace with returned value", it's the *first* returned value, asynchronously. So it kind of reduces to the common use case.
 

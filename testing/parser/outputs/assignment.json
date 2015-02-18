@@ -1,12 +1,26 @@
 {
     "type":"procedure",
-    "statements":
-    [
-        { "type":"assign","op": "=", "left": {"type":"id","name":"bar"}, "right": {"type":"id","name":"baz"} },
-        { "type":"assign","op": "=", "left": {"type":"id","name":"binky"}, "right": {"type":"number","val":64} },
-        { "type":"assign","op": "=",
-            "left": {"type":"id","name":"message"},
-            "right": {"type":"string","val":"hi there"}},
-        { "type":"assign","op": "=", "left": {"type":"id","name":"foo"}, "right": {"type":"boolean","val":true} }
-    ]
+    "body": {
+        "type": "stmt_list",
+        "head":
+            { "type":"assign","op": "=", "left": {"type":"id","name":"bar"}, "right": {"type":"id","name":"baz"} },
+        "tail": {
+            "type": "stmt_list",
+            "head":
+                { "type":"assign","op": "=", "left": {"type":"id","name":"binky"}, "right": {"type":"number","val":64} },
+            "tail": {
+                "type": "stmt_list",
+                "head":
+                    { "type":"assign","op": "=",
+                        "left": {"type":"id","name":"message"},
+                        "right": {"type":"string","val":"hi there"}},
+                "tail": {
+                    "type": "stmt_list",
+                    "head":
+                        { "type":"assign","op": "=", "left": {"type":"id","name":"foo"}, "right": {"type":"boolean","val":true} },
+                    "tail": null
+                }
+            }
+        }
+    }
 }

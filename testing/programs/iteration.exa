@@ -27,7 +27,7 @@ var foo = function () {
 
 function loop() {
 
-    // resolve condition promises here
+    // realize condition promises here
 
     foo().then(function (val) {
 

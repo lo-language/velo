@@ -1,32 +1,8 @@
-{"type":"procedure", "statements":[
-    {
-        "type":"request",
-        "to":{
-            "type":"id",
-            "name":"foo"
-        },
-        "args":[]
-    },
-    {
-        "type":"request",
-        "to":{
-            "type":"select",
-            "set":{
-                "type":"id",
-                "name":"foo"
-            },
-            "member":"bar"
-        },
-        "args":[]
-    },
-    {
-        "type":"assign",
-        "op":"=",
-        "left":{
-            "type":"id",
-            "name":"x"
-        },
-        "right":{
+{"type":"procedure", "body":{
+    "type":"stmt_list",
+    "head":{
+        "type":"expr_stmt",
+        "expr":{
             "type":"request",
             "to":{
                 "type":"id",
@@ -35,61 +11,114 @@
             "args":[]
         }
     },
-    {
-        "type":"connection",
-        "connector":"=>",
-        "source":{
-            "type":"request",
-            "to":{
-                "type":"id",
-                "name":"foo"
-            },
-            "args":[]
-        },
-        "sink":{
-            "type":"id",
-            "name":"x"
-        }
-    },
-    {
-        "type":"request",
-        "to":{
-            "type":"id",
-            "name":"foo"
-        },
-        "args":[
-            {
+    "tail":{
+        "type":"stmt_list",
+        "head":{
+            "type":"expr_stmt",
+            "expr":{
                 "type":"request",
                 "to":{
-                    "type":"id",
-                    "name":"bar"
+                    "type":"select",
+                    "set":{
+                        "type":"id",
+                        "name":"foo"
+                    },
+                    "member":"bar"
                 },
                 "args":[]
             }
-        ]
-    },
-    {
-        "type":"assign",
-        "op":"=",
-        "left":{
-            "type":"id",
-            "name":"x"
         },
-        "right":{
-            "type":"op",
-            "op":"+",
-            "left":{
-                "type":"request",
-                "to":{
+        "tail":{
+            "type":"stmt_list",
+            "head":{
+                "type":"assign",
+                "op":"=",
+                "left":{
                     "type":"id",
-                    "name":"foo"
+                    "name":"x"
                 },
-                "args":[]
+                "right":{
+                    "type":"request",
+                    "to":{
+                        "type":"id",
+                        "name":"foo"
+                    },
+                    "args":[]
+                }
             },
-            "right":{
-                "type":"number",
-                "val":7
+            "tail":{
+                "type":"stmt_list",
+                "head":{
+                    "type":"expr_stmt",
+                    "expr":{
+                        "type":"connection",
+                        "connector":"=>",
+                        "source":{
+                            "type":"request",
+                            "to":{
+                                "type":"id",
+                                "name":"foo"
+                            },
+                            "args":[]
+                        },
+                        "sink":{
+                            "type":"id",
+                            "name":"x"
+                        }
+                    }
+                },
+                "tail":{
+                    "type":"stmt_list",
+                    "head":{
+                        "type":"expr_stmt",
+                        "expr":{
+                            "type":"request",
+                            "to":{
+                                "type":"id",
+                                "name":"foo"
+                            },
+                            "args":[
+                                {
+                                    "type":"request",
+                                    "to":{
+                                        "type":"id",
+                                        "name":"bar"
+                                    },
+                                    "args":[]
+                                }
+                            ]
+                        }
+                    },
+                    "tail":{
+                        "type":"stmt_list",
+                        "head":{
+                            "type":"assign",
+                            "op":"=",
+                            "left":{
+                                "type":"id",
+                                "name":"x"
+                            },
+                            "right":{
+                                "type":"op",
+                                "op":"+",
+                                "left":{
+                                    "type":"request",
+                                    "to":{
+                                        "type":"id",
+                                        "name":"foo"
+                                    },
+                                    "args":[]
+                                },
+                                "right":{
+                                    "type":"number",
+                                    "val":7
+                                }
+                            }
+                        },
+                        "tail":null
+                    }
+                }
             }
         }
     }
-]}
+}}

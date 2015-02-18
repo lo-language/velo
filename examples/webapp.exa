@@ -100,7 +100,7 @@ env.trap('SIGINT') ->
 
     action(expr_result,
 
-    Q.resolve("hello, world!\n").then(
+    Q.realize("hello, world!\n").then(
         function () {
 
 

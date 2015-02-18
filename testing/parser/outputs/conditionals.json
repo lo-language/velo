@@ -1,89 +1,34 @@
-{"type":"procedure", "statements":[
-    {
-        "type":"conditional",
-        "predicate":{
-            "type":"op",
-            "op":">",
-            "left":{
-                "type":"id",
-                "name":"foo"
+{"type":"procedure", "body":{
+    "type": "stmt_list",
+    "head": {
+            "type":"conditional",
+            "predicate":{
+                "type":"op",
+                "op":">",
+                "left":{
+                    "type":"id",
+                    "name":"foo"
+                },
+                "right":{
+                    "type":"number",
+                    "val":2
+                }
             },
-            "right":{
-                "type":"number",
-                "val":2
+            "consequent": {
+                "type": "stmt_list",
+                "head": {
+                    "type":"assign",
+                    "op":"++",
+                    "left":{
+                        "type":"id",
+                        "name":"x"
+                    }
+                },
+                "tail": null
             }
         },
-        "consequent":[
-            {
-                "type":"assign",
-                "op":"++",
-                "left":{
-                    "type":"id",
-                    "name":"x"
-                }
-            }
-        ]
-    },
-    {
-        "type":"conditional",
-        "predicate":{
-            "type":"op",
-            "op":"==",
-            "left":{
-                "type":"id",
-                "name":"foo"
-            },
-            "right":{
-                "type":"number",
-                "val":4
-            }
-        },
-        "consequent":[
-            {
-                "type":"assign",
-                "op":"--",
-                "left":{
-                    "type":"id",
-                    "name":"x"
-                }
-            }
-        ],
-        "otherwise":[
-            {
-                "type":"assign",
-                "op":"++",
-                "left":{
-                    "type":"id",
-                    "name":"x"
-                }
-            }
-        ]
-    },
-    {
-        "type":"conditional",
-        "predicate":{
-            "type":"op",
-            "op":"==",
-            "left":{
-                "type":"id",
-                "name":"foo"
-            },
-            "right":{
-                "type":"number",
-                "val":42
-            }
-        },
-        "consequent":[
-            {
-                "type":"assign",
-                "op":"++",
-                "left":{
-                    "type":"id",
-                    "name":"x"
-                }
-            }
-        ],
-        "otherwise":{
+    "tail": { "type": "stmt_list", "head":
+        {
             "type":"conditional",
             "predicate":{
                 "type":"op",
@@ -94,41 +39,32 @@
                 },
                 "right":{
                     "type":"number",
-                    "val":15
+                    "val":4
                 }
             },
-            "consequent":[
+            "consequent":{ "type": "stmt_list", "head":
                 {
-                    "type":"skip"
-                }
-            ]
-        }
-    },
-    {
-        "type":"conditional",
-        "predicate":{
-            "type":"op",
-            "op":"==",
-            "left":{
-                "type":"id",
-                "name":"foo"
+                    "type":"assign",
+                    "op":"--",
+                    "left":{
+                        "type":"id",
+                        "name":"x"
+                    }
+                }, "tail": null
             },
-            "right":{
-                "type":"number",
-                "val":42
+            "otherwise":{ "type": "stmt_list", "head":
+                {
+                    "type":"assign",
+                    "op":"++",
+                    "left":{
+                        "type":"id",
+                        "name":"x"
+                    }
+                }, "tail": null
             }
         },
-        "consequent":[
-            {
-                "type":"assign",
-                "op":"++",
-                "left":{
-                    "type":"id",
-                    "name":"x"
-                }
-            }
-        ],
-        "otherwise":{
+    "tail": {"type": "stmt_list", "head":
+        {
             "type":"conditional",
             "predicate":{
                 "type":"op",
@@ -139,39 +75,111 @@
                 },
                 "right":{
                     "type":"number",
+                    "val":42
+                }
+            },
+            "consequent": { "type": "stmt_list", "head":
+                {
+                    "type":"assign",
+                    "op":"++",
+                    "left":{
+                        "type":"id",
+                        "name":"x"
+                    }
+                }, "tail": null
+            },
+            "otherwise":{
+                "type":"conditional",
+                "predicate":{
+                    "type":"op",
+                    "op":"==",
+                    "left":{
+                        "type":"id",
+                        "name":"foo"
+                    },
+                    "right":{
+                        "type":"number",
+                        "val":15
+                    }
+                },
+                "consequent": {"type": "stmt_list", "head":
+                    {
+                        "type":"skip"
+                    }, "tail": null
+                }
+            }
+        },
+    "tail": {"type": "stmt_list", "head":
+        {
+            "type":"conditional",
+            "predicate":{
+                "type":"op",
+                "op":"==",
+                "left":{
+                    "type":"id",
+                    "name":"foo"
+                },
+                "right":{
+                    "type":"number",
+                    "val":42
+                }
+            },
+            "consequent": { "type": "stmt_list", "head":
+                {
+                    "type":"assign",
+                    "op":"++",
+                    "left":{
+                        "type":"id",
+                        "name":"x"
+                    }
+                }, "tail": null
+            },
+            "otherwise":{
+                "type":"conditional",
+                "predicate":{
+                    "type":"op",
+                    "op":"==",
+                    "left":{
+                        "type":"id",
+                        "name":"foo"
+                    },
+                    "right":{
+                        "type":"number",
+                        "val":15
+                    }
+                },
+                "consequent": { "type": "stmt_list", "head":
+                    {
+                        "type":"skip"
+                    }, "tail": null
+                },
+                "otherwise": { "type": "stmt_list", "head":
+                    {
+                        "type":"skip"
+                    }, "tail": null
+                }
+            }
+        },
+    "tail": {"type": "stmt_list", "head":
+        {
+            "type":"iteration",
+            "condition":{
+                "type":"op",
+                "op":"<",
+                "left":{
+                    "type":"id",
+                    "name":"foo"
+                },
+                "right":{
+                    "type":"number",
                     "val":15
                 }
             },
-            "consequent":[
+            "statements": { "type": "stmt_list", "head":
                 {
                     "type":"skip"
-                }
-            ],
-            "otherwise":[
-                {
-                    "type":"skip"
-                }
-            ]
-        }
-    },
-    {
-        "type":"iteration",
-        "condition":{
-            "type":"op",
-            "op":"<",
-            "left":{
-                "type":"id",
-                "name":"foo"
-            },
-            "right":{
-                "type":"number",
-                "val":15
+                }, "tail": null
             }
-        },
-        "statements":[
-            {
-                "type":"skip"
-            }
-        ]
-    }
-]}
+        }, "tail": null}
+    }}}}
+}
