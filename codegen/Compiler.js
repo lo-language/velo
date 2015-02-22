@@ -82,14 +82,14 @@ __.prototype['procedure'] = function (node, scope) {
     localScope.defineArg('__err');
 
     // compile the statement(s) in the context of the local scope
-    return this.compile(node.body, localScope);
+    var stmts = this.compile(node.body, localScope);
 
-    // compile the statements in the context of the local scope
-//    var stmts = node.statements.map(function (stmt) {
-//        return self.compile(stmt, localScope);
-//    });
-
-//    return new JsFunction(stmts);
+    return new JsWrapper(function (env) {
+        return 'function ($_recur, args) {\n\n    ' +
+            'var result = Q.defer();\n\n    ' +
+            env.realize(stmts) +
+            'return result.promise;\n}';
+    });
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,9 +120,9 @@ __.prototype['stmt_list'] = function (node, scope) {
  */
 __.prototype['receive'] = function (node, scope) {
 
-    return 'var ' + node.names.map(function (name) {
+    return new JsWrapper('var ' + node.names.map(function (name) {
         return '$_' + name + ' = ' + 'args.shift()';
-    }).join(',\n') + ';';
+    }).join(',\n') + ';');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +142,7 @@ __.prototype['result'] = function (node, scope) {
 
     // should this node type be renamed response?
 
-    var name = 'result.realize';
+    var name = 'result.resolve';
 
     if (node.channel === 'fail') {
         name = 'result.reject';
@@ -239,7 +239,7 @@ __.prototype['iteration'] = function (node, scope) {
     var condition = this.compile(node.condition, scope);
 //    var statements = this.compile(node.statements, scope);
 
-    return new JsWrapper(function (stmtContext) {
+    return new JsWrapper(function (env) {
 //        return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
     });
 };
@@ -312,7 +312,7 @@ __.prototype['request'] = function (node, scope) {
  */
 __.prototype['id'] = function (node) {
 
-    return '$_' + node.name;
+    return new JsWrapper('$_' + node.name);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -505,7 +505,7 @@ __.prototype['op'] = function (node, scope) {
 __.prototype['boolean'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return node.val ? 'true' : 'false';
+    return new JsWrapper(node.val ? 'true' : 'false');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -517,7 +517,7 @@ __.prototype['boolean'] = function (node) {
 __.prototype['number'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return node.val;
+    return new JsWrapper(node.val);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -529,7 +529,7 @@ __.prototype['number'] = function (node) {
 __.prototype['string'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return "'" + node.val.replace(/'/g, "\\'") + "'";
+    return new JsWrapper("'" + node.val.replace(/'/g, "\\'") + "'");
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

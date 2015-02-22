@@ -9,6 +9,7 @@
 
 var SyncEnv = require('./SyncEnv');
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
  * @param template
@@ -25,6 +26,7 @@ var __ = function (template, deferred) {
     this.deferred = deferred;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Renders the JS expression in the given environment, or a syncbarrier if none given.
  *
@@ -41,7 +43,11 @@ __.prototype.render = function (outerEnv) {
     var env = new SyncEnv();
 
     // render the template in the given environment - this loads up the env with sync mappings
-    var js = this.template.call(null, env);
+    var js = typeof this.template == 'string' ? this.template : this.template.call(null, env);
+
+    if (this.next) {
+        js += '\n' + this.next.render(outerEnv);
+    }
 
     if (outerEnv) {
 
@@ -55,6 +61,21 @@ __.prototype.render = function (outerEnv) {
     return env.render(js);
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * If this wrapper is wrapping something deferred
+ *
+ * @param next  A JsWrapper for the next statement
+ * @return {*}
+ */
+__.prototype.continue = function (next) {
+
+    this.next = next;
+
+    return this;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Returns a statement form of the wrapped JS.
  * Not every expr can be rendered as a statement, might want to make a subclass here.

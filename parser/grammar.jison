@@ -259,7 +259,7 @@ atom
 literal
     : '<' ID '>' -> {type: 'symbol', name: $2}
     | BOOLEAN -> {type: 'boolean', val: $1 == 'true'}
-    | NUMBER -> {type: 'number', val: parseFloat($1)}
+    | NUMBER -> {type: 'number', val: $1}
     | STRING -> {type: 'string', val: $1}
     | '[' (expr ',')* expr? ']' -> {type: 'list', elements: $3 ? $2.concat([$3]): []}
     | '{' BEGIN* (dyad ',')* dyad? END* '}' -> {type: 'set', members: $4 ? $3.concat([$4]): []}

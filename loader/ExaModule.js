@@ -57,7 +57,7 @@ __.prototype.parse = function () {
 __.prototype.compile = function () {
 
     if (this.js === undefined) {
-        this.js = this.compiler.compile(this.parse()).renderExpr();
+        this.js = this.compiler.compile(this.parse()).render();
     }
 
     return this.js;

@@ -7,8 +7,36 @@
 
 var Compiler = require('../../codegen/Compiler');
 var Scope = require('../../codegen/Scope');
+var JsWrapper = require('../../codegen/JsWrapper');
 var util = require('util');
 
+
+module.exports["statement lists"] = {
+
+    setUp: function (cb) {
+
+        this.compiler = new Compiler();
+        cb();
+    },
+
+    "with continue": function (test) {
+
+        var node = {
+            type: "expr_stmt",
+            expr: {
+                type: 'request',
+                to: {type: 'id', name: 'foo'},
+                args: [
+                    {type: 'number', val: '42'}
+                ]}
+        };
+
+        var result = this.compiler.compile(node);
+
+        test.equal(result.continue(new JsWrapper('snork;')).render(), '$_foo($_foo,[42]);\nsnork;');
+        test.done();
+    }
+};
 
 module.exports["literals"] = {
 
@@ -21,7 +49,7 @@ module.exports["literals"] = {
 
         var node = {type: 'boolean', val: true};
 
-        test.equal(this.compiler.compile(node), 'true');
+        test.equal(this.compiler.compile(node).render(), 'true');
         test.done();
     },
 
@@ -29,7 +57,7 @@ module.exports["literals"] = {
 
         var node = {type: 'number', val: '42'};
 
-        test.equal(this.compiler.compile(node), '42');
+        test.equal(this.compiler.compile(node).render(), '42');
         test.done();
     },
 
@@ -37,7 +65,7 @@ module.exports["literals"] = {
 
         var node = {type: 'string', val: "turanga leela"};
 
-        test.equal(this.compiler.compile(node), "'turanga leela'");
+        test.equal(this.compiler.compile(node).render(), "'turanga leela'");
         test.done();
     }
 };
@@ -67,7 +95,7 @@ module.exports["identifiers"] = {
 
         scope.define('foo', true);
 
-        test.equal(this.compiler.compile(node), '$_foo');
+        test.equal(this.compiler.compile(node).render(), '$_foo');
         test.done();
     },
 
@@ -401,7 +429,7 @@ module.exports["receive"] = {
 
         var result = this.compiler.compile(node, new Scope());
 
-        test.equal(result, 'var $_foo = args.shift(),\n$_mani = args.shift(),\n$_padme = args.shift(),\n$_hum = args.shift();');
+        test.equal(result.render(), 'var $_foo = args.shift(),\n$_mani = args.shift(),\n$_padme = args.shift(),\n$_hum = args.shift();');
         test.done();
     }
 };
@@ -690,7 +718,7 @@ module.exports["procedure"] = {
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.render(),
-            "function ($_recur, args) {\n\t\tvar result = Q.defer();\n\t\n\t\tvar $_next = args.shift();\n\t$_result *= $_next;\n\t\treturn result.promise;\n}");
+            "function ($_recur, args) {\n\n    var result = Q.defer();\n\n    var $_next = args.shift();\n$_result *= $_next;return result.promise;\n}");
         test.done();
     }
 };
@@ -736,7 +764,7 @@ module.exports["result"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.render(), "result.realize(42);\nreturn result.promise;");
+        test.equal(result.render(), "result.resolve(42);\nreturn result.promise;");
         test.done();
     },
 

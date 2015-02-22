@@ -7,7 +7,26 @@
 
 var JsWrapper = require('../../codegen/JsWrapper');
 
+module.exports["continue"] = {
+
+    "string": function (test) {
+
+        var expr = new JsWrapper('var x = args.shift();');
+
+        test.equal(expr.continue(new JsWrapper('howdy;')).render(), 'var x = args.shift();\nhowdy;');
+        test.done();
+    },
+};
+
 module.exports["basics"] = {
+
+    "string": function (test) {
+
+        var expr = new JsWrapper('var x = args.shift();');
+
+        test.equal(expr.render(), 'var x = args.shift();');
+        test.done();
+    },
 
     "no-op": function (test) {
 

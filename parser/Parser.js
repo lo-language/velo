@@ -132,7 +132,7 @@ case 36:this.$ = {type: 'symbol', name: $$[$0-1]};
 break;
 case 37:this.$ = {type: 'boolean', val: $$[$0] == 'true'};
 break;
-case 38:this.$ = {type: 'number', val: parseFloat($$[$0])};
+case 38:this.$ = {type: 'number', val: $$[$0]};
 break;
 case 39:this.$ = {type: 'string', val: $$[$0]};
 break;
