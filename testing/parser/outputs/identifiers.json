@@ -9,7 +9,7 @@
         },
         "right":{
             "type":"number",
-            "val":4
+            "val":"4"
         }
     },
     "tail":{

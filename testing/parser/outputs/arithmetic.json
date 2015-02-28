@@ -12,7 +12,7 @@
                 "left": {
                     "type": "op",
                     "op": "+",
-                    "left": {"type":"number", "val":2},
+                    "left": {"type":"number", "val":"2"},
                     "right": {
                         "type": "op",
                         "op": "/",
@@ -21,7 +21,7 @@
                             "op": "*",
                             "left": {"type":"id","name":"foo"},
                             "right": {"type":"id","name":"bar"}},
-                        "right": {"type":"number", "val":-2}
+                        "right": {"type":"number", "val":"-2"}
                     }},
                 "right": {
                     "type":"op",
@@ -31,7 +31,7 @@
                         "type": "op",
                         "op": "-",
                         "left": {"type":"id","name":"age"},
-                        "right": {"type":"number", "val":4}
+                        "right": {"type":"number", "val":"4"}
                     }}
                 }
         },

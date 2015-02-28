@@ -11,7 +11,7 @@
                 },
                 "right":{
                     "type":"number",
-                    "val":2
+                    "val":"2"
                 }
             },
             "consequent": {
@@ -39,7 +39,7 @@
                 },
                 "right":{
                     "type":"number",
-                    "val":4
+                    "val":"4"
                 }
             },
             "consequent":{ "type": "stmt_list", "head":
@@ -75,7 +75,7 @@
                 },
                 "right":{
                     "type":"number",
-                    "val":42
+                    "val":"42"
                 }
             },
             "consequent": { "type": "stmt_list", "head":
@@ -99,7 +99,7 @@
                     },
                     "right":{
                         "type":"number",
-                        "val":15
+                        "val":"15"
                     }
                 },
                 "consequent": {"type": "stmt_list", "head":
@@ -121,7 +121,7 @@
                 },
                 "right":{
                     "type":"number",
-                    "val":42
+                    "val":"42"
                 }
             },
             "consequent": { "type": "stmt_list", "head":
@@ -145,7 +145,7 @@
                     },
                     "right":{
                         "type":"number",
-                        "val":15
+                        "val":"15"
                     }
                 },
                 "consequent": { "type": "stmt_list", "head":
@@ -172,7 +172,7 @@
                 },
                 "right":{
                     "type":"number",
-                    "val":15
+                    "val":"15"
                 }
             },
             "statements": { "type": "stmt_list", "head":

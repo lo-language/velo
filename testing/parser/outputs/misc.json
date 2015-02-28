@@ -51,7 +51,7 @@
                     },
                     "right":{
                         "type":"number",
-                        "val":10
+                        "val":"10"
                     }
                 },
                 "tail":{
@@ -85,7 +85,7 @@
                                 },
                                 "right":{
                                     "type":"number",
-                                    "val":5
+                                    "val":"5"
                                 }
                             },
                             "tail":{
@@ -99,7 +99,7 @@
                                     },
                                     "right":{
                                         "type":"number",
-                                        "val":7
+                                        "val":"7"
                                     }
                                 },
                                 "tail":{
@@ -113,7 +113,7 @@
                                         },
                                         "right":{
                                             "type":"number",
-                                            "val":10
+                                            "val":"10"
                                         }
                                     },
                                     "tail":{
@@ -127,7 +127,7 @@
                                             },
                                             "right":{
                                                 "type":"number",
-                                                "val":4
+                                                "val":"4"
                                             }
                                         },
                                         "tail":{
@@ -141,7 +141,7 @@
                                                 },
                                                 "right":{
                                                     "type":"number",
-                                                    "val":360
+                                                    "val":"360"
                                                 }
                                             },
                                             "tail":{
@@ -171,7 +171,7 @@
                                                         },
                                                         "right":{
                                                             "type":"number",
-                                                            "val":17
+                                                            "val":"17"
                                                         }
                                                     },
                                                     "tail":{
@@ -201,7 +201,7 @@
                                                                                 },
                                                                                 "index":{
                                                                                     "type":"number",
-                                                                                    "val":15
+                                                                                    "val":"15"
                                                                                 }
                                                                             },
                                                                             "member":"wow"
@@ -218,18 +218,18 @@
                                                                                         },
                                                                                         "value":{
                                                                                             "type":"number",
-                                                                                            "val":72
+                                                                                            "val":"72"
                                                                                         }
                                                                                     },
                                                                                     {
                                                                                         "type":"dyad",
                                                                                         "key":{
                                                                                             "type":"number",
-                                                                                            "val":89
+                                                                                            "val":"89"
                                                                                         },
                                                                                         "value":{
                                                                                             "type":"number",
-                                                                                            "val":42
+                                                                                            "val":"42"
                                                                                         }
                                                                                     }
                                                                                 ]
@@ -238,13 +238,13 @@
                                                                     },
                                                                     "index":{
                                                                         "type":"number",
-                                                                        "val":17
+                                                                        "val":"17"
                                                                     }
                                                                 },
                                                                 "args":[
                                                                     {
                                                                         "type":"number",
-                                                                        "val":57
+                                                                        "val":"57"
                                                                     }
                                                                 ]
                                                             }
@@ -266,7 +266,7 @@
                                                                                 },
                                                                                 "value":{
                                                                                     "type":"number",
-                                                                                    "val":57
+                                                                                    "val":"57"
                                                                                 }
                                                                             },
                                                                             {
@@ -277,18 +277,18 @@
                                                                                 },
                                                                                 "value":{
                                                                                     "type":"number",
-                                                                                    "val":52
+                                                                                    "val":"52"
                                                                                 }
                                                                             },
                                                                             {
                                                                                 "type":"dyad",
                                                                                 "key":{
                                                                                     "type":"number",
-                                                                                    "val":42
+                                                                                    "val":"42"
                                                                                 },
                                                                                 "value":{
                                                                                     "type":"number",
-                                                                                    "val":7
+                                                                                    "val":"7"
                                                                                 }
                                                                             },
                                                                             {
@@ -329,7 +329,7 @@
                                                                     },
                                                                     "right":{
                                                                         "type":"number",
-                                                                        "val":72
+                                                                        "val":"72"
                                                                     }
                                                                 },
                                                                 "tail":{
@@ -423,7 +423,7 @@
                                                                             },
                                                                             "right":{
                                                                                 "type":"number",
-                                                                                "val":0
+                                                                                "val":"0"
                                                                             }
                                                                         },
                                                                         "tail":{

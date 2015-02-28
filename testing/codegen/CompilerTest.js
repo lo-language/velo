@@ -7,36 +7,37 @@
 
 var Compiler = require('../../codegen/Compiler');
 var Scope = require('../../codegen/Scope');
+var Resolver = require('../../codegen/Resolver');
 var JsWrapper = require('../../codegen/JsWrapper');
 var util = require('util');
 
 
-module.exports["statement lists"] = {
-
-    setUp: function (cb) {
-
-        this.compiler = new Compiler();
-        cb();
-    },
-
-    "with continue": function (test) {
-
-        var node = {
-            type: "expr_stmt",
-            expr: {
-                type: 'request',
-                to: {type: 'id', name: 'foo'},
-                args: [
-                    {type: 'number', val: '42'}
-                ]}
-        };
-
-        var result = this.compiler.compile(node);
-
-        test.equal(result.continue(new JsWrapper('snork;')).render(), '$_foo($_foo,[42]);\nsnork;');
-        test.done();
-    }
-};
+//module.exports["statement lists"] = {
+//
+//    setUp: function (cb) {
+//
+//        this.compiler = new Compiler();
+//        cb();
+//    },
+//
+//    "with continue": function (test) {
+//
+//        var node = {
+//            type: "expr_stmt",
+//            expr: {
+//                type: 'request',
+//                to: {type: 'id', name: 'foo'},
+//                args: [
+//                    {type: 'number', val: '42'}
+//                ]}
+//        };
+//
+//        var result = this.compiler.compile(node);
+//
+//        test.equal(result.continue(new JsWrapper('snork;')).render(), '$foo($foo,[42]);\nsnork;');
+//        test.done();
+//    }
+//};
 
 module.exports["literals"] = {
 
@@ -49,7 +50,7 @@ module.exports["literals"] = {
 
         var node = {type: 'boolean', val: true};
 
-        test.equal(this.compiler.compile(node).render(), 'true');
+        test.equal(this.compiler.compile(node), 'true');
         test.done();
     },
 
@@ -57,7 +58,7 @@ module.exports["literals"] = {
 
         var node = {type: 'number', val: '42'};
 
-        test.equal(this.compiler.compile(node).render(), '42');
+        test.equal(this.compiler.compile(node), '42');
         test.done();
     },
 
@@ -65,7 +66,7 @@ module.exports["literals"] = {
 
         var node = {type: 'string', val: "turanga leela"};
 
-        test.equal(this.compiler.compile(node).render(), "'turanga leela'");
+        test.equal(this.compiler.compile(node), "'turanga leela'");
         test.done();
     }
 };
@@ -95,7 +96,7 @@ module.exports["identifiers"] = {
 
         scope.define('foo', true);
 
-        test.equal(this.compiler.compile(node).render(), '$_foo');
+        test.equal(this.compiler.compile(node), '$foo');
         test.done();
     },
 
@@ -128,7 +129,7 @@ module.exports["request"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.render(), '$_foo($_foo,[])');
+        test.equal(result.render(new Resolver()), '$foo($foo,[])');
         test.done();
     },
 
@@ -143,7 +144,7 @@ module.exports["request"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.render(), '$_foo($_foo,[42])');
+        test.equal(result.render(new Resolver()), '$foo($foo,[42])');
         test.done();
     },
 
@@ -159,11 +160,11 @@ module.exports["request"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.render(), "$_foo($_foo,[42,'hi there'])");
+        test.equal(result.render(new Resolver()), "$foo($foo,[42,'hi there'])");
         test.done();
     },
 
-    "with nested requests": function (test) {
+    "as statement, with nested requests": function (test) {
 
         var node = {
             type: 'expr_stmt',
@@ -185,7 +186,7 @@ module.exports["request"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.render(), "Q.spread([$_foo($_foo,[]),$_bar($_bar,[])], function (tmp_0,tmp_1) {\n$_baz($_baz,[tmp_0,tmp_1]);\n}, result.reject);");
+        test.equal(result.render(), "Q.spread([$foo($foo,[]),$bar($bar,[])], function (ph0,ph1) {\n$baz($baz,[ph0,ph1]);\n}, result.reject);");
         test.done();
     }
 };
@@ -213,7 +214,7 @@ module.exports["op"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.render(), '(1 * 2)');
+        test.equal(new Resolver(result).render(), '(1 * 2)');
         test.done();
     },
 
@@ -234,7 +235,7 @@ module.exports["op"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.render(), 'Q.spread([$_foo($_foo,[])], function (tmp_0) {\n(1 * tmp_0)\n}, result.reject);');
+        test.equal(new Resolver(result).render(), 'Q.spread([$foo($foo,[])], function (ph0) {\n(1 * ph0)\n}, result.reject);');
         test.done();
     },
 
@@ -259,7 +260,7 @@ module.exports["op"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.render(), 'Q.spread([$_foo($_foo,[]),$_bar($_bar,[])], function (tmp_0,tmp_1) {\n(tmp_0 * tmp_1)\n}, result.reject);');
+        test.equal(new Resolver(result).render(), 'Q.spread([$foo($foo,[]),$bar($bar,[])], function (ph0,ph1) {\n(ph0 * ph1)\n}, result.reject);');
         test.done();
     },
 
@@ -284,7 +285,7 @@ module.exports["op"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.render(), '((1 && 2) || 3)');
+        test.equal(new Resolver(result).render(), '((1 && 2) || 3)');
         test.done();
     },
 
@@ -304,7 +305,7 @@ module.exports["op"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.render(), "function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {return left.concat(right);} else return left + right;}($_foo,$_bar)");
+        test.equal(new Resolver(result).render(), "function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {return left.concat(right);} else return left + right;}($foo,$bar)");
         test.done();
     }
 
@@ -329,7 +330,7 @@ module.exports["op"] = {
 //    },
 };
 
-module.exports["statements"] = {
+module.exports["request statements"] = {
 
     "setUp": function (cb) {
         this.compiler = new Compiler();
@@ -339,21 +340,26 @@ module.exports["statements"] = {
     "request with one arg": function (test) {
 
         var node = {
+            type: 'expr_stmt',
+            expr: {
                 type: 'request',
                 to: {type: 'id', name: 'foo'},
                 args: [
                     {type: 'number', val: '42'}
-                ]};
+                ]}
+        };
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.render(), '$_foo($_foo,[42])');
+        test.equal(result.render(), '$foo($foo,[42]);');
         test.done();
     },
 
     "with nested requests": function (test) {
 
         var node = {
+            type: 'expr_stmt',
+            expr: {
                 type: 'request',
                 to: {type: 'id', name: 'baz'},
                 args: [{
@@ -369,46 +375,50 @@ module.exports["statements"] = {
                         to: {type: 'id', name: 'bar'},
                         args: []
                     }
-                }]};
+                }]}
+        };
 
         // patch sub nodes?
 
         var result = this.compiler.compile(node);
 
         test.equal(result.render(),
-            'Q.spread([$_foo($_foo,[]),$_bar($_bar,[])], function (tmp_0,tmp_1) {\n$_baz($_baz,[(tmp_0 - tmp_1)])\n}, result.reject);');
+            'Q.spread([$foo($foo,[]),$bar($bar,[])], function (ph0,ph1) {\n$baz($baz,[(ph0 - ph1)]);\n}, result.reject);');
         test.done();
     },
 
     "several nested requests": function (test) {
 
         var node = {
-            type: 'request',
-            to: {type: 'id', name: 'quux'},
-            args: [{
+            type: 'expr_stmt',
+            expr: {
                 type: 'request',
-                to: {type: 'id', name: 'baz'},
+                to: {type: 'id', name: 'quux'},
                 args: [{
-                    type: 'op',
-                    op: '-',
-                    left: {
-                        type: 'request',
-                        to: {type: 'id', name: 'foo'},
-                        args: []
-                    },
-                    right: {
-                        type: 'request',
-                        to: {type: 'id', name: 'bar'},
-                        args: []
-                    }
-                }]}]};
+                    type: 'request',
+                    to: {type: 'id', name: 'baz'},
+                    args: [{
+                        type: 'op',
+                        op: '-',
+                        left: {
+                            type: 'request',
+                            to: {type: 'id', name: 'foo'},
+                            args: []
+                        },
+                        right: {
+                            type: 'request',
+                            to: {type: 'id', name: 'bar'},
+                            args: []
+                        }
+                    }]}]}
+        };
 
         // patch sub nodes?
 
         var result = this.compiler.compile(node);
 
         test.equal(result.render(),
-            'Q.spread([$_foo($_foo,[]),$_bar($_bar,[])], function (tmp_0,tmp_1) {\nQ.spread([$_baz($_baz,[(tmp_0 - tmp_1)])], function (tmp_0) {\n$_quux($_quux,[tmp_0])\n}, result.reject);\n}, result.reject);');
+            'Q.spread([$foo($foo,[]),$bar($bar,[])], function (ph0,ph1) {\nQ.spread([$baz($baz,[(ph0 - ph1)])], function (ph0) {\n$quux($quux,[ph0]);\n}, result.reject);\n}, result.reject);');
         test.done();
     }
 };
@@ -429,7 +439,7 @@ module.exports["receive"] = {
 
         var result = this.compiler.compile(node, new Scope());
 
-        test.equal(result.render(), 'var $_foo = args.shift(),\n$_mani = args.shift(),\n$_padme = args.shift(),\n$_hum = args.shift();');
+        test.equal(result.render(), 'var $foo = args.shift(),\n$mani = args.shift(),\n$padme = args.shift(),\n$hum = args.shift();');
         test.done();
     }
 };
@@ -450,7 +460,7 @@ module.exports["cardinality"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.render(), "function (val) {if (typeof val === 'string') return val.length;else if (Array.isArray(val)) return val.length;else if (typeof val === 'object') return Object.keys(val).length;}($_foo)");
+        test.equal(new Resolver(result).render(), "function (val) {if (typeof val === 'string') return val.length;else if (Array.isArray(val)) return val.length;else if (typeof val === 'object') return Object.keys(val).length;}($foo)");
         test.done();
     }
 };
@@ -471,7 +481,7 @@ module.exports["complement"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.render(), "!$_foo");
+        test.equal(new Resolver(result).render(), "!$foo");
         test.done();
     }
 };
@@ -499,7 +509,7 @@ module.exports["conditional"] = {
         var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
-        test.equal(result.render(), 'if ($_foo) {\n$_bar = 42;\n}');
+        test.equal(result.render(), 'if ($foo) {\n$bar = 42;\n}');
 //        test.ok(scope.getStatus('bar'));
         test.done();
     },
@@ -521,7 +531,7 @@ module.exports["conditional"] = {
         var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
-        test.equal(result.render(), 'if ($_foo) {\n$_bar = 42;\n}\nelse {\n$_bar = 32;\n}');
+        test.equal(result.render(), 'if ($foo) {\n$bar = 42;\n}\nelse {\n$bar = 32;\n}');
 //        test.ok(scope.getStatus('bar'));
         test.done();
     },
@@ -549,7 +559,7 @@ module.exports["conditional"] = {
         var result = this.compiler.compile(node, scope);
 
         test.equal(result.render(),
-            'if ($_foo) {\n$_bar = 42;\n}\nelse {\nif ($_bar) {\n$_bar = 32;\n}\nelse {\n$_baz = 82;\n}\n}');
+            'if ($foo) {\n$bar = 42;\n}\nelse {\nif ($bar) {\n$bar = 32;\n}\nelse {\n$baz = 82;\n}\n}');
         test.done();
     }
 };
@@ -573,7 +583,7 @@ module.exports["assignment"] = {
         var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
-        test.equal(result.render(), '$_foo = 57;');
+        test.equal(result.render(), '$foo = 57;');
 //        test.ok(scope.getStatus('foo'));
         test.done();
     },
@@ -590,7 +600,7 @@ module.exports["assignment"] = {
         var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
-        test.equal(result.render(), '$_foo[$_bar] = 57;');
+        test.equal(result.render(), '$foo[$bar] = 57;');
 
         // context isn't modified by this
         test.throws(function () {scope.getStatus('foo')});
@@ -611,7 +621,7 @@ module.exports["assignment"] = {
 
         scope.define('bar', true);
 
-        test.equal(result.render(), '$_foo = $_bar;');
+        test.equal(result.render(), '$foo = $bar;');
         test.done();
     },
 
@@ -627,7 +637,7 @@ module.exports["assignment"] = {
         var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
-        test.equal(result.render(), 'Q.spread([$_bar($_bar,[])], function (tmp_0) {\n$_foo = tmp_0;\n}, result.reject);');
+        test.equal(result.render(), 'Q.spread([$bar($bar,[])], function (ph0) {\n$foo = ph0;\n}, result.reject);');
         test.done();
     }
 };
@@ -650,7 +660,7 @@ module.exports["subscript"] = {
         var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
-        test.equal(result.render(), '$_foo[1]');
+        test.equal(new Resolver(result).render(), '$foo[1]');
         test.done();
     },
 
@@ -664,7 +674,7 @@ module.exports["subscript"] = {
         var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
-        test.equal(result.render(), '$_foo[$_foo.length - 1]');
+        test.equal(new Resolver(result).render(), '$foo[$foo.length - 1]');
         test.done();
     }
 };
@@ -686,7 +696,7 @@ module.exports["sequence"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.render(), 'function (first, last, action) {\nfor (var num = first; num <= last; num++) { action(num); }}.bind(null,2,$_n)');
+        test.equal(new Resolver(result).render(), 'function (first, last, action) {\nfor (var num = first; num <= last; num++) { action(num); }}.bind(null,2,$n)');
         test.done();
     }
 };
@@ -717,8 +727,8 @@ module.exports["procedure"] = {
         var scope = new Scope();
         var result = this.compiler.compile(node, scope);
 
-        test.equal(result.render(),
-            "function ($_recur, args) {\n\n    var result = Q.defer();\n\n    var $_next = args.shift();\n$_result *= $_next;return result.promise;\n}");
+        test.equal(new Resolver(result).render(),
+            "function ($recur, args) {\n\n    var result = Q.defer();\n\n    var $next = args.shift();\n$result *= $next;return result.promise;\n}");
         test.done();
     }
 };
@@ -741,7 +751,7 @@ module.exports["connection"] = {
 
         var result = this.compiler.compile(node);
 
-        test.equal(result.render(), '$_foo.call(null,$_bar)');
+        test.equal(new Resolver(result).render(), '$foo.call(null,$bar)');
         test.done();
     }
 };

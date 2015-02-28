@@ -37,7 +37,7 @@
                 },
                 "right":{
                     "type":"number",
-                    "val":42
+                    "val":"42"
                 }
             },
             "tail":{
@@ -51,7 +51,7 @@
                     },
                     "right":{
                         "type":"number",
-                        "val":63.4
+                        "val":"63.4"
                     }
                 },
                 "tail":{
@@ -101,7 +101,7 @@
                                             "args":[
                                                 {
                                                     "type":"number",
-                                                    "val":1729
+                                                    "val":"1729"
                                                 }
                                             ]
                                         },

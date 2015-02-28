@@ -7,6 +7,7 @@
 var Q = require('q');
 var Scope = require('./Scope');
 var JsWrapper = require('./JsWrapper');
+var Resolver = require('./Resolver');
 
 var __ = function () {
 
@@ -57,6 +58,7 @@ __.prototype.compile = function (node, scope) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * A procedure is an expression.
  *
  * @param scope
  * @param node
@@ -84,10 +86,10 @@ __.prototype['procedure'] = function (node, scope) {
     // compile the statement(s) in the context of the local scope
     var stmts = this.compile(node.body, localScope);
 
-    return new JsWrapper(function (env) {
-        return 'function ($_recur, args) {\n\n    ' +
+    return new JsWrapper(function (resolver) {
+        return 'function ($recur, args) {\n\n    ' +
             'var result = Q.defer();\n\n    ' +
-            env.realize(stmts) +
+            resolver.resolve(stmts) +
             'return result.promise;\n}';
     });
 };
@@ -105,7 +107,7 @@ __.prototype['stmt_list'] = function (node, scope) {
     var head = this.compile(node.head, scope);
 
     if (node.tail) {
-        return head.continue(this.compile(node.tail, scope));
+        return head.setNext(this.compile(node.tail, scope));
     }
 
     return head;
@@ -120,8 +122,8 @@ __.prototype['stmt_list'] = function (node, scope) {
  */
 __.prototype['receive'] = function (node, scope) {
 
-    return new JsWrapper('var ' + node.names.map(function (name) {
-        return '$_' + name + ' = ' + 'args.shift()';
+    return new Resolver('var ' + node.names.map(function (name) {
+        return '$' + name + ' = ' + 'args.shift()';
     }).join(',\n') + ';');
 };
 
@@ -129,7 +131,12 @@ __.prototype['receive'] = function (node, scope) {
 
 __.prototype['expr_stmt'] = function (node, scope) {
 
-    return this.compile(node.expr, scope).asStatement();
+    var expr = this.compile(node.expr, scope);
+
+    // slap a semicolon on that bad boy
+    return new Resolver(new JsWrapper(function (resolver) {
+        return expr.render(resolver) + ';';
+    }));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -154,10 +161,10 @@ __.prototype['result'] = function (node, scope) {
         return self.compile(arg, scope);
     });
 
-    return new JsWrapper(function (env) {
-        return name + '(' + env.realize(args).join(',') +
+    return new Resolver(new JsWrapper(function (resolver) {
+        return name + '(' + resolver.resolve(args).join(',') +
             ');\nreturn result.promise;';
-    });
+    }));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -187,9 +194,9 @@ __.prototype['assign'] = function (node, scope) {
 //        scope.define(node.left.name, right.isReady());
 //    }
 
-    return new JsWrapper(function (env) {
-        return env.realize(left) + ' ' + node.op + ' ' + env.realize(right) + ';';
-    });
+    return new Resolver(new JsWrapper(function (resolver) {
+        return resolver.resolve(left) + ' ' + node.op + ' ' + resolver.resolve(right) + ';';
+    }));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,19 +219,19 @@ __.prototype['conditional'] = function (node, scope) {
         negBlock = this.compile(node.otherwise, scope);
     }
 
-    // todo we might want to rewrite this to only realize the blocks after evaluating the predicate
+    // todo we might want to rewrite this to only resolve the blocks after evaluating the predicate
 
-    return new JsWrapper(function (env) {
+    return new Resolver(new JsWrapper(function (resolver) {
 
-        var stmt = 'if (' + env.realize(predicate) + ') {\n' +
-            env.realize(consequent).replace(/\n/g, '\n') + '\n' + '}';
+        var stmt = 'if (' + resolver.resolve(predicate) + ') {\n' +
+            resolver.resolve(consequent).replace(/\n/g, '\n') + '\n' + '}';
 
         if (negBlock) {
-            stmt += '\nelse {\n' + env.realize(negBlock).replace(/\n/g, '\n') + '\n}';
+            stmt += '\nelse {\n' + resolver.resolve(negBlock).replace(/\n/g, '\n') + '\n}';
         }
 
         return stmt;
-    });
+    }));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -239,7 +246,7 @@ __.prototype['iteration'] = function (node, scope) {
     var condition = this.compile(node.condition, scope);
 //    var statements = this.compile(node.statements, scope);
 
-    return new JsWrapper(function (env) {
+    return new JsWrapper(function (resolver) {
 //        return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
     });
 };
@@ -292,12 +299,12 @@ __.prototype['request'] = function (node, scope) {
         return self.compile(arg, scope);
     });
 
-    return new JsWrapper(function (env) {
+    return new JsWrapper(function (resolver) {
 
-        // call realize() once since it's not idempotent (probably should be)
-        var targetId = env.realize(target);
+        // call resolve() once since it's not idempotent (probably should be)
+        var targetId = resolver.resolve(target);
 
-        return targetId + '(' + targetId + ',[' + env.realize(args).join(',') + '])';
+        return targetId + '(' + targetId + ',[' + resolver.resolve(args).join(',') + '])';
 
     }, true);
 };
@@ -312,7 +319,7 @@ __.prototype['request'] = function (node, scope) {
  */
 __.prototype['id'] = function (node) {
 
-    return new JsWrapper('$_' + node.name);
+    return '$' + node.name;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -331,12 +338,12 @@ __.prototype['cardinality'] = function (node, scope) {
     // do we really need the JS AST level? or could we compile directly in one pass?
 
     return new JsWrapper(
-        function (env) {
+        function (resolver) {
             return 'function (val) {' +
                 "if (typeof val === 'string') return val.length;" +
                 "else if (Array.isArray(val)) return val.length;" +
                 "else if (typeof val === 'object') return Object.keys(val).length;" +
-                "}(" + env.realize(right) + ")"});
+                "}(" + resolver.resolve(right) + ")"});
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -350,8 +357,8 @@ __.prototype['complement'] = function (node, scope) {
     var right = this.compile(node.operand, scope);
 
     return new JsWrapper(
-        function (env) {
-            return '!' + env.realize(right)
+        function (resolver) {
+            return '!' + resolver.resolve(right)
         });
 };
 
@@ -372,15 +379,15 @@ __.prototype['subscript'] = function (node, scope) {
         index = this.compile(node.index, scope);
     }
 
-    // todo - what if the list expression is a request or somesuch? can't realize it twice
+    // todo - what if the list expression is a request or somesuch? can't resolve it twice
     // wrap it in a helper function?
 
-    return new JsWrapper(function (env) {
+    return new JsWrapper(function (resolver) {
 
-        var listRef = env.realize(list); // realize should be idempotent...
+        var listRef = resolver.resolve(list); // resolve should be idempotent...
 
         return listRef + '[' +
-            (index === undefined ? listRef + '.length - 1' : env.realize(index)) + ']';
+            (index === undefined ? listRef + '.length - 1' : resolver.resolve(index)) + ']';
     });
 };
 
@@ -419,11 +426,11 @@ __.prototype['sequence'] = function (node, scope) {
     // renders an expression that is a function that takes a single arg -
     // the action to be performed
 
-    return new JsWrapper(function (env) {
+    return new JsWrapper(function (resolver) {
 
         return 'function (first, last, action) {\n' +
             'for (var num = first; num <= last; num++) { action(num); }' +
-        "}.bind(null," + env.realize(first) + ',' + env.realize(last) + ")";
+        "}.bind(null," + resolver.resolve(first) + ',' + resolver.resolve(last) + ")";
         });
 };
 
@@ -443,8 +450,8 @@ __.prototype['connection'] = function (node, scope) {
     var source = this.compile(node.source, scope);
     var sink = this.compile(node.sink, scope);
 
-    return new JsWrapper(function (env) {
-        return env.realize(source) + '.call(null,' + env.realize(sink) + ')'
+    return new JsWrapper(function (resolver) {
+        return resolver.resolve(source) + '.call(null,' + resolver.resolve(sink) + ')'
     });
 };
 
@@ -469,10 +476,10 @@ __.prototype['op'] = function (node, scope) {
     }
     else if (op == '+') {
 
-        return new JsWrapper(function (env) {
+        return new JsWrapper(function (resolver) {
             return 'function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {' +
                 'return left.concat(right);} else return left + right;}(' +
-                env.realize(left) + ',' + env.realize(right) + ')'});
+                resolver.resolve(left) + ',' + resolver.resolve(right) + ')'});
     }
 
 //    make sure both sides are defined
@@ -487,10 +494,10 @@ __.prototype['op'] = function (node, scope) {
 //        throw new Error("right operand not defined");
 //    }
 
-    return new JsWrapper(function (env) {
+    return new JsWrapper(function (resolver) {
 
         // use parens to be safe
-        return '(' + env.realize(left) + ' ' + op + ' ' + env.realize(right) + ')';
+        return '(' + resolver.resolve(left) + ' ' + op + ' ' + resolver.resolve(right) + ')';
     });
 };
 
@@ -505,7 +512,7 @@ __.prototype['op'] = function (node, scope) {
 __.prototype['boolean'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return new JsWrapper(node.val ? 'true' : 'false');
+    return node.val ? 'true' : 'false';
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -517,7 +524,7 @@ __.prototype['boolean'] = function (node) {
 __.prototype['number'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return new JsWrapper(node.val);
+    return node.val;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -529,7 +536,7 @@ __.prototype['number'] = function (node) {
 __.prototype['string'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
-    return new JsWrapper("'" + node.val.replace(/'/g, "\\'") + "'");
+    return "'" + node.val.replace(/'/g, "\\'") + "'";
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -603,7 +610,7 @@ __.prototype['dyad'] = function (node, scope) {
  */
 __.prototype['symbol'] = function (node) {
 
-    return new JsWrapper("'<" + node.name + ">'");
+    return "'<" + node.name + ">'";
 };
 
 module.exports = __;

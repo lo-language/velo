@@ -7,7 +7,7 @@
         "tail": {
             "type": "stmt_list",
             "head":
-                { "type":"assign","op": "=", "left": {"type":"id","name":"binky"}, "right": {"type":"number","val":64} },
+                { "type":"assign","op": "=", "left": {"type":"id","name":"binky"}, "right": {"type":"number","val":"64"} },
             "tail": {
                 "type": "stmt_list",
                 "head":
