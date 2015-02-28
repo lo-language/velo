@@ -7,7 +7,7 @@ greeting = 'howdy, pardner';
 
 // procedure literal
 HardyRamanujan is:
-    reply(1729);
+    reply 1729;
 
 // map with indentation and symbols
 pairs = {

@@ -68,6 +68,45 @@ module.exports["literals"] = {
 
         test.equal(this.compiler.compile(node), "'turanga leela'");
         test.done();
+    },
+
+    "list": function (test) {
+
+        var node = {
+            type: 'list',
+            elements:
+                [ { type: 'string', val: 'foo' },
+                    { type: 'string', val: 'mani' },
+                    { type: 'string', val: 'padme' },
+                    { type: 'string', val: 'hum' } ] };
+
+        var result = this.compiler.compile(node);
+
+        test.equal(new Resolver(result).render(), "['foo','mani','padme','hum']");
+        test.done();
+    },
+
+    "set": function (test) {
+
+        var node = { type: 'set',
+            members:
+                [ { type: 'dyad',
+                    key: { type: 'symbol', name: 'zaphod' },
+                    value: { type: 'boolean', val: true } },
+                    { type: 'dyad',
+                        key: { type: 'symbol', name: 'ford' },
+                        value: { type: 'boolean', val: true } },
+                    { type: 'dyad',
+                        key: { type: 'symbol', name: 'arthur' },
+                        value: { type: 'boolean', val: true } },
+                    { type: 'dyad',
+                        key: { type: 'symbol', name: 'ford' },
+                        value: { type: 'boolean', val: true } } ] };
+
+        var result = this.compiler.compile(node);
+
+        test.equal(new Resolver(result).render(), "{'<zaphod>':true,'<ford>':true,'<arthur>':true,'<ford>':true}");
+        test.done();
     }
 };
 
@@ -76,6 +115,14 @@ module.exports["identifiers"] = {
     "setUp": function (cb) {
         this.compiler = new Compiler();
         cb();
+    },
+
+    "symbol": function (test) {
+
+        var node = {type: 'symbol', name: 'cymbal'};
+
+        test.equal(this.compiler.compile(node), "'<cymbal>'");
+        test.done();
     },
 
 //    "undefined": function (test) {
@@ -306,6 +353,24 @@ module.exports["op"] = {
         var result = this.compiler.compile(node);
 
         test.equal(new Resolver(result).render(), "function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {return left.concat(right);} else return left + right;}($foo,$bar)");
+        test.done();
+    },
+
+    "in operator": function (test) {
+
+        // should create a context
+        // should call compile on each statement
+
+        var node = {
+            type: 'in',
+            left: { type: 'string', val: 'trillian' },
+            right: { type: 'id', name: 'dudes' } };
+
+        // patch sub nodes?
+
+        var result = this.compiler.compile(node);
+
+        test.equal(new Resolver(result).render(), "function (item, collection) {if (Array.isArray(collection)) return collection.indexOf(item) >= 0;else if (typeof val === 'object') return collection.hasOwnProperty(item);}('trillian',$dudes)");
         test.done();
     }
 

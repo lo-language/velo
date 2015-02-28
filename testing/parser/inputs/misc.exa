@@ -61,7 +61,7 @@ result = foo() ~>
 index = 0;
 
 iterator is:
-    reply(items[index]);
+    reply items[index];
     index++;
 
 reply iterator;

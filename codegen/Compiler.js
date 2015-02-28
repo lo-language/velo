@@ -38,6 +38,7 @@ only works if we don't switch fn ptrs around
 // chain statements as nesting, because each statement kind of defines the context for lower statements?
 // then do we not need a separate context idea besides the enclosing node??
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Takes an Exa AST node and returns a JS AST node. Code isn't generated until renderStmt is called on
  * JS nodes.
@@ -405,11 +406,11 @@ __.prototype['in'] = function (node, scope) {
     var right = this.compile(node.right, scope);
 
     return new JsWrapper(
-        function (stmtContext) {
+        function (resolver) {
             return 'function (item, collection) {' +
                 "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
                 "else if (typeof val === 'object') return collection.hasOwnProperty(item);" +
-                "}(" + left.renderExpr(stmtContext) + ',' + right.renderExpr(stmtContext) + ")"});
+                "}(" + resolver.resolve(left) + ',' + resolver.resolve(right) + ")"});
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -555,9 +556,9 @@ __.prototype['list'] = function (node, scope) {
         return self.compile(item, scope);
     });
 
-    return new JsWrapper(function (stmtContext) {
+    return new JsWrapper(function (resolver) {
         return '[' + items.map(function (item) {
-            return item.renderExpr(stmtContext)
+            return resolver.resolve(item)
         }).join(',') + ']';
     });
 };
@@ -578,9 +579,9 @@ __.prototype['set'] = function (node, scope) {
         return self.compile(member, scope);
     });
 
-    return new JsWrapper(function (stmtContext) {
+    return new JsWrapper(function (resolver) {
         return '{' + members.map(function (member) {
-            return member.renderExpr(stmtContext)
+            return resolver.resolve(member)
         }).join(',') + '}';
     });
 };
@@ -596,8 +597,8 @@ __.prototype['dyad'] = function (node, scope) {
     var key = this.compile(node.key, scope);
     var value = this.compile(node.value, scope);
 
-    return new JsWrapper(function (stmtContext) {
-        return key.renderExpr(stmtContext) + ':' + value.renderExpr(stmtContext);
+    return new JsWrapper(function (resolver) {
+        return resolver.resolve(key) + ':' + resolver.resolve(value);
     });
 };
 

@@ -3,7 +3,7 @@
  * 12/25/14
  */
 
-// words literal
+// list literal
 words = ['foo', 'mani', 'padme', 'hum'];
 
 // set literal with symbols and intentional repetition
@@ -42,7 +42,7 @@ if 'trillian' in dudes:
 doctor = <zoidberg>;
 
 if doctor == <zoidberg>:
-    doctor = `mccoy;
+    doctor = <mccoy>;
 
 if doctor == <zoidberg>:
     fail "uh-oh";
