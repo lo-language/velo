@@ -201,7 +201,7 @@ module.exports['procedure'] = {
 
     'success': function (test) {
 
-        console.error(this.runner.getJs());
+        console.log(this.runner.getJs());
         this.runner.success(test, [], 60);
     }
 };

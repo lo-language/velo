@@ -1,0 +1,27 @@
+/**
+ * Created by: spurcell
+ * 2/7/15
+ */
+
+
+foo is:
+
+    receive x;
+    reply factorial(x) / 2;
+
+
+factorial is:
+
+    receive num;
+
+    again = recur;
+
+    if num <= 1:
+        result = num;
+    else:
+        result = num * again(num - 1);
+
+    reply result;
+
+
+reply foo(5);
