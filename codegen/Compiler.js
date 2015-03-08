@@ -6,8 +6,7 @@
 
 var Q = require('q');
 var Scope = require('./Scope');
-var JsWrapper = require('./JsWrapper');
-var Resolver = require('./Resolver');
+var JsConstruct = require('./JsConstruct');
 
 var __ = function () {
 
@@ -47,14 +46,14 @@ only works if we don't switch fn ptrs around
  * @param scope
  * @return {*}
  */
-__.prototype.compile = function (node, scope) {
+__.compile = function (node, scope) {
 
     if (this[node.type] === undefined) {
         throw new Error("don't know how to compile node type '" + node.type + "'");
     }
 
 //    console.error('compiling ' + node.type);
-    return this[node.type](node, scope);
+    return __[node.type](node, scope);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,7 +63,7 @@ __.prototype.compile = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['procedure'] = function (node, scope) {
+__['procedure'] = function (node, scope) {
 
     var localScope;
 
@@ -101,7 +100,7 @@ __.prototype['procedure'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['stmt_list'] = function (node, scope) {
+__['stmt_list'] = function (node, scope) {
 
     // hooray for Lisp!
 
@@ -121,23 +120,21 @@ __.prototype['stmt_list'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['receive'] = function (node, scope) {
+__['receive'] = function (node, scope) {
 
-    return new Resolver('var ' + node.names.map(function (name) {
+    return 'var ' + node.names.map(function (name) {
         return '$' + name + ' = ' + 'args.shift()';
-    }).join(',\n') + ';');
+    }).join(',\n') + ';';
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__.prototype['expr_stmt'] = function (node, scope) {
+__['expr_stmt'] = function (node, scope) {
 
-    var expr = this.compile(node.expr, scope);
+    var expr = __.compile(node.expr, scope);
 
     // slap a semicolon on that bad boy
-    return new Resolver(new JsWrapper(function (resolver) {
-        return expr.render(resolver) + ';';
-    }));
+    return new JsConstruct().write(expr, ';');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -146,7 +143,7 @@ __.prototype['expr_stmt'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['result'] = function (node, scope) {
+__['result'] = function (node, scope) {
 
     // should this node type be renamed response?
 
@@ -162,10 +159,7 @@ __.prototype['result'] = function (node, scope) {
         return self.compile(arg, scope);
     });
 
-    return new Resolver(new JsWrapper(function (resolver) {
-        return name + '(' + resolver.resolve(args).join(',') +
-            ');\nreturn result.promise;';
-    }));
+    return new JsConstruct().write(name, '(', {csv: args}, ');\nreturn result.promise;');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,7 +170,7 @@ __.prototype['result'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['assign'] = function (node, scope) {
+__['assign'] = function (node, scope) {
 
     // this is guaranteed to be a statement
 
@@ -195,9 +189,7 @@ __.prototype['assign'] = function (node, scope) {
 //        scope.define(node.left.name, right.isReady());
 //    }
 
-    return new Resolver(new JsWrapper(function (resolver) {
-        return resolver.resolve(left) + ' ' + node.op + ' ' + resolver.resolve(right) + ';';
-    }));
+    return new JsConstruct().write(left, ' ', node.op, ' ', right, ';');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -206,9 +198,7 @@ __.prototype['assign'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['conditional'] = function (node, scope) {
-
-    var self = this;
+__['conditional'] = function (node, scope) {
 
     // needs predicate to be ready
 
@@ -222,17 +212,14 @@ __.prototype['conditional'] = function (node, scope) {
 
     // todo we might want to rewrite this to only resolve the blocks after evaluating the predicate
 
-    return new Resolver(new JsWrapper(function (resolver) {
+    var stmt = new JsConstruct().write(
+        'if (', predicate, ') {\n', consequent, '\n', '}');
 
-        var stmt = 'if (' + resolver.resolve(predicate) + ') {\n' +
-            resolver.resolve(consequent).replace(/\n/g, '\n') + '\n' + '}';
+    if (negBlock) {
+        stmt.write('\nelse {\n', negBlock, '\n}');
+    }
 
-        if (negBlock) {
-            stmt += '\nelse {\n' + resolver.resolve(negBlock).replace(/\n/g, '\n') + '\n}';
-        }
-
-        return stmt;
-    }));
+    return stmt;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,7 +229,7 @@ __.prototype['conditional'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['iteration'] = function (node, scope) {
+__['iteration'] = function (node, scope) {
 
     var condition = this.compile(node.condition, scope);
 //    var statements = this.compile(node.statements, scope);
@@ -259,7 +246,7 @@ __.prototype['iteration'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['complete'] = function (node, scope) {
+__['complete'] = function (node, scope) {
 
     // complete always needs to wrap its followers (children)
 
@@ -291,23 +278,34 @@ __.prototype['complete'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['request'] = function (node, scope) {
+__['request'] = function (node, scope) {
 
-    var target = this.compile(node.to, scope);
-    var self = this;
+    var request = new JsConstruct(true);
+
+    var target = __.compile(node.to);
 
     var args = node.args.map(function (arg) {
-        return self.compile(arg, scope);
+        return __.compile(arg);
     });
 
-    return new JsWrapper(function (resolver) {
+    request.write(target, '(', target, ',[', {csv: args}, '])');
 
-        // call resolve() once since it's not idempotent (probably should be)
-        var targetId = resolver.resolve(target);
+    return request;
 
-        return targetId + '(' + targetId + ',[' + resolver.resolve(args).join(',') + '])';
-
-    }, true);
+//    var self = this;
+//
+//    var args = node.args.map(function (arg) {
+//        return self.compile(arg, scope);
+//    });
+//
+//    return new JsWrapper(function (resolver) {
+//
+//        // call resolve() once since it's not idempotent (probably should be)
+//        var targetId = resolver.resolve(target);
+//
+//        return targetId + '(' + targetId + ',[' + resolver.resolve(args).join(',') + '])';
+//
+//    }, true);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -318,7 +316,7 @@ __.prototype['request'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['id'] = function (node) {
+__['id'] = function (node) {
 
     return '$' + node.name;
 };
@@ -329,7 +327,7 @@ __.prototype['id'] = function (node) {
  * @param scope
  * @param node
  */
-__.prototype['cardinality'] = function (node, scope) {
+__['cardinality'] = function (node, scope) {
 
     var right = this.compile(node.operand, scope);
 
@@ -338,13 +336,12 @@ __.prototype['cardinality'] = function (node, scope) {
     // make a general JS code class? that can hold string and expr parts?
     // do we really need the JS AST level? or could we compile directly in one pass?
 
-    return new JsWrapper(
-        function (resolver) {
-            return 'function (val) {' +
-                "if (typeof val === 'string') return val.length;" +
-                "else if (Array.isArray(val)) return val.length;" +
-                "else if (typeof val === 'object') return Object.keys(val).length;" +
-                "}(" + resolver.resolve(right) + ")"});
+    return new JsConstruct().write(
+        'function (val) {' +
+            "if (typeof val === 'string') return val.length;" +
+            "else if (Array.isArray(val)) return val.length;" +
+            "else if (typeof val === 'object') return Object.keys(val).length;" +
+            "}(", right, ")");
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -353,14 +350,9 @@ __.prototype['cardinality'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['complement'] = function (node, scope) {
+__['complement'] = function (node, scope) {
 
-    var right = this.compile(node.operand, scope);
-
-    return new JsWrapper(
-        function (resolver) {
-            return '!' + resolver.resolve(right)
-        });
+    return new JsConstruct().write('!', __.compile(node.operand, scope));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -369,7 +361,7 @@ __.prototype['complement'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['subscript'] = function (node, scope) {
+__['subscript'] = function (node, scope) {
 
     // this is guaranteed to be a statement
 
@@ -383,13 +375,8 @@ __.prototype['subscript'] = function (node, scope) {
     // todo - what if the list expression is a request or somesuch? can't resolve it twice
     // wrap it in a helper function?
 
-    return new JsWrapper(function (resolver) {
-
-        var listRef = resolver.resolve(list); // resolve should be idempotent...
-
-        return listRef + '[' +
-            (index === undefined ? listRef + '.length - 1' : resolver.resolve(index)) + ']';
-    });
+    return new JsConstruct().write(
+        list, '[', (index === undefined ? list + '.length - 1' : index), ']');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -398,19 +385,18 @@ __.prototype['subscript'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['in'] = function (node, scope) {
+__['in'] = function (node, scope) {
 
     // should holds apply to strings? maybe as 'contains'? or some non-word operator?
 
     var left = this.compile(node.left, scope);
     var right = this.compile(node.right, scope);
 
-    return new JsWrapper(
-        function (resolver) {
-            return 'function (item, collection) {' +
-                "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
-                "else if (typeof val === 'object') return collection.hasOwnProperty(item);" +
-                "}(" + resolver.resolve(left) + ',' + resolver.resolve(right) + ")"});
+    return new JsConstruct().write(
+        'function (item, collection) {' +
+            "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
+            "else if (typeof val === 'object') return collection.hasOwnProperty(item);" +
+            "}(", left, ',', right, ")");
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -419,7 +405,7 @@ __.prototype['in'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['sequence'] = function (node, scope) {
+__['sequence'] = function (node, scope) {
 
     var first = this.compile(node.first, scope);
     var last = this.compile(node.last, scope);
@@ -427,12 +413,10 @@ __.prototype['sequence'] = function (node, scope) {
     // renders an expression that is a function that takes a single arg -
     // the action to be performed
 
-    return new JsWrapper(function (resolver) {
-
-        return 'function (first, last, action) {\n' +
+    return new JsConstruct().write(
+        'function (first, last, action) {\n' +
             'for (var num = first; num <= last; num++) { action(num); }' +
-        "}.bind(null," + resolver.resolve(first) + ',' + resolver.resolve(last) + ")";
-        });
+        "}.bind(null,", first, ',', last, ')');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -441,19 +425,21 @@ __.prototype['sequence'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['connection'] = function (node, scope) {
+__['connection'] = function (node, scope) {
 
     // how to handle multiple connectors?
 
     // sources and sinks are like calls in that they generate both statements and expressions
     // they have expressions but inject statements into the context
 
-    var source = this.compile(node.source, scope);
-    var sink = this.compile(node.sink, scope);
+    var source = __.compile(node.source, scope);
+    var sink = __.compile(node.sink, scope);
 
-    return new JsWrapper(function (resolver) {
-        return resolver.resolve(source) + '.call(null,' + resolver.resolve(sink) + ')'
-    });
+//    return new JsWrapper(function (resolver) {
+//        return resolver.resolve(source) + '.call(null,' + resolver.resolve(sink) + ')'
+//    });
+
+    return new JsConstruct().write(source, '.call(null,', sink, ')');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -462,7 +448,7 @@ __.prototype['connection'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['op'] = function (node, scope) {
+__['op'] = function (node, scope) {
 
     var left = this.compile(node.left, scope);
     var right = this.compile(node.right, scope);
@@ -477,10 +463,11 @@ __.prototype['op'] = function (node, scope) {
     }
     else if (op == '+') {
 
-        return new JsWrapper(function (resolver) {
-            return 'function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {' +
-                'return left.concat(right);} else return left + right;}(' +
-                resolver.resolve(left) + ',' + resolver.resolve(right) + ')'});
+        // todo drop this in favor of combination operator ><
+        return new JsConstruct().write(
+            'function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {' +
+                'return left.concat(right);} else return left + right;}(',
+                left, ',', right, ')');
     }
 
 //    make sure both sides are defined
@@ -495,11 +482,10 @@ __.prototype['op'] = function (node, scope) {
 //        throw new Error("right operand not defined");
 //    }
 
-    return new JsWrapper(function (resolver) {
+    return new JsConstruct().write(
 
         // use parens to be safe
-        return '(' + resolver.resolve(left) + ' ' + op + ' ' + resolver.resolve(right) + ')';
-    });
+        '(', left, ' ', op, ' ', right, ')');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -510,7 +496,7 @@ __.prototype['op'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['boolean'] = function (node) {
+__['boolean'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
     return node.val ? 'true' : 'false';
@@ -522,7 +508,7 @@ __.prototype['boolean'] = function (node) {
  * @param scope
  * @param node
  */
-__.prototype['number'] = function (node) {
+__['number'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
     return node.val;
@@ -534,7 +520,7 @@ __.prototype['number'] = function (node) {
  * @param scope
  * @param node
  */
-__.prototype['string'] = function (node) {
+__['string'] = function (node) {
 
     // a literal has no effects or preconditions - just a value
     return "'" + node.val.replace(/'/g, "\\'") + "'";
@@ -546,7 +532,7 @@ __.prototype['string'] = function (node) {
  * @param scope
  * @param node
  */
-__.prototype['list'] = function (node, scope) {
+__['list'] = function (node, scope) {
 
     // list literals might have members that need to be realized
 
@@ -556,11 +542,8 @@ __.prototype['list'] = function (node, scope) {
         return self.compile(item, scope);
     });
 
-    return new JsWrapper(function (resolver) {
-        return '[' + items.map(function (item) {
-            return resolver.resolve(item)
-        }).join(',') + ']';
-    });
+
+    return new JsConstruct().write('[', {csv: items}, ']');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -569,7 +552,7 @@ __.prototype['list'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['set'] = function (node, scope) {
+__['set'] = function (node, scope) {
 
     // list literals might have members that need to be realized
 
@@ -579,11 +562,7 @@ __.prototype['set'] = function (node, scope) {
         return self.compile(member, scope);
     });
 
-    return new JsWrapper(function (resolver) {
-        return '{' + members.map(function (member) {
-            return resolver.resolve(member)
-        }).join(',') + '}';
-    });
+    return new JsConstruct().write('{', {csv: members}, '}');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -592,14 +571,12 @@ __.prototype['set'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['dyad'] = function (node, scope) {
+__['dyad'] = function (node, scope) {
 
     var key = this.compile(node.key, scope);
     var value = this.compile(node.value, scope);
 
-    return new JsWrapper(function (resolver) {
-        return resolver.resolve(key) + ':' + resolver.resolve(value);
-    });
+    return new JsConstruct().write(key, ':', value);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -609,7 +586,7 @@ __.prototype['dyad'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__.prototype['symbol'] = function (node) {
+__['symbol'] = function (node) {
 
     return "'<" + node.name + ">'";
 };
