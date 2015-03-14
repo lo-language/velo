@@ -190,18 +190,18 @@ module.exports['collections'] = {
 //    }
 //};
 
-module.exports['procedure'] = {
-
-    "setUp": function (cb) {
-
-        this.runner = new TestRunner('procedure');
-
-        this.runner.load(cb);
-    },
-
-    'success': function (test) {
-
-        console.log(this.runner.getJs());
-        this.runner.success(test, [], 60);
-    }
-};
+//module.exports['procedure'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.runner = new TestRunner('procedure');
+//
+//        this.runner.load(cb);
+//    },
+//
+//    'success': function (test) {
+//
+//        console.log(this.runner.getJs());
+//        this.runner.success(test, [], 60);
+//    }
+//};

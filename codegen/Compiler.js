@@ -1,5 +1,14 @@
 /**
  * The Exa-to-JS compiler
+ *
+ * How it works:
+ *
+ * Each AST node is compiled into either a bare JS string or an array of strings, arrays, and objects.
+ *
+ * In the compile phase, the AST is traversed and each node is compiled into either a bare JS string or a JS "construct" which is a list of JS strings and sub-constructs produced by compiling sub-nodes. Simple nodes, such as literals, compile into bare JS strings. More complex nodes compile into constructs, e.g. an addition node would compile into the construct ['(', leftOperand, ' + ', rightOperand, ')']
+ *
+ * Note:
+ * To compile an expression containing a request, we have to do a trick where we create a "resolver" block to wrap the expression.
  */
 
 'use strict';
@@ -8,39 +17,23 @@ var Q = require('q');
 var Scope = require('./Scope');
 var JsConstruct = require('./JsConstruct');
 
-var __ = function () {
-
-};
-
-/*
-
-approach
-go through the AST and determine for each node:
-- whether it's a publisher or a subscriber or both or neither
-- how to capture the value of that node in JS
-- how to capture any side effects of that node in JS
-- what async preconditions must be met before the value is available
-
-have each node record whether it's an expression or has one or more statements
-in general, have each node record its *requirements*, and then gather the requirements to write the code
-also, save codegen for last - construct a JS AST?
-
-optimization idea: detect synchronous functions at their first invocation and short-circuit the promise check?
-only works if we don't switch fn ptrs around
-
-
- */
-// forget about JS initially, transform into an exa program description, with explicit sequencing
-// semantic phase I guess
-// then compile into js?
-// first pass, go through the AST and tag with deps?
-// chain statements as nesting, because each statement kind of defines the context for lower statements?
-// then do we not need a separate context idea besides the enclosing node??
+var __ = {};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Takes an Exa AST node and returns a JS AST node. Code isn't generated until renderStmt is called on
- * JS nodes.
+ * Renders the given AST into JS source.
+ *
+ * @param ast
+ * @return {String}
+ */
+__.getJs = function (ast) {
+
+    return __.render(__.compile(ast));
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Dispatches to the appropriate node type handler.
  *
  * @param node
  * @param scope
@@ -53,7 +46,110 @@ __.compile = function (node, scope) {
     }
 
 //    console.error('compiling ' + node.type);
+
+    // dispatch to the appropriate handler
     return __[node.type](node, scope);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Renders the given construct into JS source. A construct can be a string, a request,
+ * or an array of strings and constructs.
+ *
+ * @param jsConstruct   either a string or an array
+ * @return {String}
+ */
+__.render = function (jsConstruct) {
+
+    if (typeof jsConstruct == 'string') {
+        return jsConstruct;
+    }
+
+    // catch barriers
+    if (typeof jsConstruct == 'object' && jsConstruct.stmt !== undefined) {
+        return __.render(jsConstruct.stmt);
+    }
+
+    // flatten any sub-arrays or comma-separated-value lists before we begin
+
+    function flatten (list) {
+
+        // flatten CSVs
+        if (typeof list == 'object' && list.csv !== undefined) {
+
+            return flatten(list.csv.reduce(function (prev, current, index) {
+
+                if (index > 0) {
+                    prev.push(',');
+                }
+
+                return prev.concat(current);
+            }, []));
+        }
+
+        // flatten arrays
+        if (Array.isArray(list)) {
+
+            return list.reduce(function (prev, current) {
+                return prev.concat(flatten(current));
+            }, []);
+        }
+
+        // base case
+        return list;
+    };
+
+    // concatenate the parts as a string
+
+    var requests = [];
+    var placeholders = [];
+
+    var result = flatten(jsConstruct).reduce(function (prev, current) {
+
+        if (typeof current == 'string') {
+            return prev + current;
+        }
+
+        // swap requests for placeholder variables, and stash the request for later utilization
+
+        if (typeof current == 'object' && current.req !== undefined) {
+
+            // do a switcheroo - save the request, return a placeholder name to be used in the expression
+
+            var name = 'PH' + requests.length;
+
+            placeholders.push(name);
+
+            // stash the request
+            requests.push(current.req);
+
+            return prev + name;
+        }
+
+        // catch sync barriers
+        if (typeof current == 'object' && current.stmt !== undefined) {
+            return prev + __.render(current.stmt);
+        }
+
+        console.log(jsConstruct);
+        console.log(current);
+        throw new Error("unexpected JS part: " + current);
+    }, '');
+
+    // if there were any requests in this construct, we have to render a resolver around the result
+
+    if (requests.length > 0) {
+
+        // create a new JSConstruct for the resolver
+
+        var resolver = ['Q.spread([', {csv: requests}, '], function (', {csv: placeholders}, ') {\n',
+            result,
+            '\n}, result.reject);'];
+
+        return __.render(resolver);
+    }
+
+    return result;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,14 +180,12 @@ __['procedure'] = function (node, scope) {
     localScope.defineArg('__err');
 
     // compile the statement(s) in the context of the local scope
-    var stmts = this.compile(node.body, localScope);
+    var body = __.compile(node.body, localScope);
 
-    return new JsWrapper(function (resolver) {
-        return 'function ($recur, args) {\n\n    ' +
-            'var result = Q.defer();\n\n    ' +
-            resolver.resolve(stmts) +
-            'return result.promise;\n}';
-    });
+    return ['function ($recur, args) {\n\n    ',
+            'var result = Q.defer();\n\n    ',
+            body,
+            'return result.promise;\n}'];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,13 +198,13 @@ __['stmt_list'] = function (node, scope) {
 
     // hooray for Lisp!
 
-    var head = this.compile(node.head, scope);
+    var head = {stmt: __.compile(node.head, scope)};
 
     if (node.tail) {
-        return head.setNext(this.compile(node.tail, scope));
+        return {stmt: [head, __.compile(node.tail, scope)]};
     }
 
-    return head;
+    return {stmt: head};
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,8 +227,11 @@ __['expr_stmt'] = function (node, scope) {
 
     var expr = __.compile(node.expr, scope);
 
-    // slap a semicolon on that bad boy
-    return new JsConstruct().write(expr, ';');
+    // optimization/hack - unwrap the request so it doesn't render an unnecessary resolver
+
+    // and slap a semicolon on that bad boy
+
+    return expr.req.concat(';');
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,7 +256,7 @@ __['result'] = function (node, scope) {
         return self.compile(arg, scope);
     });
 
-    return new JsConstruct().write(name, '(', {csv: args}, ');\nreturn result.promise;');
+    return [name, '(', {csv: args}, ');\nreturn result.promise;'];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,8 +271,8 @@ __['assign'] = function (node, scope) {
 
     // this is guaranteed to be a statement
 
-    var left = this.compile(node.left, scope);
-    var right = this.compile(node.right, scope);
+    var left = __.compile(node.left, scope);
+    var right = __.compile(node.right, scope);
 
     // is being ready a property of an AST node + exa scope?
     // is tracking ready state just an optimization? or do we need it to not have turtles all the way down?
@@ -189,7 +286,7 @@ __['assign'] = function (node, scope) {
 //        scope.define(node.left.name, right.isReady());
 //    }
 
-    return new JsConstruct().write(left, ' ', node.op, ' ', right, ';');
+    return [left, ' ' + node.op + ' ', right, ';'];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -202,21 +299,20 @@ __['conditional'] = function (node, scope) {
 
     // needs predicate to be ready
 
-    var predicate = this.compile(node.predicate);
-    var consequent = this.compile(node.consequent, scope);
+    var predicate = __.compile(node.predicate);
+    var consequent = __.compile(node.consequent, scope);
     var negBlock = false;
 
     if (node.otherwise) {
-        negBlock = this.compile(node.otherwise, scope);
+        negBlock = __.compile(node.otherwise, scope);
     }
 
     // todo we might want to rewrite this to only resolve the blocks after evaluating the predicate
 
-    var stmt = new JsConstruct().write(
-        'if (', predicate, ') {\n', consequent, '\n', '}');
+    var stmt = ['if (', predicate, ') {\n', consequent, '\n', '}'];
 
     if (negBlock) {
-        stmt.write('\nelse {\n', negBlock, '\n}');
+        stmt.push('\nelse {\n', negBlock, '\n}');
     }
 
     return stmt;
@@ -231,8 +327,8 @@ __['conditional'] = function (node, scope) {
  */
 __['iteration'] = function (node, scope) {
 
-    var condition = this.compile(node.condition, scope);
-//    var statements = this.compile(node.statements, scope);
+    var condition = __.compile(node.condition, scope);
+//    var statements = __.compile(node.statements, scope);
 
     return new JsWrapper(function (resolver) {
 //        return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
@@ -280,32 +376,14 @@ __['complete'] = function (node, scope) {
  */
 __['request'] = function (node, scope) {
 
-    var request = new JsConstruct(true);
-
     var target = __.compile(node.to);
 
+    // todo add convenience method for compiling arrays?
     var args = node.args.map(function (arg) {
         return __.compile(arg);
     });
 
-    request.write(target, '(', target, ',[', {csv: args}, '])');
-
-    return request;
-
-//    var self = this;
-//
-//    var args = node.args.map(function (arg) {
-//        return self.compile(arg, scope);
-//    });
-//
-//    return new JsWrapper(function (resolver) {
-//
-//        // call resolve() once since it's not idempotent (probably should be)
-//        var targetId = resolver.resolve(target);
-//
-//        return targetId + '(' + targetId + ',[' + resolver.resolve(args).join(',') + '])';
-//
-//    }, true);
+    return {req: [target, '(', target, ',[', {csv: args}, '])']};
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -329,19 +407,19 @@ __['id'] = function (node) {
  */
 __['cardinality'] = function (node, scope) {
 
-    var right = this.compile(node.operand, scope);
+    var right = __.compile(node.operand, scope);
 
     // wrap in small function? inspects type then gets size?
 
     // make a general JS code class? that can hold string and expr parts?
     // do we really need the JS AST level? or could we compile directly in one pass?
 
-    return new JsConstruct().write(
+    return [
         'function (val) {' +
             "if (typeof val === 'string') return val.length;" +
             "else if (Array.isArray(val)) return val.length;" +
             "else if (typeof val === 'object') return Object.keys(val).length;" +
-            "}(", right, ")");
+            "}(", right, ")"];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -352,7 +430,7 @@ __['cardinality'] = function (node, scope) {
  */
 __['complement'] = function (node, scope) {
 
-    return new JsConstruct().write('!', __.compile(node.operand, scope));
+    return ['!', __.compile(node.operand, scope)];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -365,18 +443,17 @@ __['subscript'] = function (node, scope) {
 
     // this is guaranteed to be a statement
 
-    var list = this.compile(node.list, scope);
+    var list = __.compile(node.list, scope);
     var index = undefined;
 
     if (node.index !== undefined) {
-        index = this.compile(node.index, scope);
+        index = __.compile(node.index, scope);
     }
 
     // todo - what if the list expression is a request or somesuch? can't resolve it twice
     // wrap it in a helper function?
 
-    return new JsConstruct().write(
-        list, '[', (index === undefined ? list + '.length - 1' : index), ']');
+    return [list, '[', (index === undefined ? list + '.length - 1' : index), ']'];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -389,14 +466,13 @@ __['in'] = function (node, scope) {
 
     // should holds apply to strings? maybe as 'contains'? or some non-word operator?
 
-    var left = this.compile(node.left, scope);
-    var right = this.compile(node.right, scope);
+    var left = __.compile(node.left, scope);
+    var right = __.compile(node.right, scope);
 
-    return new JsConstruct().write(
-        'function (item, collection) {' +
+    return ['function (item, collection) {' +
             "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
             "else if (typeof val === 'object') return collection.hasOwnProperty(item);" +
-            "}(", left, ',', right, ")");
+            "}(", left, ',', right, ")"];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -407,16 +483,15 @@ __['in'] = function (node, scope) {
  */
 __['sequence'] = function (node, scope) {
 
-    var first = this.compile(node.first, scope);
-    var last = this.compile(node.last, scope);
+    var first = __.compile(node.first, scope);
+    var last = __.compile(node.last, scope);
 
     // renders an expression that is a function that takes a single arg -
     // the action to be performed
 
-    return new JsConstruct().write(
-        'function (first, last, action) {\n' +
+    return ['function (first, last, action) {\n' +
             'for (var num = first; num <= last; num++) { action(num); }' +
-        "}.bind(null,", first, ',', last, ')');
+        "}.bind(null,", first, ',', last, ')'];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -435,11 +510,7 @@ __['connection'] = function (node, scope) {
     var source = __.compile(node.source, scope);
     var sink = __.compile(node.sink, scope);
 
-//    return new JsWrapper(function (resolver) {
-//        return resolver.resolve(source) + '.call(null,' + resolver.resolve(sink) + ')'
-//    });
-
-    return new JsConstruct().write(source, '.call(null,', sink, ')');
+    return [source, '.call(null,', sink, ')'];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -450,8 +521,8 @@ __['connection'] = function (node, scope) {
  */
 __['op'] = function (node, scope) {
 
-    var left = this.compile(node.left, scope);
-    var right = this.compile(node.right, scope);
+    var left = __.compile(node.left, scope);
+    var right = __.compile(node.right, scope);
 
     var op = node.op;
 
@@ -464,10 +535,9 @@ __['op'] = function (node, scope) {
     else if (op == '+') {
 
         // todo drop this in favor of combination operator ><
-        return new JsConstruct().write(
-            'function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {' +
+        return ['function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {' +
                 'return left.concat(right);} else return left + right;}(',
-                left, ',', right, ')');
+                left, ',', right, ')'];
     }
 
 //    make sure both sides are defined
@@ -482,10 +552,8 @@ __['op'] = function (node, scope) {
 //        throw new Error("right operand not defined");
 //    }
 
-    return new JsConstruct().write(
-
-        // use parens to be safe
-        '(', left, ' ', op, ' ', right, ')');
+    // use parens to be safe
+    return ['(', left, ' ', op, ' ', right, ')'];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -543,7 +611,7 @@ __['list'] = function (node, scope) {
     });
 
 
-    return new JsConstruct().write('[', {csv: items}, ']');
+    return ['[', {csv: items}, ']'];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -562,7 +630,7 @@ __['set'] = function (node, scope) {
         return self.compile(member, scope);
     });
 
-    return new JsConstruct().write('{', {csv: members}, '}');
+    return ['{', {csv: members}, '}'];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -573,10 +641,10 @@ __['set'] = function (node, scope) {
  */
 __['dyad'] = function (node, scope) {
 
-    var key = this.compile(node.key, scope);
-    var value = this.compile(node.value, scope);
+    var key = __.compile(node.key, scope);
+    var value = __.compile(node.value, scope);
 
-    return new JsConstruct().write(key, ':', value);
+    return [key, ':', value];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

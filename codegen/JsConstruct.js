@@ -127,7 +127,6 @@ __.prototype.render = function () {
         // render nested constructs
 
         if (piece instanceof __) {
-            console.log('here');
             return piece.render();
         }
 

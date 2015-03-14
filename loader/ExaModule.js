@@ -25,7 +25,6 @@
 
 var parser = require('./../parser/Parser');
 var Compiler = require('./../codegen/Compiler');
-var Resolver = require('./../codegen/Resolver');
 var Q = require('q');
 var fs = require('fs');
 var util = require('util');
@@ -33,7 +32,6 @@ var util = require('util');
 var __ = function (source) {
 
     this.source = source;
-    this.compiler = new Compiler();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,7 +56,7 @@ __.prototype.parse = function () {
 __.prototype.compile = function () {
 
     if (this.js === undefined) {
-        this.js = this.compiler.compile(this.parse()).render(new Resolver());
+        this.js = Compiler.getJs(this.parse());
     }
 
     return this.js;
