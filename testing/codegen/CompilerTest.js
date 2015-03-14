@@ -543,78 +543,73 @@ module.exports["complement"] = {
     }
 };
 
-//module.exports["conditional"] = {
-//
-//    "positive only": function (test) {
-//
-//        // should create a context
-//        // should call compile on each statement
-//
-//        var node = {
-//            type: 'conditional',
-//            predicate: {type: 'id', name: 'foo'},
-//            consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null}
-//        };
-//
-//        // patch sub nodes?
-//
-//        var scope = new Scope();
-//        var result = Compiler.compile(node, scope);
-//
-//        test.equal(result.render(), 'if ($foo) {\n$bar = 42;\n}');
-////        test.ok(scope.getStatus('bar'));
-//        test.done();
-//    },
-//
-//    "positive and negative blocks": function (test) {
-//
-//        // should create a context
-//        // should call compile on each statement
-//
-//        var node = {
-//            type: 'conditional',
-//            predicate: {type: 'id', name: 'foo'},
-//            consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null},
-//            otherwise: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '32'}}, tail: null}
-//        };
-//
-//        // patch sub nodes?
-//
-//        var scope = new Scope();
-//        var result = Compiler.compile(node, scope);
-//
-//        test.equal(result.render(), 'if ($foo) {\n$bar = 42;\n}\nelse {\n$bar = 32;\n}');
-////        test.ok(scope.getStatus('bar'));
-//        test.done();
-//    },
-//
-//    "with else if": function (test) {
-//
-//        // should create a context
-//        // should call compile on each statement
-//
-//        var node = {
-//            type: 'conditional',
-//            predicate: {type: 'id', name: 'foo'},
-//            consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null},
-//            otherwise: {type: 'stmt_list', head: {
-//                type: 'conditional',
-//                predicate: {type: 'id', name: 'bar'},
-//                consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '32'}}, tail: null},
-//                otherwise: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'baz'}, right: {type: 'number', val: '82'}}, tail: null},
-//            }, tail: null}
-//        };
-//
-//        // patch sub nodes?
-//
-//        var scope = new Scope();
-//        var result = Compiler.compile(node, scope);
-//
-//        test.equal(result.render(),
-//            'if ($foo) {\n$bar = 42;\n}\nelse {\nif ($bar) {\n$bar = 32;\n}\nelse {\n$baz = 82;\n}\n}');
-//        test.done();
-//    }
-//};
+module.exports["conditional"] = {
+
+    "positive only": function (test) {
+
+        // should create a context
+        // should call compile on each statement
+
+        var node = {
+            type: 'conditional',
+            predicate: {type: 'id', name: 'foo'},
+            consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null}
+        };
+
+        // patch sub nodes?
+
+        var scope = new Scope();
+
+        test.equal(Compiler.getJs(node), 'if ($foo) {\n$bar = 42;\n}');
+        test.done();
+    },
+
+    "positive and negative blocks": function (test) {
+
+        // should create a context
+        // should call compile on each statement
+
+        var node = {
+            type: 'conditional',
+            predicate: {type: 'id', name: 'foo'},
+            consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null},
+            otherwise: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '32'}}, tail: null}
+        };
+
+        // patch sub nodes?
+
+        var scope = new Scope();
+
+        test.equal(Compiler.getJs(node), 'if ($foo) {\n$bar = 42;\n}\nelse {\n$bar = 32;\n}');
+        test.done();
+    },
+
+    "with else if": function (test) {
+
+        // should create a context
+        // should call compile on each statement
+
+        var node = {
+            type: 'conditional',
+            predicate: {type: 'id', name: 'foo'},
+            consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null},
+            otherwise: {type: 'stmt_list', head: {
+                type: 'conditional',
+                predicate: {type: 'id', name: 'bar'},
+                consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '32'}}, tail: null},
+                otherwise: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'baz'}, right: {type: 'number', val: '82'}}, tail: null},
+            }, tail: null}
+        };
+
+        // patch sub nodes?
+
+        var scope = new Scope();
+
+        test.equal(Compiler.getJs(node),
+            'if ($foo) {\n$bar = 42;\n}\nelse {\nif ($bar) {\n$bar = 32;\n}\nelse {\n$baz = 82;\n}\n}');
+        test.done();
+    }
+};
 
 module.exports["assignment"] = {
 
