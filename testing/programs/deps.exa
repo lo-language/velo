@@ -1,0 +1,11 @@
+/**
+ * Created by: spurcell
+ * 3/14/14
+ */
+
+foo is:
+    reply 14;
+
+x = foo();
+
+reply x;

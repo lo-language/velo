@@ -6,87 +6,80 @@
 "use strict";
 
 var JsConstruct = require('../../codegen/JsConstruct');
+var JsRequest = require('../../codegen/JsRequest');
 
 module.exports["basics"] = {
 
     "one piece": function (test) {
 
-        var expr = new JsConstruct().write('var x = args.shift();');
+        var expr = new JsConstruct(['var x = args.shift();']);
 
-        test.equal(expr.render(), 'var x = args.shift();');
+        test.equal(expr.toString(), 'var x = args.shift();');
         test.done();
     },
 
     "several pieces": function (test) {
 
-        var expr = new JsConstruct().write('var x = ', '42', ';');
+        var expr = new JsConstruct(['var x = ', '42', ';']);
 
-        test.equal(expr.render(), 'var x = 42;');
+        test.equal(expr.toString(), 'var x = 42;');
         test.done();
     },
 
-    "nested pieces": function (test) {
+    "nested arrays": function (test) {
 
-        var expr = new JsConstruct().write(
-            '(', new JsConstruct().write('42'), ')');
+        var expr = new JsConstruct(['(', ['42'], ')']);
 
-        test.equal(expr.render(), '(42)');
+        test.equal(expr.toString(), '(42)');
         test.done();
     },
 
-    "simple request": function (test) {
+    "csvs": function (test) {
 
-        var expr = new JsConstruct().write(
-            new JsConstruct(true).write('foo()'), ';');
+        test.deepEqual(new JsConstruct([{csv: ['nork']}]).render(), ['nork']);
+        test.deepEqual(new JsConstruct([{csv: ['pork', 'stork']}]).render(), ['pork', ',', 'stork']);
+        test.deepEqual(new JsConstruct(['pork', 'stork', {csv: ['hork', 'nork']}]).render(), ['pork', 'stork', 'hork', ',', 'nork']);
+        test.deepEqual(new JsConstruct([{csv: ['pork', 'stork', {csv: ['hork', 'nork']}]}]).render(), ['pork', ',', 'stork', ',', 'hork', ',', 'nork']);
 
-        test.equal(expr.render(), 'Q.spread([foo()], function (PH0) {\nPH0;\n}, result.reject);');
+        test.deepEqual(new JsConstruct([{csv: [
+            'pork', 'stork', ['el', 'chupacabra', {csv: [
+                'hork', 'nork']}]]}]).render(), ['pork', ',', 'stork', ',', 'el', 'chupacabra', 'hork', ',', 'nork']);
+
         test.done();
     },
 
-    "as statement": function (test) {
+    "resolution construct": function (test) {
 
-        var expr = new JsConstruct(true).write(
-            'bar(', new JsConstruct(true).write('foo()'), ');');
+        // in resolving requests in statements, we create lists that contain
+        // csv objects that contain arrays of constructs - this tests that behavior
 
-        test.equal(expr.render(), 'Q.spread([foo()], function (PH0) {\nbar(PH0);\n}, result.reject);');
+        var requests = [new JsConstruct(['foo()'])];
+        var placeholders = ['nork'];
+        var parts = [];
+
+        var construct = new JsConstruct(['Q.spread([', {csv: requests}, '], function (', {csv: placeholders}, ') {',
+            parts,
+            '}, result.reject);']);
+
+        test.deepEqual(construct.toString(), 'Q.spread([foo()], function (nork) {}, result.reject);');
+
         test.done();
     },
 
-    "nested deferred": function (test) {
+    "nested constructs": function (test) {
 
-        var expr = new JsConstruct(true).write(
-            'foo([',new JsConstruct(true).write('bar()'), ']);');
+        var expr = new JsConstruct(['(', new JsConstruct(['42']), ')']);
 
-        test.equal(expr.render(), 'Q.spread([bar()], function (PH0) {\nfoo([PH0]);\n}, result.reject);');
+        test.deepEqual(expr.render(), [ '(', '42', ')' ]);
+        test.equal(expr.toString(), '(42)');
         test.done();
     },
 
-    "complex deferred": function (test) {
+    "newline": function (test) {
 
-        var expr = new JsConstruct().write(
-            new JsConstruct(true).write(
-                'foo([', new JsConstruct(true).write('bar()'), '])'), ';');
+        var expr = new JsConstruct(['var x = 15;', {br: 1}, 'var y = 43;']);
 
-        test.equal(expr.render(), 'Q.spread([bar()], function (PH0) {\nQ.spread([foo([PH0])], function (PH0) {\nPH0;\n}, result.reject);\n}, result.reject);');
-        test.done();
-    },
-
-    "multiple deferred": function (test) {
-
-        var expr = new JsConstruct().write(
-            new JsConstruct(true).write(
-                'baz(', new JsConstruct(true).write('foo()'), ', ', new JsConstruct(true).write('bar()'), ')'), ';');
-
-        test.equal(expr.render(), 'Q.spread([foo(),bar()], function (PH0,PH1) {\nQ.spread([baz(PH0, PH1)], function (PH0) {\nPH0;\n}, result.reject);\n}, result.reject);');
-        test.done();
-    },
-
-    "op with deferred": function (test) {
-
-        var expr = new JsConstruct().write(
-                '(', new JsConstruct(true).write('foo()'), ' - ', new JsConstruct(true).write('bar()'), ');');
-
-        test.equal(expr.render(), 'Q.spread([foo(),bar()], function (PH0,PH1) {\n(PH0 - PH1);\n}, result.reject);');
+        test.equal(expr.toString(), 'var x = 15;\nvar y = 43;');
         test.done();
     }
 };

@@ -1,5 +1,6 @@
 /**
- * Models a general JS construct.
+ * Models a general JS construct as a list of parts, which can be strings, sub-constructs,
+ * or utility objects that wrap constructs.
  *
  * Created by: spurcell
  * 3/1/15
@@ -9,160 +10,85 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * We could instead have a separate method to make a request.
  *
- * @param isRequest
- * @param js
+ * @param parts     an array of strings, objects or arrays
  */
-var __ = function (isRequest, js) {
+var JsConstruct = function (parts) {
 
-    this.request = isRequest;
-    this.pieces = js ? [js] : [];
+    // flatten the parts
+    this.parts = flatten(parts);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Returns true if this construct is a request.
+ * An augmented flatten.
  *
- * @return {Boolean}
+ * @param list
  */
-__.prototype.isRequest  = function () {
-    return this.request;
-};
+var flatten = function (list) {
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Writes JS pieces into the container.
- *
- * Could imagine this taking AST nodes and doing the compilation itself, without embed.
- * But if we want to compile a different structure based on whether we contain remotes or not,
- * we'll have to call embed first.
- *
- * @param piece     a piece of JS logic or an array of pieces
- */
-__.prototype.write = function (piece) {
+    return list.reduce(function (accum, current) {
 
-    // convenience method
-
-    var self = this;
-
-    if (arguments.length > 1) {
-
-        Array.prototype.slice.call(arguments).map(function (p) {
-            return self.write(p);
-        });
-
-        return this;
-    }
-
-    // another convenience method:
-    // if we're given an array, flatten it down
-
-    if (Array.isArray(piece)) {
-
-        this.pieces = this.pieces.concat(piece);
-        return this;
-    }
-
-    // another convenience method:
-    // if we're given an object with a csv property, flatten it down separated by commas
-
-    if (typeof piece == 'object') {
-
-        if (piece.csv) {
-
-            piece.csv.forEach(function (p, index) {
-
-                if (index > 0) {
-                    self.write(',');
-                }
-
-                self.write(p);
-            });
-
-            return this;
-        }
-    }
-
-    this.pieces.push(piece);
-
-    return this;
-};
-
-__.prototype.join = function (construct) {
-
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Renders this construct into JS source.
- *
- * @return {String}
- */
-__.prototype.render = function () {
-
-    var requests = [];
-    var placeholders = [];
-
-    // iterate through the pieces
-
-    var result = this.pieces.map(function (piece) {
-
-        if (typeof piece == 'string') {
-            return piece;
-        }
-
-        if (piece.isRequest()) {
-
-            var name = 'PH' + requests.length;
-
-            placeholders.push(name);
-
-            // flatten the request
-            requests.push(piece.pieces);
-
-            return name;
+        // recursively flatten arrays
+        if (Array.isArray(current)) {
+            return accum.concat(flatten(current));
         }
 
         // render nested constructs
-
-        if (piece instanceof __) {
-            return piece.render();
+        if (current instanceof JsConstruct) {
+            return accum.concat(flatten(current.parts));
         }
 
-    }).join('');
+        // flatten CSV objects
+        if (typeof current == 'object' && current.csv !== undefined) {
 
-    // see if there were any requests found in rendering this construct
-    // if there were, we have to render a resolver around the result
+            return flatten(accum.concat(current.csv.reduce(function (accum, current, index) {
 
-    if (requests.length > 0) {
+                if (index > 0) {
+                    accum.push(',');
+                }
 
-        // create a new JSConstruct for the resolver
-        return __.createResolver(result, requests, placeholders).render();
-    }
+                return accum.concat(current);
+            }, [])));
+        }
 
-    return result;
+        // base case
+        return accum.concat(current);
+    }, []);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Creates a block of JS to resolve requests within it.
- *
- * @param wrapped
- * @param requests
- * @param placeholders
- * @return {*}
+ * Renders out the parts so they can be merged into another construct.
  */
-__.createResolver = function (wrapped, requests, placeholders) {
+JsConstruct.prototype.render = function () {
 
-    var resolver = new __();
-
-    resolver.write('Q.spread([', {csv: requests}, '], function (', {csv: placeholders}, ') {\n',
-        wrapped,
-        '\n}, result.reject);');
-
-    return resolver;
+    return this.parts;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Flattens this construct into JS source.
+ */
+JsConstruct.prototype.toString = function () {
 
-module.exports = __;
+    // concatenate the parts as a string
+
+    return this.render().reduce(function (prev, current) {
+
+        if (typeof current == 'string') {
+            return prev + current;
+        }
+
+        // render line breaks
+
+        if (typeof current == 'object' && current.br == 1) {
+            return prev + '\n';
+        }
+
+        console.log(current);
+        throw new Error("unexpected JS part: " + current);
+    }, '');
+};
+
+module.exports = JsConstruct;

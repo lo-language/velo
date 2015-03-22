@@ -11,6 +11,7 @@
 "use strict";
 
 var ExaModule = require('../../loader/ExaModule');
+var Compiler = require('../../codegen/Compiler');
 var util = require('util');
 var fs = require('fs');
 var programDir = __dirname +  '/../programs';
@@ -72,6 +73,22 @@ TestRunner.prototype.failure = function (test, input, expected) {
             test.done();
         }
     );
+};
+
+module.exports['deps'] = {
+
+    "setUp": function (cb) {
+
+        this.runner = new TestRunner('deps');
+
+        this.runner.load(cb);
+    },
+
+    'neg': function (test) {
+//        console.log(util.inspect(Compiler.compile(this.runner.getAst()), {depth: null}));
+//        console.log(this.runner.getJs());
+        this.runner.success(test, [], 14);
+    }
 };
 
 module.exports['conditionals'] = {
@@ -190,18 +207,18 @@ module.exports['collections'] = {
 //    }
 //};
 
-//module.exports['procedure'] = {
-//
-//    "setUp": function (cb) {
-//
-//        this.runner = new TestRunner('procedure');
-//
-//        this.runner.load(cb);
-//    },
-//
-//    'success': function (test) {
-//
+module.exports['procedure'] = {
+
+    "setUp": function (cb) {
+
+        this.runner = new TestRunner('procedure');
+
+        this.runner.load(cb);
+    },
+
+    'success': function (test) {
+
 //        console.log(this.runner.getJs());
-//        this.runner.success(test, [], 60);
-//    }
-//};
+        this.runner.success(test, [], 60);
+    }
+};
