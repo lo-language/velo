@@ -25,21 +25,7 @@ var __ = function (parts) {
     // flatten - replace with call to superclass
     JsConstruct.call(this, parts);
 
-    // resolve any requests
-    this.resolve();
-};
-
-var JsStatement = __;
-
-// subclass extends superclass
-__.prototype = Object.create(JsConstruct.prototype);
-__.prototype.constructor = __;
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Resolves any requests into placeholders.
- */
-__.prototype.resolve = function () {
+    // resolve any requests into placeholders
 
     var self = this;
 
@@ -51,9 +37,6 @@ __.prototype.resolve = function () {
         // swap requests for placeholder variables, and stash the request for later utilization
 
         if (current instanceof JsRequest) {
-
-            // flag that we're async
-            self.async = true;
 
             // swap a placeholder name for the request used in the expression
 
@@ -71,7 +54,16 @@ __.prototype.resolve = function () {
         return prev.concat(current);
 
     }, []);
+
+    // set our async flag
+    this.async = this.requests.length > 0;
 };
+
+var JsStatement = __;
+
+// subclass extends superclass
+__.prototype = Object.create(JsConstruct.prototype);
+__.prototype.constructor = __;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -111,7 +103,7 @@ __.prototype.setNext = function (stmt) {
  */
 __.prototype.isAsync = function () {
 
-    return this.async || false;
+    return this.async;
 };
 
 module.exports = __;

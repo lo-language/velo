@@ -7,29 +7,29 @@
  * 11/11/2013
  */
 
-receive items
+receive items;
 
-if # items == 0
-    fail("who could sort an empty list?")
+if #items == 0:
+    fail "who could sort an empty list?";
 
 // base case
-if # items == 1
-    reply(items)
+if #items == 1:
+    reply items;
 
 // bisect the list
-left = items<#items / 2>
+left = remove items[0:#items/2];
 
 // recursively sort the two halves
-left = __(left)
-right = __(right)
+left = recur(left);
+right = recur(right);
 
 // merge the sorted halves
 
-while # left > 0 || # right > 0
+while #left > 0 || #right > 0:
 
     if left[0] < right[0]
-        cut(left, 0) +> out
+        merged <+ remove left[0];
     else
-        cut(right, 0) +> out
+        merged <+ remove right[0];
 
-reply(merged)
+reply merged;

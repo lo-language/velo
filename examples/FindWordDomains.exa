@@ -37,11 +37,11 @@ lib.make("/dns/whois") ->
 
 findDomains =
 
-    receive word
+    receive word;
 
     ['com', 'net', 'org', 'io', 'it', 'me', 'to', 'aero', 'co'] >>
 
-        receive tld
+        receive tld;
 
         // wacky syntactic sugar here - /REGEX/ is shorthand for an action
         word -> /.+tld/ -> {
@@ -49,7 +49,7 @@ findDomains =
         }
     }
     :: {
-        end()
+        end();
     }
 }
 

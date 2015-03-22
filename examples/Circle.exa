@@ -14,10 +14,10 @@ shape = lib.createShape([center.x - radius, center.y - radius], radius);
 circle = shape + {
 
     getCenter:
-        reply(center);
+        reply center;
     ,
     getRadius:
-        reply(radius);
+        reply radius;
 
     //    move: action (xOffset, yOffset)
     //        center.x += xOffset
@@ -28,10 +28,10 @@ circle = shape + {
         radius = newRadius;
     ,
     getArea:
-        reply(lib.PI * radius * radius);
+        reply lib.PI * radius * radius;
     ,
     draw:
         receive screen;
 };
 
-reply(circle);
+reply circle;

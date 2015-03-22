@@ -86,7 +86,7 @@ module.exports['deps'] = {
 
     'neg': function (test) {
 //        console.log(util.inspect(Compiler.compile(this.runner.getAst()), {depth: null}));
-//        console.log(this.runner.getJs());
+        console.log(this.runner.getJs());
         this.runner.success(test, [], 14);
     }
 };
