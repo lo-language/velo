@@ -1,5 +1,12 @@
 ## ExaJS: The Exa-to-JavaScript Compiler
 
+This system compiles Exa programs into JavaScript.
+
+#### To run the tests 
+
+In the project root folder:
+
+    npm test
 
 #### How code generation works
 
