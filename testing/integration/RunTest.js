@@ -85,140 +85,141 @@ module.exports['deps'] = {
     },
 
     'neg': function (test) {
-//        console.log(util.inspect(Compiler.compile(this.runner.getAst()), {depth: null}));
+        console.log(util.inspect(this.runner.getAst(), {colors: true, depth: null}));
+        console.log(util.inspect(Compiler.compile(this.runner.getAst()), {depth: null}));
 //        console.log(this.runner.getJs());
         this.runner.success(test, [], 14);
     }
 };
 
-module.exports['conditionals'] = {
-
-    "setUp": function (cb) {
-
-        this.runner = new TestRunner('conditionals');
-
-        this.runner.load(cb);
-    },
-
-    'neg': function (test) {
-        this.runner.success(test, [-1], 'negative');
-    },
-
-    'zero': function (test) {
-        this.runner.success(test, [0], 'zero!');
-    },
-
-    'pos': function (test) {
-        this.runner.success(test, [1], 'positive');
-    }
-};
-
-module.exports['factorial'] = {
-
-    "setUp": function (cb) {
-
-        this.runner = new TestRunner('factorial');
-
-        this.runner.load(cb);
-    },
-
-    'success': function (test) {
-        this.runner.success(test, [10], 3628800);
-    },
-
-    'failure': function (test) {
-        this.runner.failure(test, [-1], 'I pity the fool!');
-    }
-};
-
-module.exports['fibonacci'] = {
-
-    "setUp": function (cb) {
-
-        this.runner = new TestRunner('fibonacci');
-
-        this.runner.load(cb);
-    },
-
-    'success': function (test) {
-
-        this.runner.success(test, [10], 55);
-    },
-
-    'failure': function (test) {
-
-        this.runner.failure(test, [-1], 'Whatsamatta, you?');
-    }
-};
-
-module.exports['collections'] = {
-
-    "setUp": function (cb) {
-
-        this.runner = new TestRunner('collections');
-
-        this.runner.load(cb);
-    },
-
-    'all': function (test) {
-
-//        console.error(util.inspect(this.runner.module.parse(), {depth: null}));
-        this.runner.success(test);
-    }
-};
-
-//module.exports['factorial2'] = {
+//module.exports['conditionals'] = {
 //
 //    "setUp": function (cb) {
 //
-//        this.runner = new TestRunner('factorial2');
+//        this.runner = new TestRunner('conditionals');
+//
+//        this.runner.load(cb);
+//    },
+//
+//    'neg': function (test) {
+//        this.runner.success(test, [-1], 'negative');
+//    },
+//
+//    'zero': function (test) {
+//        this.runner.success(test, [0], 'zero!');
+//    },
+//
+//    'pos': function (test) {
+//        this.runner.success(test, [1], 'positive');
+//    }
+//};
+//
+//module.exports['factorial'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.runner = new TestRunner('factorial');
+//
+//        this.runner.load(cb);
+//    },
+//
+//    'success': function (test) {
+//        this.runner.success(test, [10], 3628800);
+//    },
+//
+//    'failure': function (test) {
+//        this.runner.failure(test, [-1], 'I pity the fool!');
+//    }
+//};
+//
+//module.exports['fibonacci'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.runner = new TestRunner('fibonacci');
 //
 //        this.runner.load(cb);
 //    },
 //
 //    'success': function (test) {
 //
-//        this.runner.success(test, 10, 3628800);
+//        this.runner.success(test, [10], 55);
 //    },
 //
 //    'failure': function (test) {
 //
-//        this.runner.failure(test, -1, "I pity the fool!");
+//        this.runner.failure(test, [-1], 'Whatsamatta, you?');
 //    }
 //};
 //
-//module.exports['fibonacci2'] = {
+//module.exports['collections'] = {
 //
 //    "setUp": function (cb) {
 //
-//        this.runner = new TestRunner('fibonacci2');
+//        this.runner = new TestRunner('collections');
+//
+//        this.runner.load(cb);
+//    },
+//
+//    'all': function (test) {
+//
+////        console.error(util.inspect(this.runner.module.parse(), {depth: null}));
+//        this.runner.success(test);
+//    }
+//};
+//
+////module.exports['factorial2'] = {
+////
+////    "setUp": function (cb) {
+////
+////        this.runner = new TestRunner('factorial2');
+////
+////        this.runner.load(cb);
+////    },
+////
+////    'success': function (test) {
+////
+////        this.runner.success(test, 10, 3628800);
+////    },
+////
+////    'failure': function (test) {
+////
+////        this.runner.failure(test, -1, "I pity the fool!");
+////    }
+////};
+////
+////module.exports['fibonacci2'] = {
+////
+////    "setUp": function (cb) {
+////
+////        this.runner = new TestRunner('fibonacci2');
+////
+////        this.runner.load(cb);
+////    },
+////
+////    'success': function (test) {
+////
+////        this.runner.success(test, 10, 55);
+////    },
+////
+////    'failure': function (test) {
+////
+////        this.runner.failure(test, -1, "Whatsamatta, you?");
+////    }
+////};
+//
+//module.exports['procedure'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.runner = new TestRunner('procedure');
 //
 //        this.runner.load(cb);
 //    },
 //
 //    'success': function (test) {
 //
-//        this.runner.success(test, 10, 55);
-//    },
-//
-//    'failure': function (test) {
-//
-//        this.runner.failure(test, -1, "Whatsamatta, you?");
+////        console.log(this.runner.getJs());
+//        this.runner.success(test, [], 60);
 //    }
 //};
-
-module.exports['procedure'] = {
-
-    "setUp": function (cb) {
-
-        this.runner = new TestRunner('procedure');
-
-        this.runner.load(cb);
-    },
-
-    'success': function (test) {
-
-//        console.log(this.runner.getJs());
-        this.runner.success(test, [], 60);
-    }
-};

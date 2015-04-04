@@ -1,6 +1,4 @@
 /**
- * Wraps a JS construct in a request context. Requests can only be unwrapped in the context of a statement.
- *
  * Created by: spurcell
  * 3/1/15
  */
@@ -15,16 +13,12 @@ var JsConstruct = require('./JsConstruct');
  */
 var __ = function (parts) {
 
-    this.construct = new JsConstruct(parts);
+    JsConstruct.call(this, parts, true, true);
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Returns the wrapped construct.
- */
-__.prototype.getConstruct = function () {
+// subclass extends superclass
+__.prototype = Object.create(JsConstruct.prototype);
+__.prototype.constructor = __;
 
-    return this.construct;
-};
 
 module.exports = __;

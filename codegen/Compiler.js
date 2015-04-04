@@ -84,9 +84,7 @@ __['procedure'] = function (node, scope) {
     var body = __.compile(node.body, localScope);
 
     return new JsConstruct(['function ($recur, args) {\n\n    ',
-            'var result = Q.defer();\n\n    ',
-            body,
-            'return result.promise;\n}']);
+            body.render(),'}']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,7 +100,14 @@ __['stmt_list'] = function (node, scope) {
     var head = __.compile(node.head, scope);
 
     if (node.tail) {
-        head.setNext(__.compile(node.tail, scope));
+
+        var tail = __.compile(node.tail, scope);
+
+        if (head.async) {
+            return new JsConstruct(['return ', head, '.then(function () {', tail, '})'], false);
+        }
+
+        return new JsConstruct([head, tail], false);
     }
 
     return head;
@@ -117,9 +122,10 @@ __['stmt_list'] = function (node, scope) {
  */
 __['receive'] = function (node, scope) {
 
-    return new JsStatement(['var ' + node.names.map(function (name) {
+    // todo have a JsStatement class that adds the semicolon
+    return new JsConstruct(['var ' + node.names.map(function (name) {
         return '$' + name + ' = ' + 'args.shift()';
-    }).join(',\n') + ';']);
+    }).join(',\n') + ';'], {statement: true});
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -130,8 +136,8 @@ __['expr_stmt'] = function (node, scope) {
 
     if (req instanceof JsRequest) {
 
-        // slap a semicolon on that bad boy
-        return new JsStatement([req.getConstruct(), ';']);
+        // slap a semicolon on that bad boy and don't resolve it
+        return new JsStatement([req, ';'], false);
     }
 
     throw new Error("only bare requests can be statements, dude!");
@@ -147,19 +153,21 @@ __['result'] = function (node, scope) {
 
     // should this node type be renamed response?
 
-    var name = 'result.resolve';
-
-    if (node.channel === 'fail') {
-        name = 'result.reject';
-    }
-
     var self = this;
 
     var args = node.args.map(function (arg) {
         return self.compile(arg, scope);
     });
 
-    return new JsStatement([name, '(', {csv: args}, ');\nreturn result.promise;']);
+    if (args.length > 1) {
+        throw new Error("results with >1 value not yet supported, sorry");
+    }
+
+    if (node.channel === 'fail') {
+        return new JsConstruct(['return Q.reject(', {csv: args}, ');']);
+    }
+
+    return new JsConstruct(['return ', {csv: args}, ';']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -218,7 +226,7 @@ __['conditional'] = function (node, scope) {
         parts.push('\nelse {\n', negBlock, '\n}');
     }
 
-    return new JsStatement(parts);
+    return new JsConstruct(parts);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
