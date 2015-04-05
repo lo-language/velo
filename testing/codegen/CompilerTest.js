@@ -16,14 +16,11 @@ module.exports["statement lists"] = {
         var node = {
             type: "stmt_list",
             head: {
-                type: "expr_stmt",
-                expr: {
-                    type: 'request',
-                    to: {type: 'id', name: 'foo'},
-                    args: [
-                        {type: 'number', val: '42'}
-                    ]}
-                },
+                type: 'assign',
+                op: '=',
+                left: {type: 'id', name: 'foo'},
+                right: {type: 'number', val: '42'}
+            },
             tail: {
                 type: "stmt_list",
                 head: {
@@ -36,7 +33,7 @@ module.exports["statement lists"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo($foo,[42]);$bar = 57;');
+        test.equal(Compiler.compile(node).render(), '$foo = 42;$bar = 57;');
         test.done();
     },
 
@@ -703,7 +700,7 @@ module.exports["result"] = {
                 {type: 'number', val: '42'}
             ]};
 
-        test.equal(Compiler.compile(node).render(), "return 42;");
+        test.equal(Compiler.compile(node).render(), "return Q(42);");
         test.done();
     },
 

@@ -5,7 +5,7 @@
 
 "use strict";
 
-var JsConstruct = require('./JsConstruct');
+var JsResolver = require('./JsResolver');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -13,11 +13,13 @@ var JsConstruct = require('./JsConstruct');
  */
 var __ = function (parts) {
 
-    JsConstruct.call(this, parts, true, true);
+    JsResolver.call(this, parts);
+
+    this.async = true;
 };
 
 // subclass extends superclass
-__.prototype = Object.create(JsConstruct.prototype);
+__.prototype = Object.create(JsResolver.prototype);
 __.prototype.constructor = __;
 
 
