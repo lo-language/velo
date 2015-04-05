@@ -17,6 +17,7 @@ var Q = require('q');
 var Scope = require('./Scope');
 var JsConstruct = require('./JsConstruct');
 var JsStatement = require('./JsStatement');
+var JsResolver = require('./JsResolver');
 var JsRequest = require('./JsRequest');
 
 var __ = {};
@@ -84,9 +85,8 @@ __['procedure'] = function (node, scope) {
     var body = __.compile(node.body, localScope);
 
     return new JsConstruct(['function ($recur, args) {\n\n    ',
-            'var result = Q.defer();\n\n    ',
             body,
-            'return result.promise;\n}']);
+        '}']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,7 +102,14 @@ __['stmt_list'] = function (node, scope) {
     var head = __.compile(node.head, scope);
 
     if (node.tail) {
-        head.setNext(__.compile(node.tail, scope));
+
+        var tail = __.compile(node.tail, scope);
+
+        if (head.isAsync()) {
+            return new JsConstruct(['return ', head, '.then(function () {', tail, '})'], false);
+        }
+
+        return new JsConstruct([head, tail]);
     }
 
     return head;
@@ -117,6 +124,7 @@ __['stmt_list'] = function (node, scope) {
  */
 __['receive'] = function (node, scope) {
 
+    // todo have a JsStatement class that adds the semicolon
     return new JsStatement(['var ' + node.names.map(function (name) {
         return '$' + name + ' = ' + 'args.shift()';
     }).join(',\n') + ';']);
@@ -130,8 +138,8 @@ __['expr_stmt'] = function (node, scope) {
 
     if (req instanceof JsRequest) {
 
-        // slap a semicolon on that bad boy
-        return new JsStatement([req.getConstruct(), ';']);
+        // slap a semicolon on that bad boy and don't resolve it
+        return new JsStatement([req, ';']);
     }
 
     throw new Error("only bare requests can be statements, dude!");
@@ -147,19 +155,21 @@ __['result'] = function (node, scope) {
 
     // should this node type be renamed response?
 
-    var name = 'result.resolve';
-
-    if (node.channel === 'fail') {
-        name = 'result.reject';
-    }
-
     var self = this;
 
     var args = node.args.map(function (arg) {
         return self.compile(arg, scope);
     });
 
-    return new JsStatement([name, '(', {csv: args}, ');\nreturn result.promise;']);
+    if (args.length > 1) {
+        throw new Error("results with >1 value not yet supported, sorry");
+    }
+
+    if (node.channel === 'fail') {
+        return new JsStatement(['return Q.reject(', {csv: args}, ');']);
+    }
+
+    return new JsStatement(['return Q(', {csv: args}, ');']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,7 +199,7 @@ __['assign'] = function (node, scope) {
 //        scope.define(node.left.name, right.isReady());
 //    }
 
-    return new JsStatement([left, ' ' + node.op + ' ', right, ';']);
+    return new JsStatement(new JsResolver([left, ' ' + node.op + ' ', right, ';'], false));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -218,7 +228,7 @@ __['conditional'] = function (node, scope) {
         parts.push('\nelse {\n', negBlock, '\n}');
     }
 
-    return new JsStatement(parts);
+    return new JsResolver(parts);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -317,7 +327,7 @@ __['cardinality'] = function (node, scope) {
     // make a general JS code class? that can hold string and expr parts?
     // do we really need the JS AST level? or could we compile directly in one pass?
 
-    return new JsConstruct([
+    return new JsResolver([
         'function (val) {' +
             "if (typeof val === 'string') return val.length;" +
             "else if (Array.isArray(val)) return val.length;" +
@@ -333,7 +343,7 @@ __['cardinality'] = function (node, scope) {
  */
 __['complement'] = function (node, scope) {
 
-    return new JsConstruct(['!', __.compile(node.operand, scope)]);
+    return new JsResolver(['!', __.compile(node.operand, scope)]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -356,7 +366,7 @@ __['subscript'] = function (node, scope) {
     // todo - what if the list expression is a request or somesuch? can't resolve it twice
     // wrap it in a helper function?
 
-    return new JsConstruct([list, '[', (index === undefined ? list + '.length - 1' : index), ']']);
+    return new JsResolver([list, '[', (index === undefined ? list + '.length - 1' : index), ']']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -372,7 +382,7 @@ __['in'] = function (node, scope) {
     var left = __.compile(node.left, scope);
     var right = __.compile(node.right, scope);
 
-    return new JsConstruct(['function (item, collection) {' +
+    return new JsResolver(['function (item, collection) {' +
             "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
             "else if (typeof val === 'object') return collection.hasOwnProperty(item);" +
             "}(", left, ',', right, ")"]);
@@ -392,7 +402,7 @@ __['sequence'] = function (node, scope) {
     // renders an expression that is a function that takes a single arg -
     // the action to be performed
 
-    return new JsConstruct(['function (first, last, action) {\n' +
+    return new JsResolver(['function (first, last, action) {\n' +
             'for (var num = first; num <= last; num++) { action(num); }' +
         "}.bind(null,", first, ',', last, ')']);
 };
@@ -413,7 +423,7 @@ __['connection'] = function (node, scope) {
     var source = __.compile(node.source, scope);
     var sink = __.compile(node.sink, scope);
 
-    return new JsConstruct([source, '.call(null,', sink, ')']);
+    return new JsResolver([source, '.call(null,', sink, ')']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -456,7 +466,7 @@ __['op'] = function (node, scope) {
 //    }
 
     // use parens to be safe
-    return new JsConstruct(['(', left, ' ', op, ' ', right, ')']);
+    return new JsResolver(['(', left, ' ', op, ' ', right, ')']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -514,7 +524,7 @@ __['list'] = function (node, scope) {
     });
 
 
-    return new JsConstruct(['[', {csv: items}, ']']);
+    return new JsResolver(['[', {csv: items}, ']']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -533,7 +543,7 @@ __['set'] = function (node, scope) {
         return self.compile(member, scope);
     });
 
-    return new JsConstruct(['{', {csv: members}, '}']);
+    return new JsResolver(['{', {csv: members}, '}']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

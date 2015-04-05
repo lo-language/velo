@@ -9,29 +9,6 @@ var Compiler = require('../../codegen/Compiler');
 var Scope = require('../../codegen/Scope');
 var util = require('util');
 
-//module.exports["toString"] = {
-//
-//    "simple": function (test) {
-//
-//        test.equal(Compiler.toString('47'), '47');
-//        test.equal(Compiler.toString(['var x = ', '47', ';']), 'var x = 47;');
-//        test.done();
-//    },
-//
-//    "nested": function (test) {
-//
-//        test.equal(Compiler.toString('47'), '47');
-//        test.equal(Compiler.toString(['var x = ', ['(', '83', ' * ', '47', ')'], ';']), 'var x = (83 * 47);');
-//        test.equal(Compiler.toString(['var x = ', ['(', '83', ' * ', ['$items', '.length'], ')'], ';']), 'var x = (83 * $items.length);');
-//        test.done();
-//    },
-//
-//    "with request": function (test) {
-//
-//        test.done();
-//    }
-//};
-
 module.exports["statement lists"] = {
 
     "independent": function (test) {
@@ -39,14 +16,11 @@ module.exports["statement lists"] = {
         var node = {
             type: "stmt_list",
             head: {
-                type: "expr_stmt",
-                expr: {
-                    type: 'request',
-                    to: {type: 'id', name: 'foo'},
-                    args: [
-                        {type: 'number', val: '42'}
-                    ]}
-                },
+                type: 'assign',
+                op: '=',
+                left: {type: 'id', name: 'foo'},
+                right: {type: 'number', val: '42'}
+            },
             tail: {
                 type: "stmt_list",
                 head: {
@@ -59,7 +33,7 @@ module.exports["statement lists"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).toString(), '$foo($foo,[42]);$bar = 57;');
+        test.equal(Compiler.compile(node).render(), '$foo = 42;$bar = 57;');
         test.done();
     },
 
@@ -90,7 +64,7 @@ module.exports["statement lists"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).toString(), 'Q.spread([$bar($bar,[42])], function (PH0) {$foo = PH0;$baz = 57;}, result.reject);');
+        test.equal(Compiler.compile(node).render(), 'return $bar($bar,[42]).then(function (x1) {$foo = x1;}).then(function () {$baz = 57;})');
         test.done();
     }
 };
@@ -131,7 +105,7 @@ module.exports["literals"] = {
                     { type: 'string', val: 'padme' },
                     { type: 'string', val: 'hum' } ] };
 
-        test.equal(Compiler.compile(node).toString(), "['foo','mani','padme','hum']");
+        test.equal(Compiler.compile(node).render(), "['foo','mani','padme','hum']");
         test.done();
     },
 
@@ -152,7 +126,7 @@ module.exports["literals"] = {
                         key: { type: 'symbol', name: 'ford' },
                         value: { type: 'boolean', val: true } } ] };
 
-        test.equal(Compiler.compile(node).toString(), "{'<zaphod>':true,'<ford>':true,'<arthur>':true,'<ford>':true}");
+        test.equal(Compiler.compile(node).render(), "{'<zaphod>':true,'<ford>':true,'<arthur>':true,'<ford>':true}");
         test.done();
     }
 };
@@ -197,7 +171,7 @@ module.exports["identifiers"] = {
 //
 //        var result = Compiler.compile(node);
 //
-//        test.deepEqual(result.toStringExpr(), '$val_foo');
+//        test.deepEqual(result.renderExpr(), '$val_foo');
 //        test.done();
 //    }
 };
@@ -207,74 +181,63 @@ module.exports["request"] = {
     "no args": function (test) {
 
         var node = {
-            type: 'expr_stmt',
-            expr: {
-                type: 'request',
-                to: {type: 'id', name: 'foo'},
-                args: []
-            }
+            type: 'request',
+            to: {type: 'id', name: 'foo'},
+            args: []
         };
 
-        test.equal(Compiler.compile(node).toString(), '$foo($foo,[]);');
+        test.equal(Compiler.compile(node).render(), '$foo($foo,[])');
         test.done();
     },
 
     "one arg": function (test) {
 
         var node = {
-            type: 'expr_stmt',
-            expr: {
-                type: 'request',
-                to: {type: 'id', name: 'foo'},
-                args: [
-                    {type: 'number', val: '42'}
-                ]
-            }
+            type: 'request',
+            to: {type: 'id', name: 'foo'},
+            args: [
+                {type: 'number', val: '42'}
+            ]
         };
 
-        test.equal(Compiler.compile(node).toString(), '$foo($foo,[42]);');
+        test.equal(Compiler.compile(node).render(), '$foo($foo,[42])');
         test.done();
     },
 
     "two args": function (test) {
 
         var node = {
-            type: 'expr_stmt',
-            expr: {
-                type: 'request',
-                to: {type: 'id', name: 'foo'},
-                args: [
-                    {type: 'number', val: '42'},
-                    {type: 'string', val: 'hi there'}
-                ]
-            }
+            type: 'request',
+            to: {type: 'id', name: 'foo'},
+            args: [
+                {type: 'number', val: '42'},
+                {type: 'string', val: 'hi there'}
+            ]
         };
 
-        test.equal(Compiler.compile(node).toString(), "$foo($foo,[42,'hi there']);");
+        test.equal(Compiler.compile(node).render(), "$foo($foo,[42,'hi there'])");
         test.done();
     },
 
-    "as statement, with nested requests": function (test) {
+    "with nested requests": function (test) {
 
         var node = {
-            type: 'expr_stmt',
-            expr: {
+            type: 'request',
+            to: {type: 'id', name: 'baz'},
+            args: [{
                 type: 'request',
-                to: {type: 'id', name: 'baz'},
-                args: [{
-                    type: 'request',
-                    to: {type: 'id', name: 'foo'},
-                    args: []
-                },{
-                    type: 'request',
-                    to: {type: 'id', name: 'bar'},
-                    args: []
-                }]
-            }};
+                to: {type: 'id', name: 'foo'},
+                args: []
+            },{
+                type: 'request',
+                to: {type: 'id', name: 'bar'},
+                args: []
+            }]
+        };
 
         // patch sub nodes?
 
-        test.equal(Compiler.compile(node).toString(), "Q.spread([$foo($foo,[]),$bar($bar,[])], function (PH0,PH1) {$baz($baz,[PH0,PH1]);}, result.reject);");
+        test.equal(Compiler.compile(node).render(), "Q.spread([$foo($foo,[]), $bar($bar,[])], function (x1, x2) {return $baz($baz,[x1,x2]);})");
         test.done();
     }
 };
@@ -295,7 +258,7 @@ module.exports["op"] = {
 
         // patch sub nodes?
 
-        test.equal(Compiler.compile(node).toString(), '(1 * 2)');
+        test.equal(Compiler.compile(node).render(), '(1 * 2)');
         test.done();
     },
 
@@ -318,7 +281,7 @@ module.exports["op"] = {
 
         // patch sub nodes?
 
-        test.equal(Compiler.compile(node).toString(), '((1 && 2) || 3)');
+        test.equal(Compiler.compile(node).render(), '((1 && 2) || 3)');
         test.done();
     },
 
@@ -336,7 +299,7 @@ module.exports["op"] = {
 
         // patch sub nodes?
 
-        test.equal(Compiler.compile(node).toString(), "function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {return left.concat(right);} else return left + right;}($foo,$bar)");
+        test.equal(Compiler.compile(node).render(), "function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {return left.concat(right);} else return left + right;}($foo,$bar)");
         test.done();
     },
 
@@ -352,7 +315,7 @@ module.exports["op"] = {
 
         // patch sub nodes?
 
-        test.equal(Compiler.compile(node).toString(), "function (item, collection) {if (Array.isArray(collection)) return collection.indexOf(item) >= 0;else if (typeof val === 'object') return collection.hasOwnProperty(item);}('trillian',$dudes)");
+        test.equal(Compiler.compile(node).render(), "function (item, collection) {if (Array.isArray(collection)) return collection.indexOf(item) >= 0;else if (typeof val === 'object') return collection.hasOwnProperty(item);}('trillian',$dudes)");
         test.done();
     }
 
@@ -391,7 +354,7 @@ module.exports["request statements"] = {
                 ]}
         };
 
-        test.equal(Compiler.compile(node).toString(), '$foo($foo,[42]);');
+        test.equal(Compiler.compile(node).render(), '$foo($foo,[42]);');
         test.done();
     },
 
@@ -420,8 +383,8 @@ module.exports["request statements"] = {
 
         // patch sub nodes?
 
-        test.equal(Compiler.compile(node).toString(),
-            'Q.spread([$foo($foo,[]),$bar($bar,[])], function (PH0,PH1) {$baz($baz,[(PH0 - PH1)]);}, result.reject);');
+        test.equal(Compiler.compile(node).render(),
+            'Q.spread([$foo($foo,[]), $bar($bar,[])], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz,[x1]);});');
         test.done();
     },
 
@@ -453,8 +416,8 @@ module.exports["request statements"] = {
 
         // patch sub nodes?
 
-        test.equal(Compiler.compile(node).toString(),
-            'Q.spread([$foo($foo,[]),$bar($bar,[])], function (PH0,PH1) {Q.spread([$baz($baz,[(PH0 - PH1)])], function (PH0) {$quux($quux,[PH0]);}, result.reject);}, result.reject);');
+        test.equal(Compiler.compile(node).render(),
+            'Q.spread([$foo($foo,[]), $bar($bar,[])], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz,[x1]);}).then(function (x1) {return $quux($quux,[x1]);});');
         test.done();
     }
 };
@@ -468,7 +431,7 @@ module.exports["receive"] = {
             names: ['foo', 'mani', 'padme', 'hum']
         };
 
-        test.equal(Compiler.compile(node).toString(), 'var $foo = args.shift(),\n$mani = args.shift(),\n$padme = args.shift(),\n$hum = args.shift();');
+        test.equal(Compiler.compile(node).render(), 'var $foo = args.shift(),\n$mani = args.shift(),\n$padme = args.shift(),\n$hum = args.shift();');
         test.done();
     }
 };
@@ -482,7 +445,7 @@ module.exports["cardinality"] = {
             operand: {type: 'id', name: 'foo'}
         };
 
-        test.equal(Compiler.compile(node).toString(), "function (val) {if (typeof val === 'string') return val.length;else if (Array.isArray(val)) return val.length;else if (typeof val === 'object') return Object.keys(val).length;}($foo)");
+        test.equal(Compiler.compile(node).render(), "function (val) {if (typeof val === 'string') return val.length;else if (Array.isArray(val)) return val.length;else if (typeof val === 'object') return Object.keys(val).length;}($foo)");
         test.done();
     }
 };
@@ -496,7 +459,7 @@ module.exports["complement"] = {
             operand: {type: 'id', name: 'foo'}
         };
 
-        test.equal(Compiler.compile(node).toString(), "!$foo");
+        test.equal(Compiler.compile(node).render(), "!$foo");
         test.done();
     }
 };
@@ -518,7 +481,7 @@ module.exports["conditional"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).toString(), 'if ($foo) {\n$bar = 42;\n}');
+        test.equal(Compiler.compile(node).render(), 'if ($foo) {\n$bar = 42;\n}');
         test.done();
     },
 
@@ -538,7 +501,7 @@ module.exports["conditional"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).toString(), 'if ($foo) {\n$bar = 42;\n}\nelse {\n$bar = 32;\n}');
+        test.equal(Compiler.compile(node).render(), 'if ($foo) {\n$bar = 42;\n}\nelse {\n$bar = 32;\n}');
         test.done();
     },
 
@@ -563,7 +526,7 @@ module.exports["conditional"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).toString(),
+        test.equal(Compiler.compile(node).render(),
             'if ($foo) {\n$bar = 42;\n}\nelse {\nif ($bar) {\n$bar = 32;\n}\nelse {\n$baz = 82;\n}\n}');
         test.done();
     }
@@ -583,7 +546,7 @@ module.exports["assignment"] = {
         var scope = new Scope();
         var result = Compiler.compile(node, scope);
 
-        test.equal(Compiler.compile(node).toString(), '$foo = 57;');
+        test.equal(Compiler.compile(node).render(), '$foo = 57;');
 //        test.ok(scope.getStatus('foo'));
         test.done();
     },
@@ -599,7 +562,7 @@ module.exports["assignment"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).toString(), '$foo[$bar] = 57;');
+        test.equal(Compiler.compile(node).render(), '$foo[$bar] = 57;');
 
         // context isn't modified by this
         test.throws(function () {scope.getStatus('foo')});
@@ -619,7 +582,7 @@ module.exports["assignment"] = {
 
         scope.define('bar', true);
 
-        test.equal(Compiler.compile(node).toString(), '$foo = $bar;');
+        test.equal(Compiler.compile(node).render(), '$foo = $bar;');
         test.done();
     },
 
@@ -634,7 +597,7 @@ module.exports["assignment"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).toString(), 'Q.spread([$bar($bar,[])], function (PH0) {$foo = PH0;}, result.reject);');
+        test.equal(Compiler.compile(node).render(), '$bar($bar,[]).then(function (x1) {$foo = x1;})');
         test.done();
     }
 };
@@ -651,7 +614,7 @@ module.exports["subscript"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).toString(), '$foo[1]');
+        test.equal(Compiler.compile(node).render(), '$foo[1]');
         test.done();
     },
 
@@ -664,7 +627,7 @@ module.exports["subscript"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).toString(), '$foo[$foo.length - 1]');
+        test.equal(Compiler.compile(node).render(), '$foo[$foo.length - 1]');
         test.done();
     }
 };
@@ -679,7 +642,7 @@ module.exports["sequence"] = {
             last: {type: 'id', name: 'n'}
         };
 
-        test.equal(Compiler.compile(node).toString(), 'function (first, last, action) {\nfor (var num = first; num <= last; num++) { action(num); }}.bind(null,2,$n)');
+        test.equal(Compiler.compile(node).render(), 'function (first, last, action) {\nfor (var num = first; num <= last; num++) { action(num); }}.bind(null,2,$n)');
         test.done();
     }
 };
@@ -704,8 +667,8 @@ module.exports["procedure"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).toString(),
-            "function ($recur, args) {\n\n    var result = Q.defer();\n\n    var $next = args.shift();$result *= $next;return result.promise;\n}");
+        test.equal(Compiler.compile(node).render(),
+            "function ($recur, args) {\n\n    var $next = args.shift();$result *= $next;}");
         test.done();
     }
 };
@@ -721,7 +684,7 @@ module.exports["connection"] = {
             sink: {type: 'id', name: 'bar'}
         };
 
-        test.equal(Compiler.compile(node).toString(), '$foo.call(null,$bar)');
+        test.equal(Compiler.compile(node).render(), '$foo.call(null,$bar)');
         test.done();
     }
 };
@@ -737,7 +700,7 @@ module.exports["result"] = {
                 {type: 'number', val: '42'}
             ]};
 
-        test.equal(Compiler.compile(node).toString(), "result.resolve(42);\nreturn result.promise;");
+        test.equal(Compiler.compile(node).render(), "return Q(42);");
         test.done();
     },
 
@@ -750,7 +713,7 @@ module.exports["result"] = {
                 {type: 'number', val: '42'}
             ]};
 
-        test.equal(Compiler.compile(node).toString(), "result.reject(42);\nreturn result.promise;");
+        test.equal(Compiler.compile(node).render(), "return Q.reject(42);");
         test.done();
     }
 };

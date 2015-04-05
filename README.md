@@ -10,9 +10,20 @@ In the project root folder:
 
 #### How code generation works
 
-The compiler generates JavaScript source from the AST bottom-up: 
+The compiler generates JavaScript source from the AST bottom-up by snapping together chunks of JS wrapped in the following classes, almost like assembling a JS AST.
 
-1. Leaf nodes compile to bare JS strings
-2. Simple non-leaf nodes compile to JS constructs represented as lists containing strings and sub-node results. E.g. an addition expression could compile to: ['(', leftOperand, ' + ', rightOperand, ')'] where leftOperand and rightOperand are compilation results, perhaps lists.
-3. More complex nodes compile to wrapper objects such as JsConstruct, JsRequest, or JsStatement. These objects just wrap lists of parts in order to expand helper objects or render transforms.
+**JsConstruct**
 
+Base class for holding chunks of JS; expands helper objects such as "csv lists".
+
+**JsResolver**
+
+Extends JsConstruct; detects promises within its parts and swaps them with placeholders and then wraps the whole thing in a promise-resolving callback passed to a Q.spread() or then().
+
+**JsRequest**
+
+Extends JsResolver to resolve its contents, so that the arguments to a call are never promises, but always values. Models a request by flagging itself as async regardless of its contents. To put it another way, makes sure its arguments are ready and marks itself as a promise.
+
+**JsStatement**
+
+Extends JsConstruct to provide a statement context; that is, it can't be used in expressions, but can be appended to preceding statements or have following statements appended to it, potentially requiring the construction of promise chains.

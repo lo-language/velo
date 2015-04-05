@@ -8,15 +8,17 @@
 
 "use strict";
 
+var util = require('util');
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param parts     an array of strings, objects or arrays
+ * @param parts     an array of strings or JsConstructs
  */
 var JsConstruct = function (parts) {
 
-    // flatten the parts
-    this.parts = flatten(parts);
+    // expand any annotation objects
+    this.parts = flatten(Array.isArray(parts) ? parts : [parts]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -29,15 +31,15 @@ var flatten = function (list) {
 
     return list.reduce(function (accum, current) {
 
-        // recursively flatten arrays
-        if (Array.isArray(current)) {
-            return accum.concat(flatten(current));
-        }
-
-        // render nested constructs
-        if (current instanceof JsConstruct) {
-            return accum.concat(flatten(current.parts));
-        }
+//        // recursively flatten arrays
+//        if (Array.isArray(current)) {
+//            return accum.concat(flatten(current));
+//        }
+//
+//        // render nested constructs
+//        if (current instanceof JsConstruct) {
+//            return accum.concat(flatten(current.parts));
+//        }
 
         // flatten CSV objects
         if (typeof current == 'object' && current.csv !== undefined) {
@@ -59,34 +61,50 @@ var flatten = function (list) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Renders out the parts so they can be merged into another construct.
+ * Returns true if this construct is async.
  */
-JsConstruct.prototype.render = function () {
+JsConstruct.prototype.isAsync = function () {
 
-    return this.parts;
+    if (this.async !== undefined) {
+        return this.async;
+    }
+
+    var self = this;
+
+    this.async = false;
+
+    this.parts.forEach(function (part) {
+
+        if (typeof part === 'object' && part instanceof JsConstruct && part.isAsync()) {
+            self.async = true;
+        }
+    });
+
+    return this.async;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Flattens this construct into JS source.
+ * Renders this construct into JS source.
  */
-JsConstruct.prototype.toString = function () {
+JsConstruct.prototype.render = function () {
 
-    // concatenate the parts as a string
-
-    return this.render().reduce(function (prev, current) {
+    return this.parts.reduce(function (prev, current) {
 
         if (typeof current == 'string') {
             return prev + current;
         }
 
-        // render line breaks
-
-        if (typeof current == 'object' && current.br == 1) {
-            return prev + '\n';
+        if (typeof current === 'object' && current instanceof JsConstruct) {
+            return prev + current.render();
         }
 
-        console.log(current);
+        // render line breaks
+
+//        if (typeof current == 'object' && current.br == 1) {
+//            return prev + '\n';
+//        }
+
         throw new Error("unexpected JS part: " + current);
     }, '');
 };
