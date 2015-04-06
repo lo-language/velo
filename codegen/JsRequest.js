@@ -15,8 +15,9 @@ var JsResolver = require('./JsResolver');
  */
 var __ = function (parts) {
 
-    JsResolver.call(this, parts);
+    JsResolver.call(this, parts, true);
 
+    // pretty much the raison d'être
     this.async = true;
 };
 

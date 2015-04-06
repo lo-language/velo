@@ -18,7 +18,6 @@ var util = require('util');
  */
 var JsConstruct = function (fragments, async) {
 
-    // expand any annotation objects
     this.fragments = Array.isArray(fragments) ? fragments : [fragments];
 
     // if async is set, use it; otherwise it'll be inherited from our fragments - one async fragment makes the construct async
@@ -42,6 +41,7 @@ JsConstruct.prototype.render = function (pretty) {
 /**
  * Renders the given JS code fragment.
  *
+ * Could potentially save a traverse of the IR by doing this in the constructor, but hey.
  */
 JsConstruct.renderFragment = function (fragment, pretty) {
 
