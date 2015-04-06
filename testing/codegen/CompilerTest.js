@@ -237,7 +237,7 @@ module.exports["request"] = {
 
         // patch sub nodes?
 
-        test.equal(Compiler.compile(node).render(), "Q.spread([$foo($foo,[]), $bar($bar,[])], function (x1, x2) {return $baz($baz,[x1,x2]);})");
+        test.equal(Compiler.compile(node).render(), "Q.spread([$foo($foo,[]),$bar($bar,[])], function (x1, x2) {return $baz($baz,[x1,x2]);})");
         test.done();
     }
 };
@@ -384,7 +384,7 @@ module.exports["request statements"] = {
         // patch sub nodes?
 
         test.equal(Compiler.compile(node).render(),
-            'Q.spread([$foo($foo,[]), $bar($bar,[])], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz,[x1]);});');
+            'Q.spread([$foo($foo,[]),$bar($bar,[])], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz,[x1]);});');
         test.done();
     },
 
@@ -417,7 +417,7 @@ module.exports["request statements"] = {
         // patch sub nodes?
 
         test.equal(Compiler.compile(node).render(),
-            'Q.spread([$foo($foo,[]), $bar($bar,[])], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz,[x1]);}).then(function (x1) {return $quux($quux,[x1]);});');
+            'Q.spread([$foo($foo,[]),$bar($bar,[])], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz,[x1]);}).then(function (x1) {return $quux($quux,[x1]);});');
         test.done();
     }
 };
@@ -660,15 +660,22 @@ module.exports["procedure"] = {
                     { type: 'assign',
                         op: '*=',
                         left: { type: 'id', name: 'result' },
-                        right: { type: 'id', name: 'next' } },
+                        right: {
+                            type: 'request',
+                            to: {type: 'id', name: 'bar'},
+                            args: [
+                                {type: 'number', val: '42'}
+                            ]} },
                 tail: null}
             }
         };
 
-        var scope = new Scope();
+        var obj = Compiler.compile(node);
 
-        test.equal(Compiler.compile(node).render(),
-            "function ($recur, args) {\n\n    var $next = args.shift();$result *= $next;}");
+        // important! - procedures are never async objects, regardless of whether they contain async statements
+        test.equal(obj.isAsync(), false);
+        test.equal(obj.render(),
+            "function ($recur, args) {\n\n    var $next = args.shift();$bar($bar,[42]).then(function (x1) {$result *= x1;})}");
         test.done();
     }
 };

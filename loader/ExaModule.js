@@ -56,7 +56,7 @@ __.prototype.parse = function () {
 __.prototype.compile = function () {
 
     if (this.js === undefined) {
-        this.js = Compiler.compile(this.parse()).render();
+        this.js = Compiler.compile(this.parse());
     }
 
     return this.js;
@@ -77,7 +77,7 @@ __.prototype.load = function () {
         // so we wrap the function we get by compiling the root procedure in another function
         // that just gives that function a name and immediately calls it, passing through any args
 
-        var body = 'var root = ' + this.compile() +
+        var body = 'var root = ' + this.compile().render() +
             '\n\nreturn root(root, args);';
 
         // load and info are temporary here

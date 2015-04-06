@@ -1,4 +1,6 @@
 /**
+ * Extends JsResolver and models a request by flagging itself as async regardless of its contents.
+ *
  * Created by: spurcell
  * 3/1/15
  */

@@ -55,7 +55,7 @@ module.exports["requests"] = {
                 ['baz(', new JsRequest(['foo()']), ', ', new JsRequest(['bar()']), ')']), ';'], false);
 
         test.ok(stmt.isAsync());
-        test.equal(stmt.render(), 'Q.spread([foo(), bar()], function (x1, x2) {return baz(x1, x2);});');
+        test.equal(stmt.render(), 'Q.spread([foo(),bar()], function (x1, x2) {return baz(x1, x2);});');
         test.done();
     }
 };

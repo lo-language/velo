@@ -13,12 +13,9 @@ var fs = require('fs');
 var __ = function (dir, program) {
 
     this.file = dir + '/' + program + '.exa';
-
-    this.load = load;
-    this.success = success;
 };
 
-var load = function (cb) {
+__.prototype.load = function (cb) {
 
     var self = this;
 
@@ -35,7 +32,12 @@ var load = function (cb) {
     });
 };
 
-var success = function (test, input, expected) {
+__.prototype.getJs = function (cb) {
+
+    return this.module.compile();
+};
+
+__.prototype.success = function (test, input, expected) {
 
     this.module.run(input).then(
         function (result) {
