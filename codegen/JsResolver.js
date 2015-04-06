@@ -13,68 +13,99 @@ var util = require('util');
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param parts     an array of strings or JsConstructs
+ * @param fragments     an array of strings or JsConstructs
  * @param addReturn
  */
-var __ = function (parts, addReturn) {
+var __ = function (fragments, addReturn) {
 
-    JsConstruct.call(this, parts);
+    JsConstruct.call(this, fragments);
 
     if (addReturn === undefined) {
         addReturn = true;
     }
 
-    // detects async parts and resolve them for this construct by swapping in placeholders
-    // and wrapping in a resolver such as Q.spread
+    // filter out async fragments, swapping in placeholders and resolving them via Q.spread (or then)
+    // and wrap the construct in a callback
 
-    var asyncParts = [];
+    var asyncfragments = [];
 
-    this.parts = this.parts.reduce(function (accum, current) {
+    var analyze = function (fragment) {
 
-        if (typeof current === 'string') {
-            return accum.concat(current);
+        if (typeof fragment === 'string') {
+            return fragment;
         }
 
-        if (typeof current === 'object' && current instanceof JsConstruct) {
+        if (Array.isArray(fragment)) {
 
-            if (current.async) {
+            // explore but don't flatten sub-array structure here!
+            return fragment.reduce(function (accum, current) {
+                // this is a bit ugly but we can't use concat without flattening arrays
+                accum.push(analyze(current));
+                return accum;
+            }, []);
+        }
 
-                asyncParts.push(current);
-                return accum.concat('x' + asyncParts.length);
+        // identify async sub-constructs
+
+        if (typeof fragment === 'object' && fragment instanceof JsConstruct) {
+
+            if (fragment.isAsync()) {
+
+                // tuck it away and replace with a placeholder var
+                asyncfragments.push(fragment);
+                return 'x' + asyncfragments.length;
             }
             else {
-                return accum.concat(current);
+                return fragment;
             }
         }
 
-        throw new Error("unexpected JS part: " + util.inspect(current, {depth: null}));
+        // peer into annotation objects
+        // todo - i don't like how intrusive this is
 
-    },[]);
+        if (typeof fragment === 'object') {
+
+            if (fragment.csv !== undefined) {
+                return {csv: analyze(fragment.csv)};
+            }
+
+            if (fragment.block !== undefined) {
+                return {block: analyze(fragment.block)};
+            }
+        }
+
+        throw new Error("unexpected JS part: " + util.inspect(fragment, {depth: null}));
+    };
+
+    this.fragments = this.fragments.reduce(function (accum, current) {
+        return accum.concat(analyze(current));
+    }, []);
 
     // render a resolver if necessary
+    // NB - this has the effect of turning *statements* into *expressions*
 
-    if (asyncParts.length > 0) {
+    if (asyncfragments.length > 0) {
 
         this.async = true;
 
         if (addReturn) {
-            this.parts = ['return '].concat(this.parts).concat(';');
+            this.fragments = ['return '].concat(this.fragments).concat(';');
         }
 
-        if (asyncParts.length == 1) {
+        if (asyncfragments.length == 1) {
 
             // use a 'then' to resolve the single promise
-            this.parts = asyncParts.concat('.then(function (x1) {').concat(this.parts).concat(['})']);
+            this.fragments = asyncfragments.concat('.then(function (x1) {').concat(this.fragments).concat(['})']);
         }
         else {
 
             // use Q.spread to resolve all promises
 
-            var args = asyncParts.map(function (part, index) {
+            var args = asyncfragments.map(function (part, index) {
                 return 'x' + (index + 1);
             }).join(', ');
 
-            this.parts = JsConstruct.flatten(['Q.spread([', {csv: asyncParts}, '], function (', args, ') {'].concat(this.parts).concat(['})']));
+            this.fragments = ['Q.spread([', {csv: asyncfragments}, '], function (', args, ') {'].concat(this.fragments).concat(['})']);
         }
     }
 };
@@ -82,29 +113,5 @@ var __ = function (parts, addReturn) {
 // subclass extends superclass
 __.prototype = Object.create(JsConstruct.prototype);
 __.prototype.constructor = __;
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Returns true if this construct is async.
- */
-__.prototype.isAsync = function () {
-
-    if (this.async !== undefined) {
-        return this.async;
-    }
-
-    var self = this;
-
-    this.async = false;
-
-    this.parts.forEach(function (part) {
-
-        if (typeof part === 'object' && part instanceof JsConstruct && part.isAsync()) {
-            self.async = true;
-        }
-    });
-
-    return this.async;
-};
 
 module.exports = __;

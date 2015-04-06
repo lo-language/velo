@@ -14,7 +14,7 @@ numNodes = 2; // use 'is' to declare const here. or use 'is' instead of is? mayb
 
 // base case - only one possibility left
 if #path == numNodes:
-    reply(1);
+    reply 1;
 
 // initialize just to put in scope - can we make this unnecessary?
 combos = 0;
@@ -65,7 +65,7 @@ result = first..last >>
     receive num, next;
 
     if isPrime(num):
-        reply(num);
+        reply num;
 
     next(); // would be cool to pass args to next, e.g. chunksize while reading
 
@@ -90,13 +90,13 @@ result = first..last >>
 
 result = map(items,
     receive item;
-    reply(request(item));    // this triggers the next item, as well?
+    reply request(item);    // this triggers the next item, as well?
 );
 
 // async reduce
 result = reduce(items, start,
     receive item, prev;
-    reply(prev + #item);
+    reply prev + #item;
 );
 
 
@@ -107,9 +107,9 @@ result = reduce(items, start,
 
 2..2^88 >>
 
-    reply(num);
+    reply num;
 
-    reply(recur(num / num));
+    reply recur(num / num);
 
     // can we do next in a loop?? but then it would be reentrant
     next(); // pull from source
@@ -187,4 +187,4 @@ result = reduce(items, start,
 // doesn't need to return the "final" promise, just the promise when it gets called (which is probably the same thing)
 //complete walk;
 
-reply(combos);
+reply combos;

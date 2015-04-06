@@ -42,9 +42,27 @@ module.exports["basics"] = {
         var expr = new JsResolver([new JsRequest(['foo()']), ' + ', new JsRequest(['bar()'])]);
 
         test.equal(expr.isAsync(), true);
-        test.equal(expr.render(), 'Q.spread([foo(),bar()], function (x1, x2) {return x1 + x2;})');
+        test.equal(expr.render(), 'Q.spread([foo(), bar()], function (x1, x2) {return x1 + x2;})');
         test.done();
     },
+
+    "can resolve within annotation objects": function (test) {
+
+        var expr = new JsResolver(['Math.min(', {csv: [new JsRequest(['foo()']), new JsRequest(['bar()'])]}, ')']);
+
+        test.equal(expr.isAsync(), true);
+        test.equal(expr.render(), 'Q.spread([foo(), bar()], function (x1, x2) {return Math.min(x1, x2);})');
+        test.done();
+    },
+
+    "resolves sets": function (test) {
+
+        var expr = new JsResolver(['{', {csv: [['foo', ':', '18'], ['bar', ':', '25']]}, '}']);
+
+        test.equal(expr.isAsync(), false);
+        test.equal(expr.render(), '{foo:18, bar:25}');
+        test.done();
+    }
 
 //    "resolution construct": function (test) {
 //

@@ -105,7 +105,7 @@ module.exports["literals"] = {
                     { type: 'string', val: 'padme' },
                     { type: 'string', val: 'hum' } ] };
 
-        test.equal(Compiler.compile(node).render(), "['foo','mani','padme','hum']");
+        test.equal(Compiler.compile(node).render(), "['foo', 'mani', 'padme', 'hum']");
         test.done();
     },
 
@@ -126,7 +126,7 @@ module.exports["literals"] = {
                         key: { type: 'symbol', name: 'ford' },
                         value: { type: 'boolean', val: true } } ] };
 
-        test.equal(Compiler.compile(node).render(), "{'<zaphod>':true,'<ford>':true,'<arthur>':true,'<ford>':true}");
+        test.equal(Compiler.compile(node).render(), "{'<zaphod>':true, '<ford>':true, '<arthur>':true, '<ford>':true}");
         test.done();
     }
 };
@@ -215,7 +215,7 @@ module.exports["request"] = {
             ]
         };
 
-        test.equal(Compiler.compile(node).render(), "$foo($foo,[42,'hi there'])");
+        test.equal(Compiler.compile(node).render(), "$foo($foo,[42, 'hi there'])");
         test.done();
     },
 
@@ -237,7 +237,7 @@ module.exports["request"] = {
 
         // patch sub nodes?
 
-        test.equal(Compiler.compile(node).render(), "Q.spread([$foo($foo,[]),$bar($bar,[])], function (x1, x2) {return $baz($baz,[x1,x2]);})");
+        test.equal(Compiler.compile(node).render(), "Q.spread([$foo($foo,[]), $bar($bar,[])], function (x1, x2) {return $baz($baz,[x1, x2]);})");
         test.done();
     }
 };
@@ -384,7 +384,7 @@ module.exports["request statements"] = {
         // patch sub nodes?
 
         test.equal(Compiler.compile(node).render(),
-            'Q.spread([$foo($foo,[]),$bar($bar,[])], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz,[x1]);});');
+            'Q.spread([$foo($foo,[]), $bar($bar,[])], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz,[x1]);});');
         test.done();
     },
 
@@ -417,7 +417,7 @@ module.exports["request statements"] = {
         // patch sub nodes?
 
         test.equal(Compiler.compile(node).render(),
-            'Q.spread([$foo($foo,[]),$bar($bar,[])], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz,[x1]);}).then(function (x1) {return $quux($quux,[x1]);});');
+            'Q.spread([$foo($foo,[]), $bar($bar,[])], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz,[x1]);}).then(function (x1) {return $quux($quux,[x1]);});');
         test.done();
     }
 };
@@ -529,7 +529,31 @@ module.exports["conditional"] = {
         test.equal(Compiler.compile(node).render(),
             'if ($foo) {\n$bar = 42;\n}\nelse {\nif ($bar) {\n$bar = 32;\n}\nelse {\n$baz = 82;\n}\n}');
         test.done();
-    }
+    },
+
+//    "positive with async stmt": function (test) {
+//
+//        // should create a context
+//        // should call compile on each statement
+//
+//        var node = {
+//            type: 'conditional',
+//            predicate: {type: 'id', name: 'foo'},
+//            consequent: {
+//                type: 'stmt_list',
+//                head: {type: 'assign', op: '=',
+//                    left: {type: 'id', name: 'bar'},
+//                    right: {type: 'request', to: {type: 'id', name: 'foo'}, args: []}},
+//                tail: null}
+//        };
+//
+//        // patch sub nodes?
+//
+//        var scope = new Scope();
+//
+//        test.equal(Compiler.compile(node).render(), 'if ($foo) {\n$bar = 42;\n}');
+//        test.done();
+//    }
 };
 
 module.exports["assignment"] = {
@@ -675,7 +699,7 @@ module.exports["procedure"] = {
         // important! - procedures are never async objects, regardless of whether they contain async statements
         test.equal(obj.isAsync(), false);
         test.equal(obj.render(),
-            "function ($recur, args) {\n\n    var $next = args.shift();$bar($bar,[42]).then(function (x1) {$result *= x1;})}");
+            "function ($recur, args) {\n\n    var $next = args.shift();$bar($bar,[42]).then(function (x1) {$result *= x1;})\n}");
         test.done();
     }
 };

@@ -1,5 +1,5 @@
 /**
- * Models a general JS construct as a list of parts, which can be strings, sub-constructs,
+ * Models a general JS construct as a list of fragments, which can be strings, sub-constructs,
  * or utility objects that wrap constructs.
  *
  * Created by: spurcell
@@ -13,15 +13,15 @@ var util = require('util');
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param parts     an array of strings or JsConstructs
+ * @param fragments an array of strings or JsConstructs
  * @param async     explicity set the async status
  */
-var JsConstruct = function (parts, async) {
+var JsConstruct = function (fragments, async) {
 
     // expand any annotation objects
-    this.parts = JsConstruct.flatten(Array.isArray(parts) ? parts : [parts]);
+    this.fragments = Array.isArray(fragments) ? fragments : [fragments];
 
-    // if async is set, use it; otherwise it'll be inherited from our parts - one async part makes us async
+    // if async is set, use it; otherwise it'll be inherited from our fragments - one async fragment makes the construct async
     if (async !== undefined) {
         this.async = async;
     }
@@ -29,45 +29,68 @@ var JsConstruct = function (parts, async) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * An augmented flatten.
+ * Renders this construct into JS source.
  *
- * @param list
+ * @param {boolean} pretty    format the code to make it more human-readable (default false)
  */
-JsConstruct.flatten = function (list) {
+JsConstruct.prototype.render = function (pretty) {
 
-    return list.reduce(function (accum, current) {
-
-//        // recursively flatten arrays
-//        if (Array.isArray(current)) {
-//            return accum.concat(flatten(current));
-//        }
-//
-//        // render nested constructs
-//        if (current instanceof JsConstruct) {
-//            return accum.concat(flatten(current.parts));
-//        }
-
-        // flatten CSV objects
-        if (typeof current == 'object' && current.csv !== undefined) {
-
-            return JsConstruct.flatten(accum.concat(current.csv.reduce(function (accum, current, index) {
-
-                if (index > 0) {
-                    accum.push(',');
-                }
-
-                return accum.concat(current);
-            }, [])));
-        }
-
-        // base case
-        return accum.concat(current);
-    }, []);
+    return JsConstruct.renderFragment(this.fragments, pretty);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Returns true if this construct is async.
+ * Renders the given JS code fragment.
+ *
+ */
+JsConstruct.renderFragment = function (fragment, pretty) {
+
+    if (typeof fragment == 'string') {
+        return fragment;
+    }
+
+    if (Array.isArray(fragment)) {
+
+        return fragment.reduce(function (accum, current) {
+            return accum + JsConstruct.renderFragment(current, pretty);
+        }, '');
+    }
+
+    if (typeof fragment === 'object') {
+
+        if (fragment instanceof JsConstruct) {
+            return fragment.render(pretty);
+        }
+
+        // expand annotation objects
+
+        // todo rename to join?
+        if (fragment.csv !== undefined) {
+
+            return JsConstruct.renderFragment(fragment.csv.reduce(function (accum, current, index) {
+
+                if (index > 0) {
+                    return accum.concat(', ').concat(current);
+                }
+
+                return accum.concat(current);
+
+            }, []));
+        }
+
+        if (fragment.block !== undefined) {
+            // todo - render the block and see if it's a one-liner before determining how many newlines?
+            // would have to move this expansion to the render phase then
+            return JsConstruct.renderFragment(['{\n\n    ', fragment.block, '\n}']);
+        }
+    }
+
+    throw new Error("unexpected JS part: " + fragment);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns true if this construct is async; traverses the fragments if not explicitly set.
  */
 JsConstruct.prototype.isAsync = function () {
 
@@ -79,7 +102,7 @@ JsConstruct.prototype.isAsync = function () {
 
     this.async = false;
 
-    this.parts.forEach(function (part) {
+    this.fragments.forEach(function (part) {
 
         if (typeof part === 'object' && part instanceof JsConstruct && part.isAsync()) {
             self.async = true;
@@ -87,32 +110,6 @@ JsConstruct.prototype.isAsync = function () {
     });
 
     return this.async;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Renders this construct into JS source.
- */
-JsConstruct.prototype.render = function () {
-
-    return this.parts.reduce(function (prev, current) {
-
-        if (typeof current == 'string') {
-            return prev + current;
-        }
-
-        if (typeof current === 'object' && current instanceof JsConstruct) {
-            return prev + current.render();
-        }
-
-        // render line breaks
-
-//        if (typeof current == 'object' && current.br == 1) {
-//            return prev + '\n';
-//        }
-
-        throw new Error("unexpected JS part: " + current);
-    }, '');
 };
 
 module.exports = JsConstruct;

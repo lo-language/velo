@@ -27,20 +27,24 @@ module.exports["basics"] = {
         test.done();
     },
 
-    "csvs": function (test) {
+    "csv annotations": function (test) {
 
         test.deepEqual(new JsConstruct([{csv: ['leeloo']}]).render(), 'leeloo');
-        test.deepEqual(new JsConstruct([{csv: ['leeloo', 'dallas']}]).render(), 'leeloo,dallas');
-        test.deepEqual(new JsConstruct(['leeloo', 'dallas', {csv: ['multi', 'pass']}]).render(), 'leeloodallasmulti,pass');
-        test.deepEqual(new JsConstruct([{csv: ['leeloo', 'dallas', {csv: ['multi', 'pass']}]}]).render(), 'leeloo,dallas,multi,pass');
+        test.deepEqual(new JsConstruct([{csv: ['leeloo', 'dallas']}]).render(), 'leeloo, dallas');
+        test.deepEqual(new JsConstruct(['leeloo', 'dallas', {csv: ['multi', 'pass']}]).render(), 'leeloodallasmulti, pass');
+        test.deepEqual(new JsConstruct([{csv: ['leeloo', 'dallas', {csv: ['multi', 'pass']}]}]).render(), 'leeloo, dallas, multi, pass');
 
         test.deepEqual(new JsConstruct([{csv: [
             'corbin', 'dallas', ['leeloo', 'dallas', {csv: [
-                'multi', 'pass']}]]}]).render(), 'corbin,dallas,leeloodallasmulti,pass');
+                'multi', 'pass']}]]}]).render(), 'corbin, dallas, leeloodallasmulti, pass');
+
+        var expr = new JsConstruct(['{', {csv: [['foo', ':', '18'], ['bar', ':', '25']]}, '}']);
+
+        test.equal(expr.isAsync(), false);
+        test.equal(expr.render(), '{foo:18, bar:25}');
 
         test.done();
     },
-
 
     "nested constructs": function (test) {
 
@@ -49,13 +53,19 @@ module.exports["basics"] = {
         test.equal(expr.isAsync(), false);
         test.equal(expr.render(), '(42)');
         test.done();
-    }
+    },
 
-//    "newline": function (test) {
-//
-//        var expr = new JsConstruct(['var x = 15;', {br: 1}, 'var y = 43;']);
-//
-//        test.equal(expr.toString(), 'var x = 15;\nvar y = 43;');
-//        test.done();
-//    }
+    "block annotations": function (test) {
+
+        var expr = new JsConstruct(['if (x == 42) ', {block: 'var z = 15;'}]);
+
+        test.equal(expr.render(), 'if (x == 42) {\n\n    var z = 15;\n}');
+
+
+        expr = new JsConstruct(['if (x == 42) ', {block: ['var z = 15;', 'var y = 47;']}]);
+
+        test.equal(expr.render(), 'if (x == 42) {\n\n    var z = 15;var y = 47;\n}');
+
+        test.done();
+    }
 };

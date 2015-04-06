@@ -84,9 +84,7 @@ __['procedure'] = function (node, scope) {
     // compile the statement(s) in the context of the local scope
     var body = __.compile(node.body, localScope);
 
-    return new JsConstruct(['function ($recur, args) {\n\n    ',
-            body,
-        '}'], false);
+    return new JsConstruct(['function ($recur, args) ', {block: body}], false);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
