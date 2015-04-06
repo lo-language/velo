@@ -42,7 +42,7 @@ module.exports["basics"] = {
         var expr = new JsResolver([new JsRequest(['foo()']), ' + ', new JsRequest(['bar()'])]);
 
         test.equal(expr.isAsync(), true);
-        test.equal(expr.render(), 'Q.spread([foo(), bar()], function (x1, x2) {return x1 + x2;})');
+        test.equal(expr.render(), 'Q.spread([foo(),bar()], function (x1, x2) {return x1 + x2;})');
         test.done();
     },
 

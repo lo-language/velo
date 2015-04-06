@@ -18,7 +18,7 @@ var util = require('util');
  */
 var __ = function (parts, addReturn) {
 
-    JsConstruct.call(this, parts, false);
+    JsConstruct.call(this, parts);
 
     if (addReturn === undefined) {
         addReturn = true;
@@ -37,14 +37,13 @@ var __ = function (parts, addReturn) {
 
         if (typeof current === 'object' && current instanceof JsConstruct) {
 
-            // todo - do we need to call render here?
             if (current.async) {
 
-                asyncParts.push(current.render());
+                asyncParts.push(current);
                 return accum.concat('x' + asyncParts.length);
             }
             else {
-                return accum.concat(current.render());
+                return accum.concat(current);
             }
         }
 
@@ -53,7 +52,6 @@ var __ = function (parts, addReturn) {
     },[]);
 
     // render a resolver if necessary
-    // maybe have a 'makewrapper' call??
 
     if (asyncParts.length > 0) {
 
@@ -76,7 +74,7 @@ var __ = function (parts, addReturn) {
                 return 'x' + (index + 1);
             }).join(', ');
 
-            this.parts = ['Q.spread([', asyncParts.join(', '), '], function (', args, ') {'].concat(this.parts).concat(['})']);
+            this.parts = JsConstruct.flatten(['Q.spread([', {csv: asyncParts}, '], function (', args, ') {'].concat(this.parts).concat(['})']));
         }
     }
 };

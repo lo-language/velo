@@ -14,11 +14,17 @@ var util = require('util');
 /**
  *
  * @param parts     an array of strings or JsConstructs
+ * @param async     explicity set the async status
  */
-var JsConstruct = function (parts) {
+var JsConstruct = function (parts, async) {
 
     // expand any annotation objects
-    this.parts = flatten(Array.isArray(parts) ? parts : [parts]);
+    this.parts = JsConstruct.flatten(Array.isArray(parts) ? parts : [parts]);
+
+    // if async is set, use it; otherwise it'll be inherited from our parts - one async part makes us async
+    if (async !== undefined) {
+        this.async = async;
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,7 +33,7 @@ var JsConstruct = function (parts) {
  *
  * @param list
  */
-var flatten = function (list) {
+JsConstruct.flatten = function (list) {
 
     return list.reduce(function (accum, current) {
 
@@ -44,7 +50,7 @@ var flatten = function (list) {
         // flatten CSV objects
         if (typeof current == 'object' && current.csv !== undefined) {
 
-            return flatten(accum.concat(current.csv.reduce(function (accum, current, index) {
+            return JsConstruct.flatten(accum.concat(current.csv.reduce(function (accum, current, index) {
 
                 if (index > 0) {
                     accum.push(',');

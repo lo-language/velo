@@ -10,82 +10,21 @@
 
 "use strict";
 
-var ExaModule = require('../../loader/ExaModule');
-var Compiler = require('../../codegen/Compiler');
+var Harness = require('../Harness');
 var util = require('util');
-var fs = require('fs');
 var programDir = __dirname +  '/../programs';
-
-var TestRunner = function (program) {
-
-    this.file = programDir + '/' + program + '.exa';
-};
-
-TestRunner.prototype.load = function (cb) {
-
-    var self = this;
-
-    fs.readFile(this.file, 'utf8', function (err, source) {
-
-        if (err) {
-            cb(err);
-            return;
-        }
-
-        self.module = new ExaModule(source);
-
-        cb();
-    });
-};
-
-TestRunner.prototype.getJs = function () {
-
-    return this.module.compile();
-};
-
-TestRunner.prototype.getAst = function () {
-
-    return this.module.parse();
-};
-
-TestRunner.prototype.success = function (test, input, expected) {
-
-    this.module.run(input).then(
-        function (result) {
-
-            if (expected !== undefined) {
-                test.equal(result, expected);
-            }
-
-            test.done();
-        }
-    ).done();
-};
-
-TestRunner.prototype.failure = function (test, input, expected) {
-
-    this.module.run(input).then(
-        function () {
-            test.fail();
-        },
-        function (err) {
-            test.equal(err, expected);
-            test.done();
-        }
-    );
-};
 
 module.exports['deps'] = {
 
     "setUp": function (cb) {
 
-        this.runner = new TestRunner('deps');
+        this.harness = new Harness(programDir, 'deps');
 
-        this.runner.load(cb);
+        this.harness.load(cb);
     },
 
-    'neg': function (test) {
-        this.runner.success(test, [], 14);
+    'success': function (test) {
+        this.harness.success(test, [], 14);
     }
 };
 
@@ -93,21 +32,21 @@ module.exports['conditionals'] = {
 
     "setUp": function (cb) {
 
-        this.runner = new TestRunner('conditionals');
+        this.harness = new Harness(programDir, 'conditionals');
 
-        this.runner.load(cb);
+        this.harness.load(cb);
     },
 
     'neg': function (test) {
-        this.runner.success(test, [-1], 'negative');
+        this.harness.success(test, [-1], 'negative');
     },
 
     'zero': function (test) {
-        this.runner.success(test, [0], 'zero!');
+        this.harness.success(test, [0], 'zero!');
     },
 
     'pos': function (test) {
-        this.runner.success(test, [1], 'positive');
+        this.harness.success(test, [1], 'positive');
     }
 };
 
@@ -115,17 +54,17 @@ module.exports['factorial'] = {
 
     "setUp": function (cb) {
 
-        this.runner = new TestRunner('factorial');
+        this.harness = new Harness(programDir, 'factorial');
 
-        this.runner.load(cb);
+        this.harness.load(cb);
     },
 
     'success': function (test) {
-        this.runner.success(test, [10], 3628800);
+        this.harness.success(test, [10], 3628800);
     },
 
     'failure': function (test) {
-        this.runner.failure(test, [-1], 'I pity the fool!');
+        this.harness.failure(test, [-1], 'I pity the fool!');
     }
 };
 
@@ -133,19 +72,19 @@ module.exports['fibonacci'] = {
 
     "setUp": function (cb) {
 
-        this.runner = new TestRunner('fibonacci');
+        this.harness = new Harness(programDir, 'fibonacci');
 
-        this.runner.load(cb);
+        this.harness.load(cb);
     },
 
     'success': function (test) {
 
-        this.runner.success(test, [10], 55);
+        this.harness.success(test, [10], 55);
     },
 
     'failure': function (test) {
 
-        this.runner.failure(test, [-1], 'Whatsamatta, you?');
+        this.harness.failure(test, [-1], 'Whatsamatta, you?');
     }
 };
 
@@ -153,15 +92,15 @@ module.exports['collections'] = {
 
     "setUp": function (cb) {
 
-        this.runner = new TestRunner('collections');
+        this.harness = new Harness(programDir, 'collections');
 
-        this.runner.load(cb);
+        this.harness.load(cb);
     },
 
     'all': function (test) {
 
-//        console.error(util.inspect(this.runner.module.parse(), {depth: null}));
-        this.runner.success(test);
+//        console.error(util.inspect(this.harness.module.parse(), {depth: null}));
+        this.harness.success(test);
     }
 };
 
@@ -169,19 +108,19 @@ module.exports['collections'] = {
 ////
 ////    "setUp": function (cb) {
 ////
-////        this.runner = new TestRunner('factorial2');
+////        this.harness = new Harness(programDir, 'factorial2');
 ////
-////        this.runner.load(cb);
+////        this.harness.load(cb);
 ////    },
 ////
 ////    'success': function (test) {
 ////
-////        this.runner.success(test, 10, 3628800);
+////        this.harness.success(test, 10, 3628800);
 ////    },
 ////
 ////    'failure': function (test) {
 ////
-////        this.runner.failure(test, -1, "I pity the fool!");
+////        this.harness.failure(test, -1, "I pity the fool!");
 ////    }
 ////};
 ////
@@ -189,19 +128,19 @@ module.exports['collections'] = {
 ////
 ////    "setUp": function (cb) {
 ////
-////        this.runner = new TestRunner('fibonacci2');
+////        this.harness = new Harness(programDir, 'fibonacci2');
 ////
-////        this.runner.load(cb);
+////        this.harness.load(cb);
 ////    },
 ////
 ////    'success': function (test) {
 ////
-////        this.runner.success(test, 10, 55);
+////        this.harness.success(test, 10, 55);
 ////    },
 ////
 ////    'failure': function (test) {
 ////
-////        this.runner.failure(test, -1, "Whatsamatta, you?");
+////        this.harness.failure(test, -1, "Whatsamatta, you?");
 ////    }
 ////};
 
@@ -209,14 +148,15 @@ module.exports['procedure'] = {
 
     "setUp": function (cb) {
 
-        this.runner = new TestRunner('procedure');
+        this.harness = new Harness(programDir, 'procedure');
 
-        this.runner.load(cb);
+        this.harness.load(cb);
     },
 
     'success': function (test) {
 
-//        console.log(this.runner.getJs());
-        this.runner.success(test, [], 60);
+//        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
+//        console.log(this.harness.getJs().render());
+        this.harness.success(test, [], 60);
     }
 };

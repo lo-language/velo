@@ -17,7 +17,7 @@ var __ = function (parts, isResult) {
 
     JsConstruct.call(this, parts);
 
-    this.isResult = isResult;
+    this.isResult = isResult || false;
 };
 
 // subclass extends superclass
