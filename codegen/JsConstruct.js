@@ -75,13 +75,19 @@ JsConstruct.renderFragment = function (fragment, pretty) {
 
                 return accum.concat(current);
 
-            }, []));
+            }, []), pretty);
         }
 
         if (fragment.block !== undefined) {
             // todo - render the block and see if it's a one-liner before determining how many newlines?
             // would have to move this expansion to the render phase then
-            return JsConstruct.renderFragment(['{\n\n    ', fragment.block, '\n}']);
+
+            if (pretty) {
+                return '{\n\n    ' + JsConstruct.renderFragment(fragment.block, pretty).replace(/\n/g, '\n    ') + '\n}';
+            }
+            else {
+                return '{' + JsConstruct.renderFragment(fragment.block, pretty) + '}';
+            }
         }
     }
 

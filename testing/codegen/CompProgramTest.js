@@ -48,8 +48,8 @@ module.exports["basics"] = {
 
         var js = Compiler.compile(ast);
 
-        console.log(require('util').inspect(js, {depth: null, colors: true}), '\n\n');
-        console.log(js.render());
+//        console.log(require('util').inspect(js, {depth: null, colors: true}), '\n\n');
+//        console.log(js.render());
 
         test.done();
     }

@@ -125,7 +125,7 @@ __['receive'] = function (node, scope) {
     // todo have a JsStatement class that adds the semicolon
     return new JsStatement(['var ' + node.names.map(function (name) {
         return '$' + name + ' = ' + 'args.shift()';
-    }).join(',\n') + ';']);
+    }).join(',\n') + ';\n\n']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +197,7 @@ __['assign'] = function (node, scope) {
 //        scope.define(node.left.name, right.isReady());
 //    }
 
-    return new JsStatement(new JsResolver([left, ' ' + node.op + ' ', right, ';'], false));
+    return new JsStatement(new JsResolver([left, ' ' + node.op + ' ', right, ';\n'], false));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -220,10 +220,10 @@ __['conditional'] = function (node, scope) {
 
     // todo we might want to rewrite this to only resolve the blocks after evaluating the predicate
 
-    var parts = ['if (', predicate, ') {\n', consequent, '\n', '}'];
+    var parts = ['if (', predicate, ') ', {block: consequent}, '\n'];
 
     if (negBlock) {
-        parts.push('\nelse {\n', negBlock, '\n}');
+        parts.push('else ', {block: negBlock}, '\n');
     }
 
     return new JsResolver(parts);
@@ -320,10 +320,7 @@ __['cardinality'] = function (node, scope) {
 
     var right = __.compile(node.operand, scope);
 
-    // wrap in small function? inspects type then gets size?
-
-    // make a general JS code class? that can hold string and expr parts?
-    // do we really need the JS AST level? or could we compile directly in one pass?
+    // todo factor this out into a call to a utility function
 
     return new JsResolver([
         'function (val) {' +
@@ -521,7 +518,6 @@ __['list'] = function (node, scope) {
         return self.compile(item, scope);
     });
 
-
     return new JsResolver(['[', {csv: items}, ']']);
 };
 
@@ -541,6 +537,7 @@ __['set'] = function (node, scope) {
         return self.compile(member, scope);
     });
 
+    // could use a block annotation here
     return new JsResolver(['{', {csv: members}, '}']);
 };
 

@@ -58,13 +58,25 @@ module.exports["basics"] = {
     "block annotations": function (test) {
 
         var expr = new JsConstruct(['if (x == 42) ', {block: 'var z = 15;'}]);
+        test.equal(expr.render(), 'if (x == 42) {var z = 15;}');
 
-        test.equal(expr.render(), 'if (x == 42) {\n\n    var z = 15;\n}');
+
+        expr = new JsConstruct(['if (x == 42) ', {block: ['var z = 15;\n', 'var y = 47;']}]);
+        test.equal(expr.render(), 'if (x == 42) {var z = 15;\nvar y = 47;}');
+
+        test.done();
+    },
+
+    "block annotations - pretty": function (test) {
+
+        var expr = new JsConstruct(['if (x == 42) ', {block: 'var z = 15;'}]);
+
+        test.equal(expr.render(true), 'if (x == 42) {\n\n    var z = 15;\n}');
 
 
-        expr = new JsConstruct(['if (x == 42) ', {block: ['var z = 15;', 'var y = 47;']}]);
+        expr = new JsConstruct(['if (x == 42) ', {block: ['var z = 15;\n', 'var y = 47;']}]);
 
-        test.equal(expr.render(), 'if (x == 42) {\n\n    var z = 15;var y = 47;\n}');
+        test.equal(expr.render(true), 'if (x == 42) {\n\n    var z = 15;\n    var y = 47;\n}');
 
         test.done();
     }

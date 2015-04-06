@@ -33,7 +33,7 @@ module.exports["statement lists"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo = 42;$bar = 57;');
+        test.equal(Compiler.compile(node).render(), '$foo = 42;\n$bar = 57;\n');
         test.done();
     },
 
@@ -64,7 +64,7 @@ module.exports["statement lists"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), 'return $bar($bar,[42]).then(function (x1) {$foo = x1;}).then(function () {$baz = 57;})');
+        test.equal(Compiler.compile(node).render(), 'return $bar($bar,[42]).then(function (x1) {$foo = x1;\n}).then(function () {$baz = 57;\n})');
         test.done();
     }
 };
@@ -431,7 +431,7 @@ module.exports["receive"] = {
             names: ['foo', 'mani', 'padme', 'hum']
         };
 
-        test.equal(Compiler.compile(node).render(), 'var $foo = args.shift(),\n$mani = args.shift(),\n$padme = args.shift(),\n$hum = args.shift();');
+        test.equal(Compiler.compile(node).render(), 'var $foo = args.shift(),\n$mani = args.shift(),\n$padme = args.shift(),\n$hum = args.shift();\n\n');
         test.done();
     }
 };
@@ -481,7 +481,7 @@ module.exports["conditional"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).render(), 'if ($foo) {\n$bar = 42;\n}');
+        test.equal(Compiler.compile(node).render(), 'if ($foo) {$bar = 42;\n}\n');
         test.done();
     },
 
@@ -501,7 +501,7 @@ module.exports["conditional"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).render(), 'if ($foo) {\n$bar = 42;\n}\nelse {\n$bar = 32;\n}');
+        test.equal(Compiler.compile(node).render(), 'if ($foo) {$bar = 42;\n}\nelse {$bar = 32;\n}\n');
         test.done();
     },
 
@@ -527,7 +527,7 @@ module.exports["conditional"] = {
         var scope = new Scope();
 
         test.equal(Compiler.compile(node).render(),
-            'if ($foo) {\n$bar = 42;\n}\nelse {\nif ($bar) {\n$bar = 32;\n}\nelse {\n$baz = 82;\n}\n}');
+            'if ($foo) {$bar = 42;\n}\nelse {if ($bar) {$bar = 32;\n}\nelse {$baz = 82;\n}\n}\n');
         test.done();
     },
 
@@ -570,7 +570,7 @@ module.exports["assignment"] = {
         var scope = new Scope();
         var result = Compiler.compile(node, scope);
 
-        test.equal(Compiler.compile(node).render(), '$foo = 57;');
+        test.equal(Compiler.compile(node).render(), '$foo = 57;\n');
 //        test.ok(scope.getStatus('foo'));
         test.done();
     },
@@ -586,7 +586,7 @@ module.exports["assignment"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).render(), '$foo[$bar] = 57;');
+        test.equal(Compiler.compile(node).render(), '$foo[$bar] = 57;\n');
 
         // context isn't modified by this
         test.throws(function () {scope.getStatus('foo')});
@@ -606,7 +606,7 @@ module.exports["assignment"] = {
 
         scope.define('bar', true);
 
-        test.equal(Compiler.compile(node).render(), '$foo = $bar;');
+        test.equal(Compiler.compile(node).render(), '$foo = $bar;\n');
         test.done();
     },
 
@@ -621,7 +621,7 @@ module.exports["assignment"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).render(), '$bar($bar,[]).then(function (x1) {$foo = x1;})');
+        test.equal(Compiler.compile(node).render(), '$bar($bar,[]).then(function (x1) {$foo = x1;\n})');
         test.done();
     }
 };
@@ -699,7 +699,7 @@ module.exports["procedure"] = {
         // important! - procedures are never async objects, regardless of whether they contain async statements
         test.equal(obj.isAsync(), false);
         test.equal(obj.render(),
-            "function ($recur, args) {\n\n    var $next = args.shift();$bar($bar,[42]).then(function (x1) {$result *= x1;})\n}");
+            "function ($recur, args) {var $next = args.shift();\n\n$bar($bar,[42]).then(function (x1) {$result *= x1;\n})}");
         test.done();
     }
 };
