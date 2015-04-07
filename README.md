@@ -2,6 +2,12 @@
 
 This system compiles Exa programs into JavaScript.
 
+#### Installation
+
+Standard Node: clone the repo then in the project root folder:
+
+    npm install
+
 #### To run the tests 
 
 In the project root folder:
