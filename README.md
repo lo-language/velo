@@ -10,7 +10,7 @@ In the project root folder:
 
 #### How code generation works
 
-The compiler generates JavaScript source from the AST bottom-up by snapping together chunks of JS wrapped in the following classes, almost like assembling a JS AST.
+The compiler generates an intermediate representation (IR) for JavaScript source from the AST bottom-up by snapping together chunks of JS wrapped in the classes below, almost like a JS AST. It then renders the IR into a JS string.
 
 **JsConstruct**
 

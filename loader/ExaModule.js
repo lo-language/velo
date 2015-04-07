@@ -77,7 +77,7 @@ __.prototype.load = function () {
         // so we wrap the function we get by compiling the root procedure in another function
         // that just gives that function a name and immediately calls it, passing through any args
 
-        var body = 'var root = ' + this.compile().render() +
+        var body = '"use strict";\nvar root = ' + this.compile().render() +
             '\n\nreturn root(root, args);';
 
         // load and info are temporary here
@@ -123,24 +123,6 @@ __.prototype.run = function (args) {
     }
 
     return this.fn.call(null, args);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Writes the program out as an executable.
- *
- * @return {promise}
- */
-__.prototype.writeExe = function (path) {
-
-    var source = "var Q = require('q');\nvar $_info = console.error;\n\n";
-
-    source += 'function $_recur() {\n\nvar args = Array.prototype.slice.call(arguments);\nvar result = Q.defer();\n\n' + this.compile() + '\n}\n\n';
-
-    // invoke
-    source += '$_recur([]).then(console.log, console.error);\n'
-
-    fs.writeFileSync(path, source);
 };
 
 module.exports = __;

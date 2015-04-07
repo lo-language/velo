@@ -6,8 +6,8 @@
 // list literal
 words = ['foo', 'mani', 'padme', 'hum'];
 
-// set literal with symbols and intentional repetition
-dudes = { <zaphod>, <ford>, <arthur>, <ford> };
+// set literal with symbols
+dudes = { <zaphod>, <ford>, <arthur>};
 
 // map literal
 // support block syntax (no braces)?

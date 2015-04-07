@@ -24,18 +24,6 @@ var __ = {};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Renders the given AST into JS source.
- *
- * @param ast
- * @return {String}
- */
-//__.getJs = function (ast) {
-//
-//    return __.compile(ast).render();
-//};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
  * Dispatches to the appropriate node type handler.
  *
  * @param node
@@ -48,10 +36,8 @@ __.compile = function (node, scope) {
         throw new Error("don't know how to compile node type '" + node.type + "'");
     }
 
-//    console.error('compiling ' + node.type);
-
     // dispatch to the appropriate handler
-    return __[node.type](node, scope);
+    return __[node.type](node, scope || new Scope());
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,12 +63,24 @@ __['procedure'] = function (node, scope) {
     // define the envelope args - might not want to do this statically, btw
     // since we might not get them with each request
 
-    localScope.defineArg('recur');
-    localScope.defineArg('__out');
-    localScope.defineArg('__err');
+//    localScope.defineArg('recur');
+//    localScope.defineArg('__out');
+//    localScope.defineArg('__err');
 
     // compile the statement(s) in the context of the local scope
     var body = __.compile(node.body, localScope);
+
+    // declare our local vars
+    // todo move to block-level scoping with 'let'
+
+    var vars = Object.keys(localScope.vars);
+    var varNames = vars.map(function (key) {
+        return localScope.vars[key];
+    });
+
+    if (vars.length > 0) {
+        body = ['var ' + varNames.join(', ') + ';\n\n', body];
+    }
 
     return new JsConstruct(['function ($recur, args) ', {block: body}], false);
 };
@@ -185,17 +183,11 @@ __['assign'] = function (node, scope) {
     var left = __.compile(node.left, scope);
     var right = __.compile(node.right, scope);
 
-    // is being ready a property of an AST node + exa scope?
-    // is tracking ready state just an optimization? or do we need it to not have turtles all the way down?
-    // can we 'ask' the ast node if it's ready?
-    // the compilation result should know that already, right?
-
     // modify the local scope
-    // todo we can't really do this, since we might be inside a conditional!
-    // maybe we could track if we're in a conditional scope??
-//    if (node.left.type == 'id') {
-//        scope.define(node.left.name, right.isReady());
-//    }
+    // todo this implies block-level scoping
+    if (node.left.type == 'id' && scope.has(node.left.name) === false) {
+        scope.define(node.left.name);
+    }
 
     return new JsStatement(new JsResolver([left, ' ' + node.op + ' ', right, ';\n'], false));
 };

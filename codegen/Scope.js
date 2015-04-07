@@ -26,11 +26,21 @@ var __ = function (parent) {
  * or an expression of exclusively the same.
  *
  * @param name
- * @param status
  */
-__.prototype.define = function (name, status) {
+__.prototype.define = function (name) {
 
-    this.vars[name] = status;
+    this.vars[name] = '$' + name;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns true iff the name is defined in this scope.
+ *
+ * @param name
+ */
+__.prototype.has = function (name) {
+
+    return this.vars[name] || false;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

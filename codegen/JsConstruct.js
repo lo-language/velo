@@ -42,6 +42,8 @@ JsConstruct.prototype.render = function (pretty) {
  * Renders the given JS code fragment.
  *
  * Could potentially save a traverse of the IR by doing this in the constructor, but hey.
+ *
+ * todo - should we factor out the traversal, since resolver uses it, too?
  */
 JsConstruct.renderFragment = function (fragment, pretty) {
 

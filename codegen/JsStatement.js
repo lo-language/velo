@@ -11,13 +11,10 @@ var util = require('util');
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * @param parts     an array of strings or constructs
- * @param isResult  flag to indicate this is a result
  */
-var __ = function (parts, isResult) {
+var __ = function (parts) {
 
     JsConstruct.call(this, parts);
-
-    this.isResult = isResult || false;
 };
 
 // subclass extends superclass

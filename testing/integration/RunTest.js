@@ -156,7 +156,7 @@ module.exports['procedure'] = {
     'success': function (test) {
 
 //        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
-        console.log(this.harness.getJs().render(true));
+//        console.log(this.harness.getJs().render(true));
         this.harness.success(test, [], 60);
     }
 };
