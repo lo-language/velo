@@ -1,2 +1,0 @@
-some kind of heredoc feature for quoting long strings with newlines
-have use strict in exa program functions

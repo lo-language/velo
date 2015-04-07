@@ -78,12 +78,10 @@ module.exports['fibonacci'] = {
     },
 
     'success': function (test) {
-
         this.harness.success(test, [10], 55);
     },
 
     'failure': function (test) {
-
         this.harness.failure(test, [-1], 'Whatsamatta, you?');
     }
 };
@@ -98,51 +96,49 @@ module.exports['collections'] = {
     },
 
     'all': function (test) {
-
-//        console.error(util.inspect(this.harness.module.parse(), {depth: null}));
         this.harness.success(test);
     }
 };
 
-////module.exports['factorial2'] = {
-////
-////    "setUp": function (cb) {
-////
-////        this.harness = new Harness(programDir, 'factorial2');
-////
-////        this.harness.load(cb);
-////    },
-////
-////    'success': function (test) {
-////
-////        this.harness.success(test, 10, 3628800);
-////    },
-////
-////    'failure': function (test) {
-////
-////        this.harness.failure(test, -1, "I pity the fool!");
-////    }
-////};
-////
-////module.exports['fibonacci2'] = {
-////
-////    "setUp": function (cb) {
-////
-////        this.harness = new Harness(programDir, 'fibonacci2');
-////
-////        this.harness.load(cb);
-////    },
-////
-////    'success': function (test) {
-////
-////        this.harness.success(test, 10, 55);
-////    },
-////
-////    'failure': function (test) {
-////
-////        this.harness.failure(test, -1, "Whatsamatta, you?");
-////    }
-////};
+//module.exports['factorial2'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.harness = new Harness(programDir, 'factorial2');
+//
+//        this.harness.load(cb);
+//    },
+//
+//    'success': function (test) {
+//
+//        this.harness.success(test, 10, 3628800);
+//    },
+//
+//    'failure': function (test) {
+//
+//        this.harness.failure(test, -1, "I pity the fool!");
+//    }
+//};
+//
+//module.exports['fibonacci2'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.harness = new Harness(programDir, 'fibonacci2');
+//
+//        this.harness.load(cb);
+//    },
+//
+//    'success': function (test) {
+//
+//        this.harness.success(test, 10, 55);
+//    },
+//
+//    'failure': function (test) {
+//
+//        this.harness.failure(test, -1, "Whatsamatta, you?");
+//    }
+//};
 
 module.exports['procedure'] = {
 
