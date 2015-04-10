@@ -1,0 +1,6 @@
+// doesn't take any input
+
+foo is:
+    fail "oh no!";
+
+foo();

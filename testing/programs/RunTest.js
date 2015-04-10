@@ -12,7 +12,26 @@
 
 var Harness = require('../Harness');
 var util = require('util');
-var programDir = __dirname +  '/../programs';
+var programDir = __dirname;
+
+// todo - i want a test harness written in exa to run these
+
+module.exports['errors'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(programDir, 'errors');
+
+        this.harness.load(cb);
+    },
+
+    'success': function (test) {
+
+//        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
+        console.log(this.harness.getJs().render(true));
+        this.harness.success(test, [], 14);
+    }
+};
 
 module.exports['deps'] = {
 
@@ -151,8 +170,6 @@ module.exports['procedure'] = {
 
     'success': function (test) {
 
-//        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
-//        console.log(this.harness.getJs().render(true));
         this.harness.success(test, [], 60);
     }
 };

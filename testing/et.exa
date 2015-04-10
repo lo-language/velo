@@ -1,0 +1,64 @@
+/*
+ * Copyright (C) 2014 by Seth Purcell
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+ * to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or 
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ *
+ * Author: Seth Purcell
+ * 4/9/15
+ */
+
+/**
+ *                       E.T.
+ *                  the Exa Tester
+ */
+
+receive args, io, env;
+
+// not 'load' because it might already be loaded - we're just linking to it, looking it up, acquiring it, it will be loaded *if necessary*
+// looks up the name in the library and returns its address - gives the caller authority to call the named procedure
+// like going to the library and checking out a book? or looking up a number in the phone book?
+// might find the file on disk and load it up, might already be loaded, might find a web service and link to it!
+// might find code on the web, download it, and load it up
+// prepare? acquire? identify? obtain? procure?
+// is the response necessarily stateless? or can it be a singleton?
+// called find because it might already be loaded
+// not import
+// called locate because it takes a name and returns an address; it's just a shared mapping
+// does it just locate? or does it also load if necessary? we could potentially lazy-load
+// i think we shouldn't combine locate with a call to what's being located; keep them separate
+// it's just locating a resource - somewhere
+// then we can send messages to it
+// so it's not really like getting your own copy of a book, it's more like being given a phone number
+// i like locate because it returns an address
+
+// locate, acquire, attach, fetch, capture, engage, employ?
+// this causes the system to locate the specified module in memory or on disk if not yet loaded and then load it
+// i like attach - it implies there's no path to something; attachment
+// kind of like mounting a disk
+
+Test        = attach('Test');
+PrintReport = attach('PrintReport');
+
+// load the module to test
+module = attach(args[1]);
+
+// create the test
+test = Test(module);
+report = test.run();
+
+// print the test report
+PrintReport(report, io.out);
