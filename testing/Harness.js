@@ -8,7 +8,7 @@
 "use strict";
 
 var ExaModule = require('../loader/ExaModule');
-var fs = require('fs');
+var Q = require('q');
 
 var __ = function (dir, program) {
 
@@ -19,17 +19,12 @@ __.prototype.load = function (cb) {
 
     var self = this;
 
-    fs.readFile(this.file, 'utf8', function (err, source) {
-
-        if (err) {
-            cb(err);
-            return;
+    ExaModule.createFromFile(this.file).then(
+        function (module) {
+            self.module = module;
+            cb();
         }
-
-        self.module = new ExaModule(source);
-
-        cb();
-    });
+    );
 };
 
 __.prototype.getJs = function (cb) {
@@ -39,8 +34,14 @@ __.prototype.getJs = function (cb) {
 
 __.prototype.success = function (test, input, expected) {
 
-    this.module.run(input).then(
+    var module = this.module;
+
+    Q().then(function () {
+        return module.run(input);
+    }).then(
         function (result) {
+
+//            console.log(result.toString());
 
             if (expected !== undefined) {
                 test.equal(result, expected);

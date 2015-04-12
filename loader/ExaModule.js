@@ -36,6 +36,23 @@ var __ = function (source) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * Creates a new ExaModule from the given source file.
+ *
+ * @param path
+ */
+__.createFromFile = function (path) {
+
+    return Q.nfcall(fs.readFile, path, 'utf-8').then(
+        function (source) {
+            return new __(source);
+        },
+    function (err) {
+        console.error(err);
+    });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
  *
  * @return {*}
  */
@@ -77,33 +94,22 @@ __.prototype.load = function () {
         // so we wrap the function we get by compiling the root procedure in another function
         // that just gives that function a name and immediately calls it, passing through any args
 
-        var body = '"use strict";\nvar root = ' + this.compile().render() +
-            '\n\nreturn root(root, args);';
+//        var body = '"use strict";\nvar root = ' + this.compile().render() +
+//            '\n\nreturn root(root, args, rootAttach);';
 
-        // load and info are temporary here
-        this.fn = new Function('Q, $_info, $_load, args', body).bind(null, Q,
+        // enable strict mode and wrap the compiled result so we can use it with the Function constructor,
+        // but keep the same sig as what we're wrapping
 
-            function (recur, args) {
-                console.error.apply(null, args);
-            },
+        var body = '"use strict";\n\nvar root = ' + this.compile().render() +
+            ';\n\nreturn root(root, args, attach)';
 
-            function (recur, args) {
+        // this has the same sig as a normal procedure so it can be returned from attach
+        // hmm - to implement recur we could just use a nested function everywhere... seems more expensive, but cleaner
+        // then we're not depending on the caller to call us properly
+        // we drop in Q so that it doesn't have to live in global space
+        // todo - should we use this instead of an arg for Q?
 
-                var path = args[0];
-
-                console.error("loading " + path);
-
-                return Q.nfcall(fs.readFile, "foo.txt", "utf-8").then(
-                    function (source) {
-
-                        var mod = new __(source);
-
-                        console.error("compiling " + source);
-                        return mod.load();
-                    }
-                );
-            }
-        );
+        this.fn = new Function('Q, recur_not_used, args, attach', body).bind(null, Q);
     }
 
     return this.fn;
@@ -112,6 +118,8 @@ __.prototype.load = function () {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Runs the program, passing in the arguments we're given, returning a promise for the result.
+ * Note that this is only called on the 'main' module for a program! All other modules are called
+ * from this module, directly or indirectly.
  *
  * @param args  arguments array to pass into the procedure
  * @return {promise}
@@ -122,7 +130,30 @@ __.prototype.run = function (args) {
         this.load();
     }
 
-    return this.fn.call(null, args);
+    // create the root attach procedure
+    // takes the normal sig since it's called like any other procedure
+
+    var rootAttach = function (recur, args, attach) {
+
+        var path = args[0] + '.exa';
+
+        console.error("loading module: " + path);
+
+        // create a module from the path
+        // we need to return a promise for a function that takes the common args of (recur, args, attach)
+        // so that it can be called directly
+
+        return __.createFromFile(path).then(
+            function (module) {
+
+                // might want to refactor this class so we don't need this bind
+                return module.load().bind(module);
+            }
+        );
+    };
+
+    // we don't need to pass a value for recur (arg 2) because of how module procedures are built
+    return this.fn(null, args, rootAttach);
 };
 
 module.exports = __;

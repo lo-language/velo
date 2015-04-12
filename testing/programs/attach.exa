@@ -1,0 +1,7 @@
+// i'd say load is the most natural, but don't want to imply loading
+// don't want to imply exclusivity - just because i've done it, doesn't mean somebody else hasn't/can't
+// don't want to imply bidirectionality/symmetry
+
+factorial = attach('factorial');
+
+reply factorial(5);

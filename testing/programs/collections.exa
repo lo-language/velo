@@ -48,7 +48,7 @@ if doctor == <zoidberg>:
     fail "uh-oh";
 
 // shouldn't be necessary but is for now; otherwise we never conclude
-reply;
+//reply;
 
 //if #map != 3
 //    fail("a most unpleasant situation, captain");

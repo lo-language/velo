@@ -21,21 +21,6 @@
  * 4/9/15
  */
 
-/**
- *                       E.T.
- *                  the Exa Tester
- */
+receive report, out;
 
-receive args, io, env;
-
-// the first module is "classy"; the second a simple procedure
-createTest  = attach('Test');
-printReport = attach('PrintReport');
-testModule  = attach(args[1]);
-
-// create the test
-test = createTest(testModule);
-report = test.run();
-
-// print the test report
-printReport(report, io.out);
+// go through the report

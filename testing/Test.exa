@@ -21,21 +21,46 @@
  * 4/9/15
  */
 
+receive testModule;
+
+// initialize
+
+report = [];
+
+// set up the tools
+
 /**
- *                       E.T.
- *                  the Exa Tester
+ * Tests for equality of two particles.
+ *
+ * @param a
+ * @param b
  */
+testSuccess is:
 
-receive args, io, env;
+    receive a, b;
 
-// the first module is "classy"; the second a simple procedure
-createTest  = attach('Test');
-printReport = attach('PrintReport');
-testModule  = attach(args[1]);
+    if (a == b):
+        report <+
 
-// create the test
-test = createTest(testModule);
-report = test.run();
 
-// print the test report
-printReport(report, io.out);
+testFailure is:
+
+    receive input;
+
+reply {
+
+    /**
+     * Calls the test module with the tools and returns the test report.
+     *
+     * Notice that the module isn't given the ability to run the test - and the
+     * caller isn't given the ability to hit the tools (and thus alter the report)!
+     */
+
+    run:
+
+        testModule({
+            equality: testEquals
+        });
+
+        reply report;
+};

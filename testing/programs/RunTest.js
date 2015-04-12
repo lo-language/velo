@@ -11,16 +11,15 @@
 "use strict";
 
 var Harness = require('../Harness');
+var Q = require('q');
 var util = require('util');
 var programDir = __dirname;
 
-// todo - i want a test harness written in exa to run these
-
-module.exports['errors'] = {
+module.exports['attach'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(programDir, 'errors');
+        this.harness = new Harness(programDir, 'attach');
 
         this.harness.load(cb);
     },
@@ -28,10 +27,31 @@ module.exports['errors'] = {
     'success': function (test) {
 
 //        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
-        console.log(this.harness.getJs().render(true));
-        this.harness.success(test, [], 14);
-    }
+//        console.log(this.harness.getJs().render(true));
+        this.harness.success(test, [], 120);
+    },
+
+//    'failure': function (test) {
+//        this.harness.failure(test, [-1], 'I pity the fool!');
+//    }
 };
+
+//module.exports['errors'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.harness = new Harness(programDir, 'errors');
+//
+//        this.harness.load(cb);
+//    },
+//
+//    'success': function (test) {
+//
+////        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
+//        console.log(this.harness.getJs().render(true));
+//        this.harness.success(test, [], 14);
+//    }
+//};
 
 module.exports['deps'] = {
 
@@ -115,6 +135,7 @@ module.exports['collections'] = {
     },
 
     'all': function (test) {
+
         this.harness.success(test);
     }
 };
