@@ -30,7 +30,7 @@ report = [];
 // set up the tools
 
 /**
- * Tests for equality of two particles.
+ * Tests for equality of its two parameters.
  *
  * @param a
  * @param b
@@ -39,13 +39,13 @@ testSuccess is:
 
     receive a, b;
 
-    if (a == b):
-        report <+
-
-
+/**
+ * Tests that the given procedure fails.
+ */
 testFailure is:
 
     receive input;
+
 
 reply {
 

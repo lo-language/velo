@@ -10,29 +10,31 @@
 
 "use strict";
 
+var Loader = require('../../loader/Loader');
 var Harness = require('../Harness');
 var Q = require('q');
 var util = require('util');
-var programDir = __dirname;
+
+var loader = new Loader(__dirname);
 
 module.exports['attach'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(programDir, 'attach');
+        this.harness = new Harness(loader, 'attach');
 
-        this.harness.load(cb);
+        this.harness.setUp(cb);
     },
 
     'success': function (test) {
 
 //        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
 //        console.log(this.harness.getJs().render(true));
-        this.harness.success(test, [], 120);
+        this.harness.testSuccess(test, [], 120);
     },
 
 //    'failure': function (test) {
-//        this.harness.failure(test, [-1], 'I pity the fool!');
+//        this.harness.testFailure(test, [-1], 'I pity the fool!');
 //    }
 };
 
@@ -40,16 +42,16 @@ module.exports['attach'] = {
 //
 //    "setUp": function (cb) {
 //
-//        this.harness = new Harness(programDir, 'errors');
+//        this.harness = new Harness(loader, 'errors');
 //
-//        this.harness.load(cb);
+//        this.harness.setUp(cb);
 //    },
 //
 //    'success': function (test) {
 //
 ////        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
 //        console.log(this.harness.getJs().render(true));
-//        this.harness.success(test, [], 14);
+//        this.harness.testSuccess(test, [], 14);
 //    }
 //};
 
@@ -57,13 +59,13 @@ module.exports['deps'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(programDir, 'deps');
+        this.harness = new Harness(loader, 'deps');
 
-        this.harness.load(cb);
+        this.harness.setUp(cb);
     },
 
     'success': function (test) {
-        this.harness.success(test, [], 14);
+        this.harness.testSuccess(test, [], 14);
     }
 };
 
@@ -71,21 +73,21 @@ module.exports['conditionals'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(programDir, 'conditionals');
+        this.harness = new Harness(loader, 'conditionals');
 
-        this.harness.load(cb);
+        this.harness.setUp(cb);
     },
 
     'neg': function (test) {
-        this.harness.success(test, [-1], 'negative');
+        this.harness.testSuccess(test, [-1], 'negative');
     },
 
     'zero': function (test) {
-        this.harness.success(test, [0], 'zero!');
+        this.harness.testSuccess(test, [0], 'zero!');
     },
 
     'pos': function (test) {
-        this.harness.success(test, [1], 'positive');
+        this.harness.testSuccess(test, [1], 'positive');
     }
 };
 
@@ -93,17 +95,17 @@ module.exports['factorial'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(programDir, 'factorial');
+        this.harness = new Harness(loader, 'factorial');
 
-        this.harness.load(cb);
+        this.harness.setUp(cb);
     },
 
     'success': function (test) {
-        this.harness.success(test, [10], 3628800);
+        this.harness.testSuccess(test, [10], 3628800);
     },
 
     'failure': function (test) {
-        this.harness.failure(test, [-1], 'I pity the fool!');
+        this.harness.testFailure(test, [-1], 'I pity the fool!');
     }
 };
 
@@ -111,17 +113,17 @@ module.exports['fibonacci'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(programDir, 'fibonacci');
+        this.harness = new Harness(loader, 'fibonacci');
 
-        this.harness.load(cb);
+        this.harness.setUp(cb);
     },
 
     'success': function (test) {
-        this.harness.success(test, [10], 55);
+        this.harness.testSuccess(test, [10], 55);
     },
 
     'failure': function (test) {
-        this.harness.failure(test, [-1], 'Whatsamatta, you?');
+        this.harness.testFailure(test, [-1], 'Whatsamatta, you?');
     }
 };
 
@@ -129,14 +131,14 @@ module.exports['collections'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(programDir, 'collections');
+        this.harness = new Harness(loader, 'collections');
 
-        this.harness.load(cb);
+        this.harness.setUp(cb);
     },
 
     'all': function (test) {
 
-        this.harness.success(test);
+        this.harness.testSuccess(test);
     }
 };
 
@@ -144,19 +146,19 @@ module.exports['collections'] = {
 //
 //    "setUp": function (cb) {
 //
-//        this.harness = new Harness(programDir, 'factorial2');
+//        this.harness = new Harness(loader, 'factorial2');
 //
-//        this.harness.load(cb);
+//        this.harness.setUp(cb);
 //    },
 //
 //    'success': function (test) {
 //
-//        this.harness.success(test, 10, 3628800);
+//        this.harness.testSuccess(test, 10, 3628800);
 //    },
 //
 //    'failure': function (test) {
 //
-//        this.harness.failure(test, -1, "I pity the fool!");
+//        this.harness.testFailure(test, -1, "I pity the fool!");
 //    }
 //};
 //
@@ -164,19 +166,19 @@ module.exports['collections'] = {
 //
 //    "setUp": function (cb) {
 //
-//        this.harness = new Harness(programDir, 'fibonacci2');
+//        this.harness = new Harness(loader, 'fibonacci2');
 //
-//        this.harness.load(cb);
+//        this.harness.setUp(cb);
 //    },
 //
 //    'success': function (test) {
 //
-//        this.harness.success(test, 10, 55);
+//        this.harness.testSuccess(test, 10, 55);
 //    },
 //
 //    'failure': function (test) {
 //
-//        this.harness.failure(test, -1, "Whatsamatta, you?");
+//        this.harness.testFailure(test, -1, "Whatsamatta, you?");
 //    }
 //};
 
@@ -184,13 +186,13 @@ module.exports['procedure'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(programDir, 'procedure');
+        this.harness = new Harness(loader, 'procedure');
 
-        this.harness.load(cb);
+        this.harness.setUp(cb);
     },
 
     'success': function (test) {
 
-        this.harness.success(test, [], 60);
+        this.harness.testSuccess(test, [], 60);
     }
 };

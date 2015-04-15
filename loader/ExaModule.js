@@ -26,29 +26,11 @@
 var parser = require('./../parser/Parser');
 var Compiler = require('./../codegen/Compiler');
 var Q = require('q');
-var fs = require('fs');
-var util = require('util');
 
-var __ = function (source) {
+var __ = function (source, loader) {
 
     this.source = source;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Creates a new ExaModule from the given source file.
- *
- * @param path
- */
-__.createFromFile = function (path) {
-
-    return Q.nfcall(fs.readFile, path, 'utf-8').then(
-        function (source) {
-            return new __(source);
-        },
-    function (err) {
-        console.error(err);
-    });
+    this.loader = loader;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +70,7 @@ __.prototype.compile = function () {
  */
 __.prototype.load = function () {
 
-    if (this.fn === undefined) {
+    if (this.procedure === undefined) {
 
         // the function we create here won't have a name, so can't call itself recursively
         // so we wrap the function we get by compiling the root procedure in another function
@@ -109,10 +91,10 @@ __.prototype.load = function () {
         // we drop in Q so that it doesn't have to live in global space
         // todo - should we use this instead of an arg for Q?
 
-        this.fn = new Function('Q, recur_not_used, args, attach', body).bind(null, Q);
+        this.procedure = new Function('Q, recur_not_used, args, attach', body).bind(null, Q);
     }
 
-    return this.fn;
+    return this.procedure;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,34 +108,12 @@ __.prototype.load = function () {
  */
 __.prototype.run = function (args) {
 
-    if (this.fn === undefined) {
+    if (this.procedure === undefined) {
         this.load();
     }
 
-    // create the root attach procedure
-    // takes the normal sig since it's called like any other procedure
-
-    var rootAttach = function (recur, args, attach) {
-
-        var path = args[0] + '.exa';
-
-        console.error("loading module: " + path);
-
-        // create a module from the path
-        // we need to return a promise for a function that takes the common args of (recur, args, attach)
-        // so that it can be called directly
-
-        return __.createFromFile(path).then(
-            function (module) {
-
-                // might want to refactor this class so we don't need this bind
-                return module.load().bind(module);
-            }
-        );
-    };
-
     // we don't need to pass a value for recur (arg 2) because of how module procedures are built
-    return this.fn(null, args, rootAttach);
+    return this.procedure(null, args, this.loader.rootAttach.bind(this.loader));
 };
 
 module.exports = __;

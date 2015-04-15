@@ -29,9 +29,9 @@
 receive args, io, env;
 
 // the first module is "classy"; the second a simple procedure
-createTest  = attach('Test');
-printReport = attach('PrintReport');
-testModule  = attach(args[1]);
+createTest  = acquire('Test');
+printReport = acquire('PrintReport');
+testModule  = acquire(args[1]);
 
 // create the test
 test = createTest(testModule);

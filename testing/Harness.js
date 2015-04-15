@@ -7,19 +7,23 @@
 
 "use strict";
 
-var ExaModule = require('../loader/ExaModule');
 var Q = require('q');
 
-var __ = function (dir, program) {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    this.file = dir + '/' + program + '.exa';
+var __ = function (loader, program) {
+
+    this.loader = loader;
+    this.program = program;
 };
 
-__.prototype.load = function (cb) {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+__.prototype.setUp = function (cb) {
 
     var self = this;
 
-    ExaModule.createFromFile(this.file).then(
+    this.loader.getModule(this.program).then(
         function (module) {
             self.module = module;
             cb();
@@ -27,12 +31,16 @@ __.prototype.load = function (cb) {
     );
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 __.prototype.getJs = function (cb) {
 
     return this.module.compile();
 };
 
-__.prototype.success = function (test, input, expected) {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+__.prototype.testSuccess = function (test, input, expected) {
 
     var module = this.module;
 
@@ -52,7 +60,9 @@ __.prototype.success = function (test, input, expected) {
     ).done();
 };
 
-__.prototype.failure = function (test, input, expected) {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+__.prototype.testFailure = function (test, input, expected) {
 
     this.module.run(input).then(
         function () {
