@@ -47,7 +47,7 @@ var __ = function (libs) {
  */
 __.prototype.findModule = function (path) {
 
-    console.error("locating module: " + path);
+//    console.error("locating module: " + path);
 
     // todo actually search libs
 
@@ -69,7 +69,7 @@ __.prototype.getModule = function (path) {
     return this.findModule(path).then(
         function (fullPath) {
 
-            console.error("loading module: " + fullPath);
+//            console.error("loading module: " + fullPath);
 
             return Q.nfcall(fs.readFile, fullPath, 'utf-8').then(
                 function (source) {

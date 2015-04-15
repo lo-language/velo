@@ -31,7 +31,6 @@ var Q = require('q');
 var util = require('util');
 var path = require('path');
 
-// todo - don't hardcode this
 var sourceFile = process.argv[2];
 
 if (sourceFile == null) {
@@ -43,8 +42,10 @@ if (sourceFile == null) {
 var modulePath = path.dirname(sourceFile);
 var moduleName = path.basename(sourceFile, '.exa');
 
-// todo read the libs from the command line
+// todo read more libs from the command line and add to the dir of the main module
 var loader = new Loader(modulePath);
+
+var io = {};
 
 loader.getModule(moduleName).then(
     function (main) {
@@ -52,7 +53,7 @@ loader.getModule(moduleName).then(
         // cut node off the arglist
         var args = Array.prototype.slice.call(process.argv, 1);
 
-        main.run(args).then(
+        main.run([args, io]).then(
             function (result) {
                 console.log(result);
             },
