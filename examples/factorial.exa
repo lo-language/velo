@@ -1,0 +1,15 @@
+receive args, io, env;
+
+factorial is:
+
+    receive num;
+
+    if num < 0:
+        fail "I pity the fool!";
+
+    if num <= 1:
+        reply 1;
+
+    reply num * recur(num - 1);
+
+reply factorial(args[2]);

@@ -2,7 +2,12 @@
  * Hilariously naïve computation of the Ackermann–Péter function
  */
 
-receive m, n;
+receive args, io;
+
+// todo convert these args from strings to numbers
+
+m = args[2];
+n = args[3];
 
 if m == 0:
     reply n + 1;
