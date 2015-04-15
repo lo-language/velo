@@ -24,7 +24,7 @@
 
 "use strict";
 
-var Module = require('./ExaModule');
+var Module = require('./Module');
 var fs = require('fs');
 var Q = require('q');
 

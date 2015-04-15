@@ -25,10 +25,13 @@
 'use strict';
 
 var fs = require('fs');
-var ExaModule = require('./loader/ExaModule');
+var Loader = require('./loader/Loader');
+var Module = require('./loader/Module');
 var Q = require('q');
 var util = require('util');
+var path = require('path');
 
+// todo - don't hardcode this
 var sourceFile = process.argv[2];
 
 if (sourceFile == null) {
@@ -36,21 +39,29 @@ if (sourceFile == null) {
     process.exit();
 }
 
-var source = fs.readFileSync(process.argv[2], 'utf8');
-var module = new ExaModule(source);
+// get the path of the main module
+var modulePath = path.dirname(sourceFile);
+var moduleName = path.basename(sourceFile, '.exa');
 
-var io = {};
+// todo read the libs from the command line
+var loader = new Loader(modulePath);
 
-console.error(module.compile());
+loader.getModule(moduleName).then(
+    function (main) {
 
-module.run().then(
-    function (result) {
-        console.log(result);
-    },
-    function (msg) {
-        console.error(msg);
-    }
-);
+        // cut node off the arglist
+        var args = Array.prototype.slice.call(process.argv, 1);
+
+        main.run(args).then(
+            function (result) {
+                console.log(result);
+            },
+            function (msg) {
+                console.error(msg);
+            }
+        );
+    });
+
 
 // todo how do we get signals from the system?
 // can we use the bare JS objects here or do they have to be exa-wrapped somehow?
