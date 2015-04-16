@@ -25,8 +25,8 @@
 'use strict';
 
 var fs = require('fs');
-var Loader = require('./loader/Loader');
-var Module = require('./loader/Module');
+var Loader = require('./../loader/Loader');
+var Module = require('./../loader/Module');
 var Q = require('q');
 var util = require('util');
 var path = require('path');

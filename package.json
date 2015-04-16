@@ -1,23 +1,24 @@
 {
-  "name": "clear",
-  "description": "A JS implementation of the Clear programming language",
-  "version": "0.1.0",
-  "preferGlobal": true,
-  "main": "lib/jison",
-  "bin": {
-    "clear": "vm/clear.js"
-  },
-  "engines": {
-    "node": ">=0.8"
-  },
-  "dependencies": {
-    "q": ""
-  },
-  "devDependencies": {
-    "nodeunit": "0.6.x",
-    "jison": "0.4.x"
-  },
-  "scripts": {
-    "test": "nodeunit testing/*"
-  }
+    "name": "exa",
+    "description": "A JavaScript implementation of the Exa programming language",
+    "version": "0.1.0",
+    "author": "Seth Purcell",
+    "preferGlobal": true,
+    "engines": {
+        "node": ">=0.8"
+    },
+    "dependencies": {
+        "q": ""
+    },
+    "devDependencies": {
+        "nodeunit": "0.6.x",
+        "jison": "0.4.x"
+    },
+    "scripts": {
+        "test": "nodeunit testing/*"
+    },
+    "bin": {
+        "exa": "./bin/exa"
+    },
+    "license": "MIT"
 }
