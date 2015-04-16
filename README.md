@@ -7,7 +7,6 @@ This system compiles Exa programs into JavaScript.
 Standard Node: clone the repo then in the project root folder:
 
     $ npm install -g
-    $ sudo ln -s $PWD/exa /usr/local/bin
     
 #### To run the examples
 
