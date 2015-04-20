@@ -16,3 +16,8 @@ foo() => x;
 foo(bar());
 
 x = foo() + 7;
+
+// todo we also want to support standalone try's (no assignment)
+x = try foo():
+    receive error;
+    fail error;

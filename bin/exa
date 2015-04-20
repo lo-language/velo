@@ -50,6 +50,8 @@ var io = {};
 loader.getModule(moduleName).then(
     function (main) {
 
+//        console.error(main.compile().render(true) + '\n\n');
+
         // cut node off the arglist
         var args = Array.prototype.slice.call(process.argv, 1);
 

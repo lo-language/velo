@@ -112,7 +112,6 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "stop"                  return 'STOP'
 "try"                   return 'TRY'
 {id}                    return 'ID'
-"procedure"             return 'PROCEDURE'
 .                       return 'INVALID'
 
 /lex
@@ -205,6 +204,7 @@ statement
     | expr ';' -> {type: 'expr_stmt', expr: $1}  // to support standalone invocations as well as connections
     | result ';'
     | assignment ';'
+    | atom assignment_op try
     | conditional
     | iteration
     | ID 'IS' ':' block -> {type: 'assign', op: '=', left: {type: 'id', name: $1}, right: {type: 'procedure', body: $4}}
@@ -274,6 +274,10 @@ dyad
 // or are they the only statements that can be expressions?
 request
     : atom '(' (expr ',')* expr? ')' -> {type: 'request', to: $1, args: $4 ? $3.concat([$4]) : []}
+    ;
+
+try
+    : TRY request ':' block -> {type: 'try', request: $2, handler: $4}
     ;
 
 unary_expr

@@ -115,7 +115,14 @@
                                 }
                             }
                         },
-                        "tail":null
+                        "tail":{
+                            "type":"stmt_list",
+                            "head":{
+                                "type":"id",
+                                "name":"x"
+                            },
+                            "tail":null
+                        }
                     }
                 }
             }
