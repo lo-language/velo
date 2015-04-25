@@ -83,15 +83,15 @@ __.prototype.load = function () {
         // but keep the same sig as what we're wrapping
 
         var body = '"use strict";\n\nvar root = ' + this.compile().render() +
-            ';\n\nreturn root(root, args, attach)';
+            ';\n\nreturn root(root, args, connect)';
 
-        // this has the same sig as a normal procedure so it can be returned from attach
+        // this has the same sig as a normal procedure so it can be returned from connect
         // hmm - to implement recur we could just use a nested function everywhere... seems more expensive, but cleaner
         // then we're not depending on the caller to call us properly
         // we drop in Q so that it doesn't have to live in global space
         // todo - should we use this instead of an arg for Q?
 
-        this.procedure = new Function('Q, recur_not_used, args, attach', body).bind(null, Q);
+        this.procedure = new Function('Q, recur_not_used, args, connect', body).bind(null, Q);
     }
 
     return this.procedure;

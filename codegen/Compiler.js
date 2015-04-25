@@ -105,7 +105,7 @@ __['procedure'] = function (node, scope) {
         body = ['var ' + varNames.join(', ') + ';\n\n', body];
     }
 
-    return new JsConstruct(['function ($recur, args, $attach) ', {block: body}], false);
+    return new JsConstruct(['function ($recur, args, $connect) ', {block: body}], false);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -309,7 +309,7 @@ __['request'] = function (node, scope) {
         return __.compile(arg);
     });
 
-    return new JsRequest([target, '(', target, ', [', {csv: args}, '], $attach)']);
+    return new JsRequest([target, '(', target, ', [', {csv: args}, '], $connect)']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -17,11 +17,11 @@ var util = require('util');
 
 var loader = new Loader(__dirname);
 
-module.exports['attach'] = {
+module.exports['connect'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(loader, 'attach');
+        this.harness = new Harness(loader, 'modules');
 
         this.harness.setUp(cb);
     },

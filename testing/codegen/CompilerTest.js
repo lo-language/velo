@@ -64,7 +64,7 @@ module.exports["statement lists"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), 'return $bar($bar, [42], $attach).then(function (x1) {$foo = x1;\n}).then(function () {$baz = 57;\n})');
+        test.equal(Compiler.compile(node).render(), 'return $bar($bar, [42], $connect).then(function (x1) {$foo = x1;\n}).then(function () {$baz = 57;\n})');
         test.done();
     }
 };
@@ -186,7 +186,7 @@ module.exports["request"] = {
             args: []
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo($foo, [], $attach)');
+        test.equal(Compiler.compile(node).render(), '$foo($foo, [], $connect)');
         test.done();
     },
 
@@ -200,7 +200,7 @@ module.exports["request"] = {
             ]
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo($foo, [42], $attach)');
+        test.equal(Compiler.compile(node).render(), '$foo($foo, [42], $connect)');
         test.done();
     },
 
@@ -215,7 +215,7 @@ module.exports["request"] = {
             ]
         };
 
-        test.equal(Compiler.compile(node).render(), "$foo($foo, [42, 'hi there'], $attach)");
+        test.equal(Compiler.compile(node).render(), "$foo($foo, [42, 'hi there'], $connect)");
         test.done();
     },
 
@@ -237,7 +237,7 @@ module.exports["request"] = {
 
         // patch sub nodes?
 
-        test.equal(Compiler.compile(node).render(), "Q.spread([$foo($foo, [], $attach), $bar($bar, [], $attach)], function (x1, x2) {return $baz($baz, [x1, x2], $attach);})");
+        test.equal(Compiler.compile(node).render(), "Q.spread([$foo($foo, [], $connect), $bar($bar, [], $connect)], function (x1, x2) {return $baz($baz, [x1, x2], $connect);})");
         test.done();
     }
 };
@@ -354,7 +354,7 @@ module.exports["request statements"] = {
                 ]}
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo($foo, [42], $attach);');
+        test.equal(Compiler.compile(node).render(), '$foo($foo, [42], $connect);');
         test.done();
     },
 
@@ -384,7 +384,7 @@ module.exports["request statements"] = {
         // patch sub nodes?
 
         test.equal(Compiler.compile(node).render(),
-            'Q.spread([$foo($foo, [], $attach), $bar($bar, [], $attach)], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz, [x1], $attach);});');
+            'Q.spread([$foo($foo, [], $connect), $bar($bar, [], $connect)], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz, [x1], $connect);});');
         test.done();
     },
 
@@ -417,7 +417,7 @@ module.exports["request statements"] = {
         // patch sub nodes?
 
         test.equal(Compiler.compile(node).render(),
-            'Q.spread([$foo($foo, [], $attach), $bar($bar, [], $attach)], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz, [x1], $attach);}).then(function (x1) {return $quux($quux, [x1], $attach);});');
+            'Q.spread([$foo($foo, [], $connect), $bar($bar, [], $connect)], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz, [x1], $connect);}).then(function (x1) {return $quux($quux, [x1], $connect);});');
         test.done();
     }
 };
@@ -621,7 +621,7 @@ module.exports["assignment"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).render(), '$bar($bar, [], $attach).then(function (x1) {$foo = x1;\n})');
+        test.equal(Compiler.compile(node).render(), '$bar($bar, [], $connect).then(function (x1) {$foo = x1;\n})');
         test.done();
     }
 };
@@ -699,7 +699,7 @@ module.exports["procedure"] = {
         // important! - procedures are never async objects, regardless of whether they contain async statements
         test.equal(obj.isAsync(), false);
         test.equal(obj.render(),
-            "function ($recur, args, $attach) {var $result;\n\nvar $next = args.shift();\n\n$bar($bar, [42], $attach).then(function (x1) {$result *= x1;\n})}");
+            "function ($recur, args, $connect) {var $result;\n\nvar $next = args.shift();\n\n$bar($bar, [42], $connect).then(function (x1) {$result *= x1;\n})}");
         test.done();
     }
 };

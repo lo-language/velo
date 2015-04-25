@@ -88,17 +88,17 @@ __.prototype.getModule = function (path) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * The root attach() procedure to be provided to a main module and called from within exa.
+ * The root connect() procedure to be provided to a main module and called from within exa.
  * It needs to conform to the procedure type as well as return a promise to a procedure.
  *
  * @param recur
  * @param args
- * @param attach
+ * @param connect
  */
-__.prototype.rootAttach = function (recur, args, attach) {
+__.prototype.rootAttach = function (recur, args, connect) {
 
     // create a module from the path
-    // we need to return a promise for a procedure (a function that takes the common args of (recur, args, attach))
+    // we need to return a promise for a procedure (a function that takes the common args of (recur, args, connect))
     // so that it can be bound to a var and called from within exa
 
     return this.getModule(args[0]).then(
