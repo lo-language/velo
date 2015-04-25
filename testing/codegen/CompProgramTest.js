@@ -20,7 +20,7 @@ var ast = { type: 'procedure',
                 body:
                 { type: 'stmt_list',
                     head:
-                    { type: 'result',
+                    { type: 'response',
                         channel: 'reply',
                         args: [ { type: 'number', val: '14' } ] },
                     tail: null } } },
@@ -37,7 +37,7 @@ var ast = { type: 'procedure',
             tail:
             { type: 'stmt_list',
                 head:
-                { type: 'result',
+                { type: 'response',
                     channel: 'reply',
                     args: [ { type: 'id', name: 'x' } ] },
                 tail: null } } } };

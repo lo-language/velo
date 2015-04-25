@@ -202,9 +202,8 @@ statement_list
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: 'receive', names: $2.concat($3)}
     | expr ';' -> {type: 'expr_stmt', expr: $1}  // to support standalone invocations as well as connections
-    | result ';'
-    | assignment ';'
-    | atom assignment_op try
+    | response ';'
+    | assignment
     | conditional
     | iteration
     | ID 'IS' ':' block -> {type: 'assign', op: '=', left: {type: 'id', name: $1}, right: {type: 'procedure', body: $4}}
@@ -213,16 +212,17 @@ statement
     | STOP ';' -> {type: 'stop'}
     ;
 
-result
-    : REPLY (expr ',')* expr? -> {type: 'result', channel: $1, args: $3 ? $2.concat([$3]) : []}
-    | FAIL (expr ',')* expr? -> {type: 'result', channel: $1, args: $3 ? $2.concat([$3]) : []}
+response
+    : REPLY (expr ',')* expr? -> {type: 'response', channel: $1, args: $3 ? $2.concat([$3]) : []}
+    | FAIL (expr ',')* expr? -> {type: 'response', channel: $1, args: $3 ? $2.concat([$3]) : []}
     ;
 
-// assignments are not expressions
+// assignments are statements, not expressions!
 assignment
-    : atom '++' -> {type: 'assign', op: $2, left: $1}
-    | atom '--' -> {type: 'assign', op: $2, left: $1}
-    | atom assignment_op expr -> {type: 'assign', op: $2, left: $1, right: $3}
+    : atom '++' ';' -> {type: 'assign', op: $2, left: $1}
+    | atom '--' ';' -> {type: 'assign', op: $2, left: $1}
+    | atom assignment_op expr ';' -> {type: 'assign', op: $2, left: $1, right: $3}
+    | atom assignment_op expr '~>' block
     ;
 
 assignment_op
@@ -276,10 +276,6 @@ request
     : atom '(' (expr ',')* expr? ')' -> {type: 'request', to: $1, args: $4 ? $3.concat([$4]) : []}
     ;
 
-try
-    : TRY request ':' block -> {type: 'try', request: $2, handler: $4}
-    ;
-
 unary_expr
     : atom
     | '#' atom -> {type: 'cardinality', operand: $2}
@@ -309,7 +305,5 @@ expr
 connection
     : expr '->' block -> {type: 'connection', connector: $2, source: $1, sink: {type: 'procedure', body: $3}}
     | expr '->' expr -> {type: 'connection', connector: $2, source: $1, sink: $3}
-    | expr '~>' block -> {type: 'connection', connector: $2, source: $1, sink: {type: 'procedure', body: $3}}
-    | expr '~>' expr -> {type: 'connection', connector: $2, source: $1, sink: $3}
     | expr '=>' expr -> {type: 'connection', connector: $2, source: $1, sink: $3}
     ;

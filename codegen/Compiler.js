@@ -170,7 +170,7 @@ __['expr_stmt'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__['result'] = function (node, scope) {
+__['response'] = function (node, scope) {
 
     // should this node type be renamed response?
 
@@ -292,8 +292,8 @@ __['conditional'] = function (node, scope) {
  *
  * Requests always compile to async calls:
  *
- * - if result ignored, we don't do anything
- * - if result directly asssigned, we can return a promise
+ * - if response ignored, we don't do anything
+ * - if response directly asssigned, we can return a promise
  * - if part of any other expression, we need to invert the parse tree to do the call first
  * - if handed a callback, wire it up to the promise
  *

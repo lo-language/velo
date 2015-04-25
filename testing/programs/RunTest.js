@@ -31,11 +31,7 @@ module.exports['attach'] = {
 //        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
 //        console.log(this.harness.getJs().render(true));
         this.harness.testSuccess(test, [], 120);
-    },
-
-//    'failure': function (test) {
-//        this.harness.testFailure(test, [-1], 'I pity the fool!');
-//    }
+    }
 };
 
 //module.exports['errors'] = {
@@ -47,11 +43,28 @@ module.exports['attach'] = {
 //        this.harness.setUp(cb);
 //    },
 //
-//    'success': function (test) {
+//    'failure': function (test) {
 //
 ////        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
 //        console.log(this.harness.getJs().render(true));
-//        this.harness.testSuccess(test, [], 14);
+//        this.harness.testFailure(test, [], "oh no!");
+//    }
+//};
+
+//module.exports['recovery'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.harness = new Harness(loader, 'recovery');
+//
+//        this.harness.setUp(cb);
+//    },
+//
+//    'success': function (test) {
+//
+//        console.log(util.inspect(this.harness.parse(), {depth: null, colors: true}));
+////        console.log(this.harness.getJs().render(true));
+//        this.harness.testSuccess(test, [], "oh no!");
 //    }
 //};
 

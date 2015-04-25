@@ -1,0 +1,7 @@
+// doesn't take any input
+
+foo is:
+    fail "oh no!";
+
+x = try foo():
+    receive error;

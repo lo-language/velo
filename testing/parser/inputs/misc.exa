@@ -34,26 +34,10 @@ monkeys["chickens"][15].wow({ true: 72, 89: 42 })[17](57);
 
 monkeys = 72;
 
-//result = foo() -> handler;
-
-/*
- is the whole chain one expression? with a value of the final reply?
- or do we not need chains?
- */
-
-/*
- is an error handler sent a request or a response??
- the calling function can take the response and make a pseudo-request out of it by adding on some channels
-*/
-
 result = foo() ~>
     receive err;
     log(err);
     reply fixed;
-->
-    receive result;
-;
-
 
 // generator - the outer process is one entry point; it creates and returns *another* entry point
 // getIterator

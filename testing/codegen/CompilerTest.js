@@ -725,7 +725,7 @@ module.exports["result"] = {
     "reply": function (test) {
 
         var node = {
-            type: 'result',
+            type: 'response',
             channel: 'reply',
             args: [
                 {type: 'number', val: '42'}
@@ -738,7 +738,7 @@ module.exports["result"] = {
     "fail": function (test) {
 
         var node = {
-            type: 'result',
+            type: 'response',
             channel: 'fail',
             args: [
                 {type: 'number', val: '42'}
