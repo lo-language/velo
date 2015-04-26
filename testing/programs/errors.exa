@@ -50,6 +50,7 @@ foo() => x ~>
 x = foo() + bar(); // these will be called concurrently, and there's no way to say they shouldn't be without unpacking the expression
 
 // what if we also support this syntax?? would that be evil?
+// or should we force this explicit syntax??
 // concurrent - not an expression!
 () -> foo;
 

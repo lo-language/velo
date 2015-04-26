@@ -56,6 +56,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
                         %}
 \s+                     /* ignore all other whitespace */
 "`"                     return '`'
+"blank"                 return 'BLANK' // null, void, empty, blank, nil?
 "true"|"false"          return 'BOOLEAN'
 {number}                return 'NUMBER'
 \"[^\"]*\"              yytext = yytext.substr(1, yyleng-2); return 'STRING';
@@ -67,6 +68,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "{"                     return '{'
 "}"                     return '}'
 ","                     return ','
+"::"                    return '::'
 ":"                     return ':'
 ";"                     return ';'
 ".."                    return 'SEQ'
@@ -203,7 +205,9 @@ statement
     : RECEIVE (ID ',')* ID ';' -> {type: 'receive', names: $2.concat($3)}
     | expr ';' -> {type: 'expr_stmt', expr: $1}  // to support standalone invocations as well as connections
     | response ';'
-    | assignment
+    | assignment ';'
+    | lvalue assignment_op request '~>' block
+    | connection
     | conditional
     | iteration
     | ID 'IS' ':' block -> {type: 'assign', op: '=', left: {type: 'id', name: $1}, right: {type: 'procedure', body: $4}}
@@ -219,10 +223,9 @@ response
 
 // assignments are statements, not expressions!
 assignment
-    : atom '++' ';' -> {type: 'assign', op: $2, left: $1}
-    | atom '--' ';' -> {type: 'assign', op: $2, left: $1}
-    | atom assignment_op expr ';' -> {type: 'assign', op: $2, left: $1, right: $3}
-    | atom assignment_op expr '~>' block
+    : lvalue '++' -> {type: 'assign', op: $2, left: $1}
+    | lvalue '--' -> {type: 'assign', op: $2, left: $1}
+    | lvalue assignment_op expr -> {type: 'assign', op: $2, left: $1, right: $3}
     ;
 
 assignment_op
@@ -247,13 +250,17 @@ iteration
 ////////////////////////////////////////////////////////////////////////////////
 // EXPRESSIONS
 
-atom
-    : literal
-    | ID -> {type: 'id', name: $1}
-    | atom '[' expr? ']' -> {type: 'subscript', list: $1, index: $3}
-    | atom '.' ID -> {type: 'select', set: $1, member: $3}
+value
+    : lvalue
+    | literal
     | '(' expr ')' -> $2
     | request
+    ;
+
+lvalue
+    : ID -> {type: 'id', name: $1}
+    | value '[' expr? ']' -> {type: 'subscript', list: $1, index: $3}
+    | value '.' ID -> {type: 'select', set: $1, member: $3}
     ;
 
 literal
@@ -263,6 +270,7 @@ literal
     | STRING -> {type: 'string', val: $1}
     | '[' (expr ',')* expr? ']' -> {type: 'list', elements: $3 ? $2.concat([$3]): []}
     | '{' BEGIN* (dyad ',')* dyad? END* '}' -> {type: 'set', members: $4 ? $3.concat([$4]): []}
+    | '::' block
     ;
 
 dyad
@@ -273,13 +281,13 @@ dyad
 // requests are the only expressions that can also be stand-alone statements
 // or are they the only statements that can be expressions?
 request
-    : atom '(' (expr ',')* expr? ')' -> {type: 'request', to: $1, args: $4 ? $3.concat([$4]) : []}
+    : value '(' (expr ',')* expr? ')' -> {type: 'request', to: $1, args: $4 ? $3.concat([$4]) : []}
     ;
 
 unary_expr
-    : atom
-    | '#' atom -> {type: 'cardinality', operand: $2}
-    | 'NOT' atom -> {type: 'complement', operand: $2}
+    : value
+    | '#' unary_expr -> {type: 'cardinality', operand: $2}
+    | 'NOT' unary_expr -> {type: 'complement', operand: $2}
     ;
 
 expr
@@ -299,11 +307,10 @@ expr
     | expr OR expr -> {type: 'op', op: $2, left: $1, right: $3}
     | expr IN expr -> {type: 'in', left: $1, right: $3}
     | expr SEQ expr -> {type: 'sequence', first: $1, last: $3}
-    | connection
+    | request '~>' expr
     ;
 
 connection
-    : expr '->' block -> {type: 'connection', connector: $2, source: $1, sink: {type: 'procedure', body: $3}}
-    | expr '->' expr -> {type: 'connection', connector: $2, source: $1, sink: $3}
-    | expr '=>' expr -> {type: 'connection', connector: $2, source: $1, sink: $3}
+    : request '=>' lvalue ('~>' expr)? ';'
+    | request '=>' lvalue '~>' block
     ;

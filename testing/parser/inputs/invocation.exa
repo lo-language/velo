@@ -3,13 +3,25 @@
 foo();           // where foo holds an action address
 foo.bar();       // where bar is an action address on record foo
 
-// promise form
+// sync form
 
 x = foo();
 
-// async
+x = foo() ~> bar;
+
+x = foo() ~>
+    receive error;
+    reply 'ok';
+
+// concurrent form
 
 foo() => x;
+
+foo() => x ~> bar;
+
+foo() => x ~>
+    receive error;
+    fail error;
 
 // sync form in expression
 
@@ -17,7 +29,6 @@ foo(bar());
 
 x = foo() + 7;
 
-// todo we also want to support standalone try's (no assignment)
 x = foo() ~>
     receive error;
     fail error;
