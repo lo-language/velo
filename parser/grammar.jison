@@ -206,7 +206,7 @@ statement
     | expr ';' -> {type: 'expr_stmt', expr: $1}  // to support standalone invocations as well as connections
     | response ';'
     | assignment ';'
-    | lvalue assignment_op request '~>' block
+    | lvalue assignment_op application '~>' block
     | connection
     | conditional
     | iteration
@@ -254,7 +254,7 @@ value
     : lvalue
     | literal
     | '(' expr ')' -> $2
-    | request
+    | application
     ;
 
 lvalue
@@ -278,9 +278,9 @@ dyad
     | expr ':' expr -> {type: 'dyad', key: $1, value: $3};
     ;
 
-// requests are the only expressions that can also be stand-alone statements
-// or are they the only statements that can be expressions?
-request
+// applications are expressions
+
+application
     : value '(' (expr ',')* expr? ')' -> {type: 'request', to: $1, args: $4 ? $3.concat([$4]) : []}
     ;
 
@@ -307,10 +307,15 @@ expr
     | expr OR expr -> {type: 'op', op: $2, left: $1, right: $3}
     | expr IN expr -> {type: 'in', left: $1, right: $3}
     | expr SEQ expr -> {type: 'sequence', first: $1, last: $3}
-    | request '~>' expr
+    | application '~>' expr
     ;
 
+// connections are NOT expressions
+
 connection
-    : request '=>' lvalue ('~>' expr)? ';'
-    | request '=>' lvalue '~>' block
+    : application '=>' lvalue ('~>' expr)? ';'
+    | application '=>' lvalue '~>' block
+    | expr '->' value ('~>' expr)? ';'
+    | expr '->' value '=>' lvalue ('~>' expr)? ';'
+    | expr '->' value '=>' lvalue '~>' block
     ;

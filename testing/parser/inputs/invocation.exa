@@ -23,6 +23,17 @@ foo() => x ~>
     receive error;
     fail error;
 
+// alternate concurrent form
+
+(foo) -> bar;
+(foo) -> bar ~> baz;
+(foo) -> bar => baz;
+(foo) -> bar => baz ~> quux;
+
+foo -> bar => baz ~>
+    receive error;
+    fail error;
+
 // sync form in expression
 
 foo(bar());
