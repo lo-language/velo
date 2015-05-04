@@ -26,9 +26,7 @@
 
 'use strict';
 
-var fs = require('fs');
 var Loader = require('./../loader/Loader');
-var Module = require('./../loader/Module');
 var Q = require('q');
 var util = require('util');
 var path = require('path');
@@ -44,20 +42,34 @@ if (sourceFile == null) {
 var modulePath = path.dirname(sourceFile);
 var moduleName = path.basename(sourceFile, '.exa');
 
-// todo read more libs from the command line and add to the dir of the main module
+// todo support specifying more libs on the command line and add to the dir of the main module
 var loader = new Loader(modulePath);
 
-var io = {};
+var io = {
+    stdout: {
+        write: function (recur, args, attach) {
+
+            process.stdout.write.apply(process.stdout, args);
+
+            return Q();
+        }
+    }
+};
+
+var system = {
+    env: process.env,
+    listen: process.on
+};
 
 loader.getModule(moduleName).then(
     function (main) {
 
-//        console.error(main.compile().render(true) + '\n\n');
+        console.error(main.compile().render(true) + '\n\n');
 
         // cut node off the arglist
         var args = Array.prototype.slice.call(process.argv, 1);
 
-        main.run([args, io]).then(
+        main.run([args, io, system]).then(
             function (result) {
                 console.log(result);
             },
@@ -65,7 +77,7 @@ loader.getModule(moduleName).then(
                 console.error(msg);
             }
         );
-    });
+    }).done();
 
 
 // todo how do we get signals from the system?

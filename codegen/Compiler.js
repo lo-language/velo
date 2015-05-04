@@ -385,6 +385,21 @@ __['subscript'] = function (node, scope) {
  * @param scope
  * @param node
  */
+__['select'] = function (node, scope) {
+
+    // this is guaranteed to be a statement
+
+    var set = __.compile(node.set, scope);
+
+    return new JsResolver([set, '.', node.member]);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param scope
+ * @param node
+ */
 __['in'] = function (node, scope) {
 
     // should holds apply to strings? maybe as 'contains'? or some non-word operator?
