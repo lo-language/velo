@@ -17,24 +17,11 @@ var util = require('util');
 
 var loader = new Loader(__dirname);
 
-module.exports['connect'] = {
 
-    "setUp": function (cb) {
-
-        this.harness = new Harness(loader, 'modules');
-
-        this.harness.setUp(cb);
-    },
-
-    'success': function (test) {
-
-//        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
-//        console.log(this.harness.getJs().render(true));
-        this.harness.testSuccess(test, [], 120);
-    }
-};
 
 //module.exports['errors'] = {
+//
+//    // test that uncaught errors are properly escalated out of the program
 //
 //    "setUp": function (cb) {
 //
@@ -51,22 +38,49 @@ module.exports['connect'] = {
 //    }
 //};
 
-//module.exports['recovery'] = {
-//
-//    "setUp": function (cb) {
-//
-//        this.harness = new Harness(loader, 'recovery');
-//
-//        this.harness.setUp(cb);
-//    },
-//
-//    'success': function (test) {
-//
-//        console.log(util.inspect(this.harness.parse(), {depth: null, colors: true}));
-////        console.log(this.harness.getJs().render(true));
-//        this.harness.testSuccess(test, [], "oh no!");
-//    }
-//};
+module.exports['connect'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(loader, 'modules');
+
+        this.harness.setUp(cb);
+    },
+
+    'success': function (test) {
+
+        this.harness.testSuccess(test, [], 120);
+    }
+};
+
+module.exports['io'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(loader, 'helloWorld');
+
+        this.harness.setUp(cb);
+    },
+
+    'success': function (test) {
+
+        test.expect(1);
+
+//        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
+//        console.log(this.harness.getJs().render(true));
+
+        // do we need every procedure to return a promise?
+        // or can we slap a promise on one from the outside if it doesn't?
+
+        this.harness.testSuccess(test, [[], {
+            stdout: {
+                write: function (recur, args, attach) {
+                    test.ok(true);
+                }
+            }
+        }, {}]);
+    }
+};
 
 module.exports['deps'] = {
 
@@ -155,6 +169,44 @@ module.exports['collections'] = {
     }
 };
 
+module.exports['procedure'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(loader, 'procedure');
+
+        this.harness.setUp(cb);
+    },
+
+    'success': function (test) {
+
+        this.harness.testSuccess(test, [], 60);
+    }
+};
+
+
+
+
+
+
+
+//module.exports['recovery'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.harness = new Harness(loader, 'recovery');
+//
+//        this.harness.setUp(cb);
+//    },
+//
+//    'success': function (test) {
+//
+//        console.log(util.inspect(this.harness.parse(), {depth: null, colors: true}));
+////        console.log(this.harness.getJs().render(true));
+//        this.harness.testSuccess(test, [], "oh no!");
+//    }
+//};
+
 //module.exports['factorial2'] = {
 //
 //    "setUp": function (cb) {
@@ -194,18 +246,3 @@ module.exports['collections'] = {
 //        this.harness.testFailure(test, -1, "Whatsamatta, you?");
 //    }
 //};
-
-module.exports['procedure'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(loader, 'procedure');
-
-        this.harness.setUp(cb);
-    },
-
-    'success': function (test) {
-
-        this.harness.testSuccess(test, [], 60);
-    }
-};
