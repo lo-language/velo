@@ -87,8 +87,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "*="                    return '*='
 "/="                    return '/='
 "%="                    return '%='
-"->"                    return '->' // success connector
-"~>"                    return '~>' // failure connector
+"->"                    return '->'
 "=>"                    return '=>' // capture connector
 ">>"                    return '>>' // stream connector
 "+"                     return '+'
@@ -105,6 +104,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "receive"               return 'RECEIVE'
 "if"                    return 'IF'
 "else"                  return 'ELSE'
+"catch"                 return 'CATCH'
 "while"                 return 'WHILE'
 "complete"              return 'COMPLETE'
 "in"                    return 'IN'
@@ -127,7 +127,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 %options token-stack
 
-%left '->' '~>' '=>'
+%left '->' '=>'
 %left 'SEQ' 'AND' 'OR' 'IN'
 %left '==' '!=' '<' '>' '<=' '>='
 %left '+' '-'
@@ -205,8 +205,8 @@ statement
     : RECEIVE (ID ',')* ID ';' -> {type: 'receive', names: $2.concat($3)}
     | expr ';' -> {type: 'expr_stmt', expr: $1}  // to support standalone invocations as well as connections
     | response ';'
-    | assignment ';'
-    | lvalue assignment_op application '~>' block
+    | assignment
+    | incdec ';'
     | connection
     | conditional
     | iteration
@@ -223,9 +223,8 @@ response
 
 // assignments are statements, not expressions!
 assignment
-    : lvalue '++' -> {type: 'assign', op: $2, left: $1}
-    | lvalue '--' -> {type: 'assign', op: $2, left: $1}
-    | lvalue assignment_op expr -> {type: 'assign', op: $2, left: $1, right: $3}
+    : lvalue assignment_op expr ';' -> {type: 'assign', op: $2, left: $1, right: $3}
+    | lvalue assignment_op application handler -> {type: 'recovery', op: $2, left: $1, application: $3, handler: $4}
     ;
 
 assignment_op
@@ -235,6 +234,11 @@ assignment_op
     | '*='
     | '/='
     | '%='
+    ;
+
+incdec
+    : lvalue '++' -> {type: 'assign', op: $2, left: $1}
+    | lvalue '--' -> {type: 'assign', op: $2, left: $1}
     ;
 
 conditional
@@ -278,10 +282,10 @@ dyad
     | expr ':' expr -> {type: 'dyad', key: $1, value: $3};
     ;
 
-// applications are expressions
+// applications ARE expressions
 
 application
-    : value '(' (expr ',')* expr? ')' -> {type: 'request', to: $1, args: $4 ? $3.concat([$4]) : []}
+    : value '(' (expr ',')* expr? ')' -> {type: 'application', to: $1, args: $4 ? $3.concat([$4]) : []}
     ;
 
 unary_expr
@@ -307,15 +311,26 @@ expr
     | expr OR expr -> {type: 'op', op: $2, left: $1, right: $3}
     | expr IN expr -> {type: 'in', left: $1, right: $3}
     | expr SEQ expr -> {type: 'sequence', first: $1, last: $3}
-    | application '~>' expr
     ;
 
-// connections are NOT expressions
+// requests are NOT expressions
+
+request
+    : expr '->' value
+    ;
+
+yields
+    : '=>' lvalue
+    ;
+
+handler
+    : CATCH ':' block
+    ;
 
 connection
-    : application '=>' lvalue ('~>' expr)? ';'
-    | application '=>' lvalue '~>' block
-    | expr '->' value ('~>' expr)? ';'
-    | expr '->' value '=>' lvalue ('~>' expr)? ';'
-    | expr '->' value '=>' lvalue '~>' block
+    : request ';'
+    | request handler
+    | request yields ';'
+    | request yields handler
+    | request ':' block handler?
     ;

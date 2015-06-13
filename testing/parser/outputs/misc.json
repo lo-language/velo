@@ -149,7 +149,7 @@
                                                 "head":{
                                                     "type":"expr_stmt",
                                                     "expr":{
-                                                        "type":"request",
+                                                        "type":"application",
                                                         "to":{
                                                             "type":"id",
                                                             "name":"doSomething"
@@ -179,11 +179,11 @@
                                                         "head":{
                                                             "type":"expr_stmt",
                                                             "expr":{
-                                                                "type":"request",
+                                                                "type":"application",
                                                                 "to":{
                                                                     "type":"subscript",
                                                                     "list":{
-                                                                        "type":"request",
+                                                                        "type":"application",
                                                                         "to":{
                                                                             "type":"select",
                                                                             "set":{
@@ -259,9 +259,9 @@
                                                                     "name":"block"
                                                                 },
                                                                 "right":{
-                                                                    "type":"request",
+                                                                    "type":"application",
                                                                     "to":{
-                                                                        "type":"request",
+                                                                        "type":"application",
                                                                         "to":{
                                                                             "type":"id",
                                                                             "name":"connect"
@@ -293,8 +293,21 @@
                                                                 "tail":{
                                                                     "type":"stmt_list",
                                                                     "head":{
-                                                                        "type":"id",
-                                                                        "name":"result"
+                                                                        "type":"recovery",
+                                                                        "op":"=",
+                                                                        "left":{
+                                                                            "type":"id",
+                                                                            "name":"result"
+                                                                        },
+                                                                        "application":{
+                                                                            "type":"application",
+                                                                            "to":{
+                                                                                "type":"id",
+                                                                                "name":"foo"
+                                                                            },
+                                                                            "args":[]
+                                                                        },
+                                                                        "handler":"catch"
                                                                     },
                                                                     "tail":{
                                                                         "type":"stmt_list",

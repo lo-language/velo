@@ -3,7 +3,7 @@
     "head":{
         "type":"expr_stmt",
         "expr":{
-            "type":"request",
+            "type":"application",
             "to":{
                 "type":"id",
                 "name":"foo"
@@ -16,7 +16,7 @@
         "head":{
             "type":"expr_stmt",
             "expr":{
-                "type":"request",
+                "type":"application",
                 "to":{
                     "type":"select",
                     "set":{
@@ -38,7 +38,7 @@
                     "name":"x"
                 },
                 "right":{
-                    "type":"request",
+                    "type":"application",
                     "to":{
                         "type":"id",
                         "name":"foo"
@@ -49,146 +49,107 @@
             "tail":{
                 "type":"stmt_list",
                 "head":{
-                    "type":"assign",
-                    "op":"=",
-                    "left":{
-                        "type":"id",
-                        "name":"x"
-                    },
-                    "right":{
-                        "type":"request",
-                        "to":{
-                            "type":"id",
-                            "name":"foo"
-                        },
-                        "args":[]
-                    }
+                    "type":"id",
+                    "name":"nil"
                 },
                 "tail":{
                     "type":"stmt_list",
                     "head":{
-                        "type":"id",
-                        "name":"x"
+                        "type":"number",
+                        "val":"48"
                     },
                     "tail":{
                         "type":"stmt_list",
                         "head":{
-                            "type":"request",
-                            "to":{
-                                "type":"id",
-                                "name":"foo"
-                            },
-                            "args":[]
+                            "type":"number",
+                            "val":"128"
                         },
                         "tail":{
                             "type":"stmt_list",
                             "head":{
-                                "type":"request",
-                                "to":{
-                                    "type":"id",
-                                    "name":"foo"
-                                },
-                                "args":[]
+                                "type":"number",
+                                "val":"42"
                             },
                             "tail":{
                                 "type":"stmt_list",
                                 "head":{
-                                    "type":"request",
-                                    "to":{
-                                        "type":"id",
-                                        "name":"foo"
-                                    },
-                                    "args":[]
+                                    "type":"id",
+                                    "name":"foo"
                                 },
                                 "tail":{
                                     "type":"stmt_list",
                                     "head":{
-                                        "type":"id",
-                                        "name":"foo"
+                                        "type":"number",
+                                        "val":"42"
                                     },
                                     "tail":{
                                         "type":"stmt_list",
                                         "head":{
-                                            "type":"id",
-                                            "name":"foo"
+                                            "type":"expr_stmt",
+                                            "expr":{
+                                                "type":"application",
+                                                "to":{
+                                                    "type":"id",
+                                                    "name":"foo"
+                                                },
+                                                "args":[
+                                                    {
+                                                        "type":"application",
+                                                        "to":{
+                                                            "type":"id",
+                                                            "name":"bar"
+                                                        },
+                                                        "args":[]
+                                                    }
+                                                ]
+                                            }
                                         },
                                         "tail":{
                                             "type":"stmt_list",
                                             "head":{
-                                                "type":"id",
-                                                "name":"foo"
+                                                "type":"assign",
+                                                "op":"=",
+                                                "left":{
+                                                    "type":"id",
+                                                    "name":"x"
+                                                },
+                                                "right":{
+                                                    "type":"op",
+                                                    "op":"+",
+                                                    "left":{
+                                                        "type":"application",
+                                                        "to":{
+                                                            "type":"id",
+                                                            "name":"foo"
+                                                        },
+                                                        "args":[]
+                                                    },
+                                                    "right":{
+                                                        "type":"number",
+                                                        "val":"7"
+                                                    }
+                                                }
                                             },
                                             "tail":{
                                                 "type":"stmt_list",
                                                 "head":{
-                                                    "type":"id",
-                                                    "name":"foo"
-                                                },
-                                                "tail":{
-                                                    "type":"stmt_list",
-                                                    "head":{
+                                                    "type":"recovery",
+                                                    "op":"=",
+                                                    "left":{
                                                         "type":"id",
-                                                        "name":"foo"
+                                                        "name":"x"
                                                     },
-                                                    "tail":{
-                                                        "type":"stmt_list",
-                                                        "head":{
-                                                            "type":"expr_stmt",
-                                                            "expr":{
-                                                                "type":"request",
-                                                                "to":{
-                                                                    "type":"id",
-                                                                    "name":"foo"
-                                                                },
-                                                                "args":[
-                                                                    {
-                                                                        "type":"request",
-                                                                        "to":{
-                                                                            "type":"id",
-                                                                            "name":"bar"
-                                                                        },
-                                                                        "args":[]
-                                                                    }
-                                                                ]
-                                                            }
+                                                    "application":{
+                                                        "type":"application",
+                                                        "to":{
+                                                            "type":"id",
+                                                            "name":"foo"
                                                         },
-                                                        "tail":{
-                                                            "type":"stmt_list",
-                                                            "head":{
-                                                                "type":"assign",
-                                                                "op":"=",
-                                                                "left":{
-                                                                    "type":"id",
-                                                                    "name":"x"
-                                                                },
-                                                                "right":{
-                                                                    "type":"op",
-                                                                    "op":"+",
-                                                                    "left":{
-                                                                        "type":"request",
-                                                                        "to":{
-                                                                            "type":"id",
-                                                                            "name":"foo"
-                                                                        },
-                                                                        "args":[]
-                                                                    },
-                                                                    "right":{
-                                                                        "type":"number",
-                                                                        "val":"7"
-                                                                    }
-                                                                }
-                                                            },
-                                                            "tail":{
-                                                                "type":"stmt_list",
-                                                                "head":{
-                                                                    "type":"id",
-                                                                    "name":"x"
-                                                                },
-                                                                "tail":null
-                                                            }
-                                                        }
-                                                    }
-                                                }
+                                                        "args":[]
+                                                    },
+                                                    "handler":"catch"
+                                                },
+                                                "tail":null
                                             }
                                         }
                                     }

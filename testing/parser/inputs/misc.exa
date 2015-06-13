@@ -26,7 +26,7 @@ block = connect('Block')();
 
 monkeys = 72;
 
-result = foo() ~>
+result = foo() catch:
     receive err;
     log(err);
     reply fixed;
