@@ -90,7 +90,7 @@ __.prototype.load = function () {
         // then we're not depending on the caller to call us properly
         // we drop in Q so that it doesn't have to live in global space
         // todo - should we use this instead of an arg for Q?
-
+console.log(body);
         this.procedure = new Function('Q, recur_not_used, args, connect', body).bind(null, Q);
     }
 

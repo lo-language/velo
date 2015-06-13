@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 by Seth Purcell
+ * Copyright (C) 2014-2015 by Seth Purcell
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation files (the "Software"), to deal in the Software
@@ -18,7 +18,6 @@
  * DEALINGS IN THE SOFTWARE.
  *
  * Author: Seth Purcell
- * ${DATE}
  */
 
 /**
@@ -59,7 +58,7 @@ __.compile = function (node, scope) {
         throw new Error("don't know how to compile node type '" + node.type + "'");
     }
 
-    // dispatch to the appropriate handler
+    // dispatch to the appropriate AST node handler
     return __[node.type](node, scope || new Scope());
 };
 
@@ -83,13 +82,6 @@ __['procedure'] = function (node, scope) {
         localScope = scope.bud();
     }
 
-    // define the envelope args - might not want to do this statically, btw
-    // since we might not get them with each request
-
-//    localScope.defineArg('recur');
-//    localScope.defineArg('__out');
-//    localScope.defineArg('__err');
-
     // compile the statement(s) in the context of the local scope
     var body = __.compile(node.body, localScope);
 
@@ -105,7 +97,8 @@ __['procedure'] = function (node, scope) {
         body = ['var ' + varNames.join(', ') + ';\n\n', body];
     }
 
-    return new JsConstruct(['function ($recur, args, $connect) ', {block: body}], false);
+    return new JsConstruct([
+        'function ($recur, args, $connect) ', {block: body}], false);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,12 +165,8 @@ __['expr_stmt'] = function (node, scope) {
  */
 __['response'] = function (node, scope) {
 
-    // should this node type be renamed response?
-
-    var self = this;
-
     var args = node.args.map(function (arg) {
-        return self.compile(arg, scope);
+        return __.compile(arg, scope);
     });
 
     if (args.length > 1) {
