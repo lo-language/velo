@@ -56,7 +56,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
                         %}
 \s+                     /* ignore all other whitespace */
 "`"                     return '`'
-"blank"                 return 'BLANK' // null, void, empty, blank, nil?
+"nil"                   return 'NIL' // null, void, empty, blank, nil?
 "true"|"false"          return 'BOOLEAN'
 {number}                return 'NUMBER'
 \"[^\"]*\"              yytext = yytext.substr(1, yyleng-2); return 'STRING';
@@ -88,7 +88,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "/="                    return '/='
 "%="                    return '%='
 "->"                    return '->'
-"=>"                    return '=>' // capture connector
+"=>"                    return '=>' // result connector
 ">>"                    return '>>' // stream connector
 "+"                     return '+'
 "-"                     return '-'
@@ -203,11 +203,11 @@ statement_list
 
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: 'receive', names: $2.concat($3)}
-    | expr ';' -> {type: 'expr_stmt', expr: $1}  // to support standalone invocations as well as connections
+    | application catcher? ';' -> {type: 'application_stmt', application: $1, catcher: $2}
     | response ';'
     | assignment
     | incdec ';'
-    | connection
+    | interaction
     | conditional
     | iteration
     | ID 'IS' ':' block -> {type: 'assign', op: '=', left: {type: 'id', name: $1}, right: {type: 'procedure', body: $4}}
@@ -224,7 +224,7 @@ response
 // assignments are statements, not expressions!
 assignment
     : lvalue assignment_op expr ';' -> {type: 'assign', op: $2, left: $1, right: $3}
-    | lvalue assignment_op application handler -> {type: 'recovery', op: $2, left: $1, application: $3, handler: $4}
+    | lvalue assignment_op application catcher -> {type: 'recovery', op: $2, left: $1, application: $3, catcher: $4}
     ;
 
 assignment_op
@@ -268,7 +268,8 @@ lvalue
     ;
 
 literal
-    : '<' ID '>' -> {type: 'symbol', name: $2}
+    : NIL
+    | '<' ID '>' -> {type: 'symbol', name: $2}
     | BOOLEAN -> {type: 'boolean', val: $1 == 'true'}
     | NUMBER -> {type: 'number', val: $1}
     | STRING -> {type: 'string', val: $1}
@@ -285,7 +286,7 @@ dyad
 // applications ARE expressions
 
 application
-    : value '(' (expr ',')* expr? ')' -> {type: 'application', to: $1, args: $4 ? $3.concat([$4]) : []}
+    : value '(' (expr ',')* expr? ')' -> {type: 'application', procedure: $1, args: $4 ? $3.concat([$4]) : []}
     ;
 
 unary_expr
@@ -313,24 +314,24 @@ expr
     | expr SEQ expr -> {type: 'sequence', first: $1, last: $3}
     ;
 
-// requests are NOT expressions
+// messages are NOT expressions
 
-request
-    : expr '->' value
+message
+    : expr '->' value -> {type: 'message', body: $1, to: $3}
     ;
 
-yields
-    : '=>' lvalue
+result
+    : '=>' lvalue -> $2
     ;
 
-handler
-    : CATCH ':' block
+catcher
+    : CATCH ':' block -> $3
     ;
 
-connection
-    : request ';'
-    | request handler
-    | request yields ';'
-    | request yields handler
-    | request ':' block handler?
+interaction
+    : message ';'
+    | message catcher -> {type: 'message', body: $1.body, to: $1.to, catcher: $2}
+    | message result ';' -> {type: 'message', body: $1.body, to: $1.to, result: $2}
+    | message result catcher -> {type: 'message', body: $1.body, to: $1.to, result: $2, catcher: $3}
+    | message ':' block catcher? -> {type: 'message', body: $1.body, to: $1.to, handler: $3, catcher: $4}
     ;

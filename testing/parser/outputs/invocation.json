@@ -1,10 +1,10 @@
 {"type":"procedure", "body":{
     "type":"stmt_list",
     "head":{
-        "type":"expr_stmt",
-        "expr":{
+        "type":"application_stmt",
+        "application":{
             "type":"application",
-            "to":{
+            "procedure":{
                 "type":"id",
                 "name":"foo"
             },
@@ -14,10 +14,10 @@
     "tail":{
         "type":"stmt_list",
         "head":{
-            "type":"expr_stmt",
-            "expr":{
+            "type":"application_stmt",
+            "application":{
                 "type":"application",
-                "to":{
+                "procedure":{
                     "type":"select",
                     "set":{
                         "type":"id",
@@ -39,7 +39,7 @@
                 },
                 "right":{
                     "type":"application",
-                    "to":{
+                    "procedure":{
                         "type":"id",
                         "name":"foo"
                     },
@@ -49,53 +49,253 @@
             "tail":{
                 "type":"stmt_list",
                 "head":{
-                    "type":"id",
-                    "name":"nil"
+                    "type":"message",
+                    "body":"nil",
+                    "to":{
+                        "type":"id",
+                        "name":"foo"
+                    },
+                    "result":{
+                        "type":"id",
+                        "name":"x"
+                    }
                 },
                 "tail":{
                     "type":"stmt_list",
                     "head":{
-                        "type":"number",
-                        "val":"48"
+                        "type":"message",
+                        "body":{
+                            "type":"number",
+                            "val":"48"
+                        },
+                        "to":{
+                            "type":"id",
+                            "name":"bar"
+                        },
+                        "handler":{
+                            "type":"stmt_list",
+                            "head":{
+                                "type":"response",
+                                "channel":"reply",
+                                "args":[
+                                    {
+                                        "type":"string",
+                                        "val":"hello"
+                                    }
+                                ]
+                            },
+                            "tail":null
+                        }
                     },
                     "tail":{
                         "type":"stmt_list",
                         "head":{
-                            "type":"number",
-                            "val":"128"
+                            "type":"message",
+                            "body":{
+                                "type":"number",
+                                "val":"128"
+                            },
+                            "to":{
+                                "type":"id",
+                                "name":"baz"
+                            },
+                            "catcher":{
+                                "type":"stmt_list",
+                                "head":{
+                                    "type":"response",
+                                    "channel":"reply",
+                                    "args":[
+                                        {
+                                            "type":"string",
+                                            "val":"bummer"
+                                        }
+                                    ]
+                                },
+                                "tail":null
+                            }
                         },
                         "tail":{
                             "type":"stmt_list",
                             "head":{
-                                "type":"number",
-                                "val":"42"
+                                "type":"message",
+                                "body":{
+                                    "type":"number",
+                                    "val":"42"
+                                },
+                                "to":{
+                                    "type":"id",
+                                    "name":"foo"
+                                },
+                                "handler":{
+                                    "type":"stmt_list",
+                                    "head":{
+                                        "type":"response",
+                                        "channel":"reply",
+                                        "args":[
+                                            {
+                                                "type":"string",
+                                                "val":"yay"
+                                            }
+                                        ]
+                                    },
+                                    "tail":null
+                                },
+                                "catcher":{
+                                    "type":"stmt_list",
+                                    "head":{
+                                        "type":"response",
+                                        "channel":"reply",
+                                        "args":[
+                                            {
+                                                "type":"string",
+                                                "val":"darn"
+                                            }
+                                        ]
+                                    },
+                                    "tail":null
+                                }
                             },
                             "tail":{
                                 "type":"stmt_list",
                                 "head":{
-                                    "type":"id",
-                                    "name":"foo"
+                                    "type":"message",
+                                    "body":{
+                                        "type":"id",
+                                        "name":"foo"
+                                    },
+                                    "to":{
+                                        "type":"id",
+                                        "name":"bar"
+                                    },
+                                    "result":{
+                                        "type":"id",
+                                        "name":"baz"
+                                    },
+                                    "catcher":{
+                                        "type":"stmt_list",
+                                        "head":{
+                                            "type":"receive",
+                                            "names":["error"]
+                                        },
+                                        "tail":{
+                                            "type":"stmt_list",
+                                            "head":{
+                                                "type":"response",
+                                                "channel":"fail",
+                                                "args":[
+                                                    {
+                                                        "type":"id",
+                                                        "name":"error"
+                                                    }
+                                                ]
+                                            },
+                                            "tail":null
+                                        }
+                                    }
                                 },
                                 "tail":{
                                     "type":"stmt_list",
                                     "head":{
-                                        "type":"number",
-                                        "val":"42"
+                                        "type":"message",
+                                        "body":{
+                                            "type":"number",
+                                            "val":"42"
+                                        },
+                                        "to":{
+                                            "type":"id",
+                                            "name":"foo"
+                                        },
+                                        "handler":{
+                                            "type":"stmt_list",
+                                            "head":{
+                                                "type":"receive",
+                                                "names":["result"]
+                                            },
+                                            "tail":{
+                                                "type":"stmt_list",
+                                                "head":{
+                                                    "type":"message",
+                                                    "body":{
+                                                        "type":"id",
+                                                        "name":"result"
+                                                    },
+                                                    "to":{
+                                                        "type":"id",
+                                                        "name":"bar"
+                                                    },
+                                                    "handler":{
+                                                        "type":"stmt_list",
+                                                        "head":{
+                                                            "type":"receive",
+                                                            "names":["result"]
+                                                        },
+                                                        "tail":{
+                                                            "type":"stmt_list",
+                                                            "head":{
+                                                                "type":"message",
+                                                                "body":{
+                                                                    "type":"id",
+                                                                    "name":"result"
+                                                                },
+                                                                "to":{
+                                                                    "type":"id",
+                                                                    "name":"baz"
+                                                                },
+                                                                "result":{
+                                                                    "type":"id",
+                                                                    "name":"yarp"
+                                                                }
+                                                            },
+                                                            "tail":null
+                                                        }
+                                                    },
+                                                    "catcher":{
+                                                        "type":"stmt_list",
+                                                        "head":{
+                                                            "type":"response",
+                                                            "channel":"fail",
+                                                            "args":[
+                                                                {
+                                                                    "type":"string",
+                                                                    "val":"narp"
+                                                                }
+                                                            ]
+                                                        },
+                                                        "tail":null
+                                                    }
+                                                },
+                                                "tail":null
+                                            }
+                                        },
+                                        "catcher":{
+                                            "type":"stmt_list",
+                                            "head":{
+                                                "type":"response",
+                                                "channel":"reply",
+                                                "args":[
+                                                    {
+                                                        "type":"string",
+                                                        "val":"darn"
+                                                    }
+                                                ]
+                                            },
+                                            "tail":null
+                                        }
                                     },
                                     "tail":{
                                         "type":"stmt_list",
                                         "head":{
-                                            "type":"expr_stmt",
-                                            "expr":{
+                                            "type":"application_stmt",
+                                            "application":{
                                                 "type":"application",
-                                                "to":{
+                                                "procedure":{
                                                     "type":"id",
                                                     "name":"foo"
                                                 },
                                                 "args":[
                                                     {
                                                         "type":"application",
-                                                        "to":{
+                                                        "procedure":{
                                                             "type":"id",
                                                             "name":"bar"
                                                         },
@@ -118,7 +318,7 @@
                                                     "op":"+",
                                                     "left":{
                                                         "type":"application",
-                                                        "to":{
+                                                        "procedure":{
                                                             "type":"id",
                                                             "name":"foo"
                                                         },
@@ -141,13 +341,33 @@
                                                     },
                                                     "application":{
                                                         "type":"application",
-                                                        "to":{
+                                                        "procedure":{
                                                             "type":"id",
                                                             "name":"foo"
                                                         },
                                                         "args":[]
                                                     },
-                                                    "handler":"catch"
+                                                    "catcher":{
+                                                        "type":"stmt_list",
+                                                        "head":{
+                                                            "type":"receive",
+                                                            "names":["error"]
+                                                        },
+                                                        "tail":{
+                                                            "type":"stmt_list",
+                                                            "head":{
+                                                                "type":"response",
+                                                                "channel":"reply",
+                                                                "args":[
+                                                                    {
+                                                                        "type":"string",
+                                                                        "val":"ok"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "tail":null
+                                                        }
+                                                    }
                                                 },
                                                 "tail":null
                                             }

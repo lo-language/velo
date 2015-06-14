@@ -147,10 +147,10 @@
                                             "tail":{
                                                 "type":"stmt_list",
                                                 "head":{
-                                                    "type":"expr_stmt",
-                                                    "expr":{
+                                                    "type":"application_stmt",
+                                                    "application":{
                                                         "type":"application",
-                                                        "to":{
+                                                        "procedure":{
                                                             "type":"id",
                                                             "name":"doSomething"
                                                         },
@@ -177,14 +177,14 @@
                                                     "tail":{
                                                         "type":"stmt_list",
                                                         "head":{
-                                                            "type":"expr_stmt",
-                                                            "expr":{
+                                                            "type":"application_stmt",
+                                                            "application":{
                                                                 "type":"application",
-                                                                "to":{
+                                                                "procedure":{
                                                                     "type":"subscript",
                                                                     "list":{
                                                                         "type":"application",
-                                                                        "to":{
+                                                                        "procedure":{
                                                                             "type":"select",
                                                                             "set":{
                                                                                 "type":"subscript",
@@ -260,9 +260,9 @@
                                                                 },
                                                                 "right":{
                                                                     "type":"application",
-                                                                    "to":{
+                                                                    "procedure":{
                                                                         "type":"application",
-                                                                        "to":{
+                                                                        "procedure":{
                                                                             "type":"id",
                                                                             "name":"connect"
                                                                         },
@@ -301,13 +301,52 @@
                                                                         },
                                                                         "application":{
                                                                             "type":"application",
-                                                                            "to":{
+                                                                            "procedure":{
                                                                                 "type":"id",
                                                                                 "name":"foo"
                                                                             },
                                                                             "args":[]
                                                                         },
-                                                                        "handler":"catch"
+                                                                        "catcher":{
+                                                                            "type":"stmt_list",
+                                                                            "head":{
+                                                                                "type":"receive",
+                                                                                "names":["err"]
+                                                                            },
+                                                                            "tail":{
+                                                                                "type":"stmt_list",
+                                                                                "head":{
+                                                                                    "type":"application_stmt",
+                                                                                    "application":{
+                                                                                        "type":"application",
+                                                                                        "procedure":{
+                                                                                            "type":"id",
+                                                                                            "name":"log"
+                                                                                        },
+                                                                                        "args":[
+                                                                                            {
+                                                                                                "type":"id",
+                                                                                                "name":"err"
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                },
+                                                                                "tail":{
+                                                                                    "type":"stmt_list",
+                                                                                    "head":{
+                                                                                        "type":"response",
+                                                                                        "channel":"reply",
+                                                                                        "args":[
+                                                                                            {
+                                                                                                "type":"id",
+                                                                                                "name":"fixed"
+                                                                                            }
+                                                                                        ]
+                                                                                    },
+                                                                                    "tail":null
+                                                                                }
+                                                                            }
+                                                                        }
                                                                     },
                                                                     "tail":{
                                                                         "type":"stmt_list",
