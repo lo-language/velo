@@ -60,7 +60,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "true"|"false"          return 'BOOLEAN'
 {number}                return 'NUMBER'
 \"[^\"]*\"              yytext = yytext.substr(1, yyleng-2); return 'STRING';
-\'[^\']*\'              yytext = yytext.substr(1, yyleng-2); return 'STRING';
+//\'[^\']*\'              yytext = yytext.substr(1, yyleng-2); return 'STRING';
 "["                     return '['
 "]"                     return ']'
 "("                     return '('

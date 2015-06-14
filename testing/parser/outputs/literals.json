@@ -1,29 +1,17 @@
-{"type":"procedure", "body":{
-    "type":"stmt_list",
-    "head":{
-        "type":"assign",
-        "op":"=",
-        "left":{
-            "type":"id",
-            "name":"x"
-        },
-        "right":{
-            "type":"boolean",
-            "val":true
-        }
-    },
-    "tail":{
+{
+    "type":"procedure",
+    "body":{
         "type":"stmt_list",
         "head":{
             "type":"assign",
             "op":"=",
             "left":{
                 "type":"id",
-                "name":"y"
+                "name":"x"
             },
             "right":{
                 "type":"boolean",
-                "val":false
+                "val":true
             }
         },
         "tail":{
@@ -33,11 +21,11 @@
                 "op":"=",
                 "left":{
                     "type":"id",
-                    "name":"answer"
+                    "name":"y"
                 },
                 "right":{
-                    "type":"number",
-                    "val":"42"
+                    "type":"boolean",
+                    "val":false
                 }
             },
             "tail":{
@@ -47,11 +35,11 @@
                     "op":"=",
                     "left":{
                         "type":"id",
-                        "name":"age"
+                        "name":"answer"
                     },
                     "right":{
                         "type":"number",
-                        "val":"63.4"
+                        "val":"42"
                     }
                 },
                 "tail":{
@@ -61,11 +49,11 @@
                         "op":"=",
                         "left":{
                             "type":"id",
-                            "name":"message"
+                            "name":"age"
                         },
                         "right":{
-                            "type":"string",
-                            "val":"hello, world!"
+                            "type":"number",
+                            "val":"63.4"
                         }
                     },
                     "tail":{
@@ -75,11 +63,11 @@
                             "op":"=",
                             "left":{
                                 "type":"id",
-                                "name":"greeting"
+                                "name":"message"
                             },
                             "right":{
                                 "type":"string",
-                                "val":"howdy, pardner"
+                                "val":"hello, world!"
                             }
                         },
                         "tail":{
@@ -154,4 +142,4 @@
             }
         }
     }
-}}
+}

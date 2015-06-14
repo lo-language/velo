@@ -3,7 +3,6 @@ y = false;
 answer = 42;
 age = 63.4;
 message = "hello, world!";
-greeting = 'howdy, pardner';
 
 // procedure literal
 HardyRamanujan is:

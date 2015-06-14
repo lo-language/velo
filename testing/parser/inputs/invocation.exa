@@ -16,17 +16,17 @@ nil -> foo => x;
 
 // handle success only
 48 -> bar:
-    reply 'hello';
+    reply "hello";
 
 // handle failure only
 128 -> baz catch:
-    reply 'bummer';
+    reply "bummer";
 
 // handle both success and failure
 42 -> foo:
-    reply 'yay';
+    reply "yay";
 catch:
-    reply 'darn';
+    reply "darn";
 
 //nil -> foo => x ~> bar;
 
@@ -44,9 +44,9 @@ foo -> bar => baz catch:
         receive result;
         result -> baz => yarp;
     catch:
-        fail 'narp';
+        fail "narp";
 catch:
-    reply 'darn';
+    reply "darn";
 
 // sync form in expressions
 
@@ -58,4 +58,4 @@ x = foo() + 7;
 
 x = foo() catch:
     receive error;
-    reply 'ok';
+    reply "ok";
