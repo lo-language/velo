@@ -237,13 +237,11 @@ Compiler['response'] = function (node, scope) {
     });
 
     // might need to process.nextTick() these guys
-
-    // there's an intentional bug here
     if (node.channel === 'fail') {
-        return new JsStatement(['if (!responded) { responded = false; fail(', {csv: args}, '); }\nreturn;\n\n']);
+        return new JsStatement(['if (fail !== null) { var temp = fail; reply = fail = null; temp(', {csv: args}, '); }\nreturn;\n\n']);
     }
 
-    return new JsStatement(['if (!responded) { responded = false; reply(', {csv: args}, '); }\nreturn;\n\n']);
+    return new JsStatement(['if (reply !== null) { var temp = reply; reply = fail = null; temp(', {csv: args}, '); }\nreturn;\n\n']);
 };
 
 // patch out request
@@ -257,42 +255,38 @@ Compiler['request'] = function (node, scope) {
         return Compiler.compile(arg);
     });
 
+    var parts = [];
+
+    // if we're looking for a response of either type, we need to track it
+    if (node.handler || node.catcher) {
+        parts = ['tasks++;\n'];
+    }
+
+    var handler = '';
+    var catcher = '';
+
     // send message template
-    return new JsStatement(['pendingResponses++;\n', target, '(', {csv: [args, target,
-        'collectResponse.bind(null)', 'collectResponse.bind(null)']}, ');\n\n']);
+    return new JsStatement([target, '(', {csv: [args, target, handler, catcher]}, ');\n\n']);
 };
 
-var procHeader = "\n\
-\n\
-    var complete = false;       // false until procedure has done all its statements\n\
-    var responded = false;      // false until procedure has produced a response\n\
-    var pendingResponses = 0;   // count of responses we're waiting on\n\
-    var runningSubtasks = 0;\n\
-\n\
-    var checkStatus = function () {\n\
-\n\
-        if (!responded && complete && pendingResponses == 0) {\n\
-\n\
-            responded = true;\n\
-\n\
-            // default reply\n\
-            reply();\n\
+// template for a *request* handler
+
+var procHeader = "\
+\n\n\
+    var tasks = 1; // this handler counts as a task\
+\n\n\
+    var completeTask = function () {\
+\n\n\
+        tasks--;\
+\n\n\
+        if (tasks == 0 && reply !== null) {\
+\n\n\
+            // implicit reply\
+            var temp = reply;\
+            reply = fail = null; // self-destruct\
+            temp();\n\
         }\n\
-    };\n\
-\n\
-    var collectResponse = function (handler) {\n\
-\n\
-        pendingResponses--;\n\
-\n\
-        if (handler !== null) {\n\
-            handler(args);\n\
-        }\n\
-        else {\n\
-            // since we won't check on the completion of the handler\n\
-            checkStatus();\n\
-        }\n\
-    };\n\n\
-";
+    };\n\n";
 /*
     // an async message 42 -> foo => x becomes:
     // 42 -> foo ~>
@@ -322,6 +316,124 @@ var procHeader = "\n\
 */
 var procFooter = '\n\
     // implicit reply at the end of every procedure\n\
-    complete = true;\n\
-    checkStatus();\n';
+    completeTask();\n';
 
+
+// manages the bookkeeping
+// could also manage inheriting error handlers
+// we're reifying a call tree but only the local view of it
+
+
+var Task = function (onReply, onFail) {
+
+    this.subtasks = 0;
+
+    // wrap the success handler in a way that doesn't need to be called in a method context
+    this.reply = function (args) {
+
+        if (onReply !== null) {
+
+            var temp = onReply;
+
+            // self-destruct
+            onReply = onFail = null;
+
+            temp(args);
+        }
+    };
+
+    // wrap the failure handler in a way that doesn't need to be called in a method context
+    this.fail = function (args) {
+
+        if (this.fail !== null) {
+
+            var temp = this.fail;
+
+            // self-destruct
+            onReply = onFail = null;
+
+            temp(args);
+        }
+    };
+};
+
+/**
+ * Both request tasks and response tasks can have subtasks.
+ *
+ * But all subtasks are response tasks and vice versa.
+ *
+ * @return {*}
+ */
+Task.prototype.createSubtask = function () {
+
+    this.subtasks++;
+
+    var subtask = new Task();
+
+    subtask.parent = this;
+
+    return subtask;
+};
+
+Task.prototype.complete = function () {
+
+    // make sure there aren't any open subtasks
+    if (this.subtasks > 0) {
+        return;
+    }
+
+    if (this.parent) {
+        this.parent.completeSubtask();
+    }
+    else {
+        // the implicit reply
+        this.reply();
+    }
+};
+
+Task.prototype.completeSubtask = function () {
+
+    this.subtasks--;
+    this.complete();
+};
+
+
+var foo = function () {};
+var bar = function () {};
+
+
+var requestHandler = function (args, recur, onReply, onFail) {
+
+    // creates a new root task
+    var task = new Task(onReply, onFail);
+
+    // can now call task.reply() and task.fail()
+
+    // here's how we make a request
+
+    var subtask = task.createSubtask();
+    foo(args, foo, function (args) { // a response handler doesn't need an envelope
+
+        var task = this;
+
+        // make another request
+
+        var subtask = task.createSubtask();
+        bar(args, bar, function (args) {  // a response handler doesn't need an envelope
+
+            var task = this;
+
+            // eventually we'll get to a leaf task like this, and calling complete will actually complete the subtask in the parent
+            task.complete();
+
+        }.bind(subtask));
+
+        task.complete();
+
+    }.bind(subtask));
+
+    // another request at this level could just overwrite subtask - we're done with that value
+    // or we could do something where creating a subtask takes the handlers and binds them itself...
+
+    task.complete();
+};
