@@ -144,7 +144,7 @@ __['receive'] = function (node, scope) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__['expr_stmt'] = function (node, scope) {
+__['application_stmt'] = function (node, scope) {
 
     var req = __.compile(node.expr, scope);
 
@@ -289,7 +289,7 @@ __['conditional'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__['request'] = function (node, scope) {
+__['application'] = function (node, scope) {
 
     var target = __.compile(node.to);
 
