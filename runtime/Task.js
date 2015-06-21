@@ -44,7 +44,7 @@ var __ = function (onReply, onFail) {
 
 __.prototype.reply = function (args) {
 
-    if (this.onReply !== null) {
+    if (this.onReply !== null && typeof this.onReply !== "undefined") {
 
         // send the reply message
         process.nextTick(this.onReply.bind(null, args));
@@ -56,7 +56,7 @@ __.prototype.reply = function (args) {
 
 __.prototype.fail = function (args) {
 
-    if (this.onFail !== null) {
+    if (this.onFail !== null && typeof this.onFail !== "undefined") {
 
         // send the fail message
         process.nextTick(this.onFail.bind(null, args));
@@ -66,16 +66,16 @@ __.prototype.fail = function (args) {
     }
 };
 
-__.prototype.createSubtask = function () {
-
-    this.subtasks++;
-
-    var subtask = new __();
-
-    subtask.parent = this;
-
-    return subtask;
-};
+//__.prototype.createSubtask = function () {
+//
+//    this.subtasks++;
+//
+//    var subtask = new __();
+//
+//    subtask.parent = this;
+//
+//    return subtask;
+//};
 
 /**
  * Tries to close this task - which means close it unless there are open subtasks.
@@ -119,7 +119,17 @@ __.prototype.sendMessage = function (target, args, onReply, onFail) {
 
     // send the message
     // might want to nexttick this...
-    target(args, target, onReply ? onReply.bind(subtask) : undefined, onFail ? onFail.bind(subtask) : undefined);
+
+    process.nextTick(
+        function () {
+            target(args, target, onReply ? onReply.bind(subtask) : undefined, onFail ? onFail.bind(subtask) : undefined);
+        }
+    );
+
+    // we could actually just create a new root Task object here and pass that instead of onReply & onFail...
+    // and then the request handler wouldn't have to create that task as the first thing it does
+    // will also need to pass connect
+    // we could call target and bind the root Task to it, so it could use 'this' like a handler
 };
 
 module.exports = __;

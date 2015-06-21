@@ -112,10 +112,11 @@ module.exports = {
 
         test.expect(6);
 
-        var sequence = 0;
+        var collector = '';
 
         var task = new Task(function (args) {
-            test.equal(sequence, 3);
+            test.equal(args, undefined); // implicit reply sends no args
+            test.equal(collector, 'foobar');
             test.done();
         }, function (args) {
             test.fail();
@@ -124,23 +125,79 @@ module.exports = {
         // model the message receiver
         var requestHandler = function (args, recur, onReply, onFail) {
 
-            test.equal(args, 42);
-            test.equal(sequence, 0);
-            sequence++;
+            test.equal(args, 'foo');
+            test.equal(collector, '');
+            collector += args;
 
             var task = new Task(onReply, onFail);
 
-            task.reply('foo');
+            task.reply('bar');
 
             task.tryClose();
         };
 
         // send a message from this task
-        task.sendMessage(requestHandler, 42, function (args) {
+        task.sendMessage(requestHandler, 'foo', function (args) {
 
-            test.equal(args, 'foo');
-            test.equal(sequence, 1);
-            sequence++;
+            test.equal(args, 'bar');
+            test.equal(collector, 'foo');
+            collector += args;
+
+            // handlers need to close their subtasks
+            this.tryClose();
+        });
+
+        // shouldn't fire implicit reply until the message has been processed
+        task.tryClose();
+    },
+
+    "close waits for multiple subtasks": function (test) {
+
+        test.expect(7);
+
+        var task = new Task(function (args) {
+            test.equal(expected.length, 0);
+            test.done();
+        }, function (args) {
+            test.fail();
+        });
+
+        var expected = ['foo', 'bar', 'baz'];
+        var replies = ['boo', 'zar', 'maz'];
+
+        // model a message receiver
+        var transmogrify = function (args, recur, onReply, onFail) {
+
+            var task = new Task(onReply, onFail);
+
+            test.equal(args, expected.shift());
+            task.reply(replies.shift());
+
+            task.tryClose();
+        };
+
+        // send a message from this task
+        task.sendMessage(transmogrify, 'foo', function (args) {
+
+            test.equal(args, 'boo');
+
+            // handlers need to close their subtasks
+            this.tryClose();
+        });
+
+        // send a message from this task
+        task.sendMessage(transmogrify, 'bar', function (args) {
+
+            test.equal(args, 'zar');
+
+            // handlers need to close their subtasks
+            this.tryClose();
+        });
+
+        // send a message from this task
+        task.sendMessage(transmogrify, 'baz', function (args) {
+
+            test.equal(args, 'maz');
 
             // handlers need to close their subtasks
             this.tryClose();
@@ -148,88 +205,103 @@ module.exports = {
 
         // shouldn't fire implicit reply
         task.tryClose();
-
-        process.nextTick(function () {
-
-            test.equal(sequence, 2);
-            sequence++;
-        });
     },
 
-    "close waits for multiple subtasks": function (test) {
+    "close waits for nested subtasks": function (test) {
 
-        test.expect(1);
+//        test.expect(1);
 
-        var expecting = false;
+        var results = [];
 
         var task = new Task(function (args) {
-            test.ok(expecting);
+            test.deepEqual(results, [ 'call1',
+                'call2:pre',
+                'call2:post',
+                'call3:pre',
+                'call3:post',
+                'call4',
+                'call1:handler',
+                'call2:subcall',
+                'call2:handler',
+                'call3:subcall',
+                'call3:handler',
+                'call4:handler',
+                'call2:subcall:handler',
+                'call3:subcall:handler' ]);
             test.done();
         }, function (args) {
             test.fail();
         });
 
-        var subtask = task.createSubtask();
-        var subtask2 = task.createSubtask();
-        var subtask3 = task.createSubtask();
+        var passTheBuck = function (args, recur, onReply, onFail) {
 
-        // shouldn't fire implicit reply
-        task.tryClose();
+            var task = new Task(onReply, onFail);
 
-        process.nextTick(function () {
+            // send a submessage
 
-            // this shouldn't close it
-            subtask.tryClose();
-            subtask2.tryClose();
+            results.push(args + ':pre');
 
-            process.nextTick(function () {
+            // send a message from this task
+            task.sendMessage(buckStopsHere, args + ':subcall', function (args) {
 
-                // open a new subtask, why not?
-                var subtask4 = task.createSubtask();
+                results.push(args + ':handler');
 
-                // this shouldn't close it now
-                subtask3.tryClose();
-
-                process.nextTick(function () {
-
-                    expecting = true;
-
-                    // ok, this should close it now
-                    subtask4.tryClose();
-                });
+                // handlers need to close their subtasks
+                this.tryClose();
             });
+
+            results.push(args + ':post');
+
+            task.reply(args);
+
+            task.tryClose();
+        };
+
+        var buckStopsHere = function (args, recur, onReply, onFail) {
+
+            var task = new Task(onReply, onFail);
+
+            results.push(args);
+
+            task.reply(args);
+
+            task.tryClose();
+        };
+
+        // send a message from this task
+        task.sendMessage(buckStopsHere, 'call1', function (args) {
+
+            results.push(args + ':handler');
+
+            // handlers need to close their subtasks
+            this.tryClose();
         });
-    },
 
-    "close waits for multiple levels of subtasks": function (test) {
+        // send a message from this task
+        task.sendMessage(passTheBuck, 'call2', function (args) {
 
-        test.expect(1);
+            results.push(args + ':handler');
 
-        var expecting = false;
-
-        var task = new Task(function (args) {
-            test.ok(expecting);
-            test.done();
-        }, function (args) {
-            test.fail();
+            // handlers need to close their subtasks
+            this.tryClose();
         });
 
-        var subtask = task.createSubtask();
+        // send a message from this task
+        task.sendMessage(passTheBuck, 'call3', function (args) {
 
-        var subtask2 = subtask.createSubtask();
-        var subtask3 = subtask.createSubtask();
-        var subtask4 = subtask2.createSubtask();
+            results.push(args + ':handler');
 
-        subtask.tryClose();
-        subtask2.tryClose();
-        subtask3.tryClose();
+            // handlers need to close their subtasks
+            this.tryClose();
+        });
 
-        process.nextTick(function () {
+        // send a message from this task
+        task.sendMessage(buckStopsHere, 'call4', function (args) {
 
-            expecting = true;
+            results.push(args + ':handler');
 
-            // this should close them all up now
-            subtask4.tryClose();
+            // handlers need to close their subtasks
+            this.tryClose();
         });
     },
 

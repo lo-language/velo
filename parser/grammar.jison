@@ -328,6 +328,7 @@ catcher
     : CATCH ':' block -> $3
     ;
 
+// todo change this to dispatch?
 interaction
     : message ';'
     | message catcher -> {type: 'message', body: $1.body, to: $1.to, catcher: $2}
