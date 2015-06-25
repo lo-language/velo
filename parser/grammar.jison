@@ -88,7 +88,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "/="                    return '/='
 "%="                    return '%='
 "->"                    return '->'
-"=>"                    return '=>' // result connector
+"=>"                    return '=>' // future connector
 ">>"                    return '>>' // stream connector
 "+"                     return '+'
 "-"                     return '-'
@@ -111,8 +111,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "skip"                  return 'SKIP'
 "reply"                 return 'REPLY'
 "fail"                  return 'FAIL'
-"stop"                  return 'STOP'
-"try"                   return 'TRY'
+"replace"               return 'REPLACE'    // recovers from an error. recover? rebound?
 {id}                    return 'ID'
 .                       return 'INVALID'
 
@@ -203,15 +202,15 @@ statement_list
 
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: 'receive', names: $2.concat($3)}
-    | application catcher? ';' -> {type: 'application_stmt', application: $1, catcher: $2}
+    | application contingency? ';' -> {type: 'application_stmt', application: $1, contingency: $2}
     | response ';'
     | assignment
     | incdec ';'
-    | interaction
+    | dispatch
     | conditional
     | iteration
     | ID 'IS' ':' block -> {type: 'assign', op: '=', left: {type: 'id', name: $1}, right: {type: 'procedure', body: $4}}
-    | COMPLETE (expr ',')* expr ';' -> {type: 'complete', promises: $2.concat([$3])}
+    | COMPLETE (expr ',')* expr ';' -> {type: 'complete', futures: $2.concat([$3])}
     | SKIP ';' -> {type: 'skip'}
     | STOP ';' -> {type: 'stop'}
     ;
@@ -219,12 +218,13 @@ statement
 response
     : REPLY (expr ',')* expr? -> {type: 'response', channel: $1, args: $3 ? $2.concat([$3]) : []}
     | FAIL (expr ',')* expr? -> {type: 'response', channel: $1, args: $3 ? $2.concat([$3]) : []}
+    | REPLACE (expr ',')* expr? -> {type: 'response', channel: $1, args: $3 ? $2.concat([$3]) : []}
     ;
 
 // assignments are statements, not expressions!
 assignment
     : lvalue assignment_op expr ';' -> {type: 'assign', op: $2, left: $1, right: $3}
-    | lvalue assignment_op application catcher -> {type: 'recovery', op: $2, left: $1, application: $3, catcher: $4}
+    | lvalue assignment_op application contingency -> {type: 'recovery', op: $2, left: $1, application: $3, contingency: $4}
     ;
 
 assignment_op
@@ -320,19 +320,23 @@ message
     : expr '->' value -> {type: 'message', body: $1, to: $3}
     ;
 
-result
-    : '=>' lvalue -> $2
-    ;
-
-catcher
+contingency
     : CATCH ':' block -> $3
     ;
 
-// todo change this to dispatch?
-interaction
+// a future is like an IOU for a value - *any* lvalue can be a future
+// if the future is abandoned, any code referring to it will see it as *undefined*
+
+future
+    : '=>' lvalue -> $2
+    ;
+
+// a dispatch is almost like a switch statement
+
+dispatch
     : message ';'
-    | message catcher -> {type: 'message', body: $1.body, to: $1.to, catcher: $2}
-    | message result ';' -> {type: 'message', body: $1.body, to: $1.to, result: $2}
-    | message result catcher -> {type: 'message', body: $1.body, to: $1.to, result: $2, catcher: $3}
-    | message ':' block catcher? -> {type: 'message', body: $1.body, to: $1.to, handler: $3, catcher: $4}
+    | message contingency -> {type: 'message', body: $1.body, to: $1.to, contingency: $2}
+    | message future ';' -> {type: 'message', body: $1.body, to: $1.to, future: $2}
+    | message future contingency -> {type: 'message', body: $1.body, to: $1.to, future: $2, contingency: $3}
+    | message ':' block contingency? -> {type: 'message', body: $1.body, to: $1.to, subsequent: $3, contingency: $4}
     ;

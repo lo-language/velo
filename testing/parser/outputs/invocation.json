@@ -55,7 +55,7 @@
                         "type":"id",
                         "name":"foo"
                     },
-                    "result":{
+                    "future":{
                         "type":"id",
                         "name":"x"
                     }
@@ -72,7 +72,7 @@
                             "type":"id",
                             "name":"bar"
                         },
-                        "handler":{
+                        "subsequent":{
                             "type":"stmt_list",
                             "head":{
                                 "type":"response",
@@ -99,7 +99,7 @@
                                 "type":"id",
                                 "name":"baz"
                             },
-                            "catcher":{
+                            "contingency":{
                                 "type":"stmt_list",
                                 "head":{
                                     "type":"response",
@@ -126,7 +126,7 @@
                                     "type":"id",
                                     "name":"foo"
                                 },
-                                "handler":{
+                                "subsequent":{
                                     "type":"stmt_list",
                                     "head":{
                                         "type":"response",
@@ -140,7 +140,7 @@
                                     },
                                     "tail":null
                                 },
-                                "catcher":{
+                                "contingency":{
                                     "type":"stmt_list",
                                     "head":{
                                         "type":"response",
@@ -167,11 +167,11 @@
                                         "type":"id",
                                         "name":"bar"
                                     },
-                                    "result":{
+                                    "future":{
                                         "type":"id",
                                         "name":"baz"
                                     },
-                                    "catcher":{
+                                    "contingency":{
                                         "type":"stmt_list",
                                         "head":{
                                             "type":"receive",
@@ -205,7 +205,7 @@
                                             "type":"id",
                                             "name":"foo"
                                         },
-                                        "handler":{
+                                        "subsequent":{
                                             "type":"stmt_list",
                                             "head":{
                                                 "type":"receive",
@@ -223,7 +223,7 @@
                                                         "type":"id",
                                                         "name":"bar"
                                                     },
-                                                    "handler":{
+                                                    "subsequent":{
                                                         "type":"stmt_list",
                                                         "head":{
                                                             "type":"receive",
@@ -241,7 +241,7 @@
                                                                     "type":"id",
                                                                     "name":"baz"
                                                                 },
-                                                                "result":{
+                                                                "future":{
                                                                     "type":"id",
                                                                     "name":"yarp"
                                                                 }
@@ -249,7 +249,7 @@
                                                             "tail":null
                                                         }
                                                     },
-                                                    "catcher":{
+                                                    "contingency":{
                                                         "type":"stmt_list",
                                                         "head":{
                                                             "type":"response",
@@ -267,7 +267,7 @@
                                                 "tail":null
                                             }
                                         },
-                                        "catcher":{
+                                        "contingency":{
                                             "type":"stmt_list",
                                             "head":{
                                                 "type":"response",
@@ -347,7 +347,7 @@
                                                         },
                                                         "args":[]
                                                     },
-                                                    "catcher":{
+                                                    "contingency":{
                                                         "type":"stmt_list",
                                                         "head":{
                                                             "type":"receive",
@@ -357,7 +357,7 @@
                                                             "type":"stmt_list",
                                                             "head":{
                                                                 "type":"response",
-                                                                "channel":"reply",
+                                                                "channel":"replace",
                                                                 "args":[
                                                                     {
                                                                         "type":"string",

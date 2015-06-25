@@ -307,7 +307,7 @@
                                                                             },
                                                                             "args":[]
                                                                         },
-                                                                        "catcher":{
+                                                                        "contingency":{
                                                                             "type":"stmt_list",
                                                                             "head":{
                                                                                 "type":"receive",

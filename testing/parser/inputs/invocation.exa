@@ -58,4 +58,4 @@ x = foo() + 7;
 
 x = foo() catch:
     receive error;
-    reply "ok";
+    replace "ok";
