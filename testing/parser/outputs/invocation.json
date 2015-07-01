@@ -4,7 +4,7 @@
         "type":"application_stmt",
         "application":{
             "type":"application",
-            "procedure":{
+            "of":{
                 "type":"id",
                 "name":"foo"
             },
@@ -17,7 +17,7 @@
             "type":"application_stmt",
             "application":{
                 "type":"application",
-                "procedure":{
+                "of":{
                     "type":"select",
                     "set":{
                         "type":"id",
@@ -39,7 +39,7 @@
                 },
                 "right":{
                     "type":"application",
-                    "procedure":{
+                    "of":{
                         "type":"id",
                         "name":"foo"
                     },
@@ -49,57 +49,34 @@
             "tail":{
                 "type":"stmt_list",
                 "head":{
-                    "type":"message",
-                    "body":"nil",
-                    "to":{
-                        "type":"id",
-                        "name":"foo"
-                    },
-                    "future":{
-                        "type":"id",
-                        "name":"x"
+                    "type":"application_stmt",
+                    "application":{
+                        "type":"application",
+                        "of":{
+                            "type":"id",
+                            "name":"foo"
+                        },
+                        "args":[]
                     }
                 },
                 "tail":{
                     "type":"stmt_list",
-                    "head":{
-                        "type":"message",
-                        "body":{
-                            "type":"number",
-                            "val":"48"
-                        },
-                        "to":{
-                            "type":"id",
-                            "name":"bar"
-                        },
-                        "subsequent":{
-                            "type":"stmt_list",
-                            "head":{
-                                "type":"response",
-                                "channel":"reply",
-                                "args":[
-                                    {
-                                        "type":"string",
-                                        "val":"hello"
-                                    }
-                                ]
-                            },
-                            "tail":null
-                        }
-                    },
+                    "head":"=>",
                     "tail":{
                         "type":"stmt_list",
                         "head":{
                             "type":"message",
-                            "body":{
-                                "type":"number",
-                                "val":"128"
-                            },
+                            "body":[
+                                {
+                                    "type":"number",
+                                    "val":"48"
+                                }
+                            ],
                             "to":{
                                 "type":"id",
-                                "name":"baz"
+                                "name":"bar"
                             },
-                            "contingency":{
+                            "subsequent":{
                                 "type":"stmt_list",
                                 "head":{
                                     "type":"response",
@@ -107,7 +84,7 @@
                                     "args":[
                                         {
                                             "type":"string",
-                                            "val":"bummer"
+                                            "val":"hello"
                                         }
                                     ]
                                 },
@@ -118,27 +95,15 @@
                             "type":"stmt_list",
                             "head":{
                                 "type":"message",
-                                "body":{
-                                    "type":"number",
-                                    "val":"42"
-                                },
+                                "body":[
+                                    {
+                                        "type":"number",
+                                        "val":"128"
+                                    }
+                                ],
                                 "to":{
                                     "type":"id",
-                                    "name":"foo"
-                                },
-                                "subsequent":{
-                                    "type":"stmt_list",
-                                    "head":{
-                                        "type":"response",
-                                        "channel":"reply",
-                                        "args":[
-                                            {
-                                                "type":"string",
-                                                "val":"yay"
-                                            }
-                                        ]
-                                    },
-                                    "tail":null
+                                    "name":"baz"
                                 },
                                 "contingency":{
                                     "type":"stmt_list",
@@ -148,7 +113,7 @@
                                         "args":[
                                             {
                                                 "type":"string",
-                                                "val":"darn"
+                                                "val":"bummer"
                                             }
                                         ]
                                     },
@@ -159,217 +124,228 @@
                                 "type":"stmt_list",
                                 "head":{
                                     "type":"message",
-                                    "body":{
+                                    "body":[
+                                        {
+                                            "type":"number",
+                                            "val":"42"
+                                        }
+                                    ],
+                                    "to":{
                                         "type":"id",
                                         "name":"foo"
                                     },
-                                    "to":{
-                                        "type":"id",
-                                        "name":"bar"
-                                    },
-                                    "future":{
-                                        "type":"id",
-                                        "name":"baz"
+                                    "subsequent":{
+                                        "type":"stmt_list",
+                                        "head":{
+                                            "type":"response",
+                                            "channel":"reply",
+                                            "args":[
+                                                {
+                                                    "type":"string",
+                                                    "val":"yay"
+                                                }
+                                            ]
+                                        },
+                                        "tail":null
                                     },
                                     "contingency":{
                                         "type":"stmt_list",
                                         "head":{
-                                            "type":"receive",
-                                            "names":["error"]
+                                            "type":"response",
+                                            "channel":"reply",
+                                            "args":[
+                                                {
+                                                    "type":"string",
+                                                    "val":"darn"
+                                                }
+                                            ]
                                         },
-                                        "tail":{
-                                            "type":"stmt_list",
-                                            "head":{
-                                                "type":"response",
-                                                "channel":"fail",
-                                                "args":[
-                                                    {
-                                                        "type":"id",
-                                                        "name":"error"
-                                                    }
-                                                ]
-                                            },
-                                            "tail":null
-                                        }
+                                        "tail":null
                                     }
                                 },
                                 "tail":{
                                     "type":"stmt_list",
                                     "head":{
-                                        "type":"message",
-                                        "body":{
-                                            "type":"number",
-                                            "val":"42"
-                                        },
-                                        "to":{
+                                        "type":"application",
+                                        "of":{
                                             "type":"id",
-                                            "name":"foo"
+                                            "name":"bar"
                                         },
-                                        "subsequent":{
-                                            "type":"stmt_list",
-                                            "head":{
-                                                "type":"receive",
-                                                "names":["result"]
-                                            },
-                                            "tail":{
-                                                "type":"stmt_list",
-                                                "head":{
-                                                    "type":"message",
-                                                    "body":{
-                                                        "type":"id",
-                                                        "name":"result"
-                                                    },
-                                                    "to":{
-                                                        "type":"id",
-                                                        "name":"bar"
-                                                    },
-                                                    "subsequent":{
-                                                        "type":"stmt_list",
-                                                        "head":{
-                                                            "type":"receive",
-                                                            "names":["result"]
-                                                        },
-                                                        "tail":{
-                                                            "type":"stmt_list",
-                                                            "head":{
-                                                                "type":"message",
-                                                                "body":{
-                                                                    "type":"id",
-                                                                    "name":"result"
-                                                                },
-                                                                "to":{
-                                                                    "type":"id",
-                                                                    "name":"baz"
-                                                                },
-                                                                "future":{
-                                                                    "type":"id",
-                                                                    "name":"yarp"
-                                                                }
-                                                            },
-                                                            "tail":null
-                                                        }
-                                                    },
-                                                    "contingency":{
-                                                        "type":"stmt_list",
-                                                        "head":{
-                                                            "type":"response",
-                                                            "channel":"fail",
-                                                            "args":[
-                                                                {
-                                                                    "type":"string",
-                                                                    "val":"narp"
-                                                                }
-                                                            ]
-                                                        },
-                                                        "tail":null
-                                                    }
-                                                },
-                                                "tail":null
+                                        "args":[
+                                            {
+                                                "type":"id",
+                                                "name":"foo"
                                             }
-                                        },
-                                        "contingency":{
-                                            "type":"stmt_list",
-                                            "head":{
-                                                "type":"response",
-                                                "channel":"reply",
-                                                "args":[
-                                                    {
-                                                        "type":"string",
-                                                        "val":"darn"
-                                                    }
-                                                ]
-                                            },
-                                            "tail":null
-                                        }
+                                        ]
                                     },
                                     "tail":{
                                         "type":"stmt_list",
                                         "head":{
-                                            "type":"application_stmt",
-                                            "application":{
-                                                "type":"application",
-                                                "procedure":{
-                                                    "type":"id",
-                                                    "name":"foo"
+                                            "type":"message",
+                                            "body":[
+                                                {
+                                                    "type":"number",
+                                                    "val":"42"
+                                                }
+                                            ],
+                                            "to":{
+                                                "type":"id",
+                                                "name":"foo"
+                                            },
+                                            "subsequent":{
+                                                "type":"stmt_list",
+                                                "head":{
+                                                    "type":"receive",
+                                                    "names":["result"]
                                                 },
-                                                "args":[
-                                                    {
-                                                        "type":"application",
-                                                        "procedure":{
+                                                "tail":{
+                                                    "type":"stmt_list",
+                                                    "head":{
+                                                        "type":"message",
+                                                        "body":[
+                                                            {
+                                                                "type":"id",
+                                                                "name":"result"
+                                                            }
+                                                        ],
+                                                        "to":{
                                                             "type":"id",
                                                             "name":"bar"
                                                         },
-                                                        "args":[]
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        "tail":{
-                                            "type":"stmt_list",
-                                            "head":{
-                                                "type":"assign",
-                                                "op":"=",
-                                                "left":{
-                                                    "type":"id",
-                                                    "name":"x"
-                                                },
-                                                "right":{
-                                                    "type":"op",
-                                                    "op":"+",
-                                                    "left":{
-                                                        "type":"application",
-                                                        "procedure":{
-                                                            "type":"id",
-                                                            "name":"foo"
+                                                        "subsequent":{
+                                                            "type":"stmt_list",
+                                                            "head":{
+                                                                "type":"receive",
+                                                                "names":["result"]
+                                                            },
+                                                            "tail":{
+                                                                "type":"stmt_list",
+                                                                "head":"=>",
+                                                                "tail":null
+                                                            }
                                                         },
-                                                        "args":[]
-                                                    },
-                                                    "right":{
-                                                        "type":"number",
-                                                        "val":"7"
-                                                    }
-                                                }
-                                            },
-                                            "tail":{
-                                                "type":"stmt_list",
-                                                "head":{
-                                                    "type":"recovery",
-                                                    "op":"=",
-                                                    "left":{
-                                                        "type":"id",
-                                                        "name":"x"
-                                                    },
-                                                    "application":{
-                                                        "type":"application",
-                                                        "procedure":{
-                                                            "type":"id",
-                                                            "name":"foo"
-                                                        },
-                                                        "args":[]
-                                                    },
-                                                    "contingency":{
-                                                        "type":"stmt_list",
-                                                        "head":{
-                                                            "type":"receive",
-                                                            "names":["error"]
-                                                        },
-                                                        "tail":{
+                                                        "contingency":{
                                                             "type":"stmt_list",
                                                             "head":{
                                                                 "type":"response",
-                                                                "channel":"replace",
+                                                                "channel":"fail",
                                                                 "args":[
                                                                     {
                                                                         "type":"string",
-                                                                        "val":"ok"
+                                                                        "val":"narp"
                                                                     }
                                                                 ]
                                                             },
                                                             "tail":null
                                                         }
-                                                    }
+                                                    },
+                                                    "tail":null
+                                                }
+                                            },
+                                            "contingency":{
+                                                "type":"stmt_list",
+                                                "head":{
+                                                    "type":"response",
+                                                    "channel":"reply",
+                                                    "args":[
+                                                        {
+                                                            "type":"string",
+                                                            "val":"darn"
+                                                        }
+                                                    ]
                                                 },
                                                 "tail":null
+                                            }
+                                        },
+                                        "tail":{
+                                            "type":"stmt_list",
+                                            "head":{
+                                                "type":"application_stmt",
+                                                "application":{
+                                                    "type":"application",
+                                                    "of":{
+                                                        "type":"id",
+                                                        "name":"foo"
+                                                    },
+                                                    "args":[
+                                                        {
+                                                            "type":"application",
+                                                            "of":{
+                                                                "type":"id",
+                                                                "name":"bar"
+                                                            },
+                                                            "args":[]
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "tail":{
+                                                "type":"stmt_list",
+                                                "head":{
+                                                    "type":"assign",
+                                                    "op":"=",
+                                                    "left":{
+                                                        "type":"id",
+                                                        "name":"x"
+                                                    },
+                                                    "right":{
+                                                        "type":"op",
+                                                        "op":"+",
+                                                        "left":{
+                                                            "type":"application",
+                                                            "of":{
+                                                                "type":"id",
+                                                                "name":"foo"
+                                                            },
+                                                            "args":[]
+                                                        },
+                                                        "right":{
+                                                            "type":"number",
+                                                            "val":"7"
+                                                        }
+                                                    }
+                                                },
+                                                "tail":{
+                                                    "type":"stmt_list",
+                                                    "head":{
+                                                        "type":"recovery",
+                                                        "op":"=",
+                                                        "left":{
+                                                            "type":"id",
+                                                            "name":"x"
+                                                        },
+                                                        "application":{
+                                                            "type":"application",
+                                                            "of":{
+                                                                "type":"id",
+                                                                "name":"foo"
+                                                            },
+                                                            "args":[]
+                                                        },
+                                                        "contingency":{
+                                                            "type":"stmt_list",
+                                                            "head":{
+                                                                "type":"receive",
+                                                                "names":["error"]
+                                                            },
+                                                            "tail":{
+                                                                "type":"stmt_list",
+                                                                "head":{
+                                                                    "type":"response",
+                                                                    "channel":"replace",
+                                                                    "args":[
+                                                                        {
+                                                                            "type":"string",
+                                                                            "val":"ok"
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "tail":null
+                                                            }
+                                                        }
+                                                    },
+                                                    "tail":null
+                                                }
                                             }
                                         }
                                     }

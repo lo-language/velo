@@ -1,29 +1,26 @@
-// async by default
+// sync calls
 
-foo();           // where foo holds an action address
-foo.bar();       // where bar is an action address on record foo
-
-// sync form
+foo();
+foo.bar();
 
 x = foo();
 
-//x = foo() ~> bar;
-
 // concurrent form
+foo();
 
-// capture the result in a promise
-nil -> foo => x;
+// capture the result in a future
+foo() => x;
 
 // handle success only
-48 -> bar:
+after bar(48):
     reply "hello";
 
 // handle failure only
-128 -> baz catch:
+after baz(128) catch:
     reply "bummer";
 
 // handle both success and failure
-42 -> foo:
+after foo(42):
     reply "yay";
 catch:
     reply "darn";
@@ -31,18 +28,18 @@ catch:
 //nil -> foo => x ~> bar;
 
 // capture with failure handler
-foo -> bar => baz catch:
+bar(foo) => baz catch:
     receive error;
     fail error;
 
 // nested requests
 // should we support pipes like 42 -> foo -> bar -> baz?
-42 -> foo:
+after foo(42):
     receive result;
 
-    result -> bar:
+    after bar(result):
         receive result;
-        result -> baz => yarp;
+        baz(result) => yarp;
     catch:
         fail "narp";
 catch:

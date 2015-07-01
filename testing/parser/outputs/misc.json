@@ -57,7 +57,7 @@
                 "tail":{
                     "type":"stmt_list",
                     "head":{
-                        "type":"assign",
+                        "type":"increment",
                         "op":"++",
                         "left":{
                             "type":"id",
@@ -67,7 +67,7 @@
                     "tail":{
                         "type":"stmt_list",
                         "head":{
-                            "type":"assign",
+                            "type":"decrement",
                             "op":"--",
                             "left":{
                                 "type":"id",
@@ -150,7 +150,7 @@
                                                     "type":"application_stmt",
                                                     "application":{
                                                         "type":"application",
-                                                        "procedure":{
+                                                        "of":{
                                                             "type":"id",
                                                             "name":"doSomething"
                                                         },
@@ -180,11 +180,11 @@
                                                             "type":"application_stmt",
                                                             "application":{
                                                                 "type":"application",
-                                                                "procedure":{
+                                                                "of":{
                                                                     "type":"subscript",
                                                                     "list":{
                                                                         "type":"application",
-                                                                        "procedure":{
+                                                                        "of":{
                                                                             "type":"select",
                                                                             "set":{
                                                                                 "type":"subscript",
@@ -260,9 +260,9 @@
                                                                 },
                                                                 "right":{
                                                                     "type":"application",
-                                                                    "procedure":{
+                                                                    "of":{
                                                                         "type":"application",
-                                                                        "procedure":{
+                                                                        "of":{
                                                                             "type":"id",
                                                                             "name":"connect"
                                                                         },
@@ -301,7 +301,7 @@
                                                                         },
                                                                         "application":{
                                                                             "type":"application",
-                                                                            "procedure":{
+                                                                            "of":{
                                                                                 "type":"id",
                                                                                 "name":"foo"
                                                                             },
@@ -319,7 +319,7 @@
                                                                                     "type":"application_stmt",
                                                                                     "application":{
                                                                                         "type":"application",
-                                                                                        "procedure":{
+                                                                                        "of":{
                                                                                             "type":"id",
                                                                                             "name":"log"
                                                                                         },
@@ -395,7 +395,7 @@
                                                                                         "tail":{
                                                                                             "type":"stmt_list",
                                                                                             "head":{
-                                                                                                "type":"assign",
+                                                                                                "type":"increment",
                                                                                                 "op":"++",
                                                                                                 "left":{
                                                                                                     "type":"id",

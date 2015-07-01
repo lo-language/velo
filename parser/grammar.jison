@@ -56,7 +56,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
                         %}
 \s+                     /* ignore all other whitespace */
 "`"                     return '`'
-"nil"                   return 'NIL' // null, void, empty, blank, nil?
+"nil"                   return 'NIL' // none, null, void, empty, blank, nada, nothing, zip, nil, missing, undefined, undef? some symbol? () empty parens?
 "true"|"false"          return 'BOOLEAN'
 {number}                return 'NUMBER'
 \"[^\"]*\"              yytext = yytext.substr(1, yyleng-2); return 'STRING';
@@ -104,9 +104,9 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "receive"               return 'RECEIVE'
 "if"                    return 'IF'
 "else"                  return 'ELSE'
-"catch"                 return 'CATCH'
+"catch"                 return 'CATCH'      // failed?
 "while"                 return 'WHILE'
-"complete"              return 'COMPLETE'
+"after"                 return 'AFTER'      // when, on, release, send, dispatch, fire?
 "in"                    return 'IN'
 "skip"                  return 'SKIP'
 "reply"                 return 'REPLY'
@@ -200,13 +200,16 @@ statement_list
     | statement statement_list -> {type: 'stmt_list', head: $1, tail: $2}
     ;
 
+// I'm not convinced application expressions should be allowed to have contingencies attached
+
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: 'receive', names: $2.concat($3)}
     | application contingency? ';' -> {type: 'application_stmt', application: $1, contingency: $2}
     | response ';'
     | assignment
-    | incdec ';'
+    | step ';'
     | dispatch
+    | future
     | conditional
     | iteration
     | ID 'IS' ':' block -> {type: 'assign', op: '=', left: {type: 'id', name: $1}, right: {type: 'procedure', body: $4}}
@@ -236,9 +239,9 @@ assignment_op
     | '%='
     ;
 
-incdec
-    : lvalue '++' -> {type: 'assign', op: $2, left: $1}
-    | lvalue '--' -> {type: 'assign', op: $2, left: $1}
+step
+    : lvalue '++' -> {type: 'increment', op: $2, left: $1}
+    | lvalue '--' -> {type: 'decrement', op: $2, left: $1}
     ;
 
 conditional
@@ -268,7 +271,7 @@ lvalue
     ;
 
 literal
-    : NIL
+    : NIL -> {type: 'nil'}
     | '<' ID '>' -> {type: 'symbol', name: $2}
     | BOOLEAN -> {type: 'boolean', val: $1 == 'true'}
     | NUMBER -> {type: 'number', val: $1}
@@ -286,7 +289,7 @@ dyad
 // applications ARE expressions
 
 application
-    : value '(' (expr ',')* expr? ')' -> {type: 'application', procedure: $1, args: $4 ? $3.concat([$4]) : []}
+    : value '(' (expr ',')* expr? ')' -> {type: 'application', of: $1, args: $4 ? $3.concat([$4]) : []}
     ;
 
 unary_expr
@@ -314,29 +317,30 @@ expr
     | expr SEQ expr -> {type: 'sequence', first: $1, last: $3}
     ;
 
-// messages are NOT expressions
-
-message
-    : expr '->' value -> {type: 'message', body: $1, to: $3}
-    ;
-
-contingency
-    : CATCH ':' block -> $3
-    ;
-
 // a future is like an IOU for a value - *any* lvalue can be a future
 // if the future is abandoned, any code referring to it will see it as *undefined*
 
 future
-    : '=>' lvalue -> $2
+    : application '=>' lvalue ';' -> $2
+    | application '=>' lvalue contingency
     ;
 
 // a dispatch is almost like a switch statement
+// the subsequent/contingency blocks are not strictly procedures,
+// if we define procedures as having to receive requests, since sub/cont blocks receive responses
 
 dispatch
     : message ';'
     | message contingency -> {type: 'message', body: $1.body, to: $1.to, contingency: $2}
-    | message future ';' -> {type: 'message', body: $1.body, to: $1.to, future: $2}
-    | message future contingency -> {type: 'message', body: $1.body, to: $1.to, future: $2, contingency: $3}
     | message ':' block contingency? -> {type: 'message', body: $1.body, to: $1.to, subsequent: $3, contingency: $4}
+    ;
+
+// messages are NOT expressions
+
+message
+    : AFTER application -> {type: 'message', body: $2.args, to: $2.of}
+    ;
+
+contingency
+    : CATCH ':' block -> $3
     ;
