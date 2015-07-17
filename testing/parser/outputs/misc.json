@@ -149,7 +149,7 @@
                                                 "head":{
                                                     "type":"application_stmt",
                                                     "application":{
-                                                        "type":"application",
+                                                        "type":"message",
                                                         "of":{
                                                             "type":"id",
                                                             "name":"doSomething"
@@ -179,11 +179,11 @@
                                                         "head":{
                                                             "type":"application_stmt",
                                                             "application":{
-                                                                "type":"application",
+                                                                "type":"message",
                                                                 "of":{
                                                                     "type":"subscript",
                                                                     "list":{
-                                                                        "type":"application",
+                                                                        "type":"message",
                                                                         "of":{
                                                                             "type":"select",
                                                                             "set":{
@@ -259,9 +259,9 @@
                                                                     "name":"block"
                                                                 },
                                                                 "right":{
-                                                                    "type":"application",
+                                                                    "type":"message",
                                                                     "of":{
-                                                                        "type":"application",
+                                                                        "type":"message",
                                                                         "of":{
                                                                             "type":"id",
                                                                             "name":"connect"
@@ -300,7 +300,7 @@
                                                                             "name":"result"
                                                                         },
                                                                         "application":{
-                                                                            "type":"application",
+                                                                            "type":"message",
                                                                             "of":{
                                                                                 "type":"id",
                                                                                 "name":"foo"
@@ -318,7 +318,7 @@
                                                                                 "head":{
                                                                                     "type":"application_stmt",
                                                                                     "application":{
-                                                                                        "type":"application",
+                                                                                        "type":"message",
                                                                                         "of":{
                                                                                             "type":"id",
                                                                                             "name":"log"

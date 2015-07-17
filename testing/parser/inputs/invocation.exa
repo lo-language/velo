@@ -4,42 +4,52 @@ foo();
 foo.bar();
 
 x = foo();
+(x, y) = foo();
 
-// concurrent form
-foo();
+// todo
+// x, y = foo();
 
-// capture the result in a future
-foo() => x;
+// async calls
+
+foo;
+foo ~ 18;
+
+sessionStore.getByID ~ sessionID;
+
+foo => bar;
+foo ~ 47 => (bar, baz);  // destructuring
 
 // handle success only
-after bar(48):
+after bar ~ 48:
     reply "hello";
 
 // handle failure only
-after baz(128) catch:
+after baz ~ 128:
+    skip;
+catch:
     reply "bummer";
 
+// todo
+// after baz(12) mute;
+
 // handle both success and failure
-after foo(42):
+after foo ~ 42:
     reply "yay";
 catch:
     reply "darn";
 
 //nil -> foo => x ~> bar;
 
-// capture with failure handler
-bar(foo) => baz catch:
-    receive error;
-    fail error;
+// future with failure handler
+//bar(foo) => baz catch:
+//    fail;
 
 // nested requests
 // should we support pipes like 42 -> foo -> bar -> baz?
-after foo(42):
-    receive result;
+after foo ~ 42 => result:
 
-    after bar(result):
-        receive result;
-        baz(result) => yarp;
+    after bar ~ result => result:
+        baz ~ result => yarp;
     catch:
         fail "narp";
 catch:

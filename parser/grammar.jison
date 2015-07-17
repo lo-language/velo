@@ -71,6 +71,8 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "::"                    return '::'
 ":"                     return ':'
 ";"                     return ';'
+"~"                     return '~'
+"\\"                    return 'BS'
 ".."                    return 'SEQ'
 "."                     return '.'
 "<="                    return '<='
@@ -107,10 +109,12 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "catch"                 return 'CATCH'      // failed?
 "while"                 return 'WHILE'
 "after"                 return 'AFTER'      // when, on, release, send, dispatch, fire?
+"dispatch"              return 'DISPATCH'
 "in"                    return 'IN'
 "skip"                  return 'SKIP'
 "reply"                 return 'REPLY'
 "fail"                  return 'FAIL'
+"mute"                  return 'MUTE'
 "replace"               return 'REPLACE'    // recovers from an error. recover? rebound?
 {id}                    return 'ID'
 .                       return 'INVALID'
@@ -139,7 +143,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 grammar to-dos:
 
-chains need to be built out
+responses via callbacks as foo<arg1, arg2> to differentiate from requests which are foo(arg1, arg2)
 
 would like semicolons to be replaced with newlines
 would like commas in list & set literals to be optional
@@ -208,8 +212,8 @@ statement
     | response ';'
     | assignment
     | step ';'
+    | lvalue ';'    // this is an attempt to be able to send messages just by using the procvar
     | dispatch
-    | future
     | conditional
     | iteration
     | ID 'IS' ':' block -> {type: 'assign', op: '=', left: {type: 'id', name: $1}, right: {type: 'procedure', body: $4}}
@@ -225,6 +229,7 @@ response
     ;
 
 // assignments are statements, not expressions!
+// todo multiple lvalues separated by commas for destructuring
 assignment
     : lvalue assignment_op expr ';' -> {type: 'assign', op: $2, left: $1, right: $3}
     | lvalue assignment_op application contingency -> {type: 'recovery', op: $2, left: $1, application: $3, contingency: $4}
@@ -268,6 +273,7 @@ lvalue
     : ID -> {type: 'id', name: $1}
     | value '[' expr? ']' -> {type: 'subscript', list: $1, index: $3}
     | value '.' ID -> {type: 'select', set: $1, member: $3}
+    | '(' lvalue (',' lvalue)+ ')' -> {type: 'destructure', members: $3.concat([$2])}
     ;
 
 literal
@@ -289,7 +295,7 @@ dyad
 // applications ARE expressions
 
 application
-    : value '(' (expr ',')* expr? ')' -> {type: 'application', of: $1, args: $4 ? $3.concat([$4]) : []}
+    : value '(' (expr ',')* expr? ')' -> {type: 'message', of: $1, args: $4 ? $3.concat([$4]) : []}
     ;
 
 unary_expr
@@ -317,30 +323,33 @@ expr
     | expr SEQ expr -> {type: 'sequence', first: $1, last: $3}
     ;
 
-// a future is like an IOU for a value - *any* lvalue can be a future
-// if the future is abandoned, any code referring to it will see it as *undefined*
-
-future
-    : application '=>' lvalue ';' -> $2
-    | application '=>' lvalue contingency
-    ;
-
-// a dispatch is almost like a switch statement
+// a dispatch is like a switch statement
 // the subsequent/contingency blocks are not strictly procedures,
 // if we define procedures as having to receive requests, since sub/cont blocks receive responses
 
 dispatch
-    : message ';'
-    | message contingency -> {type: 'message', body: $1.body, to: $1.to, contingency: $2}
-    | message ':' block contingency? -> {type: 'message', body: $1.body, to: $1.to, subsequent: $3, contingency: $4}
+    : future ';'
+    | future contingency
+    | AFTER future ':' block contingency?
+//    | DISPATCH application contingency?   // for when we don't care about the return value at all
+    ;
+
+// a future is like an IOU for a value - *any* lvalue can be a future
+// if the future is abandoned, any code referring to it will see it as *undefined*
+
+future
+    : message
+    | message '=>' (lvalue ',')* lvalue -> $2
+    | value '=>'  (lvalue ',')* lvalue
     ;
 
 // messages are NOT expressions
 
 message
-    : AFTER application -> {type: 'message', body: $2.args, to: $2.of}
+    : value '~' (expr ',')* expr? -> {type: 'message', body: $2.args, to: $2.of}
     ;
 
+// todo: mute
 contingency
     : CATCH ':' block -> $3
     ;
