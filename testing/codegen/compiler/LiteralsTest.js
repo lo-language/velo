@@ -11,6 +11,14 @@ var util = require('util');
 
 module.exports["literals"] = {
 
+    "nil": function (test) {
+
+        var node = {type: 'nil'};
+
+        test.equal(Compiler.compile(node), 'null');
+        test.done();
+    },
+
     "boolean": function (test) {
 
         var node = {type: 'boolean', val: true};
