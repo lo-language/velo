@@ -18,7 +18,15 @@ module.exports["cardinality"] = {
             operand: {type: 'id', name: 'foo'}
         };
 
-        test.equal(Compiler.compile(node).render(), "function (val) {if (typeof val === 'string') return val.length;else if (Array.isArray(val)) return val.length;else if (typeof val === 'object') return Object.keys(val).length;}($foo)");
+        // todo throw runtime error if none match?
+        // todo can get rid of function call here with conditional operator
+
+        test.equal(Compiler.compile(node).render(),
+            "function (val) {" +
+                "if (typeof val === 'string') return val.length;" +
+                "else if (Array.isArray(val)) return val.length;" +
+                "else if (typeof val === 'object') return Object.keys(val).length;}($foo)");
+
         test.done();
     }
 };

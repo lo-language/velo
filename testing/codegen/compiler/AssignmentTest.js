@@ -11,7 +11,7 @@ var util = require('util');
 
 module.exports["assignment"] = {
 
-    "assign literal of id": function (test) {
+    "assign literal to id": function (test) {
 
         var node = {
             type: 'assign',
@@ -28,7 +28,7 @@ module.exports["assignment"] = {
         test.done();
     },
 
-    "assign literal of expression": function (test) {
+    "assign literal to lvalue expression": function (test) {
 
         var node = {
             type: 'assign',
@@ -46,7 +46,7 @@ module.exports["assignment"] = {
         test.done();
     },
 
-    "assign ready id of id": function (test) {
+    "assign id to id": function (test) {
 
         var node = {
             type: 'assign',
@@ -63,7 +63,7 @@ module.exports["assignment"] = {
         test.done();
     },
 
-    "assign request of id": function (test) {
+    "assign application to id": function (test) {
 
         var node = {
             type: 'assign',
