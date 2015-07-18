@@ -214,7 +214,8 @@ module.exports = {
         var results = [];
 
         var task = new Task(function (args) {
-            test.deepEqual(results, [ 'call1',
+            test.deepEqual(results, [
+                'call1',
                 'call2:pre',
                 'call2:post',
                 'call3:pre',

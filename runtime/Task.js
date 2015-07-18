@@ -28,13 +28,13 @@
 /**
  * Models an Exa task, either for processing a request or a response, to handle the bookkeeping.
  *
- * Both request tasks and response tasks can have subtasks, but a request task is always the root
- * and only a request task can only be the root. This creates a structure similar to a call stack,
- * but not a call stack.
+ * Both request tasks and response tasks can have subtasks, but a request task must be at the root.
+ * This creates a structure similar to a call stack, but as a tree.
+ *
+ * Takes a reply handler and a fail handler.
  *
  * @return {*}
  */
-
 var __ = function (onReply, onFail) {
 
     this.subtasks = 0;
@@ -42,6 +42,11 @@ var __ = function (onReply, onFail) {
     this.onFail = onFail;
 };
 
+/**
+ * Sends a reply to the requestor.
+ *
+ * @param args
+ */
 __.prototype.reply = function (args) {
 
     if (this.onReply !== null && typeof this.onReply !== "undefined") {
@@ -49,11 +54,16 @@ __.prototype.reply = function (args) {
         // send the reply message
         process.nextTick(this.onReply.bind(null, args));
 
-        // self-destruct
+        // destroy our ability to respond again
         this.onFail = this.onReply = null;
     }
 };
 
+/**
+ * Sends a failure message to the requestor.
+ *
+ * @param args
+ */
 __.prototype.fail = function (args) {
 
     if (this.onFail !== null && typeof this.onFail !== "undefined") {
@@ -61,26 +71,16 @@ __.prototype.fail = function (args) {
         // send the fail message
         process.nextTick(this.onFail.bind(null, args));
 
-        // self-destruct
+        // destroy our ability to respond again
         this.onReply = this.onFail = null;
     }
 };
 
-//__.prototype.createSubtask = function () {
-//
-//    this.subtasks++;
-//
-//    var subtask = new __();
-//
-//    subtask.parent = this;
-//
-//    return subtask;
-//};
-
 /**
- * Tries to close this task - which means close it unless there are open subtasks.
+ * Tries to close this task - it will close unless there are open subtasks. Close in this case is the bookkeeping
+ * sense.
  *
- * We shouldn't need to track the closed state since that's just subtasks == 0
+ * We shouldn't need to track the closed state separately since that's just subtasks == 0
  */
 __.prototype.tryClose = function () {
 
@@ -98,16 +98,29 @@ __.prototype.tryClose = function () {
     }
 };
 
+/**
+ * Marks a subtask complete for bookkeeping. We don't care about which subtask.
+ */
 __.prototype.completeSubtask = function () {
 
     this.subtasks--;
     this.tryClose();
 };
 
-__.prototype.sendMessage = function (target, args, onReply, onFail) {
+/**
+ * Sends a message and makes note of a subtask for this task, since we can't consider our task complete
+ * if there are still child tasks kicking around for which we're expecting a response.
+ *
+ * @param address   address where the message should be sent
+ * @param args      args for the message
+ * @param onReply   callback for success response
+ * @param onFail    callback for failure response
+ */
+__.prototype.sendMessage = function (address, args, onReply, onFail) {
 
     var subtask = new __();
 
+    // todo don't increment if there's no response handlers provided
     this.subtasks++;
 
     subtask.parent = this;
@@ -118,11 +131,10 @@ __.prototype.sendMessage = function (target, args, onReply, onFail) {
     // todo where do we create the implicit fail handler?
 
     // send the message
-    // might want to nexttick this...
 
     process.nextTick(
         function () {
-            target(args, target, onReply ? onReply.bind(subtask) : undefined, onFail ? onFail.bind(subtask) : undefined);
+            address(args, address, onReply ? onReply.bind(subtask) : undefined, onFail ? onFail.bind(subtask) : undefined);
         }
     );
 
