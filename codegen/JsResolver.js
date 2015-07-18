@@ -18,7 +18,6 @@
  * DEALINGS IN THE SOFTWARE.
  *
  * Author: Seth Purcell
- * ${DATE}
  */
 
 /**

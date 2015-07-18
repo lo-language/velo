@@ -29,8 +29,8 @@
 receive args, io, env;
 
 // the first module is "classy"; the second a simple procedure
-createTest  = acquire('Test');
-printReport = acquire('PrintReport');
+createTest  = acquire("Test");
+printReport = acquire("PrintReport");
 testModule  = acquire(args[1]);
 
 // create the test
