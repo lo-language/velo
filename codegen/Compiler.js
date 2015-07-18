@@ -485,25 +485,6 @@ __['sequence'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__['connection'] = function (node, scope) {
-
-    // how to handle multiple connectors?
-
-    // sources and sinks are like calls in that they generate both statements and expressions
-    // they have expressions but inject statements into the context
-
-    var source = __.compile(node.source, scope);
-    var sink = __.compile(node.sink, scope);
-
-    return new JsResolver([source, '.call(null,', sink, ')']);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param scope
- * @param node
- */
 __['op'] = function (node, scope) {
 
     var left = __.compile(node.left, scope);
