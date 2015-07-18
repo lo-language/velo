@@ -69,7 +69,7 @@ module.exports["assignment"] = {
             type: 'assign',
             op: '=',
             left: {type: 'id', name: 'foo'},
-            right: {type: 'application', of: {type: 'id', name: 'bar'}, args: []}
+            right: {type: 'application', address: {type: 'id', name: 'bar'}, args: []}
         };
 
         var scope = new Scope();

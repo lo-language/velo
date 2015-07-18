@@ -152,7 +152,7 @@ case 51:this.$ = {type: 'dyad', key: $$[$0], value: {type: 'boolean', val: true}
 break;
 case 52:this.$ = {type: 'dyad', key: $$[$0-2], value: $$[$0]};;
 break;
-case 53:this.$ = {type: 'message', of: $$[$0-4], args: $$[$0-1] ? $$[$0-2].concat([$$[$0-1]]) : []};
+case 53:this.$ = {type: 'application', address: $$[$0-4], args: $$[$0-1] ? $$[$0-2].concat([$$[$0-1]]) : []};
 break;
 case 55:this.$ = {type: 'cardinality', operand: $$[$0]};
 break;
@@ -190,7 +190,7 @@ case 72:this.$ = {type: 'sequence', first: $$[$0-2], last: $$[$0]};
 break;
 case 77:this.$ = $$[$0-2];
 break;
-case 79:this.$ = {type: 'message', body: $$[$0-2].args, to: $$[$0-2].of};
+case 79:this.$ = {type: 'message', body: $$[$0-2].args, address: $$[$0-2].of};
 break;
 case 80:this.$ = $$[$0];
 break;

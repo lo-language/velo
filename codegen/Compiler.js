@@ -113,7 +113,7 @@ __['procedure'] = function (node, scope) {
 
     // nixing anonymous recursion and implicit "connect" for now...
     return new JsConstruct([
-        'function ($recur, args, $connect, onReply, onFail) ', {block: body}], false);
+        'function ($recur, args, onReply, onFail) ', {block: body}], false);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -348,7 +348,7 @@ __['message'] = function (node, scope) {
  */
 __['application'] = function (node, scope) {
 
-    var target = __.compile(node.of);
+    var target = __.compile(node.address);
 
     // todo add convenience method for compiling arrays?
     var args = node.args.map(function (arg) {

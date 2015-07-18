@@ -24,7 +24,7 @@ module.exports["procedure"] = {
                         left: { type: 'id', name: 'result' },
                         right: {
                             type: 'application',
-                            of: {type: 'id', name: 'bar'},
+                            address: {type: 'id', name: 'bar'},
                             args: [
                                 {type: 'number', val: '42'}
                             ]} },

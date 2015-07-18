@@ -15,7 +15,7 @@ module.exports["application"] = {
 
         var node = {
             type: 'application',
-            of: {type: 'id', name: 'foo'},
+            address: {type: 'id', name: 'foo'},
             args: []
         };
 
@@ -27,7 +27,7 @@ module.exports["application"] = {
 
         var node = {
             type: 'application',
-            of: {type: 'id', name: 'foo'},
+            address: {type: 'id', name: 'foo'},
             args: [
                 {type: 'number', val: '42'}
             ]
@@ -41,7 +41,7 @@ module.exports["application"] = {
 
         var node = {
             type: 'application',
-            of: {type: 'id', name: 'foo'},
+            address: {type: 'id', name: 'foo'},
             args: [
                 {type: 'number', val: '42'},
                 {type: 'string', val: 'hi there'}
@@ -56,14 +56,14 @@ module.exports["application"] = {
 
         var node = {
             type: 'application',
-            of: {type: 'id', name: 'baz'},
+            address: {type: 'id', name: 'baz'},
             args: [{
                 type: 'application',
-                of: {type: 'id', name: 'foo'},
+                address: {type: 'id', name: 'foo'},
                 args: []
             },{
                 type: 'application',
-                of: {type: 'id', name: 'bar'},
+                address: {type: 'id', name: 'bar'},
                 args: []
             }]
         };
@@ -71,6 +71,88 @@ module.exports["application"] = {
         // patch sub nodes?
 
         test.equal(Compiler.compile(node).render(), "Q.spread([$foo($foo, [], $connect), $bar($bar, [], $connect)], function (x1, x2) {return $baz($baz, [x1, x2], $connect);})");
+        test.done();
+    }
+};
+
+module.exports["application statements"] = {
+
+    "application with one arg": function (test) {
+
+        var node = {
+            type: 'application_stmt',
+            expr: {
+                type: 'application',
+                address: {type: 'id', name: 'foo'},
+                args: [
+                    {type: 'number', val: '42'}
+                ]}
+        };
+
+        test.equal(Compiler.compile(node).render(), '$foo($foo, [42], $connect);');
+        test.done();
+    },
+
+    "with nested applications": function (test) {
+
+        var node = {
+            type: 'application_stmt',
+            expr: {
+                type: 'application',
+                address: {type: 'id', name: 'baz'},
+                args: [{
+                    type: 'op',
+                    op: '-',
+                    left: {
+                        type: 'application',
+                        address: {type: 'id', name: 'foo'},
+                        args: []
+                    },
+                    right: {
+                        type: 'application',
+                        address: {type: 'id', name: 'bar'},
+                        args: []
+                    }
+                }]}
+        };
+
+        // patch sub nodes?
+
+        test.equal(Compiler.compile(node).render(),
+            'Q.spread([$foo($foo, [], $connect), $bar($bar, [], $connect)], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz, [x1], $connect);});');
+        test.done();
+    },
+
+    "several nested applications": function (test) {
+
+        var node = {
+            type: 'application_stmt',
+            expr: {
+                type: 'application',
+                address: {type: 'id', name: 'quux'},
+                args: [{
+                    type: 'application',
+                    address: {type: 'id', name: 'baz'},
+                    args: [{
+                        type: 'op',
+                        op: '-',
+                        left: {
+                            type: 'application',
+                            address: {type: 'id', name: 'foo'},
+                            args: []
+                        },
+                        right: {
+                            type: 'application',
+                            address: {type: 'id', name: 'bar'},
+                            args: []
+                        }
+                    }]}]}
+        };
+
+        // patch sub nodes?
+
+        test.equal(Compiler.compile(node).render(),
+            'Q.spread([$foo($foo, [], $connect), $bar($bar, [], $connect)], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz, [x1], $connect);}).then(function (x1) {return $quux($quux, [x1], $connect);});');
         test.done();
     }
 };

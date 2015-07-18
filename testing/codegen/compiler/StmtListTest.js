@@ -47,7 +47,7 @@ module.exports["statement lists"] = {
                 left: {type: 'id', name: 'foo'},
                 right: {
                     type: 'application',
-                    of: {type: 'id', name: 'bar'},
+                    address: {type: 'id', name: 'bar'},
                     args: [
                         {type: 'number', val: '42'}
                     ]}

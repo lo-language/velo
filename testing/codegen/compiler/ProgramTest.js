@@ -32,7 +32,7 @@ var ast = { type: 'procedure',
                 left: { type: 'id', name: 'x' },
                 right:
                 { type: 'application',
-                    to: { type: 'id', name: 'foo' },
+                    address: { type: 'id', name: 'foo' },
                     args: [] } },
             tail:
             { type: 'stmt_list',

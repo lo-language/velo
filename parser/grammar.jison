@@ -295,7 +295,7 @@ dyad
 // applications ARE expressions
 
 application
-    : value '(' (expr ',')* expr? ')' -> {type: 'message', of: $1, args: $4 ? $3.concat([$4]) : []}
+    : value '(' (expr ',')* expr? ')' -> {type: 'application', address: $1, args: $4 ? $3.concat([$4]) : []}
     ;
 
 unary_expr
@@ -346,7 +346,7 @@ future
 // messages are NOT expressions
 
 message
-    : value '~' (expr ',')* expr? -> {type: 'message', body: $2.args, to: $2.of}
+    : value '~' (expr ',')* expr? -> {type: 'message', body: $2.args, address: $2.of}
     ;
 
 // todo: mute

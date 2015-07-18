@@ -149,8 +149,8 @@
                                                 "head":{
                                                     "type":"application_stmt",
                                                     "application":{
-                                                        "type":"message",
-                                                        "of":{
+                                                        "type":"application",
+                                                        "address":{
                                                             "type":"id",
                                                             "name":"doSomething"
                                                         },
@@ -179,12 +179,12 @@
                                                         "head":{
                                                             "type":"application_stmt",
                                                             "application":{
-                                                                "type":"message",
-                                                                "of":{
+                                                                "type":"application",
+                                                                "address":{
                                                                     "type":"subscript",
                                                                     "list":{
-                                                                        "type":"message",
-                                                                        "of":{
+                                                                        "type":"application",
+                                                                        "address":{
                                                                             "type":"select",
                                                                             "set":{
                                                                                 "type":"subscript",
@@ -259,10 +259,10 @@
                                                                     "name":"block"
                                                                 },
                                                                 "right":{
-                                                                    "type":"message",
-                                                                    "of":{
-                                                                        "type":"message",
-                                                                        "of":{
+                                                                    "type":"application",
+                                                                    "address":{
+                                                                        "type":"application",
+                                                                        "address":{
                                                                             "type":"id",
                                                                             "name":"connect"
                                                                         },
@@ -300,8 +300,8 @@
                                                                             "name":"result"
                                                                         },
                                                                         "application":{
-                                                                            "type":"message",
-                                                                            "of":{
+                                                                            "type":"application",
+                                                                            "address":{
                                                                                 "type":"id",
                                                                                 "name":"foo"
                                                                             },
@@ -318,8 +318,8 @@
                                                                                 "head":{
                                                                                     "type":"application_stmt",
                                                                                     "application":{
-                                                                                        "type":"message",
-                                                                                        "of":{
+                                                                                        "type":"application",
+                                                                                        "address":{
                                                                                             "type":"id",
                                                                                             "name":"log"
                                                                                         },

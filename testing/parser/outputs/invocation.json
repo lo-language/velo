@@ -3,8 +3,8 @@
     "head":{
         "type":"application_stmt",
         "application":{
-            "type":"message",
-            "of":{
+            "type":"application",
+            "address":{
                 "type":"id",
                 "name":"foo"
             },
@@ -16,8 +16,8 @@
         "head":{
             "type":"application_stmt",
             "application":{
-                "type":"message",
-                "of":{
+                "type":"application",
+                "address":{
                     "type":"select",
                     "set":{
                         "type":"id",
@@ -38,8 +38,8 @@
                     "name":"x"
                 },
                 "right":{
-                    "type":"message",
-                    "of":{
+                    "type":"application",
+                    "address":{
                         "type":"id",
                         "name":"foo"
                     },
@@ -59,8 +59,8 @@
                         }]
                     },
                     "right":{
-                        "type":"message",
-                        "of":{
+                        "type":"application",
+                        "address":{
                             "type":"id",
                             "name":"foo"
                         },
@@ -109,15 +109,15 @@
                                                         "head":{
                                                             "type":"application_stmt",
                                                             "application":{
-                                                                "type":"message",
-                                                                "of":{
+                                                                "type":"application",
+                                                                "address":{
                                                                     "type":"id",
                                                                     "name":"foo"
                                                                 },
                                                                 "args":[
                                                                     {
-                                                                        "type":"message",
-                                                                        "of":{
+                                                                        "type":"application",
+                                                                        "address":{
                                                                             "type":"id",
                                                                             "name":"bar"
                                                                         },
@@ -139,8 +139,8 @@
                                                                     "type":"op",
                                                                     "op":"+",
                                                                     "left":{
-                                                                        "type":"message",
-                                                                        "of":{
+                                                                        "type":"application",
+                                                                        "address":{
                                                                             "type":"id",
                                                                             "name":"foo"
                                                                         },
@@ -162,8 +162,8 @@
                                                                         "name":"x"
                                                                     },
                                                                     "application":{
-                                                                        "type":"message",
-                                                                        "of":{
+                                                                        "type":"application",
+                                                                        "address":{
                                                                             "type":"id",
                                                                             "name":"foo"
                                                                         },
