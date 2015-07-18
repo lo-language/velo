@@ -2,6 +2,6 @@
 // don't want to imply exclusivity - just because i've done it, doesn't mean somebody else hasn't/can't
 // don't want to imply bidirectionality/symmetry
 
-factorial = connect('factorial');
+factorial = connect("factorial");
 
 reply factorial(5);

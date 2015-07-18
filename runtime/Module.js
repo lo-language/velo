@@ -25,6 +25,7 @@
 
 var parser = require('./../parser/Parser');
 var Compiler = require('./../codegen/Compiler');
+var Task = require('./../runtime/Task');
 var Q = require('q');
 
 var __ = function (source, loader) {
@@ -91,7 +92,7 @@ __.prototype.load = function () {
         // we drop in Q so that it doesn't have to live in global space
         // todo - should we use this instead of an arg for Q?
 console.log(body);
-        this.procedure = new Function('Q, recur_not_used, args, connect', body).bind(null, Q);
+        this.procedure = new Function('Task, Q, recur_not_used, args, connect', body).bind(null, Task, Q);
     }
 
     return this.procedure;

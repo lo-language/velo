@@ -10,6 +10,6 @@ factorial is:
     if num <= 1:
         reply 1;
 
-    reply num * recur(num - 1);
+    reply num * factorial(num - 1);
 
 reply factorial(args[2]);
