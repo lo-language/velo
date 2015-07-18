@@ -10,7 +10,7 @@
 
 "use strict";
 
-var Loader = require('../../loader/Loader');
+var Loader = require('../../runtime/Loader');
 var Harness = require('../Harness');
 var Q = require('q');
 var util = require('util');
@@ -49,6 +49,7 @@ module.exports['connect'] = {
 
     'success': function (test) {
 
+//        console.log(util.inspect(this.harness.module.parse(), {depth: null, colors: true}));
         this.harness.testSuccess(test, [], 120);
     }
 };

@@ -64,6 +64,17 @@ __.compile = function (node, scope) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ *
+ * @param scope
+ * @param node
+ */
+__['nil'] = function (node, scope) {
+
+    return "null";
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
  * A procedure is an expression.
  *
  * @param scope
@@ -97,8 +108,12 @@ __['procedure'] = function (node, scope) {
         body = ['var ' + varNames.join(', ') + ';\n\n', body];
     }
 
+    // create our task
+    body = ['var task = new Task(onReply, onFail);\n', body];
+
+    // nixing anonymous recursion and implicit "connect" for now...
     return new JsConstruct([
-        'function ($recur, args, $connect) ', {block: body}], false);
+        'function ($recur, args, $connect, onReply, onFail) ', {block: body}], false);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,11 +188,13 @@ __['response'] = function (node, scope) {
         throw new Error("results with >1 value not yet supported, sorry");
     }
 
+    // we assume the existence of a Task object named 'task'
+
     if (node.channel === 'fail') {
-        return new JsStatement(['return Q.reject(', {csv: args}, ');']);
+        return new JsStatement(['task.fail(', {csv: args}, ');\nreturn;\n\n']);
     }
 
-    return new JsStatement(['return Q(', {csv: args}, ');']);
+    return new JsStatement(['task.reply(', {csv: args}, ');\nreturn;\n\n']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -274,30 +291,71 @@ __['conditional'] = function (node, scope) {
 //};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Requests
+// Message dispatch
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * A request can be part of an expression or a standalone statement.
+ * Generates code to send messages via Task.sendMessage().
  *
- * Requests always compile to async calls:
- *
- * - if response ignored, we don't do anything
- * - if response directly asssigned, we can return a promise
- * - if part of any other expression, we need to invert the parse tree to do the call first
- * - if handed a callback, wire it up to the promise
+ * @param scope
+ * @param node
+ */
+__['message'] = function (node, scope) {
+
+    // compile the parts
+
+    var target = __.compile(node.to);
+
+    // todo add convenience method for compiling arrays?
+    var args = node.body.map(function (arg) {
+        return __.compile(arg);
+    });
+
+    // render an async call
+    var parts = ['this.sendMessage(', target, ', [', {csv: args}, ']'];
+
+    if (node.subsequent) {
+
+        var subsequent = ['function () {', __.compile(node.subsequent), '}'];
+
+        parts.push([', ', subsequent]);
+    }
+    else {
+        parts.push(', null');
+    }
+
+    if (node.contingency) {
+
+        var contingency = ['function () {', __.compile(node.contingency), '}'];
+
+        parts.push([', ', contingency]);
+    }
+    else {
+        parts.push(', null');
+    }
+
+    parts.push(');');
+
+    return new JsConstruct(parts);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Application
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
  *
  * @param scope
  * @param node
  */
 __['application'] = function (node, scope) {
 
-    var target = __.compile(node.to);
+    var target = __.compile(node.of);
 
     // todo add convenience method for compiling arrays?
     var args = node.args.map(function (arg) {
         return __.compile(arg);
     });
 
+    // todo - compile as syntactic sugar around message
     return new JsRequest([target, '(', target, ', [', {csv: args}, '], $connect)']);
 };
 

@@ -5,7 +5,7 @@
 
 "use strict";
 
-var Compiler = require('../../codegen/Compiler');
+var Compiler = require('../../../codegen/Compiler');
 var util = require('util');
 
 var ast = { type: 'procedure',
@@ -31,7 +31,7 @@ var ast = { type: 'procedure',
                 op: '=',
                 left: { type: 'id', name: 'x' },
                 right:
-                { type: 'request',
+                { type: 'application',
                     to: { type: 'id', name: 'foo' },
                     args: [] } },
             tail:

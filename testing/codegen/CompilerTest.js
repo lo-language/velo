@@ -64,8 +64,8 @@ module.exports["statement lists"] = {
                 op: '=',
                 left: {type: 'id', name: 'foo'},
                 right: {
-                    type: 'request',
-                    to: {type: 'id', name: 'bar'},
+                    type: 'application',
+                    of: {type: 'id', name: 'bar'},
                     args: [
                         {type: 'number', val: '42'}
                     ]}
@@ -194,13 +194,13 @@ module.exports["identifiers"] = {
 //    }
 };
 
-module.exports["request"] = {
+module.exports["application"] = {
 
     "no args": function (test) {
 
         var node = {
-            type: 'request',
-            to: {type: 'id', name: 'foo'},
+            type: 'application',
+            of: {type: 'id', name: 'foo'},
             args: []
         };
 
@@ -211,8 +211,8 @@ module.exports["request"] = {
     "one arg": function (test) {
 
         var node = {
-            type: 'request',
-            to: {type: 'id', name: 'foo'},
+            type: 'application',
+            of: {type: 'id', name: 'foo'},
             args: [
                 {type: 'number', val: '42'}
             ]
@@ -225,8 +225,8 @@ module.exports["request"] = {
     "two args": function (test) {
 
         var node = {
-            type: 'request',
-            to: {type: 'id', name: 'foo'},
+            type: 'application',
+            of: {type: 'id', name: 'foo'},
             args: [
                 {type: 'number', val: '42'},
                 {type: 'string', val: 'hi there'}
@@ -240,15 +240,15 @@ module.exports["request"] = {
     "with nested requests": function (test) {
 
         var node = {
-            type: 'request',
-            to: {type: 'id', name: 'baz'},
+            type: 'application',
+            of: {type: 'id', name: 'baz'},
             args: [{
-                type: 'request',
-                to: {type: 'id', name: 'foo'},
+                type: 'application',
+                of: {type: 'id', name: 'foo'},
                 args: []
             },{
-                type: 'request',
-                to: {type: 'id', name: 'bar'},
+                type: 'application',
+                of: {type: 'id', name: 'bar'},
                 args: []
             }]
         };
@@ -321,7 +321,7 @@ module.exports["op"] = {
         test.done();
     },
 
-    "in operator": function (test) {
+    "in operaofr": function (test) {
 
         // should create a context
         // should call compile on each statement
@@ -363,10 +363,10 @@ module.exports["request statements"] = {
     "request with one arg": function (test) {
 
         var node = {
-            type: 'expr_stmt',
+            type: 'application_stmt',
             expr: {
-                type: 'request',
-                to: {type: 'id', name: 'foo'},
+                type: 'application',
+                of: {type: 'id', name: 'foo'},
                 args: [
                     {type: 'number', val: '42'}
                 ]}
@@ -379,21 +379,21 @@ module.exports["request statements"] = {
     "with nested requests": function (test) {
 
         var node = {
-            type: 'expr_stmt',
+            type: 'application_stmt',
             expr: {
-                type: 'request',
-                to: {type: 'id', name: 'baz'},
+                type: 'application',
+                of: {type: 'id', name: 'baz'},
                 args: [{
                     type: 'op',
                     op: '-',
                     left: {
-                        type: 'request',
-                        to: {type: 'id', name: 'foo'},
+                        type: 'application',
+                        of: {type: 'id', name: 'foo'},
                         args: []
                     },
                     right: {
-                        type: 'request',
-                        to: {type: 'id', name: 'bar'},
+                        type: 'application',
+                        of: {type: 'id', name: 'bar'},
                         args: []
                     }
                 }]}
@@ -409,24 +409,24 @@ module.exports["request statements"] = {
     "several nested requests": function (test) {
 
         var node = {
-            type: 'expr_stmt',
+            type: 'application_stmt',
             expr: {
-                type: 'request',
-                to: {type: 'id', name: 'quux'},
+                type: 'application',
+                of: {type: 'id', name: 'quux'},
                 args: [{
-                    type: 'request',
-                    to: {type: 'id', name: 'baz'},
+                    type: 'application',
+                    of: {type: 'id', name: 'baz'},
                     args: [{
                         type: 'op',
                         op: '-',
                         left: {
-                            type: 'request',
-                            to: {type: 'id', name: 'foo'},
+                            type: 'application',
+                            of: {type: 'id', name: 'foo'},
                             args: []
                         },
                         right: {
-                            type: 'request',
-                            to: {type: 'id', name: 'bar'},
+                            type: 'application',
+                            of: {type: 'id', name: 'bar'},
                             args: []
                         }
                     }]}]}
@@ -561,7 +561,7 @@ module.exports["conditional"] = {
 //                type: 'stmt_list',
 //                head: {type: 'assign', op: '=',
 //                    left: {type: 'id', name: 'bar'},
-//                    right: {type: 'request', to: {type: 'id', name: 'foo'}, args: []}},
+//                    right: {type: 'request', of: {type: 'id', name: 'foo'}, args: []}},
 //                tail: null}
 //        };
 //
@@ -576,7 +576,7 @@ module.exports["conditional"] = {
 
 module.exports["assignment"] = {
 
-    "assign literal to id": function (test) {
+    "assign literal of id": function (test) {
 
         var node = {
             type: 'assign',
@@ -593,7 +593,7 @@ module.exports["assignment"] = {
         test.done();
     },
 
-    "assign literal to expression": function (test) {
+    "assign literal of expression": function (test) {
 
         var node = {
             type: 'assign',
@@ -611,7 +611,7 @@ module.exports["assignment"] = {
         test.done();
     },
 
-    "assign ready id to id": function (test) {
+    "assign ready id of id": function (test) {
 
         var node = {
             type: 'assign',
@@ -628,13 +628,13 @@ module.exports["assignment"] = {
         test.done();
     },
 
-    "assign request to id": function (test) {
+    "assign request of id": function (test) {
 
         var node = {
             type: 'assign',
             op: '=',
             left: {type: 'id', name: 'foo'},
-            right: {type: 'request', to: {type: 'id', name: 'bar'}, args: []}
+            right: {type: 'application', of: {type: 'id', name: 'bar'}, args: []}
         };
 
         var scope = new Scope();
@@ -703,8 +703,8 @@ module.exports["procedure"] = {
                         op: '*=',
                         left: { type: 'id', name: 'result' },
                         right: {
-                            type: 'request',
-                            to: {type: 'id', name: 'bar'},
+                            type: 'application',
+                            of: {type: 'id', name: 'bar'},
                             args: [
                                 {type: 'number', val: '42'}
                             ]} },
@@ -717,7 +717,7 @@ module.exports["procedure"] = {
         // important! - procedures are never async objects, regardless of whether they contain async statements
         test.equal(obj.isAsync(), false);
         test.equal(obj.render(),
-            "function ($recur, args, $connect) {var $result;\n\nvar $next = args.shift();\n\n$bar($bar, [42], $connect).then(function (x1) {$result *= x1;\n})}");
+            "function ($recur, args, onReply, onFail) {var task = new Task(onReply, onFail);\nvar $result;\n\nvar $next = args.shift();\n\n$bar($bar, [42], $connect).then(function (x1) {$result *= x1;\n})}");
         test.done();
     }
 };
@@ -728,7 +728,7 @@ module.exports["connection"] = {
 
         var node = {
             type: 'connection',
-            connector: '>>',
+            connecofr: '>>',
             source: {type: 'id', name: 'foo'},
             sink: {type: 'id', name: 'bar'}
         };
@@ -738,7 +738,7 @@ module.exports["connection"] = {
     }
 };
 
-module.exports["result"] = {
+module.exports["response"] = {
 
     "reply": function (test) {
 
@@ -749,7 +749,7 @@ module.exports["result"] = {
                 {type: 'number', val: '42'}
             ]};
 
-        test.equal(Compiler.compile(node).render(), "return Q(42);");
+        test.equal(Compiler.compile(node).render(), "task.reply(42);\nreturn;\n\n");
         test.done();
     },
 
@@ -762,7 +762,7 @@ module.exports["result"] = {
                 {type: 'number', val: '42'}
             ]};
 
-        test.equal(Compiler.compile(node).render(), "return Q.reject(42);");
+        test.equal(Compiler.compile(node).render(), "task.fail(42);\nreturn;\n\n");
         test.done();
     }
 };
