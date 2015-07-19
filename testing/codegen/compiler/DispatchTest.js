@@ -15,8 +15,8 @@ module.exports["dispatch"] = {
 
         var node = {
             "type":"message",
-            "body": [],
-            "to": {
+            "args": [],
+            "address": {
                 "type": "id",
                 "name": "foo"
             }
@@ -30,8 +30,8 @@ module.exports["dispatch"] = {
 
         var node = {
             "type":"message",
-            "body": [],
-            "to": {
+            "args": [],
+            "address": {
                 "type": "id",
                 "name": "foo"
             },
@@ -55,8 +55,8 @@ module.exports["dispatch"] = {
 
         var node = {
             "type":"message",
-            "body": [],
-            "to": {
+            "args": [],
+            "address": {
                 "type": "id",
                 "name": "foo"
             },
@@ -80,8 +80,8 @@ module.exports["dispatch"] = {
 
         var node = {
             "type":"message",
-            "body": [],
-            "to": {
+            "args": [],
+            "address": {
                 "type": "id",
                 "name": "foo"
             },

@@ -24,7 +24,8 @@
 
 "use strict";
 
-var Task = require('../../runtime/Task');
+var Request = require('../../runtime/Request');
+var util = require('util');
 
 module.exports = {
 
@@ -32,80 +33,80 @@ module.exports = {
 
         test.expect(1);
 
-        var task = new Task(function (args) {
+        var request = new Request(function (args) {
             test.equal(args, "foo");
             test.done();
         }, function (args) {
             test.fail();
         });
 
-        task.reply("foo");
-        task.reply("boo");
-        task.fail("boo");
-        task.fail("foo");
-        task.reply("foo");
+        request.reply("foo");
+        request.reply("boo");
+        request.fail("boo");
+        request.fail("foo");
+        request.reply("foo");
     },
 
     "fail kills further response": function (test) {
 
         test.expect(1);
 
-        var task = new Task(function (args) {
+        var request = new Request(function (args) {
             test.fail();
         }, function (args) {
             test.equal(args, "foo");
             test.done();
         });
 
-        task.fail("foo");
-        task.reply("foo");
-        task.reply("boo");
-        task.fail("foo");
-        task.reply("foo");
+        request.fail("foo");
+        request.reply("foo");
+        request.reply("boo");
+        request.fail("foo");
+        request.reply("foo");
     },
 
     "implicit reply on close": function (test) {
 
         test.expect(1);
 
-        var task = new Task(function (args) {
+        var request = new Request(function (args) {
             test.equal(args, undefined);
             test.done();
         }, function (args) {
             test.fail();
         });
 
-        task.tryClose();
+        request.tryClose();
     },
 
     "no implicit reply after reply": function (test) {
 
         test.expect(1);
 
-        var task = new Task(function (args) {
+        var request = new Request(function (args) {
             test.equal(args, "foo");
             test.done();
         }, function (args) {
             test.fail();
         });
 
-        task.reply("foo");
-        task.tryClose();
+        request.reply("foo");
+        request.tryClose();
     },
 
     "no implicit reply after fail": function (test) {
 
         test.expect(1);
 
-        var task = new Task(function (args) {
+        var request = new Request(function (args) {
             test.fail();
         }, function (args) {
             test.equal(args, "boo");
             test.done();
         });
 
-        task.fail("boo");
-        task.tryClose();
+        request.fail("boo");
+        request.tryClose();
     },
 
     "close waits for one message": function (test) {
@@ -114,7 +115,7 @@ module.exports = {
 
         var collector = '';
 
-        var task = new Task(function (args) {
+        var request = new Request(function (args) {
             test.equal(args, undefined); // implicit reply sends no args
             test.equal(collector, 'foobar');
             test.done();
@@ -123,39 +124,36 @@ module.exports = {
         });
 
         // model the message receiver
-        var requestHandler = function (args, recur, onReply, onFail) {
+        var requestHandler = function (recur, args) {
 
             test.equal(args, 'foo');
             test.equal(collector, '');
             collector += args;
 
-            var task = new Task(onReply, onFail);
-
-            task.reply('bar');
-
-            task.tryClose();
+            this.reply('bar');
+            this.tryClose();
         };
 
-        // send a message from this task
-        task.sendMessage(requestHandler, 'foo', function (args) {
+        // send a message from this request
+        request.sendMessage(requestHandler, 'foo', function (args) {
 
             test.equal(args, 'bar');
             test.equal(collector, 'foo');
             collector += args;
 
-            // handlers need to close their subtasks
+            // handlers need to close their subrequests
             this.tryClose();
         });
 
         // shouldn't fire implicit reply until the message has been processed
-        task.tryClose();
+        request.tryClose();
     },
 
-    "close waits for multiple subtasks": function (test) {
+    "close waits for multiple subrequests": function (test) {
 
         test.expect(7);
 
-        var task = new Task(function (args) {
+        var request = new Request(function (args) {
             test.equal(expected.length, 0);
             test.done();
         }, function (args) {
@@ -166,54 +164,55 @@ module.exports = {
         var replies = ['boo', 'zar', 'maz'];
 
         // model a message receiver
-        var transmogrify = function (args, recur, onReply, onFail) {
-
-            var task = new Task(onReply, onFail);
+        var transmogrify = function (recur, args) {
 
             test.equal(args, expected.shift());
-            task.reply(replies.shift());
+            this.reply(replies.shift());
 
-            task.tryClose();
+            this.tryClose();
         };
 
-        // send a message from this task
-        task.sendMessage(transmogrify, 'foo', function (args) {
+        // send a message from this request
+        request.sendMessage(transmogrify, 'foo', function (args) {
 
             test.equal(args, 'boo');
 
-            // handlers need to close their subtasks
+            // handlers need to close their subrequests
             this.tryClose();
         });
 
-        // send a message from this task
-        task.sendMessage(transmogrify, 'bar', function (args) {
+        // send a message from this request
+        request.sendMessage(transmogrify, 'bar', function (args) {
 
             test.equal(args, 'zar');
 
-            // handlers need to close their subtasks
+            // handlers need to close their subrequests
             this.tryClose();
         });
 
-        // send a message from this task
-        task.sendMessage(transmogrify, 'baz', function (args) {
+        // send a message from this request
+        request.sendMessage(transmogrify, 'baz', function (args) {
 
             test.equal(args, 'maz');
 
-            // handlers need to close their subtasks
+            // handlers need to close their subrequests
             this.tryClose();
         });
 
         // shouldn't fire implicit reply
-        task.tryClose();
+        request.tryClose();
     },
 
-    "close waits for nested subtasks": function (test) {
+    "close waits for nested subrequests": function (test) {
 
-//        test.expect(1);
+        test.expect(1);
 
         var results = [];
 
-        var task = new Task(function (args) {
+        var request = new Request(function (args) {
+
+            // todo i think there's a race here, maybe from requests and responses sharing a subrequest
+
             test.deepEqual(results, [
                 'call1',
                 'call2:pre',
@@ -228,80 +227,75 @@ module.exports = {
                 'call3:handler',
                 'call4:handler',
                 'call2:subcall:handler',
-                'call3:subcall:handler' ]);
+                'call3:subcall:handler']);
+
             test.done();
         }, function (args) {
             test.fail();
         });
 
-        var passTheBuck = function (args, recur, onReply, onFail) {
-
-            var task = new Task(onReply, onFail);
+        var passTheBuck = function (recur, args) {
 
             // send a submessage
 
             results.push(args + ':pre');
 
-            // send a message from this task
-            task.sendMessage(buckStopsHere, args + ':subcall', function (args) {
+            // send a message from this request
+            this.sendMessage(buckStopsHere, args + ':subcall', function (args) {
 
                 results.push(args + ':handler');
 
-                // handlers need to close their subtasks
+                // handlers need to close their subrequests
                 this.tryClose();
             });
 
             results.push(args + ':post');
 
-            task.reply(args);
-
-            task.tryClose();
+            this.reply(args);
+            this.tryClose();
         };
 
-        var buckStopsHere = function (args, recur, onReply, onFail) {
-
-            var task = new Task(onReply, onFail);
+        var buckStopsHere = function (recur, args) {
 
             results.push(args);
 
-            task.reply(args);
-
-            task.tryClose();
+            this.reply(args);
+            this.tryClose();
         };
 
-        // send a message from this task
-        task.sendMessage(buckStopsHere, 'call1', function (args) {
+        // send a message from this request
+        request.sendMessage(buckStopsHere, 'call1', function (args) {
 
             results.push(args + ':handler');
 
-            // handlers need to close their subtasks
+            // handlers need to close their subrequests
             this.tryClose();
         });
 
-        // send a message from this task
-        task.sendMessage(passTheBuck, 'call2', function (args) {
+        // send a message from this request
+        request.sendMessage(passTheBuck, 'call2', function (args) {
 
             results.push(args + ':handler');
 
-            // handlers need to close their subtasks
+            // handlers need to close their subrequests
             this.tryClose();
         });
 
-        // send a message from this task
-        task.sendMessage(passTheBuck, 'call3', function (args) {
+        // send a message from this request
+        request.sendMessage(passTheBuck, 'call3', function (args) {
 
             results.push(args + ':handler');
 
-            // handlers need to close their subtasks
+            // handlers need to close their subrequests
             this.tryClose();
         });
 
-        // send a message from this task
-        task.sendMessage(buckStopsHere, 'call4', function (args) {
+        // send a message from this request
+        request.sendMessage(buckStopsHere, 'call4', function (args) {
 
             results.push(args + ':handler');
 
-            // handlers need to close their subtasks
+            // handlers need to close their subrequests
             this.tryClose();
         });
     },
@@ -312,20 +306,15 @@ module.exports = {
         test.done();
     },
 
-    "mockup of implicit reply with subtasks and failure": function (test) {
+    "mockup of implicit reply with subrequests and failure": function (test) {
 
         // mock up a request handler - this would be generated by the compiler
 
-        var requestHandler = function (args, recur, onReply, onFail) {
-
-            // creates a new root task
-            var task = new Task(onReply, onFail);
-
-            // can now call task.reply() and task.fail()
+        var requestHandler = function (recur, args) {
 
             // here's how we make a request
 
-            task.sendMessage(foo, args, function (args) { // a response handler doesn't need an envelope
+            this.sendMessage(foo, args, function (args) { // a response handler doesn't need an envelope
 
                 // make another request - with no reply handler
 
@@ -333,13 +322,13 @@ module.exports = {
 
                     console.log("what?! a failure?!");
 
-                    // eventually we'll get to a leaf task like this, and calling complete will actually complete the subtask in the parent
+                    // eventually we'll get to a leaf request like this, and calling complete will actually complete the subrequest in the parent
                     this.tryClose();
                 });
 
                 this.sendMessage(baz, args, function (args) {  // a response handler doesn't need an envelope
 
-                    // eventually we'll get to a leaf task like this, where calling tryClose will succeed in closing the task
+                    // eventually we'll get to a leaf request like this, where calling tryClose will succeed in closing the request
                     this.tryClose();
 
                 });
@@ -348,30 +337,31 @@ module.exports = {
 
             });
 
-            // another request at this level could just overwrite subtask - we're done with that value
-            // or we could do something where creating a subtask takes the handlers and binds them itself...
+            // another request at this level could just overwrite subrequest - we're done with that value
+            // or we could do something where creating a subrequest takes the handlers and binds them itself...
 
-            task.tryClose();
+            this.tryClose();
         };
 
         // set up some stubs for our request handler to send messages to
 
-        var foo = function (args, recur, reply, fail) {
+        var foo = function (recur, args, reply, fail) {
             console.log("i am foo");
-            process.nextTick(reply);
+            this.reply();
         };
 
-        var bar = function (args, recur, reply, fail) {
+        var bar = function (recur, args, reply, fail) {
             console.log("i am bar!");
-            process.nextTick(fail);
+            this.fail();
         };
 
-        var baz = function (args, recur, reply, fail) {
+        var baz = function (recur, args, reply, fail) {
             console.log("I am a BANANA!");
-            process.nextTick(reply);
+            this.reply();
         };
 
-        requestHandler([], requestHandler, function () {
+        // todo send a root request
+        Request.sendRootMessage(requestHandler, [], function () {
             test.done();
         }, function () {
             test.fail();

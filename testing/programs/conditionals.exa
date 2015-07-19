@@ -6,8 +6,8 @@
 receive x;
 
 if x < 0:
-    reply 'negative';
+    reply "negative";
 else if x == 0:
-    reply 'zero!';
+    reply "zero!";
 else:
-    reply 'positive';
+    reply "positive";

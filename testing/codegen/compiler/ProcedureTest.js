@@ -37,7 +37,7 @@ module.exports["procedure"] = {
         // important! - procedures are never async objects, regardless of whether they contain async statements
         test.equal(obj.isAsync(), false);
         test.equal(obj.render(),
-            "function ($recur, args, onReply, onFail) {var task = new Task(onReply, onFail);\nvar $result;\n\nvar $next = args.shift();\n\n$bar($bar, [42], $connect).then(function (x1) {$result *= x1;\n})}");
+            "function ($recur, args) {var $result;\n\nvar $next = args.shift();\n\n$bar($bar, [42]).then(function (x1) {$result *= x1;\n})\n\nthis.tryClose();}");
         test.done();
     }
 };

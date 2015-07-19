@@ -76,12 +76,36 @@
                     "tail":{
                         "type":"stmt_list",
                         "head":{
-                            "type":"message"
+                            "type":"message",
+                            "address":{
+                                "type":"id",
+                                "name":"foo"
+                            },
+                            "args":[
+                                {
+                                    "type":"number",
+                                    "val":"18"
+                                }
+                            ]
                         },
                         "tail":{
                             "type":"stmt_list",
                             "head":{
-                                "type":"message"
+                                "type":"message",
+                                "address":{
+                                    "type":"select",
+                                    "set":{
+                                        "type":"id",
+                                        "name":"sessionStore"
+                                    },
+                                    "member":"getByID"
+                                },
+                                "args":[
+                                    {
+                                        "type":"id",
+                                        "name":"sessionID"
+                                    }
+                                ]
                             },
                             "tail":{
                                 "type":"stmt_list",

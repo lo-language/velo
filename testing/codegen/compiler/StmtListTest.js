@@ -64,7 +64,7 @@ module.exports["statement lists"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), 'return $bar($bar, [42], $connect).then(function (x1) {$foo = x1;\n}).then(function () {$baz = 57;\n})');
+        test.equal(Compiler.compile(node).render(), 'return $bar($bar, [42]).then(function (x1) {$foo = x1;\n}).then(function () {$baz = 57;\n})');
         test.done();
     }
 };

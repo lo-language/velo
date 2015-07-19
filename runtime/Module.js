@@ -25,7 +25,7 @@
 
 var parser = require('./../parser/Parser');
 var Compiler = require('./../codegen/Compiler');
-var Task = require('./../runtime/Task');
+var Request = require('./../runtime/Request');
 var Q = require('q');
 
 var __ = function (source, loader) {
@@ -56,7 +56,13 @@ __.prototype.parse = function () {
 __.prototype.compile = function () {
 
     if (this.js === undefined) {
-        this.js = Compiler.compile(this.parse());
+
+//        try {
+            this.js = Compiler.compile(this.parse());
+//        }
+//        catch (e) {
+//            console.error(e);
+//        }
     }
 
     return this.js;
@@ -73,26 +79,19 @@ __.prototype.load = function () {
 
     if (this.procedure === undefined) {
 
-        // the function we create here won't have a name, so can't call itself recursively
-        // so we wrap the function we get by compiling the root procedure in another function
-        // that just gives that function a name and immediately calls it, passing through any args
-
-//        var body = '"use strict";\nvar root = ' + this.compile().render() +
-//            '\n\nreturn root(root, args, rootAttach);';
-
         // enable strict mode and wrap the compiled result so we can use it with the Function constructor,
         // but keep the same sig as what we're wrapping
 
-        var body = '"use strict";\n\nvar root = ' + this.compile().render() +
-            ';\n\nreturn root(root, args, connect)';
+        // todo - how do we want to interface between our internal procedure style and JS?
 
-        // this has the same sig as a normal procedure so it can be returned from connect
-        // hmm - to implement recur we could just use a nested function everywhere... seems more expensive, but cleaner
-        // then we're not depending on the caller to call us properly
-        // we drop in Q so that it doesn't have to live in global space
-        // todo - should we use this instead of an arg for Q?
-console.log(body);
-        this.procedure = new Function('Task, Q, recur_not_used, args, connect', body).bind(null, Task, Q);
+        var body =
+            '"use strict";\n\n' +
+            'var root = ' + this.compile().render() + ';\n\n' +
+            'root.call(this, root, rootArgs);\n';
+
+        // prepare a function with the same signature as a standard procedure so it can be returned from connect
+
+        this.procedure = new Function('ignored, rootArgs', body);
     }
 
     return this.procedure;
@@ -113,8 +112,11 @@ __.prototype.run = function (args) {
         this.load();
     }
 
-    // we don't need to pass a value for recur (arg 2) because of how module procedures are built
-    return this.procedure(null, args, this.loader.rootAttach.bind(this.loader));
+    var d = Q.defer();
+
+    Request.sendRootMessage(this.procedure, args, d.resolve, d.reject);
+
+    return d.promise;
 };
 
 module.exports = __;

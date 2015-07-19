@@ -20,7 +20,7 @@ module.exports["response"] = {
                 {type: 'number', val: '42'}
             ]};
 
-        test.equal(Compiler.compile(node).render(), "task.reply(42);\nreturn;\n\n");
+        test.equal(Compiler.compile(node).render(), "this.reply(42);\nreturn;\n\n");
         test.done();
     },
 
@@ -33,7 +33,7 @@ module.exports["response"] = {
                 {type: 'number', val: '42'}
             ]};
 
-        test.equal(Compiler.compile(node).render(), "task.fail(42);\nreturn;\n\n");
+        test.equal(Compiler.compile(node).render(), "this.fail(42);\nreturn;\n\n");
         test.done();
     }
 };

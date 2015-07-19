@@ -346,7 +346,7 @@ future
 // messages are NOT expressions
 
 message
-    : value '~' (expr ',')* expr? -> {type: 'message', body: $2.args, address: $2.of}
+    : value '~' (expr ',')* expr -> {type: 'message', address: $1, args: $3.concat([$4])}
     ;
 
 // todo: mute

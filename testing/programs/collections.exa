@@ -4,14 +4,14 @@
  */
 
 // list literal
-words = ['foo', 'mani', 'padme', 'hum'];
+words = ["foo", "mani", "padme", "hum"];
 
 // set literal with symbols
 dudes = { <zaphod>, <ford>, <arthur>};
 
 // map literal
 // support block syntax (no braces)?
-//map = {'manhattan': 'new york', 'brooklyn': 'kings', 'queens': 'queens'};
+//map = {"manhattan": "new york", "brooklyn": "kings", "queens": "queens"};
 
 // test cardinality
 
@@ -28,16 +28,16 @@ if #dudes < 3:
 
 // todo throw an error on undefined identifiers
 //if #set != 3
-//    fail("surely you're joking");
+//    fail("surely you"re joking");
 
 // test membership
 // or should these be a in b?
 
-if 'om' in words:
-    fail 'oops';
+if "om" in words:
+    fail "oops";
 
-if 'trillian' in dudes:
-    fail 'not a dude';
+if "trillian" in dudes:
+    fail "not a dude";
 
 doctor = <zoidberg>;
 
@@ -47,7 +47,7 @@ if doctor == <zoidberg>:
 if doctor == <zoidberg>:
     fail "uh-oh";
 
-// shouldn't be necessary but is for now; otherwise we never conclude
+// shouldn"t be necessary but is for now; otherwise we never conclude
 //reply;
 
 //if #map != 3

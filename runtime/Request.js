@@ -37,7 +37,10 @@
  */
 var __ = function (onReply, onFail) {
 
-    this.subtasks = 0;
+    // todo inherit parent's onReply and onFail??
+    // should recur be part of the request, not an arg?
+
+    this.subRequests = 0;
     this.onReply = onReply;
     this.onFail = onFail;
 };
@@ -52,7 +55,7 @@ __.prototype.reply = function (args) {
     if (this.onReply !== null && typeof this.onReply !== "undefined") {
 
         // send the reply message
-        process.nextTick(this.onReply.bind(null, args));
+        process.nextTick(this.onReply.bind(this, args));
 
         // destroy our ability to respond again
         this.onFail = this.onReply = null;
@@ -69,7 +72,7 @@ __.prototype.fail = function (args) {
     if (this.onFail !== null && typeof this.onFail !== "undefined") {
 
         // send the fail message
-        process.nextTick(this.onFail.bind(null, args));
+        process.nextTick(this.onFail.bind(this, args));
 
         // destroy our ability to respond again
         this.onReply = this.onFail = null;
@@ -77,20 +80,20 @@ __.prototype.fail = function (args) {
 };
 
 /**
- * Tries to close this task - it will close unless there are open subtasks. Close in this case is the bookkeeping
+ * Tries to close this task - it will close unless there are open subrequests. Close in this case is the bookkeeping
  * sense.
  *
  * We shouldn't need to track the closed state separately since that's just subtasks == 0
  */
 __.prototype.tryClose = function () {
 
-    // make sure there aren't any open subtasks
-    if (this.subtasks > 0) {
+    // make sure there aren't any open subrequests
+    if (this.subRequests > 0) {
         return;
     }
 
     if (this.parent) {
-        this.parent.completeSubtask();
+        this.parent.completeSubrequest();
     }
     else {
         // this is a root task; issue the implicit reply
@@ -101,47 +104,51 @@ __.prototype.tryClose = function () {
 /**
  * Marks a subtask complete for bookkeeping. We don't care about which subtask.
  */
-__.prototype.completeSubtask = function () {
+__.prototype.completeSubrequest = function () {
 
-    this.subtasks--;
+    this.subRequests--;
     this.tryClose();
 };
 
 /**
- * Sends a message and makes note of a subtask for this task, since we can't consider our task complete
+ * Sends a message after creating a subrequest under this request, since we can't consider our task complete
  * if there are still child tasks kicking around for which we're expecting a response.
  *
- * @param address   address where the message should be sent
- * @param args      args for the message
+ * @param fn        function to be called for this request
+ * @param args      array of args for the function
  * @param onReply   callback for success response
  * @param onFail    callback for failure response
  */
-__.prototype.sendMessage = function (address, args, onReply, onFail) {
+__.prototype.sendMessage = function (fn, args, onReply, onFail) {
 
-    var subtask = new __();
+    // create the subrequest
 
-    // todo don't increment if there's no response handlers provided
-    this.subtasks++;
+    var request = new __(onReply, onFail);
 
-    subtask.parent = this;
+    // todo don't track this request if no response handlers were provided
 
-    // we bind the subtask to make it available to the handlers as 'this'
-    // specifically so we can call sendMessage and tryClose on it
+    request.parent = this;
+    this.subRequests++;
 
-    // todo where do we create the implicit fail handler?
+    // send the message by calling the JS function for the procedure with 'this' bound to this Request
+    // we also bind the subtask to the handlers so they can call sendMessage and tryClose via 'this'
 
-    // send the message
+    process.nextTick(fn.bind(request, fn, args));
+};
 
-    process.nextTick(
-        function () {
-            address(args, address, onReply ? onReply.bind(subtask) : undefined, onFail ? onFail.bind(subtask) : undefined);
-        }
-    );
+/**
+ * Creates and sends a root request.
+ *
+ * @param fn
+ * @param args
+ * @param onReply
+ * @param onFail
+ */
+__.sendRootMessage = function (fn, args, onReply, onFail) {
 
-    // we could actually just create a new root Task object here and pass that instead of onReply & onFail...
-    // and then the request handler wouldn't have to create that task as the first thing it does
-    // will also need to pass connect
-    // we could call target and bind the root Task to it, so it could use 'this' like a handler
+    var request = new __(onReply, onFail);
+
+    process.nextTick(fn.bind(request, fn, args));
 };
 
 module.exports = __;

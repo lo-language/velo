@@ -19,7 +19,7 @@ module.exports["application"] = {
             args: []
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo($foo, [], $connect)');
+        test.equal(Compiler.compile(node).render(), '$foo($foo, [])');
         test.done();
     },
 
@@ -33,7 +33,7 @@ module.exports["application"] = {
             ]
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo($foo, [42], $connect)');
+        test.equal(Compiler.compile(node).render(), '$foo($foo, [42])');
         test.done();
     },
 
@@ -48,7 +48,7 @@ module.exports["application"] = {
             ]
         };
 
-        test.equal(Compiler.compile(node).render(), "$foo($foo, [42, 'hi there'], $connect)");
+        test.equal(Compiler.compile(node).render(), "$foo($foo, [42, 'hi there'])");
         test.done();
     },
 
@@ -70,7 +70,7 @@ module.exports["application"] = {
 
         // patch sub nodes?
 
-        test.equal(Compiler.compile(node).render(), "Q.spread([$foo($foo, [], $connect), $bar($bar, [], $connect)], function (x1, x2) {return $baz($baz, [x1, x2], $connect);})");
+        test.equal(Compiler.compile(node).render(), "Q.spread([$foo($foo, []), $bar($bar, [])], function (x1, x2) {return $baz($baz, [x1, x2]);})");
         test.done();
     }
 };
@@ -81,7 +81,7 @@ module.exports["application statements"] = {
 
         var node = {
             type: 'application_stmt',
-            expr: {
+            application: {
                 type: 'application',
                 address: {type: 'id', name: 'foo'},
                 args: [
@@ -89,7 +89,7 @@ module.exports["application statements"] = {
                 ]}
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo($foo, [42], $connect);');
+        test.equal(Compiler.compile(node).render(), '$foo($foo, [42]);');
         test.done();
     },
 
@@ -97,7 +97,7 @@ module.exports["application statements"] = {
 
         var node = {
             type: 'application_stmt',
-            expr: {
+            application: {
                 type: 'application',
                 address: {type: 'id', name: 'baz'},
                 args: [{
@@ -119,7 +119,7 @@ module.exports["application statements"] = {
         // patch sub nodes?
 
         test.equal(Compiler.compile(node).render(),
-            'Q.spread([$foo($foo, [], $connect), $bar($bar, [], $connect)], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz, [x1], $connect);});');
+            'Q.spread([$foo($foo, []), $bar($bar, [])], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz, [x1]);});');
         test.done();
     },
 
@@ -127,7 +127,7 @@ module.exports["application statements"] = {
 
         var node = {
             type: 'application_stmt',
-            expr: {
+            application: {
                 type: 'application',
                 address: {type: 'id', name: 'quux'},
                 args: [{
@@ -152,7 +152,7 @@ module.exports["application statements"] = {
         // patch sub nodes?
 
         test.equal(Compiler.compile(node).render(),
-            'Q.spread([$foo($foo, [], $connect), $bar($bar, [], $connect)], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz, [x1], $connect);}).then(function (x1) {return $quux($quux, [x1], $connect);});');
+            'Q.spread([$foo($foo, []), $bar($bar, [])], function (x1, x2) {return (x1 - x2);}).then(function (x1) {return $baz($baz, [x1]);}).then(function (x1) {return $quux($quux, [x1]);});');
         test.done();
     }
 };

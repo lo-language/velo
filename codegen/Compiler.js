@@ -108,12 +108,11 @@ __['procedure'] = function (node, scope) {
         body = ['var ' + varNames.join(', ') + ';\n\n', body];
     }
 
-    // create our task
-    body = ['var task = new Task(onReply, onFail);\n', body];
+    body = [body, '\n\nthis.tryClose();'];
 
-    // nixing anonymous recursion and implicit "connect" for now...
+    // nixing implicit "connect" for now...
     return new JsConstruct([
-        'function ($recur, args, onReply, onFail) ', {block: body}], false);
+        'function ($recur, args) ', {block: body}], false);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -161,12 +160,12 @@ __['receive'] = function (node, scope) {
 
 __['application_stmt'] = function (node, scope) {
 
-    var req = __.compile(node.expr, scope);
+    var application = __.compile(node.application, scope);
 
-    if (req instanceof JsRequest) {
+    if (application instanceof JsRequest) {
 
         // slap a semicolon on that bad boy and don't resolve it
-        return new JsStatement([req, ';']);
+        return new JsStatement([application, ';']);
     }
 
     throw new Error("only bare requests can be statements, dude!");
@@ -191,10 +190,10 @@ __['response'] = function (node, scope) {
     // we assume the existence of a Task object named 'task'
 
     if (node.channel === 'fail') {
-        return new JsStatement(['task.fail(', {csv: args}, ');\nreturn;\n\n']);
+        return new JsStatement(['this.fail(', {csv: args}, ');\nreturn;\n\n']);
     }
 
-    return new JsStatement(['task.reply(', {csv: args}, ');\nreturn;\n\n']);
+    return new JsStatement(['this.reply(', {csv: args}, ');\nreturn;\n\n']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -303,10 +302,10 @@ __['message'] = function (node, scope) {
 
     // compile the parts
 
-    var target = __.compile(node.to);
+    var target = __.compile(node.address);
 
     // todo add convenience method for compiling arrays?
-    var args = node.body.map(function (arg) {
+    var args = node.args.map(function (arg) {
         return __.compile(arg);
     });
 
@@ -350,13 +349,12 @@ __['application'] = function (node, scope) {
 
     var target = __.compile(node.address);
 
-    // todo add convenience method for compiling arrays?
     var args = node.args.map(function (arg) {
         return __.compile(arg);
     });
 
     // todo - compile as syntactic sugar around message
-    return new JsRequest([target, '(', target, ', [', {csv: args}, '], $connect)']);
+    return new JsRequest([target, '(', target, ', [', {csv: args}, '])']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

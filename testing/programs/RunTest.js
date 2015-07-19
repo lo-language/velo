@@ -38,21 +38,21 @@ var loader = new Loader(__dirname);
 //    }
 //};
 
-module.exports['connect'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(loader, 'modules');
-
-        this.harness.setUp(cb);
-    },
-
-    'success': function (test) {
-
-//        console.log(util.inspect(this.harness.module.parse(), {depth: null, colors: true}));
-        this.harness.testSuccess(test, [], 120);
-    }
-};
+//module.exports['connect'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.harness = new Harness(loader, 'modules');
+//
+//        this.harness.setUp(cb);
+//    },
+//
+//    'success': function (test) {
+//
+////        console.log(util.inspect(this.harness.module.parse(), {depth: null, colors: true}));
+//        this.harness.testSuccess(test, [], 120);
+//    }
+//};
 
 module.exports['io'] = {
 
@@ -67,35 +67,40 @@ module.exports['io'] = {
 
         test.expect(1);
 
-//        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
-//        console.log(this.harness.getJs().render(true));
 
-        // do we need every procedure to return a promise?
-        // or can we slap a promise on one from the outside if it doesn't?
+        try {
+            this.harness.getJs();
+        }
+        catch (e) {
+            console.error(e.stack);
+        }
+
+//        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
 
         this.harness.testSuccess(test, [[], {
             stdout: {
-                write: function (recur, args, attach) {
+                write: function (recur, args) {
                     test.ok(true);
+                    this.tryClose();
                 }
             }
         }, {}]);
     }
 };
 
-module.exports['deps'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(loader, 'deps');
-
-        this.harness.setUp(cb);
-    },
-
-    'success': function (test) {
-        this.harness.testSuccess(test, [], 14);
-    }
-};
+//module.exports['deps'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.harness = new Harness(loader, 'deps');
+//
+//        this.harness.setUp(cb);
+//    },
+//
+//    'success': function (test) {
+//        this.harness.testSuccess(test, [], 14);
+//    }
+//};
 
 module.exports['conditionals'] = {
 
@@ -119,41 +124,42 @@ module.exports['conditionals'] = {
     }
 };
 
-module.exports['factorial'] = {
+//module.exports['factorial'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.harness = new Harness(loader, 'factorial');
+//
+//        this.harness.setUp(cb);
+//    },
+//
+//    'success': function (test) {
+//        console.log(this.harness.getJs().render(true));
+//        this.harness.testSuccess(test, [10], 3628800);
+//    },
+//
+//    'failure': function (test) {
+//        this.harness.testFailure(test, [-1], 'I pity the fool!');
+//    }
+//};
 
-    "setUp": function (cb) {
-
-        this.harness = new Harness(loader, 'factorial');
-
-        this.harness.setUp(cb);
-    },
-
-    'success': function (test) {
-        this.harness.testSuccess(test, [10], 3628800);
-    },
-
-    'failure': function (test) {
-        this.harness.testFailure(test, [-1], 'I pity the fool!');
-    }
-};
-
-module.exports['fibonacci'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(loader, 'fibonacci');
-
-        this.harness.setUp(cb);
-    },
-
-    'success': function (test) {
-        this.harness.testSuccess(test, [10], 55);
-    },
-
-    'failure': function (test) {
-        this.harness.testFailure(test, [-1], 'Whatsamatta, you?');
-    }
-};
+//module.exports['fibonacci'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.harness = new Harness(loader, 'fibonacci');
+//
+//        this.harness.setUp(cb);
+//    },
+//
+//    'success': function (test) {
+//        this.harness.testSuccess(test, [10], 55);
+//    },
+//
+//    'failure': function (test) {
+//        this.harness.testFailure(test, [-1], 'Whatsamatta, you?');
+//    }
+//};
 
 module.exports['collections'] = {
 
@@ -170,25 +176,20 @@ module.exports['collections'] = {
     }
 };
 
-module.exports['procedure'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(loader, 'procedure');
-
-        this.harness.setUp(cb);
-    },
-
-    'success': function (test) {
-
-        this.harness.testSuccess(test, [], 60);
-    }
-};
-
-
-
-
-
+//module.exports['procedure'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.harness = new Harness(loader, 'procedure');
+//
+//        this.harness.setUp(cb);
+//    },
+//
+//    'success': function (test) {
+//
+//        this.harness.testSuccess(test, [], 60);
+//    }
+//};
 
 
 //module.exports['recovery'] = {
