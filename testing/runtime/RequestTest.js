@@ -361,7 +361,7 @@ module.exports = {
         };
 
         // todo send a root request
-        Request.sendRootMessage(requestHandler, [], function () {
+        Request.sendRootRequest(requestHandler, [], function () {
             test.done();
         }, function () {
             test.fail();

@@ -26,9 +26,9 @@
 
 
 /**
- * Models an Exa task, either for processing a request or a response, to handle the bookkeeping.
+ * Models an Exa request to handle the bookkeeping.
  *
- * Both request tasks and response tasks can have subtasks, but a request task must be at the root.
+ * Both request handlers and response handlers can send subrequests, but a request task must be at the root.
  * This creates a structure similar to a call stack, but as a tree.
  *
  * Takes a reply handler and a fail handler.
@@ -37,7 +37,10 @@
  */
 var __ = function (onReply, onFail) {
 
+    // todo should we take the target fn and args in this constructor?
+
     // todo inherit parent's onReply and onFail??
+
     // should recur be part of the request, not an arg?
 
     this.subRequests = 0;
@@ -144,7 +147,7 @@ __.prototype.sendMessage = function (fn, args, onReply, onFail) {
  * @param onReply
  * @param onFail
  */
-__.sendRootMessage = function (fn, args, onReply, onFail) {
+__.sendRootRequest = function (fn, args, onReply, onFail) {
 
     var request = new __(onReply, onFail);
 

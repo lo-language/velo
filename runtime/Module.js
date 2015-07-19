@@ -114,7 +114,7 @@ __.prototype.run = function (args) {
 
     var d = Q.defer();
 
-    Request.sendRootMessage(this.procedure, args, d.resolve, d.reject);
+    Request.sendRootRequest(this.procedure, args, d.resolve, d.reject);
 
     return d.promise;
 };
