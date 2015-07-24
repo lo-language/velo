@@ -28,14 +28,14 @@
 /**
  * Models an Exa request to handle the bookkeeping.
  *
- * Both request handlers and response handlers can send subrequests, but a request task must be at the root.
- * This creates a structure similar to a call stack, but as a tree.
+ * Both request handlers and response handlers can send subrequests, but all subrequests are attached to a parent request.
+ * This creates a request tree which serves a similar purpose to a call stack.
  *
  * Takes a reply handler and a fail handler.
  *
  * @return {*}
  */
-var __ = function (onReply, onFail) {
+var __ = function (onReply, onFail, onComplete) {
 
     // todo should we take the target fn and args in this constructor?
 
@@ -46,10 +46,11 @@ var __ = function (onReply, onFail) {
     this.subRequests = 0;
     this.onReply = onReply;
     this.onFail = onFail;
+    this.onComplete = onComplete;
 };
 
 /**
- * Sends a reply to the requestor.
+ * Sends a reply to the requestor, provided we haven't already responded.
  *
  * @param args
  */
@@ -57,16 +58,33 @@ __.prototype.reply = function (args) {
 
     if (this.onReply !== null && typeof this.onReply !== "undefined") {
 
-        // send the reply message
-        process.nextTick(this.onReply.bind(this, args));
+        console.error("scheduling reply for " + this.name);
+
+        // send the reply message, with this bound to this request
+        var onReply = this.onReply.bind(this, args);
+        var t = this;
+        process.nextTick(function () {
+            onReply();
+
+            console.error("signaling completion of: " + t.name);
+            t.onComplete && t.onComplete();
+        });
+//        this.onReply(args);
 
         // destroy our ability to respond again
         this.onFail = this.onReply = null;
+
+        // report back to the parent request that we've completed
+        // onComplete is actually bound to the parent, despite how we're calling it
+//        this.onComplete && this.onComplete();
+    }
+    else {
+        console.error("failed attempt to reply on " + this.name);
     }
 };
 
 /**
- * Sends a failure message to the requestor.
+ * Sends a failure message to the requestor, provided we haven't already responded.
  *
  * @param args
  */
@@ -75,40 +93,47 @@ __.prototype.fail = function (args) {
     if (this.onFail !== null && typeof this.onFail !== "undefined") {
 
         // send the fail message
-        process.nextTick(this.onFail.bind(this, args));
+        process.nextTick(function () {
+            this.onFail(args);
+        });
+//        this.onFail(args);
 
         // destroy our ability to respond again
         this.onReply = this.onFail = null;
+
+        // report back to the parent request that we've completed
+        // onComplete is actually bound to the parent, despite how we're calling it
+        this.onComplete && this.onComplete();
     }
 };
 
 /**
- * Tries to close this task - it will close unless there are open subrequests. Close in this case is the bookkeeping
- * sense.
+ * Tries to close this task - it will close unless there are open subrequests.
+ * Close in this case is the bookkeeping sense.
+ * When we close, we trigger a default reply.
  *
  * We shouldn't need to track the closed state separately since that's just subtasks == 0
  */
-__.prototype.tryClose = function () {
+__.prototype.tryClose = function (name) {
+
+    console.error("trying to close " + this.name);
 
     // make sure there aren't any open subrequests
     if (this.subRequests > 0) {
+        console.error("... but has " + this.subRequests + " pending subrequests");
         return;
     }
 
-    if (this.parent) {
-        this.parent.completeSubrequest();
-    }
-    else {
-        // this is a root task; issue the implicit reply
-        this.reply();
-    }
+    console.error("...closing!");
+    this.onReply && this.reply();
 };
 
 /**
  * Marks a subtask complete for bookkeeping. We don't care about which subtask.
  */
-__.prototype.completeSubrequest = function () {
+__.prototype.checkOff = function () {
 
+    console.error("checking off subrequest of: " + this.name);
     this.subRequests--;
     this.tryClose();
 };
@@ -124,18 +149,22 @@ __.prototype.completeSubrequest = function () {
  */
 __.prototype.sendMessage = function (fn, args, onReply, onFail) {
 
-    // create the subrequest
-
-    var request = new __(onReply, onFail);
-
     // todo don't track this request if no response handlers were provided
 
-    request.parent = this;
+    // create the subrequest and wire it up to check itself off when it responds
+
+    this.children = this.children || 1;
+
+    // should we dynamically wrap the raw handlers here, and include the checkoff?
+    // basically saying, intercept the handler callback to do our bookkeeping
+    // or in the constructor?
+    var request = new __(onReply, onFail, this.checkOff.bind(this));
+    request.name = this.name + ':child' + this.children++;
     this.subRequests++;
 
     // send the message by calling the JS function for the procedure with 'this' bound to this Request
     // we also bind the subtask to the handlers so they can call sendMessage and tryClose via 'this'
-
+console.error("scheduling request: " + request.name);
     process.nextTick(fn.bind(request, fn, args));
 };
 
