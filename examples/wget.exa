@@ -1,0 +1,38 @@
+// don't take args? io.cliArgs
+receive args, io, system;
+
+//after io.stdout.write ~ "howdy!\n":
+//
+//    after io.stdout.write ~ "el chupacabra!\n":
+//        io.stdout.write ~ "toledo\n";
+//
+//    io.stdout.write ~ "sporkchop!\n";
+//
+//
+//io.stdout.write ~ "porkchop?\n";
+
+
+//after io.http.get ~ "http://www.google.com":
+//    receive res, body;
+//    io.stdout.write ~ "response from google: " + res.statusCode + "\n";
+//    io.stdout.write ~ "body length: " + #body + "\n";
+//
+//io.stdout.write ~ "sent request to google\n\n";
+
+
+sendRequest is:
+
+    receive url;
+
+    after io.http.get ~ url:
+        receive res, body;
+        io.stdout.write ~ "response from " + url + ": status = " + res.statusCode + "\n";
+        io.stdout.write ~ "body length: " + #body + "\n";
+
+    io.stdout.write ~ "sent request to " + url + "\n";
+
+// race some requests
+
+sendRequest ~ "http://www.apple.com";
+sendRequest ~ "http://www.google.com";
+sendRequest ~ "http://www.exalang.org";

@@ -26,10 +26,11 @@
 
 'use strict';
 
-var Loader = require('./../loader/Loader');
+var Loader = require('./../runtime/Loader');
 var Q = require('q');
 var util = require('util');
 var path = require('path');
+var http = require('http');
 
 var sourceFile = process.argv[2];
 
@@ -50,8 +51,28 @@ var io = {
         write: function (recur, args, attach) {
 
             process.stdout.write.apply(process.stdout, args);
+            this.reply();
+        }
+    },
+    http: {
+        get: function (recur, args) {
 
-            return Q();
+            var exaRequest = this;
+
+            http.get(args[0], function (res) {
+
+//                console.log("Got response: " + res.statusCode);
+
+                var body = '';
+
+                res.setEncoding('utf8');
+                res.on('data', function (chunk) {
+                    body += chunk;
+                });
+                res.on('end', function () {
+                    exaRequest.reply([res, body]);
+                });
+            });
         }
     }
 };
@@ -64,14 +85,15 @@ var system = {
 loader.getModule(moduleName).then(
     function (main) {
 
-        console.error(main.compile().render(true) + '\n\n');
+//        console.log(util.inspect(main.parse(), {depth: null, colors: true}));
+//        console.error(main.compile().render(true) + '\n\n');
 
         // cut node off the arglist
         var args = Array.prototype.slice.call(process.argv, 1);
 
         main.run([args, io, system]).then(
             function (result) {
-                console.log(result);
+//                console.log(result);
             },
             function (msg) {
                 console.error(msg);

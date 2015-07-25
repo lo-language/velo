@@ -58,7 +58,7 @@ __.prototype.reply = function (args) {
 
     if (this.onReply !== null && typeof this.onReply !== "undefined") {
 
-        console.error("scheduling reply for " + this.name);
+//        console.error("scheduling reply for " + this.name);
 
         // send the reply message, with this bound to this request
         var response = this.onReply.bind(this, args);
@@ -66,7 +66,7 @@ __.prototype.reply = function (args) {
         process.nextTick(function () {
             response();
 
-            console.error("signaling completion of: " + t.name);
+//            console.error("signaling completion of: " + t.name);
 
             // report back to the parent request that we've completed
             // onComplete is actually bound to the parent, despite how we're calling it
@@ -93,7 +93,7 @@ __.prototype.fail = function (args) {
         process.nextTick(function () {
             response();
 
-            console.error("signaling completion of: " + t.name);
+//            console.error("signaling completion of: " + t.name);
 
             // report back to the parent request that we've completed
             // onComplete is actually bound to the parent, despite how we're calling it
@@ -114,15 +114,15 @@ __.prototype.fail = function (args) {
  */
 __.prototype.tryClose = function (name) {
 
-    console.error("trying to close " + this.name);
+//    console.error("trying to close " + this.name);
 
     // make sure there aren't any open subrequests
     if (this.subRequests > 0) {
-        console.error("... but has " + this.subRequests + " pending subrequests");
+//        console.error("... but has " + this.subRequests + " pending subrequests");
         return;
     }
 
-    console.error("...closing!");
+//    console.error("...closing!");
     this.onReply && this.reply();
 };
 
@@ -131,7 +131,7 @@ __.prototype.tryClose = function (name) {
  */
 __.prototype.checkOff = function () {
 
-    console.error("checking off subrequest of: " + this.name);
+//    console.error("checking off subrequest of: " + this.name);
     this.subRequests--;
     this.tryClose();
 };
@@ -164,7 +164,7 @@ __.prototype.sendMessage = function (fn, args, onReply, onFail) {
 
     // send the message by calling the JS function for the procedure with 'this' bound to this Request
     // we also bind the subtask to the handlers so they can call sendMessage and tryClose via 'this'
-console.error("scheduling request: " + request.name);
+//console.error("scheduling request: " + request.name + " (" + args + ")");
     process.nextTick(fn.bind(request, fn, args));
 };
 
@@ -179,6 +179,8 @@ console.error("scheduling request: " + request.name);
 __.sendRootRequest = function (fn, args, onReply, onFail) {
 
     var request = new __(onReply, onFail);
+
+    request.name = 'root';
 
     process.nextTick(fn.bind(request, fn, args));
 };

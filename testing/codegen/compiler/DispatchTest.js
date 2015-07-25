@@ -11,21 +11,6 @@ var util = require('util');
 
 module.exports["dispatch"] = {
 
-    "no handlers": function (test) {
-
-        var node = {
-            "type":"message",
-            "args": [],
-            "address": {
-                "type": "id",
-                "name": "foo"
-            }
-        };
-
-        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [], null, null);');
-        test.done();
-    },
-
     "with response handler": function (test) {
 
         var node = {
@@ -47,7 +32,7 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [], function () {$foo = 42;\n}, null);');
+        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [], function (args) {$foo = 42;\n}, null);\n\n');
         test.done();
     },
 
@@ -72,7 +57,7 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [], null, function () {$foo = 42;\n});');
+        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [], null, function (args) {$foo = 42;\n});\n\n');
         test.done();
     },
 
@@ -107,7 +92,7 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [], function () {$foo = 42;\n}, function () {$bar = 57;\n});');
+        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [], function (args) {$foo = 42;\n}, function (args) {$bar = 57;\n});\n\n');
         test.done();
     }
 };

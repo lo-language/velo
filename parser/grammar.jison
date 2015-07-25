@@ -330,7 +330,7 @@ expr
 dispatch
     : future ';'
     | future contingency
-    | AFTER future ':' block contingency?
+    | AFTER future ':' block contingency? -> {type: 'message', address: $2.address, args: $2.args, subsequent: $4, contingency: $5}
 //    | DISPATCH application contingency?   // for when we don't care about the return value at all
     ;
 

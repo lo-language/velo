@@ -293,7 +293,7 @@ __['conditional'] = function (node, scope) {
 // Message dispatch
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Generates code to send messages via Task.sendMessage().
+ * Generates code to send messages via Request.sendMessage().
  *
  * @param scope
  * @param node
@@ -314,7 +314,7 @@ __['message'] = function (node, scope) {
 
     if (node.subsequent) {
 
-        var subsequent = ['function () {', __.compile(node.subsequent), '}'];
+        var subsequent = ['function (args) ', {block: [__.compile(node.subsequent)]}];
 
         parts.push([', ', subsequent]);
     }
@@ -324,7 +324,7 @@ __['message'] = function (node, scope) {
 
     if (node.contingency) {
 
-        var contingency = ['function () {', __.compile(node.contingency), '}'];
+        var contingency = ['function (args) ', {block: [__.compile(node.contingency)]}];
 
         parts.push([', ', contingency]);
     }
@@ -332,7 +332,7 @@ __['message'] = function (node, scope) {
         parts.push(', null');
     }
 
-    parts.push(');');
+    parts.push(');\n\n');
 
     return new JsConstruct(parts);
 };

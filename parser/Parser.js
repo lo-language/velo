@@ -188,6 +188,8 @@ case 71:this.$ = {type: 'in', left: $$[$0-2], right: $$[$0]};
 break;
 case 72:this.$ = {type: 'sequence', first: $$[$0-2], last: $$[$0]};
 break;
+case 75:this.$ = {type: 'message', address: $$[$0-3].address, args: $$[$0-3].args, subsequent: $$[$0-1], contingency: $$[$0]};
+break;
 case 77:this.$ = $$[$0-2];
 break;
 case 79:this.$ = {type: 'message', address: $$[$0-3], args: $$[$0-1].concat([$$[$0]])};
