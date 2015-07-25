@@ -351,16 +351,9 @@ module.exports = {
                 this.sendMessage(bar, args, null, function (args) {  // an error handler
 
                     console.log("what?! a failure?!");
-
-                    // eventually we'll get to a leaf request like this, and calling complete will actually complete the subrequest in the parent
-                    this.tryClose();
                 });
 
                 this.sendMessage(baz, args, function (args) {  // a response handler doesn't need an envelope
-
-                    // eventually we'll get to a leaf request like this, where calling tryClose will succeed in closing the request
-                    this.tryClose();
-
                 });
 
                 this.tryClose();

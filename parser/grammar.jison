@@ -55,12 +55,10 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
     }
                         %}
 \s+                     /* ignore all other whitespace */
-"`"                     return '`'
 "nil"                   return 'NIL' // none, null, void, empty, blank, nada, nothing, zip, nil, missing, undefined, undef? some symbol? () empty parens?
 "true"|"false"          return 'BOOLEAN'
 {number}                return 'NUMBER'
 \"[^\"]*\"              yytext = yytext.substr(1, yyleng-2); return 'STRING';
-//\'[^\']*\'              yytext = yytext.substr(1, yyleng-2); return 'STRING';
 "["                     return '['
 "]"                     return ']'
 "("                     return '('
