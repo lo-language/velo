@@ -32,7 +32,12 @@ __.prototype.setUp = function (cb) {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/**
+ * Returns the JSConstruct for this program.
+ *
+ * @param cb
+ * @return {String|*}
+ */
 __.prototype.getJs = function (cb) {
 
     return this.module.compile();
@@ -49,13 +54,14 @@ __.prototype.testSuccess = function (test, input, expected) {
     }).then(
         function (result) {
 
-//            console.log(result.toString());
-
             if (expected !== undefined) {
                 test.equal(result, expected);
             }
 
             test.done();
+        },
+        function (err) {
+            console.error("oh noes!");
         }
     ).done();
 };

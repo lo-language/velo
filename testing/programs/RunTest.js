@@ -75,7 +75,7 @@ module.exports['io'] = {
             console.error(e.stack);
         }
 
-//        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
+        console.log(util.inspect(this.harness.getJs().render(), {depth: null, colors: true}));
 
         this.harness.testSuccess(test, [[], {
             stdout: {

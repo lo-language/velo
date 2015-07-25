@@ -61,25 +61,20 @@ __.prototype.reply = function (args) {
         console.error("scheduling reply for " + this.name);
 
         // send the reply message, with this bound to this request
-        var onReply = this.onReply.bind(this, args);
+        var response = this.onReply.bind(this, args);
         var t = this;
         process.nextTick(function () {
-            onReply();
+            response();
 
             console.error("signaling completion of: " + t.name);
+
+            // report back to the parent request that we've completed
+            // onComplete is actually bound to the parent, despite how we're calling it
             t.onComplete && t.onComplete();
         });
-//        this.onReply(args);
 
-        // destroy our ability to respond again
+        // immediately destroy our ability to respond again
         this.onFail = this.onReply = null;
-
-        // report back to the parent request that we've completed
-        // onComplete is actually bound to the parent, despite how we're calling it
-//        this.onComplete && this.onComplete();
-    }
-    else {
-        console.error("failed attempt to reply on " + this.name);
     }
 };
 
@@ -92,18 +87,21 @@ __.prototype.fail = function (args) {
 
     if (this.onFail !== null && typeof this.onFail !== "undefined") {
 
-        // send the fail message
+        // send the fail message, with this bound to this request
+        var response = this.onFail.bind(this, args);
+        var t = this;
         process.nextTick(function () {
-            this.onFail(args);
+            response();
+
+            console.error("signaling completion of: " + t.name);
+
+            // report back to the parent request that we've completed
+            // onComplete is actually bound to the parent, despite how we're calling it
+            t.onComplete && t.onComplete();
         });
-//        this.onFail(args);
 
-        // destroy our ability to respond again
+        // immediately destroy our ability to respond again
         this.onReply = this.onFail = null;
-
-        // report back to the parent request that we've completed
-        // onComplete is actually bound to the parent, despite how we're calling it
-        this.onComplete && this.onComplete();
     }
 };
 
@@ -151,16 +149,18 @@ __.prototype.sendMessage = function (fn, args, onReply, onFail) {
 
     // todo don't track this request if no response handlers were provided
 
-    // create the subrequest and wire it up to check itself off when it responds
 
     this.children = this.children || 1;
 
-    // should we dynamically wrap the raw handlers here, and include the checkoff?
-    // basically saying, intercept the handler callback to do our bookkeeping
-    // or in the constructor?
+
+    // create the subrequest and if it has handlers, wire it up to check itself off when it responds
+
     var request = new __(onReply, onFail, this.checkOff.bind(this));
     request.name = this.name + ':child' + this.children++;
-    this.subRequests++;
+
+    if (onReply || onFail) {
+        this.subRequests++;
+    }
 
     // send the message by calling the JS function for the procedure with 'this' bound to this Request
     // we also bind the subtask to the handlers so they can call sendMessage and tryClose via 'this'

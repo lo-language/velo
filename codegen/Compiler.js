@@ -46,7 +46,7 @@ var __ = {};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Dispatches to the appropriate node type handler.
+ * Dispatches to the appropriate node type handler. Returns a JSConstruct.
  *
  * @param node
  * @param scope

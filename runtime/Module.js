@@ -57,12 +57,12 @@ __.prototype.compile = function () {
 
     if (this.js === undefined) {
 
-//        try {
+        try {
             this.js = Compiler.compile(this.parse());
-//        }
-//        catch (e) {
-//            console.error(e);
-//        }
+        }
+        catch (e) {
+            console.error(e);
+        }
     }
 
     return this.js;
@@ -114,7 +114,7 @@ __.prototype.run = function (args) {
 
     var d = Q.defer();
 
-    Request.sendRootRequest(this.procedure, args, d.resolve, d.reject);
+    Request.sendRootRequest(this.procedure, args, d.resolve.bind(d), d.reject.bind(d));
 
     return d.promise;
 };
