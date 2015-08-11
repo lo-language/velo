@@ -15,7 +15,7 @@
         "jison": "0.4.x"
     },
     "scripts": {
-        "test": "nodeunit testing/*"
+        "test": "nodeunit testing/parser testing/codegen testing/runtime testing/programs"
     },
     "bin": {
         "exa": "./bin/exa"
