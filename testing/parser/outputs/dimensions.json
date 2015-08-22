@@ -2,15 +2,13 @@
     "type":"stmt_list",
     "head":{
         "type":"quality",
-        "name":"color",
-        "symbols":["black", "white"]
+        "variants":["black", "white"]
     },
     "tail":{
         "type":"stmt_list",
         "head":{
             "type":"quality",
-            "name":"rank",
-            "symbols":["pawn", "knight", "bishop", "rook", "king", "queen"]
+            "variants":["pawn", "knight", "bishop", "rook", "king", "queen"]
         },
         "tail":null
     }

@@ -207,7 +207,7 @@ statement_list
 
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: 'receive', names: $2.concat($3)}
-    | QUALITY ID (ID ',')* ID ';' -> {type: 'quality', name: $2, symbols: $3.concat($4)}
+    | QUALITY (ID ',')+ ID ';' -> {type: 'quality', variants: $2.concat($3)}
     | application contingency? ';' -> {type: 'application_stmt', application: $1, contingency: $2}
     | response ';'
     | assignment
