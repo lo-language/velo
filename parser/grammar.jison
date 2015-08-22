@@ -100,6 +100,8 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "="                     return '='
 "?"                     return '?'
 "#"                     return '#'
+"quality"               return 'QUALITY'
+"quantity"              return 'QUANTITY'
 "is"                    return 'IS'
 "receive"               return 'RECEIVE'
 "if"                    return 'IF'
@@ -107,7 +109,6 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "catch"                 return 'CATCH'      // failed?
 "while"                 return 'WHILE'
 "after"                 return 'AFTER'      // when, on, release, send, dispatch, fire?
-"dispatch"              return 'DISPATCH'
 "in"                    return 'IN'
 "skip"                  return 'SKIP'
 "reply"                 return 'REPLY'
@@ -206,6 +207,7 @@ statement_list
 
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: 'receive', names: $2.concat($3)}
+    | QUALITY ID (ID ',')* ID ';' -> {type: 'quality', name: $2, symbols: $3.concat($4)}
     | application contingency? ';' -> {type: 'application_stmt', application: $1, contingency: $2}
     | response ';'
     | assignment

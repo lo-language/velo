@@ -1,0 +1,17 @@
+{"type":"procedure", "body":{
+    "type":"stmt_list",
+    "head":{
+        "type":"quality",
+        "name":"color",
+        "symbols":["black", "white"]
+    },
+    "tail":{
+        "type":"stmt_list",
+        "head":{
+            "type":"quality",
+            "name":"rank",
+            "symbols":["pawn", "knight", "bishop", "rook", "king", "queen"]
+        },
+        "tail":null
+    }
+}}

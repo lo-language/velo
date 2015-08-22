@@ -1,0 +1,2 @@
+quality color   black, white;
+quality rank    pawn, knight, bishop, rook, king, queen;
