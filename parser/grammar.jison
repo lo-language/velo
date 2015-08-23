@@ -100,8 +100,8 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "="                     return '='
 "?"                     return '?'
 "#"                     return '#'
-"quality"               return 'QUALITY'
-"quantity"              return 'QUANTITY'
+"define"                return 'DEFINE'
+"distinguish"           return 'DISTINGUISH'
 "is"                    return 'IS'
 "receive"               return 'RECEIVE'
 "if"                    return 'IF'
@@ -207,7 +207,8 @@ statement_list
 
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: 'receive', names: $2.concat($3)}
-    | QUALITY (ID ',')+ ID ';' -> {type: 'quality', variants: $2.concat($3)}
+    | DEFINE ID (NUMBER|STRING) ';' -> {type: 'constant', name: $2, value: $3}
+    | DISTINGUISH ID+ ID ';' -> {type: 'range', variants: $2.concat($3)}
     | application contingency? ';' -> {type: 'application_stmt', application: $1, contingency: $2}
     | response ';'
     | assignment

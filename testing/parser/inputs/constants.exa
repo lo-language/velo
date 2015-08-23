@@ -1,0 +1,11 @@
+define port 443;
+
+distinguish black white;
+
+distinguish
+king
+queen
+rook
+bishop
+knight
+pawn;
