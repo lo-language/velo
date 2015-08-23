@@ -4,12 +4,23 @@ answer = 42;
 age = 63.4;
 message = "hello, world!";
 
+// list
+names = ["Ford", "Arthur", "Trillian", "Zaphod"];
+
+// map
+homes = [
+    "Ford":     "Betelgeuse",
+    "Arthur":   "Earth",
+    "Trillian": "Earth",
+    "Zaphod":   "Betelgeuse"
+];
+
 // procedure literal
 HardyRamanujan is:
     reply 1729;
 
-// map with indentation and symbols
+// record with indentation
 pairs = {
-    key1: <blue>,
-    key2: <amber>
+    key1: "alpha",
+    key2: "bravo"
 };

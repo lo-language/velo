@@ -279,18 +279,21 @@ lvalue
 
 literal
     : NIL -> {type: 'nil'}
-    | '<' ID '>' -> {type: 'symbol', name: $2}
     | BOOLEAN -> {type: 'boolean', val: $1 == 'true'}
     | NUMBER -> {type: 'number', val: $1}
     | STRING -> {type: 'string', val: $1}
-    | '[' (expr ',')* expr? ']' -> {type: 'list', elements: $3 ? $2.concat([$3]): []}
-    | '{' BEGIN* (dyad ',')* dyad? END* '}' -> {type: 'set', members: $4 ? $3.concat([$4]): []}
+    | '[' BEGIN? (dyad ',')* dyad? END? ']' -> {type: 'list', elements: $4 ? $3.concat([$4]): []}
+    | '{' BEGIN? (attribute ',')* attribute? END? '}' -> {type: 'record', attributes: $4 ? $3.concat([$4]): []}
     | '::' block
     ;
 
 dyad
     : expr -> {type: 'dyad', key: $1, value: {type: 'boolean', val: true}};
     | expr ':' expr -> {type: 'dyad', key: $1, value: $3};
+    ;
+
+attribute
+    : ID ':' expr -> {type: 'field', name: $1, value: $3}
     ;
 
 // applications ARE expressions
@@ -332,7 +335,6 @@ dispatch
     : future ';'
     | future contingency
     | AFTER future ':' block contingency? -> {type: 'message', address: $2.address, args: $2.args, subsequent: $4, contingency: $5}
-//    | DISPATCH application contingency?   // for when we don't care about the return value at all
     ;
 
 // a future is like an IOU for a value - *any* lvalue can be a future

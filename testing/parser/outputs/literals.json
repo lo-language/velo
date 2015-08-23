@@ -1,17 +1,29 @@
-{
-    "type":"procedure",
-    "body":{
+{"type":"procedure", "body":{
+    "type":"stmt_list",
+    "head":{
+        "type":"assign",
+        "op":"=",
+        "left":{
+            "type":"id",
+            "name":"x"
+        },
+        "right":{
+            "type":"boolean",
+            "val":true
+        }
+    },
+    "tail":{
         "type":"stmt_list",
         "head":{
             "type":"assign",
             "op":"=",
             "left":{
                 "type":"id",
-                "name":"x"
+                "name":"y"
             },
             "right":{
                 "type":"boolean",
-                "val":true
+                "val":false
             }
         },
         "tail":{
@@ -21,11 +33,11 @@
                 "op":"=",
                 "left":{
                     "type":"id",
-                    "name":"y"
+                    "name":"answer"
                 },
                 "right":{
-                    "type":"boolean",
-                    "val":false
+                    "type":"number",
+                    "val":"42"
                 }
             },
             "tail":{
@@ -35,11 +47,11 @@
                     "op":"=",
                     "left":{
                         "type":"id",
-                        "name":"answer"
+                        "name":"age"
                     },
                     "right":{
                         "type":"number",
-                        "val":"42"
+                        "val":"63.4"
                     }
                 },
                 "tail":{
@@ -49,11 +61,11 @@
                         "op":"=",
                         "left":{
                             "type":"id",
-                            "name":"age"
+                            "name":"message"
                         },
                         "right":{
-                            "type":"number",
-                            "val":"63.4"
+                            "type":"string",
+                            "val":"hello, world!"
                         }
                     },
                     "tail":{
@@ -63,11 +75,56 @@
                             "op":"=",
                             "left":{
                                 "type":"id",
-                                "name":"message"
+                                "name":"names"
                             },
                             "right":{
-                                "type":"string",
-                                "val":"hello, world!"
+                                "type":"list",
+                                "elements":[
+                                    {
+                                        "type":"dyad",
+                                        "key":{
+                                            "type":"string",
+                                            "val":"Ford"
+                                        },
+                                        "value":{
+                                            "type":"boolean",
+                                            "val":true
+                                        }
+                                    },
+                                    {
+                                        "type":"dyad",
+                                        "key":{
+                                            "type":"string",
+                                            "val":"Arthur"
+                                        },
+                                        "value":{
+                                            "type":"boolean",
+                                            "val":true
+                                        }
+                                    },
+                                    {
+                                        "type":"dyad",
+                                        "key":{
+                                            "type":"string",
+                                            "val":"Trillian"
+                                        },
+                                        "value":{
+                                            "type":"boolean",
+                                            "val":true
+                                        }
+                                    },
+                                    {
+                                        "type":"dyad",
+                                        "key":{
+                                            "type":"string",
+                                            "val":"Zaphod"
+                                        },
+                                        "value":{
+                                            "type":"boolean",
+                                            "val":true
+                                        }
+                                    }
+                                ]
                             }
                         },
                         "tail":{
@@ -77,24 +134,56 @@
                                 "op":"=",
                                 "left":{
                                     "type":"id",
-                                    "name":"HardyRamanujan"
+                                    "name":"homes"
                                 },
                                 "right":{
-                                    "type":"procedure",
-                                    "body":{
-                                        "type":"stmt_list",
-                                        "head":{
-                                            "type":"response",
-                                            "channel":"reply",
-                                            "args":[
-                                                {
-                                                    "type":"number",
-                                                    "val":"1729"
-                                                }
-                                            ]
+                                    "type":"list",
+                                    "elements":[
+                                        {
+                                            "type":"dyad",
+                                            "key":{
+                                                "type":"string",
+                                                "val":"Ford"
+                                            },
+                                            "value":{
+                                                "type":"string",
+                                                "val":"Betelgeuse"
+                                            }
                                         },
-                                        "tail":null
-                                    }
+                                        {
+                                            "type":"dyad",
+                                            "key":{
+                                                "type":"string",
+                                                "val":"Arthur"
+                                            },
+                                            "value":{
+                                                "type":"string",
+                                                "val":"Earth"
+                                            }
+                                        },
+                                        {
+                                            "type":"dyad",
+                                            "key":{
+                                                "type":"string",
+                                                "val":"Trillian"
+                                            },
+                                            "value":{
+                                                "type":"string",
+                                                "val":"Earth"
+                                            }
+                                        },
+                                        {
+                                            "type":"dyad",
+                                            "key":{
+                                                "type":"string",
+                                                "val":"Zaphod"
+                                            },
+                                            "value":{
+                                                "type":"string",
+                                                "val":"Betelgeuse"
+                                            }
+                                        }
+                                    ]
                                 }
                             },
                             "tail":{
@@ -104,37 +193,59 @@
                                     "op":"=",
                                     "left":{
                                         "type":"id",
-                                        "name":"pairs"
+                                        "name":"HardyRamanujan"
                                     },
                                     "right":{
-                                        "type":"set",
-                                        "members":[
-                                            {
-                                                "type":"dyad",
-                                                "key":{
-                                                    "type":"id",
-                                                    "name":"key1"
-                                                },
-                                                "value":{
-                                                    "type":"symbol",
-                                                    "name":"blue"
-                                                }
+                                        "type":"procedure",
+                                        "body":{
+                                            "type":"stmt_list",
+                                            "head":{
+                                                "type":"response",
+                                                "channel":"reply",
+                                                "args":[
+                                                    {
+                                                        "type":"number",
+                                                        "val":"1729"
+                                                    }
+                                                ]
                                             },
-                                            {
-                                                "type":"dyad",
-                                                "key":{
-                                                    "type":"id",
-                                                    "name":"key2"
-                                                },
-                                                "value":{
-                                                    "type":"symbol",
-                                                    "name":"amber"
-                                                }
-                                            }
-                                        ]
+                                            "tail":null
+                                        }
                                     }
                                 },
-                                "tail":null
+                                "tail":{
+                                    "type":"stmt_list",
+                                    "head":{
+                                        "type":"assign",
+                                        "op":"=",
+                                        "left":{
+                                            "type":"id",
+                                            "name":"pairs"
+                                        },
+                                        "right":{
+                                            "type":"record",
+                                            "attributes":[
+                                                {
+                                                    "type":"field",
+                                                    "name":"key1",
+                                                    "value":{
+                                                        "type":"string",
+                                                        "val":"alpha"
+                                                    }
+                                                },
+                                                {
+                                                    "type":"field",
+                                                    "name":"key2",
+                                                    "value":{
+                                                        "type":"string",
+                                                        "val":"bravo"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "tail":null
+                                }
                             }
                         }
                     }
@@ -142,4 +253,4 @@
             }
         }
     }
-}
+}}

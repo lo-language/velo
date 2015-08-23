@@ -208,25 +208,27 @@
                                                                         },
                                                                         "args":[
                                                                             {
-                                                                                "type":"set",
-                                                                                "members":[
+                                                                                "type":"record",
+                                                                                "attributes":[
                                                                                     {
-                                                                                        "type":"dyad",
-                                                                                        "key":{
+                                                                                        "type":"field",
+                                                                                        "name":"ready",
+                                                                                        "value":{
                                                                                             "type":"boolean",
                                                                                             "val":true
-                                                                                        },
+                                                                                        }
+                                                                                    },
+                                                                                    {
+                                                                                        "type":"field",
+                                                                                        "name":"height",
                                                                                         "value":{
                                                                                             "type":"number",
                                                                                             "val":"72"
                                                                                         }
                                                                                     },
                                                                                     {
-                                                                                        "type":"dyad",
-                                                                                        "key":{
-                                                                                            "type":"number",
-                                                                                            "val":"89"
-                                                                                        },
+                                                                                        "type":"field",
+                                                                                        "name":"answer",
                                                                                         "value":{
                                                                                             "type":"number",
                                                                                             "val":"42"
