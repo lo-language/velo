@@ -208,7 +208,7 @@ statement_list
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: 'receive', names: $2.concat($3)}
     | DEFINE ID (NUMBER|STRING) ';' -> {type: 'constant', name: $2, value: $3}
-    | DISTINGUISH ID+ ID ';' -> {type: 'range', variants: $2.concat($3)}
+    | DISTINGUISH (ID ','?)+ ID ';' -> {type: 'range', variants: $2.concat($3)}
     | application contingency? ';' -> {type: 'application_stmt', application: $1, contingency: $2}
     | response ';'
     | assignment

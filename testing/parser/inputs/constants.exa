@@ -1,6 +1,6 @@
 define port 443;
 
-distinguish black white;
+distinguish black, white;
 
 distinguish
 king
