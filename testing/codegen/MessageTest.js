@@ -5,8 +5,8 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
-var Scope = require('../../../codegen/Scope');
+var Compiler = require('../../codegen/Compiler');
+var Scope = require('../../codegen/Scope');
 var util = require('util');
 
 module.exports["message"] = {
