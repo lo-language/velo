@@ -19,7 +19,7 @@ module.exports["application"] = {
             args: []
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo($foo, [])');
+        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [], function (args) {T1}, null);\n\n');
         test.done();
     },
 
@@ -33,7 +33,7 @@ module.exports["application"] = {
             ]
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo($foo, [42])');
+        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [42], function (args) {T1}, null);\n\n');
         test.done();
     },
 
@@ -48,7 +48,7 @@ module.exports["application"] = {
             ]
         };
 
-        test.equal(Compiler.compile(node).render(), "$foo($foo, [42, 'hi there'])");
+        test.equal(Compiler.compile(node).render(), "this.sendMessage($foo, [42, 'hi there'], function (args) {T1}, null);\n\n");
         test.done();
     },
 
@@ -70,7 +70,7 @@ module.exports["application"] = {
 
         // patch sub nodes?
 
-        test.equal(Compiler.compile(node).render(), "Q.spread([$foo($foo, []), $bar($bar, [])], function (x1, x2) {return $baz($baz, [x1, x2]);})");
+        test.equal(Compiler.compile(node).render(), "this.sendMessage($bar, [], function (args) {this.sendMessage($foo, [], function (args) {this.sendMessage($baz, [T1, T2], function (args) {T1}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     }
 };
@@ -89,7 +89,7 @@ module.exports["application statements"] = {
                 ]}
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo($foo, [42]);');
+        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [42], function (args) {T1}, null);\n\n');
         test.done();
     },
 

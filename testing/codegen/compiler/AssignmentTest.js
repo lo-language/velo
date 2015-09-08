@@ -74,7 +74,7 @@ module.exports["assignment"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).render(), '$bar($bar, []).then(function (x1) {$foo = x1;\n})');
+        test.equal(Compiler.compile(node).render(), 'this.sendMessage($bar, [], function (args) {$foo = T1;\n}, null);\n\n');
         test.done();
     }
 };

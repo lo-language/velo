@@ -5,24 +5,24 @@
 
 "use strict";
 
-var Compiler = require('../../codegen/Compiler');
-var Scope = require('../../codegen/Scope');
+var Message = require('../../codegen/Message');
 var util = require('util');
 
-module.exports["message"] = {
+module.exports["basics"] = {
 
     "no handlers": function (test) {
 
-        var node = {
-            "type":"message",
-            "args": [],
-            "address": {
-                "type": "id",
-                "name": "foo"
-            }
-        };
+        var msg = new Message('$foo', []);
 
-        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [], null, null);\n\n');
+        test.equal(msg.render(), 'this.sendMessage($foo, [], null, null);\n\n');
+        test.done();
+    },
+
+    "success handler": function (test) {
+
+        var msg = new Message('$foo', [], "x = 1;");
+
+        test.equal(msg.render(), 'this.sendMessage($foo, [], function (args) {x = 1;}, null);\n\n');
         test.done();
     }
 };

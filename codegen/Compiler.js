@@ -27,7 +27,10 @@
  *
  * Each AST node is compiled into either a bare JS string or an array of strings, arrays, and objects.
  *
- * In the compile phase, the AST is traversed and each node is compiled into either a bare JS string or a JS "construct" which is a list of JS strings and sub-constructs produced by compiling sub-nodes. Simple nodes, such as literals, compile into bare JS strings. More complex nodes compile into constructs, e.g. an addition node would compile into the construct ['(', leftOperand, ' + ', rightOperand, ')']
+ * In the compile phase, the AST is traversed and each node is compiled into either a bare JS string
+ * or a JS "construct" which is a list of JS strings and sub-constructs produced by compiling sub-nodes.
+ * Simple nodes, such as literals, compile into bare JS strings. More complex nodes compile into constructs,
+ * e.g. an addition node would compile into the construct ['(', leftOperand, ' + ', rightOperand, ')']
  *
  * Note:
  * To compile an expression containing a request, we have to do a trick where we create a "resolver" block to wrap the expression.
@@ -38,9 +41,8 @@
 var Q = require('q');
 var Scope = require('./Scope');
 var JsConstruct = require('./JsConstruct');
-var JsStatement = require('./JsStatement');
-var JsResolver = require('./JsResolver');
-var JsRequest = require('./JsRequest');
+var Message = require('./Message');
+var SyncMessage = require('./SyncMessage');
 
 var __ = {};
 
@@ -131,8 +133,10 @@ __['stmt_list'] = function (node, scope) {
 
         var tail = __.compile(node.tail, scope);
 
-        if (head.isAsync()) {
-            return new JsConstruct(['return ', head, '.then(function () {', tail, '})'], false);
+        if (head.isWrapped) {
+
+            // todo this should return a SyncMessage, not a message, so we can propagate the SyncMessage upwards
+            return head.add(tail);
         }
 
         return new JsConstruct([head, tail]);
@@ -160,15 +164,7 @@ __['receive'] = function (node, scope) {
 
 __['application_stmt'] = function (node, scope) {
 
-    var application = __.compile(node.application, scope);
-
-    if (application instanceof JsRequest) {
-
-        // slap a semicolon on that bad boy and don't resolve it
-        return new JsStatement([application, ';']);
-    }
-
-    throw new Error("only bare requests can be statements, dude!");
+    return __.compile(node.application, scope);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -217,7 +213,7 @@ __['assign'] = function (node, scope) {
         scope.define(node.left.name);
     }
 
-    return new JsStatement(new JsResolver([left, ' ' + node.op + ' ', right, ';\n'], false));
+    return new JsConstruct([left, ' ' + node.op + ' ', right, ';\n']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -246,7 +242,7 @@ __['conditional'] = function (node, scope) {
         parts.push('else ', {block: negBlock}, '\n');
     }
 
-    return new JsResolver(parts);
+    return new JsConstruct(parts);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -261,7 +257,7 @@ __['conditional'] = function (node, scope) {
 //    var condition = __.compile(node.condition, scope);
 ////    var statements = __.compile(node.statements, scope);
 //
-//    return new JsWrapper(function (resolver) {
+//    return new JsSyncMessage(function (resolver) {
 ////        return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
 //    });
 //};
@@ -304,37 +300,13 @@ __['message'] = function (node, scope) {
 
     var target = __.compile(node.address);
 
-    // todo add convenience method for compiling arrays?
     var args = node.args.map(function (arg) {
         return __.compile(arg);
     });
 
-    // render an async call
-    var parts = ['this.sendMessage(', target, ', [', {csv: args}, ']'];
-
-    if (node.subsequent) {
-
-        var subsequent = ['function (args) ', {block: [__.compile(node.subsequent)]}];
-
-        parts.push([', ', subsequent]);
-    }
-    else {
-        parts.push(', null');
-    }
-
-    if (node.contingency) {
-
-        var contingency = ['function (args) ', {block: [__.compile(node.contingency)]}];
-
-        parts.push([', ', contingency]);
-    }
-    else {
-        parts.push(', null');
-    }
-
-    parts.push(');\n\n');
-
-    return new JsConstruct(parts);
+    return new Message(target, args,
+        node.subsequent ? __.compile(node.subsequent) : null,
+        node.contingency ? __.compile(node.contingency) : null);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -353,8 +325,8 @@ __['application'] = function (node, scope) {
         return __.compile(arg);
     });
 
-    // todo - compile as syntactic sugar around message
-    return new JsRequest([target, '(', target, ', [', {csv: args}, '])']);
+    // return a wrapped placeholder
+    return new SyncMessage(target, args);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -382,7 +354,7 @@ __['cardinality'] = function (node, scope) {
 
     // todo factor this out into a call to a utility function
 
-    return new JsResolver([
+    return new JsConstruct([
         'function (val) {' +
             "if (typeof val === 'string') return val.length;" +
             "else if (Array.isArray(val)) return val.length;" +
@@ -398,7 +370,7 @@ __['cardinality'] = function (node, scope) {
  */
 __['complement'] = function (node, scope) {
 
-    return new JsResolver(['!', __.compile(node.operand, scope)]);
+    return new JsConstruct(['!', __.compile(node.operand, scope)]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -421,7 +393,7 @@ __['subscript'] = function (node, scope) {
     // todo - what if the list expression is a request or somesuch? can't resolve it twice
     // wrap it in a helper function?
 
-    return new JsResolver([list, '[', (index === undefined ? list + '.length - 1' : index), ']']);
+    return new JsConstruct([list, '[', (index === undefined ? list + '.length - 1' : index), ']']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -436,7 +408,7 @@ __['select'] = function (node, scope) {
 
     var set = __.compile(node.set, scope);
 
-    return new JsResolver([set, '.', node.member]);
+    return new JsConstruct([set, '.', node.member]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -445,18 +417,18 @@ __['select'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__['in'] = function (node, scope) {
-
-    // should holds apply to strings? maybe as 'contains'? or some non-word operator?
-
-    var left = __.compile(node.left, scope);
-    var right = __.compile(node.right, scope);
-
-    return new JsResolver(['function (item, collection) {' +
-            "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
-            "else if (typeof val === 'object') return collection.hasOwnProperty(item);" +
-            "}(", left, ',', right, ")"]);
-};
+//__['in'] = function (node, scope) {
+//
+//    // should holds apply to strings? maybe as 'contains'? or some non-word operator?
+//
+//    var left = __.compile(node.left, scope);
+//    var right = __.compile(node.right, scope);
+//
+//    return new JsConstruct(['function (item, collection) {' +
+//            "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
+//            "else if (typeof val === 'object') return collection.hasOwnProperty(item);" +
+//            "}(", left, ',', right, ")"]);
+//};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -464,18 +436,18 @@ __['in'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__['sequence'] = function (node, scope) {
-
-    var first = __.compile(node.first, scope);
-    var last = __.compile(node.last, scope);
-
-    // renders an expression that is a function that takes a single arg -
-    // the action to be performed
-
-    return new JsResolver(['function (first, last, action) {\n' +
-            'for (var num = first; num <= last; num++) { action(num); }' +
-        "}.bind(null,", first, ',', last, ')']);
-};
+//__['sequence'] = function (node, scope) {
+//
+//    var first = __.compile(node.first, scope);
+//    var last = __.compile(node.last, scope);
+//
+//    // renders an expression that is a function that takes a single arg -
+//    // the action to be performed
+//
+//    return new JsConstruct(['function (first, last, action) {\n' +
+//            'for (var num = first; num <= last; num++) { action(num); }' +
+//        "}.bind(null,", first, ',', last, ')']);
+//};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -517,7 +489,7 @@ __['op'] = function (node, scope) {
 //    }
 
     // use parens to be safe
-    return new JsResolver(['(', left, ' ', op, ' ', right, ')']);
+    return new JsConstruct(['(', left, ' ', op, ' ', right, ')']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -574,7 +546,7 @@ __['list'] = function (node, scope) {
         return self.compile(item, scope);
     });
 
-    return new JsResolver(['[', {csv: items}, ']']);
+    return new JsConstruct(['[', {csv: items}, ']']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -594,7 +566,7 @@ __['set'] = function (node, scope) {
     });
 
     // could use a block annotation here
-    return new JsResolver(['{', {csv: members}, '}']);
+    return new JsConstruct(['{', {csv: members}, '}']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

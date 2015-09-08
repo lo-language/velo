@@ -60,9 +60,7 @@ var __ = function (address, args, subsequent, contingency) {
     JsConstruct.call(this, parts);
 };
 
-// subclass extends superclass
 __.prototype = Object.create(JsConstruct.prototype);
 __.prototype.constructor = __;
-
 
 module.exports = __;

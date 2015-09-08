@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 by Seth Purcell
+ * Copyright (C) 2015 by Seth Purcell
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation files (the "Software"), to deal in the Software
@@ -7,7 +7,7 @@
  * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
  * to whom the Software is furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all copies or
+ * The above copyright notice and this permission notice shall be included in all copies or 
  * substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
@@ -18,34 +18,43 @@
  * DEALINGS IN THE SOFTWARE.
  *
  * Author: Seth Purcell
+ * 7/26/15
  */
 
 /**
- * Extends JsResolver and models a request by flagging itself as async regardless of its contents.
- *
- * Created by: spurcell
- * 3/1/15
+ * A Wrapper can be attached to an arbitrary JsConstruct and moved around.
  */
 
 "use strict";
 
-var JsResolver = require('./JsResolver');
+var Message = require('./Message');
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * @param parts     an array of strings or constructs
+ * Models a synchronous message.
+ *
+ * @param address
+ * @param args
+ * @private
  */
-var __ = function (parts) {
+var __ = function (address, args) {
 
-    JsResolver.call(this, parts, true);
-
-    // pretty much our raison d'être
-    this.async = true;
+    this.address = address;
+    this.args = args || [];
+    this.sm = true;
 };
 
-// subclass extends superclass
-__.prototype = Object.create(JsResolver.prototype);
-__.prototype.constructor = __;
+/**
+ * Returns a message construct wrapped around the
+ *
+ * @param blocked   JsConstruct
+ * @return {*}
+ */
+__.prototype.wrap = function (blocked) {
+
+    // at some point we need to scan this message args & address for wrappers
+    // should this happen here, on wrapper construction, or after this returns?
+    return new Message(this.address, this.args, blocked);
+};
 
 
 module.exports = __;
