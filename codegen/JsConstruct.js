@@ -59,9 +59,13 @@ var JsConstruct = function (parts) {
 /**
  * Returns a JsConstruct with SyncMessages resolved by wrapping in Messages.
  */
-JsConstruct.prototype.resolve = function () {
+JsConstruct.prototype.resolve = function (placeholderNum) {
 
     var wrappers = [];
+
+    if (placeholderNum === undefined) {
+        placeholderNum = 0;
+    }
 
     // scan the fragments swapping SyncMessages for placeholders
 
@@ -85,7 +89,12 @@ JsConstruct.prototype.resolve = function () {
 
             if (part.sm) {
                 wrappers.unshift(part);
-                return 'P' + wrappers.length; // todo
+                part.placeholder = 'P' + placeholderNum++;
+                return part.placeholder; // todo - maybe we can let the wrapper know its position here?
+            }
+            else if (part instanceof JsConstruct) {
+                // try flattening for now
+                return analyze(part.parts);
             }
             else if (part.csv !== undefined) {
                 return {csv: analyze(part.csv)};
@@ -95,26 +104,26 @@ JsConstruct.prototype.resolve = function () {
                 return {block: analyze(part.block)};
             }
         }
+
+        throw new Error("unexpected JS part in resolve: " + util.inspect(part, {depth: null}));
     };
 
-    this.parts = this.parts.reduce(function (accum, current) {
+    // HEREIAM this is where we have the problem - in the final pass after both wrappers are in place, a function body becomes undefined
+    // so we should step in here
+    var parts = this.parts.reduce(function (accum, current) {
         return accum.concat(analyze(current));
     }, []);
 
     // render any necessary wrappers
 
-    if (wrappers.length > 0) {
-
-        var parts = this.parts;
+    if (wrappers.length > 0) {  // could optimize by returning this if no wrappers found
 
         wrappers.forEach(function (sm) {
-            parts = sm.wrap(parts);//.resolve();
+            parts = sm.wrap(parts).resolve(placeholderNum);
         });
-
-        this.parts = parts;
     }
 
-    return new JsConstruct(this.parts);
+    return new JsConstruct(parts);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

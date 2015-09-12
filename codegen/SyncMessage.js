@@ -21,10 +21,6 @@
  * 7/26/15
  */
 
-/**
- * A Wrapper can be attached to an arbitrary JsConstruct and moved around.
- */
-
 "use strict";
 
 var Message = require('./Message');
@@ -40,20 +36,19 @@ var __ = function (address, args) {
 
     this.address = address;
     this.args = args || [];
-    this.sm = true;
+    this.sm = true; // workaround for: can't use instanceof in JSC because it creates a dep cycle
+    this.placeholder = '??';
 };
 
 /**
  * Returns a message construct wrapped around the
  *
- * @param blocked   JsConstruct
+ * @param blocked   array of JsConstruct parts
  * @return {*}
  */
 __.prototype.wrap = function (blocked) {
 
-    // at some point we need to scan this message args & address for wrappers
-    // should this happen here, on wrapper construction, or after this returns?
-    return new Message(this.address, this.args, blocked);
+    return new Message(this.address, this.args, blocked, null, this.placeholder);
 };
 
 

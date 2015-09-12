@@ -15,19 +15,9 @@ module.exports["message"] = {
 
         var sm = new SyncMessage('$foo');
 
-        test.equal(sm.render(), 'T1');
+        sm.placeholder = 'boba';
 
-        test.equal(sm.wrap('hola').render(), 'this.sendMessage($foo, [], function (args) {hola}, null);\n\n');
+        test.equal(sm.wrap('hola').resolve().render(), 'this.sendMessage($foo, [], function (boba) {hola}, null);\n\n');
         test.done();
-    },
-
-//    "wrap placeholder": function (test) {
-//
-//        var sm = new SyncMessage('$foo');
-//
-//        var construct = new JsConstruct(sm.placeholder);
-//
-//        test.equal(construct.render(), 'this.sendMessage($foo, [], function (args) {??}, null);\n\n');
-//        test.done();
-//    }
+    }
 };

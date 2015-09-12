@@ -34,10 +34,8 @@ module.exports["procedure"] = {
 
         var obj = Compiler.compile(node);
 
-        // important! - procedures are never async objects, regardless of whether they contain async statements
-        test.equal(obj.isAsync(), false);
         test.equal(obj.render(),
-            "function ($recur, args) {var $result;\n\nvar $next = args.shift();\n\n$bar($bar, [42]).then(function (x1) {$result *= x1;\n})\n\nthis.tryClose();}");
+            'function ($recur, args) {var $result;\n\nvar $next = args.shift();\n\nthis.sendMessage($bar, [42], function (P0) {$result *= P0;\n}, null);\n\n\n\nthis.tryClose();}');
         test.done();
     }
 };

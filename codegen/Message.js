@@ -35,21 +35,29 @@ var JsConstruct = require('./JsConstruct');
  * @param contingency
  * @private
  */
-var __ = function (address, args, subsequent, contingency) {
+var __ = function (address, args, subsequent, contingency, replyParams, failParams) {
 
     // render an async call
+
+    if (replyParams === undefined) {
+        replyParams = 'args';
+    }
+
+    if (failParams === undefined) {
+        failParams = 'args';
+    }
 
     var parts = ['this.sendMessage(', address, ', [', {csv: args}, ']'];
 
     if (subsequent) {
-        parts.push([', ', 'function (args) ', {block: subsequent}]);
+        parts.push([', ', 'function (', replyParams, ') ', {block: subsequent}]);
     }
     else {
         parts.push(', null');
     }
 
     if (contingency) {
-        parts.push([', ', 'function (args) ', {block: contingency}]);
+        parts.push([', ', 'function (', failParams, ') ', {block: contingency}]);
     }
     else {
         parts.push(', null');

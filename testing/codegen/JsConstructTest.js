@@ -98,19 +98,27 @@ module.exports["resolve"] = {
         test.done();
     },
 
-    "one promise": function (test) {
+    "one blocker": function (test) {
 
         var expr = new JsConstruct([new SyncMessage('$foo'), ' + ', '3']).resolve();
 
-        test.equal(expr.render(), 'this.sendMessage($foo, [], function (args) {P1 + 3}, null);\n\n');
+        test.equal(expr.render(), 'this.sendMessage($foo, [], function (P0) {P0 + 3}, null);\n\n');
         test.done();
     },
 
-    "two promises": function (test) {
+    "bare blocker": function (test) {
+
+        var expr = new JsConstruct([new SyncMessage('$foo'), ';']).resolve();
+
+        test.equal(expr.render(), 'this.sendMessage($foo, [], function (P0) {P0;}, null);\n\n');
+        test.done();
+    },
+
+    "two blockers": function (test) {
 
         var expr = new JsConstruct([new SyncMessage('$foo'), ' + ', new SyncMessage('$bar')]).resolve();
 
-        test.equal(expr.render(), "this.sendMessage($foo, [], function (args) {this.sendMessage($bar, [], function (args) {P1 + P2}, null);\n\n}, null);\n\n");
+        test.equal(expr.render(), "this.sendMessage($foo, [], function (P0) {this.sendMessage($bar, [], function (P1) {P0 + P1}, null);\n\n}, null);\n\n");
         test.done();
     },
 
@@ -118,7 +126,7 @@ module.exports["resolve"] = {
 
         var expr = new JsConstruct(['Math.min(', {csv: [new SyncMessage('$foo'), new SyncMessage('$bar')]}, ')']).resolve();
 
-        test.equal(expr.render(), "this.sendMessage($foo, [], function (args) {this.sendMessage($bar, [], function (args) {Math.min(P1, P2)}, null);\n\n}, null);\n\n");
+        test.equal(expr.render(), "this.sendMessage($foo, [], function (P0) {this.sendMessage($bar, [], function (P1) {Math.min(P0, P1)}, null);\n\n}, null);\n\n");
         test.done();
     },
 
@@ -128,7 +136,25 @@ module.exports["resolve"] = {
 
         test.equal(expr.render(), '{foo:18, bar:25}');
         test.done();
-    }
+    },
 
-    // todo nested messages!!
+    "nested blockers": function (test) {
+
+        var expr = new JsConstruct([new SyncMessage('$foo', [new SyncMessage('$bar')]), ';']).resolve();
+
+        test.equal(expr.render(), 'this.sendMessage($bar, [], function (P1) {this.sendMessage($foo, [P1], function (P0) {P0;}, null);\n\n}, null);\n\n');
+        test.done();
+    },
+
+    "multiple nested blockers": function (test) {
+
+        var expr = new JsConstruct([
+            new SyncMessage('$foo', [
+                new SyncMessage('$bar', [new SyncMessage('$baz')]),
+                new SyncMessage('$quux', [new SyncMessage('$snux')])
+            ]), ';']).resolve();
+
+        test.equal(expr.render(), 'this.sendMessage($baz, [], function (P3) {this.sendMessage($bar, [P3], function (P1) {this.sendMessage($snux, [], function (P3) {this.sendMessage($quux, [P3], function (P2) {this.sendMessage($foo, [P1, P2], function (P0) {P0;}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n');
+        test.done();
+    }
 };

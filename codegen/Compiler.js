@@ -154,8 +154,7 @@ __['stmt_list'] = function (node, scope) {
  */
 __['receive'] = function (node, scope) {
 
-    // todo have a JsStatement class that adds the semicolon
-    return new JsStatement(['var ' + node.names.map(function (name) {
+    return new JsConstruct(['var ' + node.names.map(function (name) {
         return '$' + name + ' = ' + 'args.shift()';
     }).join(',\n') + ';\n\n']);
 };
@@ -186,10 +185,10 @@ __['response'] = function (node, scope) {
     // we assume the existence of a Task object named 'task'
 
     if (node.channel === 'fail') {
-        return new JsStatement(['this.fail(', {csv: args}, ');\nreturn;\n\n']);
+        return new JsConstruct(['this.fail(', {csv: args}, ');\nreturn;\n\n']);
     }
 
-    return new JsStatement(['this.reply(', {csv: args}, ');\nreturn;\n\n']);
+    return new JsConstruct(['this.reply(', {csv: args}, ');\nreturn;\n\n']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,8 +212,10 @@ __['assign'] = function (node, scope) {
         scope.define(node.left.name);
     }
 
-    return new JsConstruct([left, ' ' + node.op + ' ', right, ';\n']);
-};
+    return new JsConstruct([left, ' ' + node.op + ' ', right, ';\n']).resolve();
+    // this was genius
+    // above comment inserted by my slightly tipsy wife after adding the .resolve() - SP
+ };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -326,7 +327,7 @@ __['application'] = function (node, scope) {
     });
 
     // return a wrapped placeholder
-    return new SyncMessage(target, args);
+    return new JsConstruct(new SyncMessage(target, args));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -417,18 +418,18 @@ __['select'] = function (node, scope) {
  * @param scope
  * @param node
  */
-//__['in'] = function (node, scope) {
-//
-//    // should holds apply to strings? maybe as 'contains'? or some non-word operator?
-//
-//    var left = __.compile(node.left, scope);
-//    var right = __.compile(node.right, scope);
-//
-//    return new JsConstruct(['function (item, collection) {' +
-//            "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
-//            "else if (typeof val === 'object') return collection.hasOwnProperty(item);" +
-//            "}(", left, ',', right, ")"]);
-//};
+__['in'] = function (node, scope) {
+
+    // should holds apply to strings? maybe as 'contains'? or some non-word operator?
+
+    var left = __.compile(node.left, scope);
+    var right = __.compile(node.right, scope);
+
+    return new JsConstruct(['function (item, collection) {' +
+            "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
+            "else if (typeof val === 'object') return collection.hasOwnProperty(item);" +
+            "}(", left, ',', right, ")"]);
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -436,18 +437,18 @@ __['select'] = function (node, scope) {
  * @param scope
  * @param node
  */
-//__['sequence'] = function (node, scope) {
-//
-//    var first = __.compile(node.first, scope);
-//    var last = __.compile(node.last, scope);
-//
-//    // renders an expression that is a function that takes a single arg -
-//    // the action to be performed
-//
-//    return new JsConstruct(['function (first, last, action) {\n' +
-//            'for (var num = first; num <= last; num++) { action(num); }' +
-//        "}.bind(null,", first, ',', last, ')']);
-//};
+__['sequence'] = function (node, scope) {
+
+    var first = __.compile(node.first, scope);
+    var last = __.compile(node.last, scope);
+
+    // renders an expression that is a function that takes a single arg -
+    // the action to be performed
+
+    return new JsConstruct(['function (first, last, action) {\n' +
+            'for (var num = first; num <= last; num++) { action(num); }' +
+        "}.bind(null,", first, ',', last, ')']);
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
