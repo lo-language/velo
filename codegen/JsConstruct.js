@@ -108,15 +108,17 @@ JsConstruct.prototype.resolve = function (placeholderNum) {
         throw new Error("unexpected JS part in resolve: " + util.inspect(part, {depth: null}));
     };
 
-    // HEREIAM this is where we have the problem - in the final pass after both wrappers are in place, a function body becomes undefined
-    // so we should step in here
     var parts = this.parts.reduce(function (accum, current) {
         return accum.concat(analyze(current));
     }, []);
 
+    if (wrappers.length == 0) {
+        return this;
+    }
+
     // render any necessary wrappers
 
-    if (wrappers.length > 0) {  // could optimize by returning this if no wrappers found
+    if (wrappers.length > 0) {
 
         wrappers.forEach(function (sm) {
             parts = sm.wrap(parts).resolve(placeholderNum);

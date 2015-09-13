@@ -110,7 +110,7 @@ __['procedure'] = function (node, scope) {
         body = ['var ' + varNames.join(', ') + ';\n\n', body];
     }
 
-    body = [body, '\n\nthis.tryClose();'];
+    body = [body, '\nthis.tryClose();'];
 
     // nixing implicit "connect" for now...
     return new JsConstruct([
@@ -133,16 +133,10 @@ __['stmt_list'] = function (node, scope) {
 
         var tail = __.compile(node.tail, scope);
 
-        if (head.isWrapped) {
-
-            // todo this should return a SyncMessage, not a message, so we can propagate the SyncMessage upwards
-            return head.add(tail);
-        }
-
-        return new JsConstruct([head, tail]);
+        return new JsConstruct([head, tail]).resolve();
     }
 
-    return head;
+    return head.resolve();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -185,10 +179,10 @@ __['response'] = function (node, scope) {
     // we assume the existence of a Task object named 'task'
 
     if (node.channel === 'fail') {
-        return new JsConstruct(['this.fail(', {csv: args}, ');\nreturn;\n\n']);
+        return new JsConstruct(['this.fail(', {csv: args}, ');\nreturn;']);
     }
 
-    return new JsConstruct(['this.reply(', {csv: args}, ');\nreturn;\n\n']);
+    return new JsConstruct(['this.reply(', {csv: args}, ');\nreturn;']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,9 +206,9 @@ __['assign'] = function (node, scope) {
         scope.define(node.left.name);
     }
 
-    return new JsConstruct([left, ' ' + node.op + ' ', right, ';\n']).resolve();
+    return new JsConstruct([left, ' ' + node.op + ' ', right, ';\n']);
     // this was genius
-    // above comment inserted by my slightly tipsy wife after adding the .resolve() - SP
+    // above comment inserted by my slightly tipsy wife - SP
  };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -237,10 +231,10 @@ __['conditional'] = function (node, scope) {
 
     // todo we might want to rewrite this to only resolve the blocks after evaluating the predicate
 
-    var parts = ['if (', predicate, ') ', {block: consequent}, '\n'];
+    var parts = ['if (', predicate, ') ', {block: consequent}, '\n\n'];
 
     if (negBlock) {
-        parts.push('else ', {block: negBlock}, '\n');
+        parts.push('else ', {block: negBlock}, '\n\n');
     }
 
     return new JsConstruct(parts);

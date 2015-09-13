@@ -26,7 +26,7 @@ module.exports["conditional"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).render(), 'if ($foo) {$bar = 42;\n}\n');
+        test.equal(Compiler.compile(node).render(), 'if ($foo) {$bar = 42;\n}\n\n');
         test.done();
     },
 
@@ -46,7 +46,7 @@ module.exports["conditional"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).render(), 'if ($foo) {$bar = 42;\n}\nelse {$bar = 32;\n}\n');
+        test.equal(Compiler.compile(node).render(), 'if ($foo) {$bar = 42;\n}\n\nelse {$bar = 32;\n}\n\n');
         test.done();
     },
 
@@ -72,7 +72,7 @@ module.exports["conditional"] = {
         var scope = new Scope();
 
         test.equal(Compiler.compile(node).render(),
-            'if ($foo) {$bar = 42;\n}\nelse {if ($bar) {$bar = 32;\n}\nelse {$baz = 82;\n}\n}\n');
+            'if ($foo) {$bar = 42;\n}\n\nelse {if ($bar) {$bar = 32;\n}\n\nelse {$baz = 82;\n}\n\n}\n\n');
         test.done();
     },
 
