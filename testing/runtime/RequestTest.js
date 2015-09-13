@@ -237,8 +237,6 @@ module.exports = {
         console.error("create root");
         var request = new Request(function (args) {
 
-            console.error('response handler for ' + this.name);
-
             test.deepEqual(results, [
                 'call1',
                 'call2:pre',

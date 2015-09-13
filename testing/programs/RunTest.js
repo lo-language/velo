@@ -17,8 +17,6 @@ var util = require('util');
 
 var loader = new Loader(__dirname);
 
-
-
 //module.exports['errors'] = {
 //
 //    // test that uncaught errors are properly escalated out of the program
@@ -75,8 +73,6 @@ module.exports['io'] = {
             console.error(e.stack);
         }
 
-        console.log(this.harness.getJs().render(true));
-
         this.harness.testSuccess(test, [[], {
             stdout: {
                 write: function (recur, args) {
@@ -102,64 +98,64 @@ module.exports['io'] = {
 //    }
 //};
 
-module.exports['conditionals'] = {
+//module.exports['conditionals'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.harness = new Harness(loader, 'conditionals');
+//
+//        this.harness.setUp(cb);
+//    },
+//
+//    'neg': function (test) {
+//        this.harness.testSuccess(test, [-1], 'negative');
+//    },
+//
+//    'zero': function (test) {
+//        this.harness.testSuccess(test, [0], 'zero!');
+//    },
+//
+//    'pos': function (test) {
+//        this.harness.testSuccess(test, [1], 'positive');
+//    }
+//};
+
+module.exports['factorial'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(loader, 'conditionals');
+        this.harness = new Harness(loader, 'factorial');
 
         this.harness.setUp(cb);
     },
 
-    'neg': function (test) {
-        this.harness.testSuccess(test, [-1], 'negative');
+    'success': function (test) {
+//        console.log(this.harness.getJs().render(true));
+        this.harness.testSuccess(test, [10], 3628800);
     },
 
-    'zero': function (test) {
-        this.harness.testSuccess(test, [0], 'zero!');
-    },
-
-    'pos': function (test) {
-        this.harness.testSuccess(test, [1], 'positive');
+    'failure': function (test) {
+        this.harness.testFailure(test, [-1], 'I pity the fool!');
     }
 };
 
-//module.exports['factorial'] = {
-//
-//    "setUp": function (cb) {
-//
-//        this.harness = new Harness(loader, 'factorial');
-//
-//        this.harness.setUp(cb);
-//    },
-//
-//    'success': function (test) {
-//        console.log(this.harness.getJs().render(true));
-//        this.harness.testSuccess(test, [10], 3628800);
-//    },
-//
-//    'failure': function (test) {
-//        this.harness.testFailure(test, [-1], 'I pity the fool!');
-//    }
-//};
+module.exports['fibonacci'] = {
 
-//module.exports['fibonacci'] = {
-//
-//    "setUp": function (cb) {
-//
-//        this.harness = new Harness(loader, 'fibonacci');
-//
-//        this.harness.setUp(cb);
-//    },
-//
-//    'success': function (test) {
-//        this.harness.testSuccess(test, [10], 55);
-//    },
-//
-//    'failure': function (test) {
-//        this.harness.testFailure(test, [-1], 'Whatsamatta, you?');
-//    }
-//};
+    "setUp": function (cb) {
+
+        this.harness = new Harness(loader, 'fibonacci');
+
+        this.harness.setUp(cb);
+    },
+
+    'success': function (test) {
+        this.harness.testSuccess(test, [10], 55);
+    },
+
+    'failure': function (test) {
+        this.harness.testFailure(test, [-1], 'Whatsamatta, you?');
+    }
+};
 
 module.exports['collections'] = {
 
@@ -176,20 +172,20 @@ module.exports['collections'] = {
     }
 };
 
-//module.exports['procedure'] = {
-//
-//    "setUp": function (cb) {
-//
-//        this.harness = new Harness(loader, 'procedure');
-//
-//        this.harness.setUp(cb);
-//    },
-//
-//    'success': function (test) {
-//
-//        this.harness.testSuccess(test, [], 60);
-//    }
-//};
+module.exports['procedure'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(loader, 'procedure');
+
+        this.harness.setUp(cb);
+    },
+
+    'success': function (test) {
+
+        this.harness.testSuccess(test, [], 60);
+    }
+};
 
 
 //module.exports['recovery'] = {

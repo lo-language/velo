@@ -1,7 +1,7 @@
 {
     "name": "exa",
-    "description": "A JavaScript implementation of the Exa programming language",
-    "version": "0.1.0",
+    "description": "A prototype implementation of the Exa programming language",
+    "version": "0.2.0",
     "author": "Seth Purcell",
     "preferGlobal": true,
     "engines": {

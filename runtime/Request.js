@@ -24,7 +24,7 @@
 
 "use strict";
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Models an Exa request to handle the bookkeeping.
  *
@@ -44,11 +44,12 @@ var __ = function (onReply, onFail, onComplete) {
     // should recur be part of the request, not an arg?
 
     this.subRequests = 0;
-    this.onReply = onReply;
-    this.onFail = onFail;
+    this.onReply = onReply; // already bound to parent request
+    this.onFail = onFail;   // ditto
     this.onComplete = onComplete;
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Sends a reply to the requestor, provided we haven't already responded.
  *
@@ -61,10 +62,10 @@ __.prototype.reply = function (args) {
 //        console.error("scheduling reply for " + this.name);
 
         // send the reply message, with this bound to this request
-        var response = this.onReply.bind(this, args);
+        var response = this.onReply;
         var t = this;
         process.nextTick(function () {
-            response();
+            response(args);
 
 //            console.error("signaling completion of: " + t.name);
 
@@ -78,6 +79,7 @@ __.prototype.reply = function (args) {
     }
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Sends a failure message to the requestor, provided we haven't already responded.
  *
@@ -87,7 +89,7 @@ __.prototype.fail = function (args) {
 
     if (this.onFail !== null && typeof this.onFail !== "undefined") {
 
-        // send the fail message, with this bound to this request
+        // send the fail message, with this bound to the *parent* request
         var response = this.onFail.bind(this, args);
         var t = this;
         process.nextTick(function () {
@@ -105,6 +107,7 @@ __.prototype.fail = function (args) {
     }
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Tries to close this task - it will close unless there are open subrequests.
  * Close in this case is the bookkeeping sense.
@@ -126,6 +129,7 @@ __.prototype.tryClose = function (name) {
     this.onReply && this.reply();
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Marks a subtask complete for bookkeeping. We don't care about which subtask.
  */
@@ -136,6 +140,7 @@ __.prototype.checkOff = function () {
     this.tryClose();
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Sends a message after creating a subrequest under this request, since we can't consider our task complete
  * if there are still child tasks kicking around for which we're expecting a response.
@@ -152,10 +157,11 @@ __.prototype.sendMessage = function (fn, args, onReply, onFail) {
 
     this.children = this.children || 1;
 
-
     // create the subrequest and if it has handlers, wire it up to check itself off when it responds
+    // also wire up onReply and onFail to this (parent) request
+    // todo - clean this up - not sure this is the best place to bind to parent request
 
-    var request = new __(onReply, onFail, this.checkOff.bind(this));
+    var request = new __(onReply ? onReply.bind(this) : null, onFail ? onFail.bind(this) : null, this.checkOff.bind(this));
     request.name = this.name + ':child' + this.children++;
 
     if (onReply || onFail) {
@@ -168,6 +174,7 @@ __.prototype.sendMessage = function (fn, args, onReply, onFail) {
     process.nextTick(fn.bind(request, fn, args));
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Creates and sends a root request.
  *

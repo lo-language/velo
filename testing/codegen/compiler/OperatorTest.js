@@ -70,7 +70,7 @@ module.exports["op"] = {
         test.done();
     },
 
-    "in operaofr": function (test) {
+    "in operator": function (test) {
 
         // should create a context
         // should call compile on each statement

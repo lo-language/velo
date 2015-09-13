@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 by Seth Purcell
+ * Copyright (C) 2015 by Seth Purcell
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation files (the "Software"), to deal in the Software
@@ -7,7 +7,7 @@
  * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
  * to whom the Software is furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all copies or
+ * The above copyright notice and this permission notice shall be included in all copies or 
  * substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
@@ -18,14 +18,26 @@
  * DEALINGS IN THE SOFTWARE.
  *
  * Author: Seth Purcell
+ * 7/26/15
  */
 
 /**
- * Models a general JS construct as a list of fragments, which can be strings, sub-constructs,
- * or utility objects that wrap constructs.
+ * Here's how this works:
  *
- * Created by: spurcell
- * 3/1/15
+ * constructs contain fragments of JS, some with annotations, that can be rendered into JS
+ * a constrcut can *also* hold a stack of wrappers to resolve sync expressions inside the construct
+ *
+ * for sync message expressions, we need to wrap the enclosing JS in a callback.
+ * we need to invert the order of evaluation
+ *
+ * we go down to the bottom and then start building up the JS? and thus have to invert?
+ *
+ * what if as we go deeper into the tree, we wrap what's above us as necessary?
+ *
+ * when a construct is created, we scan it for 'blockers', message expressions that are synchronous
+ * when we find a blocker, we write it down and then swap in a placeholder variable
+ *
+ *
  */
 
 "use strict";
@@ -35,17 +47,85 @@ var util = require('util');
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param fragments an array of strings or JsConstructs
- * @param async     explicity set the async status
+ * @param parts     an array of strings or JsConstructs
  */
-var JsConstruct = function (fragments, async) {
+var JsConstruct = function (parts) {
 
-    this.fragments = Array.isArray(fragments) ? fragments : [fragments];
+    // enable a single fragment to be passed in directly
+    this.parts = Array.isArray(parts) ? parts : [parts];
+};
 
-    // if async is set, use it; otherwise it'll be inherited from our fragments - one async fragment makes the construct async
-    if (async !== undefined) {
-        this.async = async;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns a JsConstruct with SyncMessages resolved by wrapping in Messages.
+ */
+JsConstruct.prototype.resolve = function (placeholderNum) {
+
+    var wrappers = [];
+
+    if (placeholderNum === undefined) {
+        placeholderNum = 0;
     }
+
+    // scan the fragments swapping SyncMessages for placeholders
+
+    var analyze = function (part) {
+
+        if (typeof part === 'string') {
+            return part;
+        }
+
+        if (Array.isArray(part)) {
+
+            // explore but don't flatten sub-array structure here!
+            return part.reduce(function (accum, current) {
+                // this is a bit ugly but we can't use concat without flattening arrays
+                accum.push(analyze(current));
+                return accum;
+            }, []);
+        }
+
+        if (typeof part === 'object') {
+
+            if (part.sm) {
+                wrappers.unshift(part);
+                part.placeholder = 'P' + placeholderNum++;
+                return part.placeholder; // todo - maybe we can let the wrapper know its position here?
+            }
+            else if (part instanceof JsConstruct) {
+                // try flattening for now
+                return analyze(part.parts);
+            }
+            else if (part.csv !== undefined) {
+                return {csv: analyze(part.csv)};
+            }
+
+            if (part.block !== undefined) {
+                return {block: analyze(part.block)};
+            }
+        }
+
+        throw new Error("unexpected JS part in resolve: " + util.inspect(part, {depth: null}));
+    };
+
+    var parts = this.parts.reduce(function (accum, current) {
+        return accum.concat(analyze(current));
+    }, []);
+
+    if (wrappers.length == 0) {
+        return this;
+    }
+
+    // render any necessary wrappers
+
+    if (wrappers.length > 0) {
+
+        wrappers.forEach(function (sm) {
+            parts = sm.wrap(parts).resolve(placeholderNum);
+        });
+    }
+
+    return new JsConstruct(parts);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,7 +136,7 @@ var JsConstruct = function (fragments, async) {
  */
 JsConstruct.prototype.render = function (pretty) {
 
-    return JsConstruct.renderFragment(this.fragments, pretty);
+    return JsConstruct.renderFragment(this.parts, pretty);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,7 +162,7 @@ JsConstruct.renderFragment = function (fragment, pretty) {
 
     if (typeof fragment === 'object') {
 
-        if (fragment instanceof JsConstruct) {
+        if (typeof fragment.render === 'function') {
             return fragment.render(pretty);
         }
 
@@ -115,31 +195,7 @@ JsConstruct.renderFragment = function (fragment, pretty) {
         }
     }
 
-    throw new Error("unexpected JS part: " + fragment);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Returns true if this construct is async; traverses the fragments if not explicitly set.
- */
-JsConstruct.prototype.isAsync = function () {
-
-    if (this.async !== undefined) {
-        return this.async;
-    }
-
-    var self = this;
-
-    this.async = false;
-
-    this.fragments.forEach(function (part) {
-
-        if (typeof part === 'object' && part instanceof JsConstruct && part.isAsync()) {
-            self.async = true;
-        }
-    });
-
-    return this.async;
+    throw new Error("unexpected JS part: " + util.inspect(fragment));
 };
 
 module.exports = JsConstruct;

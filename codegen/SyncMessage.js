@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 by Seth Purcell
+ * Copyright (C) 2015 by Seth Purcell
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation files (the "Software"), to deal in the Software
@@ -7,7 +7,7 @@
  * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
  * to whom the Software is furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all copies or
+ * The above copyright notice and this permission notice shall be included in all copies or 
  * substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
@@ -18,29 +18,38 @@
  * DEALINGS IN THE SOFTWARE.
  *
  * Author: Seth Purcell
- */
-
-/**
- * Created by: spurcell
- * 3/1/15
+ * 7/26/15
  */
 
 "use strict";
 
-var JsConstruct = require('./JsConstruct');
-var util = require('util');
+var Message = require('./Message');
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * @param parts     an array of strings or constructs
+ * Models a synchronous message.
+ *
+ * @param address
+ * @param args
+ * @private
  */
-var __ = function (parts) {
+var __ = function (address, args) {
 
-    JsConstruct.call(this, parts);
+    this.address = address;
+    this.args = args || [];
+    this.sm = true; // workaround for: can't use instanceof in JSC because it creates a dep cycle
+    this.placeholder = '??';
 };
 
-// subclass extends superclass
-__.prototype = Object.create(JsConstruct.prototype);
-__.prototype.constructor = __;
+/**
+ * Returns a message construct wrapped around the
+ *
+ * @param blocked   array of JsConstruct parts
+ * @return {*}
+ */
+__.prototype.wrap = function (blocked) {
+
+    return new Message(this.address, this.args, blocked, null, this.placeholder);
+};
+
 
 module.exports = __;
