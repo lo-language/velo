@@ -81,48 +81,20 @@
                                 "type":"list",
                                 "elements":[
                                     {
-                                        "type":"dyad",
-                                        "key":{
-                                            "type":"string",
-                                            "val":"Ford"
-                                        },
-                                        "value":{
-                                            "type":"boolean",
-                                            "val":true
-                                        }
+                                        "type":"string",
+                                        "val":"Ford"
                                     },
                                     {
-                                        "type":"dyad",
-                                        "key":{
-                                            "type":"string",
-                                            "val":"Arthur"
-                                        },
-                                        "value":{
-                                            "type":"boolean",
-                                            "val":true
-                                        }
+                                        "type":"string",
+                                        "val":"Arthur"
                                     },
                                     {
-                                        "type":"dyad",
-                                        "key":{
-                                            "type":"string",
-                                            "val":"Trillian"
-                                        },
-                                        "value":{
-                                            "type":"boolean",
-                                            "val":true
-                                        }
+                                        "type":"string",
+                                        "val":"Trillian"
                                     },
                                     {
-                                        "type":"dyad",
-                                        "key":{
-                                            "type":"string",
-                                            "val":"Zaphod"
-                                        },
-                                        "value":{
-                                            "type":"boolean",
-                                            "val":true
-                                        }
+                                        "type":"string",
+                                        "val":"Zaphod"
                                     }
                                 ]
                             }

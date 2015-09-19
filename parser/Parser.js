@@ -150,8 +150,6 @@ case 49:this.$ = {type: 'list', elements: $$[$0-2] ? $$[$0-3].concat([$$[$0-2]])
 break;
 case 50:this.$ = {type: 'record', attributes: $$[$0-2] ? $$[$0-3].concat([$$[$0-2]]): []};
 break;
-case 52:this.$ = {type: 'dyad', key: $$[$0], value: {type: 'boolean', val: true}};;
-break;
 case 53:this.$ = {type: 'dyad', key: $$[$0-2], value: $$[$0]};;
 break;
 case 54:this.$ = {type: 'field', name: $$[$0-2], value: $$[$0]};

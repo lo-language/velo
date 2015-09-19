@@ -288,7 +288,7 @@ literal
     ;
 
 dyad
-    : expr -> {type: 'dyad', key: $1, value: {type: 'boolean', val: true}};
+    : expr
     | expr ':' expr -> {type: 'dyad', key: $1, value: $3};
     ;
 

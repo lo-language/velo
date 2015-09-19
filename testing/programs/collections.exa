@@ -6,13 +6,6 @@
 // list literal
 words = ["foo", "mani", "padme", "hum"];
 
-// set literal with symbols
-dudes = { <zaphod>, <ford>, <arthur>};
-
-// map literal
-// support block syntax (no braces)?
-//map = {"manhattan": "new york", "brooklyn": "kings", "queens": "queens"};
-
 // test cardinality
 
 name = "snooks";
@@ -23,8 +16,8 @@ if #name < 6:
 if #words != 4:
     fail "what the deuce?!";
 
-if #dudes < 3:
-    fail "not very froody";
+//if #dudes < 3:
+//    fail "not very froody";
 
 // todo throw an error on undefined identifiers
 //if #set != 3
@@ -33,19 +26,11 @@ if #dudes < 3:
 // test membership
 // or should these be a in b?
 
-if "om" in words:
-    fail "oops";
+//if "om" in words:
+//    fail "oops";
 
-if "trillian" in dudes:
-    fail "not a dude";
-
-doctor = <zoidberg>;
-
-if doctor == <zoidberg>:
-    doctor = <mccoy>;
-
-if doctor == <zoidberg>:
-    fail "uh-oh";
+//if "trillian" in dudes:
+//    fail "not a dude";
 
 // shouldn"t be necessary but is for now; otherwise we never conclude
 //reply;

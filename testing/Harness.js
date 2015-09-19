@@ -35,12 +35,11 @@ __.prototype.setUp = function (cb) {
 /**
  * Returns the JSConstruct for this program.
  *
- * @param cb
  * @return {String|*}
  */
-__.prototype.getJs = function (cb) {
+__.prototype.getJs = function () {
 
-    return this.module.compile();
+    return this.module.getJs();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,6 +47,8 @@ __.prototype.getJs = function (cb) {
 __.prototype.testSuccess = function (test, input, expected) {
 
     var module = this.module;
+
+    var _this = this;
 
     Q().then(function () {
         return module.run(input);
@@ -61,7 +62,8 @@ __.prototype.testSuccess = function (test, input, expected) {
             test.done();
         },
         function (err) {
-            console.error("oh noes!");
+            console.error("error running " + _this.program + ".exa: " + err);
+            console.log(_this.getJs());
         }
     ).done();
 };

@@ -53,12 +53,12 @@ __.prototype.parse = function () {
  *
  * @return {String}
  */
-__.prototype.compile = function () {
+__.prototype.getJs = function () {
 
     if (this.js === undefined) {
 
         try {
-            this.js = Compiler.compile(this.parse());
+            this.js = Compiler.compile(this.parse()).render();
         }
         catch (e) {
             console.error(e);
@@ -86,7 +86,7 @@ __.prototype.load = function () {
 
         var body =
             '"use strict";\n\n' +
-            'var root = ' + this.compile().render() + ';\n\n' +
+            'var root = ' + this.getJs() + ';\n\n' +
             'root.call(this, root, rootArgs);\n';
 
         // prepare a function with the same signature as a standard procedure so it can be returned from connect
