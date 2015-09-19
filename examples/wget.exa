@@ -11,10 +11,16 @@ sendRequest is:
         io.stdout.write ~ "response from " + url + ": status = " + res.statusCode + "\n";
         io.stdout.write ~ "body length: " + #body + "\n";
 
+        reply #body;
+
     io.stdout.write ~ "sent request to " + url + "\n";
 
 // race some requests
 
-sendRequest ~ "http://www.apple.com";
 sendRequest ~ "http://www.google.com";
+
+sendRequest("http://www.apple.com");
+
+//io.stdout.write ~ "apple length was: " + len + "\n\n";
+
 sendRequest ~ "http://www.exalang.org";

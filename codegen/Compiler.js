@@ -157,7 +157,8 @@ __['receive'] = function (node, scope) {
 
 __['application_stmt'] = function (node, scope) {
 
-    return __.compile(node.application, scope);
+    // slap a semicolon on that bad boy
+    return new JsConstruct([__.compile(node.application, scope), ';\n']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
