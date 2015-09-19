@@ -89,7 +89,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "%="                    return '%='
 "->"                    return '->'
 "=>"                    return '=>' // future connector
-">>"                    return '>>' // stream connector
+">>"                    return 'PROCEDURE'
 "+"                     return '+'
 "-"                     return '-'
 "*"                     return '*'
@@ -102,7 +102,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "#"                     return '#'
 "define"                return 'DEFINE'
 "distinguish"           return 'DISTINGUISH'
-"is"                    return 'IS'
+"procedure"             return 'PROCEDURE'
 "receive"               return 'RECEIVE'
 "if"                    return 'IF'
 "else"                  return 'ELSE'
@@ -186,7 +186,7 @@ could also be "on foo:"
 ////////////////////////////////////////////////////////////////////////////////
 // STRUCTURE
 
-program
+module
     : statement_list EOF
         { return {type: 'procedure', body: $1}; }
     ;
@@ -217,7 +217,6 @@ statement
     | dispatch
     | conditional
     | iteration
-    | ID 'IS' ':' block -> {type: 'assign', op: '=', left: {type: 'id', name: $1}, right: {type: 'procedure', body: $4}}
     | COMPLETE (expr ',')* expr ';' -> {type: 'complete', futures: $2.concat([$3])}
     | SKIP ';' -> {type: 'skip'}
     | STOP ';' -> {type: 'stop'}
@@ -282,9 +281,9 @@ literal
     | BOOLEAN -> {type: 'boolean', val: $1 == 'true'}
     | NUMBER -> {type: 'number', val: $1}
     | STRING -> {type: 'string', val: $1}
+    | PROCEDURE ':' block -> {type: 'procedure', body: $3}
     | '[' BEGIN? (dyad ',')* dyad? END? ']' -> {type: 'list', elements: $4 ? $3.concat([$4]): []}
     | '{' BEGIN? (attribute ',')* attribute? END? '}' -> {type: 'record', attributes: $4 ? $3.concat([$4]): []}
-    | '::' block
     ;
 
 dyad

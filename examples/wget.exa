@@ -1,6 +1,6 @@
 receive args, io, system;
 
-sendRequest is:
+sendRequest = >>:
 
     receive url;
 
@@ -14,6 +14,7 @@ sendRequest is:
         reply #body;
 
     io.stdout.write ~ "sent request to " + url + "\n";
+;
 
 // race some requests
 

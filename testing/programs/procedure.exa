@@ -4,13 +4,13 @@
  */
 
 
-foo is:
+foo = >>:
 
     receive x;
     reply factorial(x) / 2;
+;
 
-
-factorial is:
+factorial = >>:
 
     receive num;
 
@@ -20,6 +20,6 @@ factorial is:
         reply num;
 
     reply num * again(num - 1);
-
+;
 
 reply foo(5);

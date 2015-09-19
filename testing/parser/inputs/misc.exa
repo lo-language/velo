@@ -36,8 +36,9 @@ result = foo() catch:
 
 index = 0;
 
-iterator is:
+iterator = procedure:
     reply items[index];
     index++;
+;
 
 reply iterator;

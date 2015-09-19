@@ -12,4 +12,4 @@ factorial is:
 
     reply num * factorial(num - 1);
 
-reply factorial(args[2]);
+io.stdout.write ~ "" + factorial(args[2]);

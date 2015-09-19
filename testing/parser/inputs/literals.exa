@@ -16,8 +16,9 @@ homes = [
 ];
 
 // procedure literal
-HardyRamanujan is:
+HardyRamanujan = procedure:
     reply 1729;
+;
 
 // record with indentation
 pairs = {
