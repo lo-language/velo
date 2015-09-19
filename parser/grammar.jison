@@ -58,7 +58,10 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "nil"                   return 'NIL' // none, null, void, empty, blank, nada, nothing, zip, nil, missing, undefined, undef? some symbol? () empty parens?
 "true"|"false"          return 'BOOLEAN'
 {number}                return 'NUMBER'
-\"[^\"]*\"              yytext = yytext.substr(1, yyleng-2); return 'STRING';
+\"[^\`\"]*\"            yytext = yytext.substr(1, yyleng-2); return 'STRING'
+\"[^\`\"]*\`            yytext = yytext.substr(1, yyleng-2); return 'INTER_BEGIN'
+\`[^\`\"]*\`            yytext = yytext.substr(1, yyleng-2); return 'INTER_MID'
+\`[^\`\"]*\"            yytext = yytext.substr(1, yyleng-2); return 'INTER_END'
 "["                     return '['
 "]"                     return ']'
 "("                     return '('
@@ -244,6 +247,7 @@ assignment_op
     | '%='
     ;
 
+// NOT expressions
 step
     : lvalue '++' -> {type: 'increment', op: $2, left: $1}
     | lvalue '--' -> {type: 'decrement', op: $2, left: $1}
@@ -267,6 +271,12 @@ value
     | literal
     | '(' expr ')' -> $2
     | application
+    | INTER_BEGIN dynastring INTER_END -> {type: 'interpolation', left: $1, middle: $2, right: $3}
+    ;
+
+dynastring
+    : expr
+    | expr INTER_MID dynastring -> {type: 'dynastring', left: $1, middle: $2, right: $3 }
     ;
 
 lvalue

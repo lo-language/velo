@@ -57,24 +57,24 @@ module.exports["literals"] = {
         test.done();
     },
 
-    "set": function (test) {
-
-        var node = { type: 'set',
-            members:
-                [ { type: 'dyad',
-                    key: { type: 'symbol', name: 'zaphod' },
-                    value: { type: 'boolean', val: true } },
-                    { type: 'dyad',
-                        key: { type: 'symbol', name: 'ford' },
-                        value: { type: 'boolean', val: true } },
-                    { type: 'dyad',
-                        key: { type: 'symbol', name: 'arthur' },
-                        value: { type: 'boolean', val: true } },
-                    { type: 'dyad',
-                        key: { type: 'symbol', name: 'ford' },
-                        value: { type: 'boolean', val: true } } ] };
-
-        test.equal(Compiler.compile(node).render(), "{'<zaphod>':true, '<ford>':true, '<arthur>':true, '<ford>':true}");
-        test.done();
-    }
+//    "set": function (test) {
+//
+//        var node = { type: 'set',
+//            members:
+//                [ { type: 'dyad',
+//                    key: { type: 'symbol', name: 'zaphod' },
+//                    value: { type: 'boolean', val: true } },
+//                    { type: 'dyad',
+//                        key: { type: 'symbol', name: 'ford' },
+//                        value: { type: 'boolean', val: true } },
+//                    { type: 'dyad',
+//                        key: { type: 'symbol', name: 'arthur' },
+//                        value: { type: 'boolean', val: true } },
+//                    { type: 'dyad',
+//                        key: { type: 'symbol', name: 'ford' },
+//                        value: { type: 'boolean', val: true } } ] };
+//
+//        test.equal(Compiler.compile(node).render(), "{'<zaphod>':true, '<ford>':true, '<arthur>':true, '<ford>':true}");
+//        test.done();
+//    }
 };

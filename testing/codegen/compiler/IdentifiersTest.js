@@ -11,14 +11,6 @@ var util = require('util');
 
 module.exports["identifiers"] = {
 
-    "symbol": function (test) {
-
-        var node = {type: 'symbol', name: 'cymbal'};
-
-        test.equal(Compiler.compile(node), "'<cymbal>'");
-        test.done();
-    },
-
 //    "undefined": function (test) {
 //
 //        var node = {type: 'id', name: 'foo'};

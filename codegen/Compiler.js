@@ -580,15 +580,17 @@ __['dyad'] = function (node, scope) {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Compiles a symbol into a string literal for now.
- *
- * @param scope
- * @param node
- */
-__['symbol'] = function (node) {
 
-    return "'<" + node.name + ">'";
+__['interpolation'] = function (node, scope) {
+
+    return new JsConstruct(["'", node.left, "' + ",
+        __.compile(node.middle, scope), " + '", node.right, "'"]);
+};
+
+__['dynastring'] = function (node, scope) {
+
+    return new JsConstruct([__.compile(node.left), " + '", node.middle, "' + ",
+        __.compile(node.right, scope)]);
 };
 
 module.exports = __;
