@@ -158,3 +158,22 @@ module.exports["resolve"] = {
         test.done();
     }
 };
+
+module.exports["build message"] = {
+
+    "no handlers": function (test) {
+
+        var msg = JsConstruct.buildMessage('$foo', []);
+
+        test.equal(msg.render(), 'this.sendMessage($foo, [], null, null);\n\n');
+        test.done();
+    },
+
+    "success handler": function (test) {
+
+        var msg = JsConstruct.buildMessage('$foo', [], "x = 1;");
+
+        test.equal(msg.render(), 'this.sendMessage($foo, [], function (args) {x = 1;}, null);\n\n');
+        test.done();
+    }
+};

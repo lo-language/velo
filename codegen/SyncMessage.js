@@ -23,7 +23,7 @@
 
 "use strict";
 
-var Message = require('./Message');
+var JsConstruct = require('./JsConstruct');
 
 /**
  * Models a synchronous message.
@@ -48,7 +48,8 @@ var __ = function (address, args) {
  */
 __.prototype.wrap = function (blocked) {
 
-    return new Message(this.address, this.args, blocked, null, this.placeholder);
+    return JsConstruct.buildMessage(
+        this.address, this.args, blocked, null, this.placeholder);
 };
 
 

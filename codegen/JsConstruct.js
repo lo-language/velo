@@ -25,19 +25,8 @@
  * Here's how this works:
  *
  * constructs contain fragments of JS, some with annotations, that can be rendered into JS
- * a constrcut can *also* hold a stack of wrappers to resolve sync expressions inside the construct
  *
- * for sync message expressions, we need to wrap the enclosing JS in a callback.
- * we need to invert the order of evaluation
- *
- * we go down to the bottom and then start building up the JS? and thus have to invert?
- *
- * what if as we go deeper into the tree, we wrap what's above us as necessary?
- *
- * when a construct is created, we scan it for 'blockers', message expressions that are synchronous
- * when we find a blocker, we write it down and then swap in a placeholder variable
- *
- *
+ * for sync message expressions, we need to wrap the enclosing JS in a callback
  */
 
 "use strict";
@@ -57,7 +46,7 @@ var JsConstruct = function (parts) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Returns a JsConstruct with SyncMessages resolved by wrapping in Messages.
+ * Returns a JsConstruct with SyncMessages resolved by wrapping the construct in as many Messages as required.
  */
 JsConstruct.prototype.resolve = function (placeholderNum) {
 
@@ -112,18 +101,17 @@ JsConstruct.prototype.resolve = function (placeholderNum) {
         return accum.concat(analyze(current));
     }, []);
 
+    // no change
+
     if (wrappers.length == 0) {
         return this;
     }
 
     // render any necessary wrappers
 
-    if (wrappers.length > 0) {
-
-        wrappers.forEach(function (sm) {
-            parts = sm.wrap(parts).resolve(placeholderNum);
-        });
-    }
+    wrappers.forEach(function (sm) {
+        parts = sm.wrap(parts).resolve(placeholderNum);
+    });
 
     return new JsConstruct(parts);
 };
@@ -168,7 +156,7 @@ JsConstruct.renderFragment = function (fragment, pretty) {
 
         // expand annotation objects
 
-        // todo rename to join?
+        // todo rename to join? or args?
         if (fragment.csv !== undefined) {
 
             return JsConstruct.renderFragment(fragment.csv.reduce(function (accum, current, index) {
@@ -196,6 +184,39 @@ JsConstruct.renderFragment = function (fragment, pretty) {
     }
 
     throw new Error("unexpected JS part: " + util.inspect(fragment));
+};
+
+JsConstruct.buildMessage = function (address, args, subsequent, contingency, replyParams, failParams) {
+
+    // render an async call
+
+    if (replyParams === undefined) {
+        replyParams = 'args';
+    }
+
+    if (failParams === undefined) {
+        failParams = 'args';
+    }
+
+    var parts = ['this.sendMessage(', address, ', [', {csv: args}, ']'];
+
+    if (subsequent) {
+        parts.push([', ', 'function (', replyParams, ') ', {block: subsequent}]);
+    }
+    else {
+        parts.push(', null');
+    }
+
+    if (contingency) {
+        parts.push([', ', 'function (', failParams, ') ', {block: contingency}]);
+    }
+    else {
+        parts.push(', null');
+    }
+
+    parts.push(');\n\n');
+
+    return new JsConstruct(parts);
 };
 
 module.exports = JsConstruct;

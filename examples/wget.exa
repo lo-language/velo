@@ -4,6 +4,8 @@ define google "http://www.google.com";
 define apple "http://www.apple.com";
 define exa "http://www.exalang.org";
 
+connect("nork");
+
 sendRequest = >>:
 
     receive url;

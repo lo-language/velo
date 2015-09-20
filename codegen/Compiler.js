@@ -41,7 +41,6 @@
 var Q = require('q');
 var Scope = require('./Scope');
 var JsConstruct = require('./JsConstruct');
-var Message = require('./Message');
 var SyncMessage = require('./SyncMessage');
 
 var __ = {};
@@ -131,6 +130,8 @@ __['stmt_list'] = function (node, scope) {
 
         var tail = __.compile(node.tail, scope);
 
+        // we resolve *after* joining the tail on the head so that the tail
+        // is captured within any wrappers required by the head
         return new JsConstruct([head, tail]).resolve();
     }
 
@@ -215,7 +216,7 @@ __['assign'] = function (node, scope) {
 
     return new JsConstruct([left, ' ' + node.op + ' ', right, ';\n']);
     // this was genius
-    // above comment inserted by my slightly tipsy wife - SP
+    // above comment inserted by my slightly tipsy wife regarding code later removed - SP
  };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -226,7 +227,9 @@ __['assign'] = function (node, scope) {
  */
 __['conditional'] = function (node, scope) {
 
-    // needs predicate to be ready
+    // if the predicate is sync that's easy because we always want to resolve it
+    // the trick is sync logic in the branches because we only want to resolve if
+    // necessary
 
     var predicate = __.compile(node.predicate, scope);
     var consequent = __.compile(node.consequent, scope);
@@ -235,8 +238,6 @@ __['conditional'] = function (node, scope) {
     if (node.otherwise) {
         negBlock = __.compile(node.otherwise, scope);
     }
-
-    // todo we might want to rewrite this to only resolve the blocks after evaluating the predicate
 
     var parts = ['if (', predicate, ') ', {block: consequent}, '\n\n'];
 
@@ -306,7 +307,7 @@ __['message'] = function (node, scope) {
         return __.compile(arg, scope);
     });
 
-    return new Message(target, args,
+    return JsConstruct.buildMessage(target, args,
         node.subsequent ? __.compile(node.subsequent) : null,
         node.contingency ? __.compile(node.contingency) : null);
 };
@@ -344,9 +345,15 @@ __['id'] = function (node, scope) {
     // we know we're not rendering an lvalue because we're defended from that
     // in the assignment code generator
 
+    // should we pass down in a context if we're in eval or assign mode?
+    // context could also let us know we're in string interpolation
+    // as well as conditionals
+
     if (scope.isConstant(node.name)) {
         return scope.resolve(node.name);
     }
+
+    // todo if we're in an eval
 
     return '$' + node.name;
 };

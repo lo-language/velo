@@ -81,7 +81,7 @@ loader.getModule(moduleName).then(
     function (main) {
 
 //        console.log(util.inspect(main.parse(), {depth: null, colors: true}));
-//        console.error(main.getJs() + '\n\n');
+        console.error(main.getJs() + '\n\n');
 
         // cut node off the arglist
         var args = Array.prototype.slice.call(process.argv, 1);
@@ -118,3 +118,43 @@ loader.getModule(moduleName).then(
 //    // inform the OS
 //    process.exit(1);
 //});
+
+//function ($recur, args) {
+//    var $port;
+//
+//    var $args = args.shift(),
+//        $io = args.shift();
+//
+//    $port = 443;
+//
+//    if (($port == 80)) {
+//        this.sendMessage($io.stdout.write, ['http\n'], function (P0) {
+//            P0;
+//        }, null);
+//
+//    }
+//
+//    else {
+//        if (($port == 443)) {
+//            this.sendMessage($io.stdout.write, ['https\n'], function (P0) {
+//                P0;
+//            }, null);
+//
+//        }
+//
+//        else {
+//            this.sendMessage($io.stdout.write, ['??\n'], function (P0) {
+//                P0;
+//            }, null);
+//
+//        }
+//
+//    }
+//
+//    this.sendMessage($io.stdout.write, ['snork\n'], function (P0) {
+//        P0;
+//    }, null);
+//
+//
+//    this.tryClose();
+//}

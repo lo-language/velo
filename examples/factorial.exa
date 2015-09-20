@@ -1,6 +1,6 @@
-receive args, io, env;
+receive args, io;
 
-factorial is:
+factorial = >>:
 
     receive num;
 
@@ -11,5 +11,6 @@ factorial is:
         reply 1;
 
     reply num * factorial(num - 1);
+;
 
-io.stdout.write ~ "" + factorial(args[2]);
+io.stdout.write ~ "`factorial(args[2])`\n";
