@@ -87,6 +87,7 @@ __['procedure'] = function (node, scope) {
     var localScope;
 
     // if there's no enclosing scope, we're at the root of the scope tree
+    // todo not sure we should do this (supply a scope here)
     if (scope === undefined) {
         localScope = new Scope();
     }
@@ -101,13 +102,10 @@ __['procedure'] = function (node, scope) {
     // declare our local vars
     // todo move to block-level scoping with 'let'
 
-    var vars = Object.keys(localScope.vars);
-    var varNames = vars.map(function (key) {
-        return localScope.vars[key];
-    });
+    var localVars = localScope.getJsVars();
 
-    if (vars.length > 0) {
-        body = ['var ' + varNames.join(', ') + ';\n\n', body];
+    if (localVars.length > 0) {
+        body = ['var ' + localVars.join(', ') + ';\n\n', body];
     }
 
     body = [body, '\nthis.tryClose();'];
@@ -189,7 +187,7 @@ __['response'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * An assignment may alter the current scope by defining a variable in it if the LHS of the assign
- * is a simple identifier.
+ * is an identifier.
  *
  * @param scope
  * @param node
@@ -201,10 +199,18 @@ __['assign'] = function (node, scope) {
     var left = __.compile(node.left, scope);
     var right = __.compile(node.right, scope);
 
-    // modify the local scope
     // todo this implies block-level scoping
-    if (node.left.type == 'id' && scope.has(node.left.name) === false) {
-        scope.define(node.left.name);
+    if (node.left.type == 'id') {
+
+        // validate we're not assigning to a constant
+        if (scope.isConstant(node.left.name)) {
+            throw new Error("can't assign to a constant");
+        }
+
+        // declare if a new var
+        if (scope.has(node.left.name) == false) {
+            scope.declare(node.left.name);
+        }
     }
 
     return new JsConstruct([left, ' ' + node.op + ' ', right, ';\n']);
@@ -222,7 +228,7 @@ __['conditional'] = function (node, scope) {
 
     // needs predicate to be ready
 
-    var predicate = __.compile(node.predicate);
+    var predicate = __.compile(node.predicate, scope);
     var consequent = __.compile(node.consequent, scope);
     var negBlock = false;
 
@@ -294,10 +300,10 @@ __['message'] = function (node, scope) {
 
     // compile the parts
 
-    var target = __.compile(node.address);
+    var target = __.compile(node.address, scope);
 
     var args = node.args.map(function (arg) {
-        return __.compile(arg);
+        return __.compile(arg, scope);
     });
 
     return new Message(target, args,
@@ -315,10 +321,10 @@ __['message'] = function (node, scope) {
  */
 __['application'] = function (node, scope) {
 
-    var target = __.compile(node.address);
+    var target = __.compile(node.address, scope);
 
     var args = node.args.map(function (arg) {
-        return __.compile(arg);
+        return __.compile(arg, scope);
     });
 
     // return a wrapped placeholder
@@ -333,9 +339,30 @@ __['application'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__['id'] = function (node) {
+__['id'] = function (node, scope) {
+
+    // we know we're not rendering an lvalue because we're defended from that
+    // in the assignment code generator
+
+    if (scope.isConstant(node.name)) {
+        return scope.resolve(node.name);
+    }
 
     return '$' + node.name;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ * @param scope
+ * @return {String}
+ */
+__['constant'] = function (node, scope) {
+
+    scope.define(node.name, __.compile(node.value, scope));
+
+    return '';
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -589,7 +616,7 @@ __['interpolation'] = function (node, scope) {
 
 __['dynastring'] = function (node, scope) {
 
-    return new JsConstruct([__.compile(node.left), " + '", node.middle, "' + ",
+    return new JsConstruct([__.compile(node.left, scope), " + '", node.middle, "' + ",
         __.compile(node.right, scope)]);
 };
 

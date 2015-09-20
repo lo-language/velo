@@ -9,26 +9,44 @@ var Scope = require('../../codegen/Scope');
 
 module.exports["basics"] = {
 
-    'define var': function (test) {
+    'declare var': function (test) {
 
         var scope = new Scope();
 
-        scope.define('foo', true);
+        test.equal(scope.has('foo'), false);
+        test.deepEqual(scope.getJsVars(), []);
 
-//        test.equal(scope.getStatus('foo'), true);
-//        test.throws(function () {scope.getStatus('bar');});
+        scope.declare('foo');
+        test.equal(scope.has('foo'), true);
+        test.deepEqual(scope.getJsVars(), ['$foo']);
+
+        // test idempotency
+        scope.declare('foo');
+        test.equal(scope.has('foo'), true);
+        test.deepEqual(scope.getJsVars(), ['$foo']);
+
+        // redefine as constant fails
+        test.throws(function () {scope.define('foo', 42);});
 
         test.done();
     },
 
-    'define arg': function (test) {
+    'define constant': function (test) {
 
         var scope = new Scope();
 
-        scope.defineArg('foo');
+        test.equal(scope.has('port'), false);
+        test.deepEqual(scope.getJsVars(), []);
 
-//        test.equal(scope.getStatus('foo'), true);
-//        test.throws(function () {scope.getStatus('bar');});
+        scope.define('port', 8080);
+
+        test.deepEqual(scope.getJsVars(), []);
+        test.equal(scope.has('port'), true);
+        test.equal(scope.isConstant('port'), true);
+        test.equal(scope.resolve('port'), 8080);
+
+        // declare as var now fails
+        test.throws(function () {scope.declare('port');});
 
         test.done();
     }
@@ -40,22 +58,52 @@ module.exports["child scope"] = {
 
         var parent = new Scope();
 
-        parent.define('foo', true);
+        var child = parent.bud();
+
+        parent.declare('foo');
+
+        test.deepEqual(child.getJsVars(), []);
+
+        // should be defined in the child as well
+        test.ok(child.has('foo'));
+        test.equal(child.isConstant('foo'), false);
+
+        // define bar in the child
+        child.declare('bar');
+        test.equal(child.has('bar'), true);
+        test.deepEqual(child.getJsVars(), ['$bar']);
+
+        // should not be defined in the parent
+        test.equal(parent.has('bar'), false);
+
+        test.done();
+    },
+
+    'define constant in parent': function (test) {
+
+        var parent = new Scope();
 
         var child = parent.bud();
 
-//        test.equal(parent.getStatus('foo'), true);
+        parent.define('foo', "42");
+
+        test.deepEqual(child.getJsVars(), []);
 
         // should be defined in the child as well
-//        test.equal(child.getStatus('foo'), true);
-        test.throws(function () {child.getStatus('bar');});
+        test.ok(child.has('foo'));
+        test.ok(child.isConstant('foo'));
+        test.equal(child.resolve('foo'), 42);
 
         // define bar in the child
-        child.defineArg('bar');
-//        test.equal(child.getStatus('bar'), true);
+        child.define('bar', "53");
+        test.equal(child.has('bar'), true);
+        test.deepEqual(child.getJsVars(), []);
+        test.ok(child.has('bar'));
+        test.ok(child.isConstant('bar'));
+        test.equal(child.resolve('bar'), "53");
 
         // should not be defined in the parent
-//        test.throws(function () {parent.getStatus('bar');});
+        test.equal(parent.has('bar'), false);
 
         test.done();
     }

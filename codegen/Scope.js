@@ -29,6 +29,7 @@
 
 "use strict";
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
  * @param parent    the parent scope, if any
@@ -37,32 +38,111 @@
 var __ = function (parent) {
 
     this.parent = parent;
-
-    // map of defined names
     this.vars = {};
+    this.constants = {};
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Defines a variable and marks it as ready iff it's being set to a literal or argument
- * or an expression of exclusively the same.
+ * Declares a variable in this scope.
  *
  * @param name
  */
-__.prototype.define = function (name) {
+__.prototype.declare = function (name) {
+
+    if (this.constants[name] !== undefined) {
+        throw new Error(name + " is a constant in this scope");
+    }
 
     this.vars[name] = '$' + name;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Returns true iff the name is defined in this scope.
+ * Defines a constant in this scope.
  *
  * @param name
+ * @param value
+ */
+__.prototype.define = function (name, value) {
+
+    if (this.vars[name] !== undefined) {
+        throw new Error(name + " is a var in this scope");
+    }
+
+    this.constants[name] = value;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns true
  */
 __.prototype.has = function (name) {
 
-    return this.vars[name] || false;
+    if (this.vars[name] !== undefined) {
+        return true;
+    }
+
+    if (this.constants[name] !== undefined) {
+        return true;
+    }
+
+    if (this.parent) {
+        return this.parent.has(name);
+    }
+
+    return false;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+__.prototype.getJsVars = function (name) {
+
+    var _this = this;
+
+    return Object.keys(this.vars).map(function (key) {
+        return _this.vars[key];
+    });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns true if the specified name is a defined constant.
+ *
+ * @param name
+ * @return {Boolean}
+ */
+__.prototype.isConstant = function (name) {
+
+    if (this.constants[name] !== undefined) {
+        return true;
+    }
+
+    if (this.parent) {
+        return this.parent.isConstant(name);
+    }
+
+    return false;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns the value of the specified constant.
+ *
+ * @param name
+ * @return {*}
+ */
+__.prototype.resolve = function (name) {
+
+    if (this.constants[name] !== undefined) {
+        return this.constants[name];
+    }
+
+    if (this.parent) {
+        return this.parent.resolve(name);
+    }
+
+    throw new Error(name + " is not a defined constant");
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,17 +164,6 @@ __.prototype.getStatus = function (name) {
     }
 
     return this.vars[name];
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param name
- * @return {Number} the number of this argument
- */
-__.prototype.defineArg = function (name) {
-
-    this.define(name, true);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

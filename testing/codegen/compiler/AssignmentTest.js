@@ -21,10 +21,11 @@ module.exports["assignment"] = {
         };
 
         var scope = new Scope();
-        var result = Compiler.compile(node, scope);
 
-        test.equal(Compiler.compile(node).render(), '$foo = 57;\n');
-//        test.ok(scope.getStatus('foo'));
+        test.equal(scope.has('foo'), false);
+
+        test.equal(Compiler.compile(node, scope).render(), '$foo = 57;\n');
+        test.equal(scope.has('foo'), true);
         test.done();
     },
 
@@ -39,10 +40,7 @@ module.exports["assignment"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).render(), '$foo[$bar] = 57;\n');
-
-        // context isn't modified by this
-        test.throws(function () {scope.getStatus('foo')});
+        test.equal(Compiler.compile(node, scope).render(), '$foo[$bar] = 57;\n');
         test.done();
     },
 
@@ -57,9 +55,9 @@ module.exports["assignment"] = {
 
         var scope = new Scope();
 
-        scope.define('bar', true);
-
-        test.equal(Compiler.compile(node).render(), '$foo = $bar;\n');
+        test.equal(scope.has('foo'), false);
+        test.equal(Compiler.compile(node, scope).render(), '$foo = $bar;\n');
+        test.equal(scope.has('foo'), true);
         test.done();
     },
 
@@ -74,7 +72,37 @@ module.exports["assignment"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).resolve().render(), 'this.sendMessage($bar, [], function (P0) {$foo = P0;\n}, null);\n\n');
+        test.equal(scope.has('foo'), false);
+        test.equal(Compiler.compile(node, scope).resolve().render(), 'this.sendMessage($bar, [], function (P0) {$foo = P0;\n}, null);\n\n');
+        test.equal(scope.has('foo'), true);
+
+        test.done();
+    },
+
+    "doesn't assign if in parent scope": function (test) {
+
+        var node = {
+            type: 'assign',
+            op: '=',
+            left: {type: 'id', name: 'foo'},
+            right: {type: 'number', val: '57'}
+        };
+
+        var parent = new Scope();
+
+        parent.declare('foo');
+
+        var scope = parent.bud();
+
+        test.equal(scope.has('foo'), true);
+
+        test.equal(Compiler.compile(node, scope).render(), '$foo = 57;\n');
+        test.deepEqual(scope.getJsVars(), []);
+        test.done();
+    },
+
+    "throws if assigning to constant": function (test) {
+
         test.done();
     }
 };

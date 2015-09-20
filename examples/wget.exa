@@ -1,4 +1,8 @@
-receive args, io, system;
+receive args, io;
+
+define google "http://www.google.com";
+define apple "http://www.apple.com";
+define exa "http://www.exalang.org";
 
 sendRequest = >>:
 
@@ -18,10 +22,10 @@ sendRequest = >>:
 
 // race some requests
 
-sendRequest ~ "http://www.google.com";
+sendRequest ~ google;
 
-sendRequest("http://www.apple.com");
+sendRequest(apple);
 
 //io.stdout.write ~ "apple length was: " + len + "\n\n";
 
-sendRequest ~ "http://www.exalang.org";
+sendRequest ~ exa;

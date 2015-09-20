@@ -21,27 +21,25 @@ module.exports["identifiers"] = {
 //        test.done();
 //    },
 
-    "ready value": function (test) {
+    "normal var": function (test) {
 
         var node = {type: 'id', name: 'foo'};
 
         var scope = new Scope();
 
-        scope.define('foo', true);
-
-        test.equal(Compiler.compile(node), '$foo');
+        test.equal(Compiler.compile(node, scope), '$foo');
         test.done();
     },
 
-//    "defined promise": function (test) {
-//
-//        var node = {type: 'id', name: 'foo'};
-//
-//        Compiler.context.definePromise('foo');
-//
-//        var result = Compiler.compile(node);
-//
-//        test.deepEqual(result.renderExpr(), '$val_foo');
-//        test.done();
-//    }
+    "constant": function (test) {
+
+        var node = {type: 'id', name: 'foo'};
+
+        var scope = new Scope();
+
+        scope.define('foo', "42");
+
+        test.equal(Compiler.compile(node, scope), '42');
+        test.done();
+    }
 };

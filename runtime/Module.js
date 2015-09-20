@@ -32,6 +32,14 @@ var __ = function (source, loader) {
 
     this.source = source;
     this.loader = loader;
+
+    // will be called from within exa, which means with args of (recur, args) and object context of a request
+
+    this.acquire = function (recur, args) {
+
+        console.log('schmoopy');
+        this.reply();
+    };
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +97,7 @@ __.prototype.load = function () {
             'var root = ' + this.getJs() + ';\n\n' +
             'root.call(this, root, rootArgs);\n';
 
-        // prepare a function with the same signature as a standard procedure so it can be returned from connect
+        // prepare a function with the same signature as a standard procedure so it can be returned from acquire
 
         this.procedure = new Function('ignored, rootArgs', body);
     }

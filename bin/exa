@@ -77,21 +77,16 @@ var io = {
     }
 };
 
-var system = {
-    env: process.env,
-    listen: process.on
-};
-
 loader.getModule(moduleName).then(
     function (main) {
 
 //        console.log(util.inspect(main.parse(), {depth: null, colors: true}));
-//        console.error(main.compile().render(true) + '\n\n');
+//        console.error(main.getJs() + '\n\n');
 
         // cut node off the arglist
         var args = Array.prototype.slice.call(process.argv, 1);
 
-        main.run([args, io, system]).then(
+        main.run([args, io]).then(
             function (result) {
 //                console.log(result);
             },

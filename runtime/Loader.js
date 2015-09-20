@@ -88,26 +88,27 @@ __.prototype.getModule = function (path) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * The root connect() procedure to be provided to a main module and called from within exa.
- * It needs to conform to the procedure type as well as return a promise to a procedure.
+ * Has the signature to be called as a procedure from Exa.
  *
  * @param recur
  * @param args
- * @param connect
+ * @return {*}
  */
-__.prototype.rootAttach = function (recur, args, connect) {
+__.prototype.acquire = function (recur, args) {
 
-    // create a module from the path
-    // we need to return a promise for a procedure (a function that takes the common args of (recur, args, connect))
-    // so that it can be bound to a var and called from within exa
-
-    return this.getModule(args[0]).then(
+    this.getModule(args[0]).then(
         function (module) {
 
             // might want to refactor this class so we don't need this bind
             return module.load();
         }
-    );
+    ).then(
+        function () {
+
+
+
+        }
+    ).end();
 };
 
 module.exports = __;
