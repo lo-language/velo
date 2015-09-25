@@ -130,7 +130,7 @@ module.exports['factorial'] = {
     },
 
     'success': function (test) {
-//        console.log(this.harness.getJs().render(true));
+        console.log(this.harness.getJs());
         this.harness.testSuccess(test, [10], 3628800);
     },
 

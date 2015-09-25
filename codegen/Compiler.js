@@ -38,7 +38,6 @@
 
 'use strict';
 
-var Q = require('q');
 var Scope = require('./Scope');
 var JsConstruct = require('./JsConstruct');
 var SyncMessage = require('./SyncMessage');
@@ -130,9 +129,29 @@ __['stmt_list'] = function (node, scope) {
 
         var tail = __.compile(node.tail, scope);
 
+        if (node.head.type == 'conditional') {
+
+            // grab a continuation before diving into a conditional
+            var cont = scope.pushContinuation(tail);
+
+            // recompile the head with a continuation
+            head = __.compile(node.head, scope);
+
+            scope.popContinuation();
+
+            // define the continuation before we use it
+            return new JsConstruct([cont, head]).resolve();
+        }
+
         // we resolve *after* joining the tail on the head so that the tail
         // is captured within any wrappers required by the head
         return new JsConstruct([head, tail]).resolve();
+    }
+    else if (scope.continuations.length > 0) {
+
+        // call the continuation as the last thing we do in each block
+        // todo probably have to qualify this
+        return new JsConstruct([head, scope.getContinuation()]).resolve();
     }
 
     return head.resolve();
@@ -237,6 +256,9 @@ __['conditional'] = function (node, scope) {
 
     if (node.otherwise) {
         negBlock = __.compile(node.otherwise, scope);
+    }
+    else if (scope.continuations.length > 0) {
+        negBlock = scope.getContinuation();
     }
 
     var parts = ['if (', predicate, ') ', {block: consequent}, '\n\n'];

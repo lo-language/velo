@@ -29,6 +29,8 @@
 
 "use strict";
 
+var JsConstruct = require('./JsConstruct');
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
@@ -40,6 +42,7 @@ var __ = function (parent) {
     this.parent = parent;
     this.vars = {};
     this.constants = {};
+    this.continuations = [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,6 +178,32 @@ __.prototype.getStatus = function (name) {
 __.prototype.bud = function () {
 
     return new __(this);
+};
+
+/**
+ *
+ */
+__.prototype.pushContinuation = function (stmt_list) {
+
+    var num = this.continuations.length + 1;
+
+    var cont = new JsConstruct(["var cont" + num, " = function () {\n", stmt_list, "\n};\n"]);
+
+    this.continuations.push(cont);
+
+    return cont;
+};
+
+__.prototype.popContinuation = function () {
+
+    this.continuations.pop();
+};
+
+__.prototype.getContinuation = function () {
+
+    var num = this.continuations.length;
+
+    return "cont" + num + ".call(this);\n"
 };
 
 module.exports = __;

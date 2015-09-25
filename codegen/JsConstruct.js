@@ -37,11 +37,23 @@ var util = require('util');
 /**
  *
  * @param parts     an array of strings or JsConstructs
+ * @param sync      true if this construct contains or implements sync calls
  */
-var JsConstruct = function (parts) {
+var JsConstruct = function (parts, sync) {
 
     // enable a single fragment to be passed in directly
     this.parts = Array.isArray(parts) ? parts : [parts];
+
+    this.sync = sync || false;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @return {Boolean}
+ */
+JsConstruct.prototype.isSync = function () {
+    return this.sync;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +88,7 @@ JsConstruct.prototype.resolve = function (placeholderNum) {
 
         if (typeof part === 'object') {
 
-            if (part.sm) {
+            if (part instanceof SyncMessage) {
                 wrappers.unshift(part);
                 part.placeholder = 'P' + placeholderNum++;
                 return part.placeholder; // todo - maybe we can let the wrapper know its position here?
@@ -186,7 +198,20 @@ JsConstruct.renderFragment = function (fragment, pretty) {
     throw new Error("unexpected JS part: " + util.inspect(fragment));
 };
 
-JsConstruct.buildMessage = function (address, args, subsequent, contingency, replyParams, failParams) {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Builds a message.
+ *
+ * @param address
+ * @param args
+ * @param subsequent
+ * @param contingency
+ * @param replyParams
+ * @param failParams
+ * @param syncWrapper
+ * @return {*}
+ */
+JsConstruct.buildMessage = function (address, args, subsequent, contingency, replyParams, failParams, syncWrapper) {
 
     // render an async call
 
@@ -216,7 +241,10 @@ JsConstruct.buildMessage = function (address, args, subsequent, contingency, rep
 
     parts.push(');\n\n');
 
-    return new JsConstruct(parts);
+    return new JsConstruct(parts, syncWrapper);
 };
 
 module.exports = JsConstruct;
+
+// escape the cyclic dependency
+var SyncMessage = require('./SyncMessage');

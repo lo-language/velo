@@ -34,10 +34,6 @@ The compiler generates JavaScript source from the AST bottom-up by snapping toge
 
 Base class for holding chunks of JS; expands helper objects such as argument lists.
 
-**Message**
-
-Extends JsConstruct to generate the code for sending a message.
-
 **SyncMessage**
 
 Models a synchronous message by wrapping supplied code in a Message.

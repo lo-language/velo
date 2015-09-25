@@ -36,7 +36,6 @@ var __ = function (address, args) {
 
     this.address = address;
     this.args = args || [];
-    this.sm = true; // workaround for: can't use instanceof in JSC because it creates a dep cycle
     this.placeholder = '??';
 };
 
@@ -49,7 +48,7 @@ var __ = function (address, args) {
 __.prototype.wrap = function (blocked) {
 
     return JsConstruct.buildMessage(
-        this.address, this.args, blocked, null, this.placeholder);
+        this.address, this.args, blocked, null, this.placeholder, true);
 };
 
 
