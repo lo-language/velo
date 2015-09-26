@@ -293,7 +293,7 @@ literal
     | STRING -> {type: 'string', val: $1}
     | PROCEDURE ':' block -> {type: 'procedure', body: $3}
     | '[' BEGIN? (dyad ',')* dyad? END? ']' -> {type: 'list', elements: $4 ? $3.concat([$4]): []}
-    | '{' BEGIN? (attribute ',')* attribute? END? '}' -> {type: 'record', attributes: $4 ? $3.concat([$4]): []}
+    | '{' BEGIN? (field ',')* field? END? '}' -> {type: 'record', fields: $4 ? $3.concat([$4]): []}
     ;
 
 dyad
@@ -301,7 +301,7 @@ dyad
     | expr ':' expr -> {type: 'dyad', key: $1, value: $3};
     ;
 
-attribute
+field
     : ID ':' expr -> {type: 'field', name: $1, value: $3}
     ;
 

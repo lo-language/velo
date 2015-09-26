@@ -81,7 +81,7 @@ loader.getModule(moduleName).then(
     function (main) {
 
 //        console.log(util.inspect(main.parse(), {depth: null, colors: true}));
-        console.error(main.getJs() + '\n\n');
+//        console.error(main.getJs() + '\n\n');
 
         // cut node off the arglist
         var args = Array.prototype.slice.call(process.argv, 1);

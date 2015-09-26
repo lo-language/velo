@@ -196,7 +196,7 @@
                                         },
                                         "right":{
                                             "type":"record",
-                                            "attributes":[
+                                            "fields":[
                                                 {
                                                     "type":"field",
                                                     "name":"key1",

@@ -600,6 +600,7 @@ __['string'] = function (node) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * Handles lists and maps.
  *
  * @param scope
  * @param node
@@ -634,18 +635,31 @@ __['list'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__['set'] = function (node, scope) {
+__['dyad'] = function (node, scope) {
 
-    // list literals might have members that need to be realized
+    var key = __.compile(node.key, scope);
+    var value = __.compile(node.value, scope);
+
+    return [key, ':', value];
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Records are just implemented as JS objects of course.
+ *
+ * @param scope
+ * @param node
+ */
+__['record'] = function (node, scope) {
 
     var self = this;
 
-    var members = node.members.map(function (member) {
-        return self.compile(member, scope);
+    var fields = node.fields.map(function (field) {
+        return self.compile(field, scope);
     });
 
     // could use a block annotation here
-    return new JsConstruct(['{', {csv: members}, '}']);
+    return new JsConstruct(['{', {csv: fields}, '}']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -654,12 +668,12 @@ __['set'] = function (node, scope) {
  * @param scope
  * @param node
  */
-__['dyad'] = function (node, scope) {
+__['field'] = function (node, scope) {
 
-    var key = __.compile(node.key, scope);
     var value = __.compile(node.value, scope);
 
-    return [key, ':', value];
+    // we don't qualify field names
+    return [node.name, ':', value];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

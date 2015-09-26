@@ -209,7 +209,7 @@
                                                                         "args":[
                                                                             {
                                                                                 "type":"record",
-                                                                                "attributes":[
+                                                                                "fields":[
                                                                                     {
                                                                                         "type":"field",
                                                                                         "name":"ready",
