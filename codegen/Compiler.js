@@ -169,8 +169,17 @@ __['stmt_list'] = function (node, scope) {
  */
 __['receive'] = function (node, scope) {
 
-    return new JsConstruct(['var ' + node.names.map(function (name) {
+    // todo do we always want the declaration? could use receive to clobber existing values...
+
+    return new JsConstruct([node.names.map(function (name) {
+
+        // declare if a new var
+        if (scope.has(name) == false) {
+            scope.declare(name);
+        }
+
         return '$' + name + ' = ' + 'args.shift()';
+
     }).join(',\n') + ';\n\n']);
 };
 
@@ -601,9 +610,20 @@ __['list'] = function (node, scope) {
 
     var self = this;
 
+    var isMap = false;
+
     var items = node.elements.map(function (item) {
+
+        if (item.type == 'dyad') {
+            isMap = true;
+        }
+
         return self.compile(item, scope);
     });
+
+    if (isMap) {
+        return new JsConstruct(['{', {csv: items}, '}']);
+    }
 
     return new JsConstruct(['[', {csv: items}, ']']);
 };

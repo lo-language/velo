@@ -18,7 +18,16 @@ module.exports["receive"] = {
             names: ['foo', 'mani', 'padme', 'hum']
         };
 
-        test.equal(Compiler.compile(node).render(), 'var $foo = args.shift(),\n$mani = args.shift(),\n$padme = args.shift(),\n$hum = args.shift();\n\n');
+        var scope = new Scope();
+
+        test.equal(scope.has("foo"), false);
+        test.equal(scope.has("mani"), false);
+        test.equal(Compiler.compile(node, scope).render(), '$foo = args.shift(),\n$mani = args.shift(),\n$padme = args.shift(),\n$hum = args.shift();\n\n');
+
+        // params should now be declared in the scope
+        test.equal(scope.has("foo"), true);
+        test.equal(scope.has("mani"), true);
+
         test.done();
     }
 };
