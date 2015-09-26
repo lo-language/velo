@@ -29,20 +29,19 @@
 
 "use strict";
 
-var JsConstruct = require('./JsConstruct');
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
  * @param parent    the parent scope, if any
+ * @param continuation
  * @private
  */
-var __ = function (parent) {
+var __ = function (parent, continuation) {
 
     this.parent = parent;
     this.vars = {};
     this.constants = {};
-    this.continuations = [];
+    this.cont = continuation;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,39 +170,35 @@ __.prototype.getStatus = function (name) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Creates and returns a new child context. The child knows its parent, but the parent has no record of the child.
+ * Creates and returns a new child scope. The child knows its parent, but the parent has no record of the child.
  *
  * @return {*}
  */
-__.prototype.bud = function () {
+__.prototype.bud = function (continuation) {
 
-    return new __(this);
+    return new __(this, continuation);
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * Returns true if this scope has a current continuation.
  *
+ * @return {Boolean}
  */
-__.prototype.pushContinuation = function (stmt_list) {
+__.prototype.hasContinuation = function () {
 
-    var num = this.continuations.length + 1;
-
-    var cont = new JsConstruct(["var cont" + num, " = function () {\n", stmt_list, "\n};\n"]);
-
-    this.continuations.push(cont);
-
-    return cont;
+    return this.cont ? true : false;
 };
 
-__.prototype.popContinuation = function () {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns a call to the current continuation.
+ *
+ * @return {String}
+ */
+__.prototype.getCallCont = function () {
 
-    this.continuations.pop();
-};
-
-__.prototype.getContinuation = function () {
-
-    var num = this.continuations.length;
-
-    return "cont" + num + ".call(this);\n"
+    return "cc.call(this);\n";
 };
 
 module.exports = __;

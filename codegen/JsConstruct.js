@@ -244,6 +244,16 @@ JsConstruct.buildMessage = function (address, args, subsequent, contingency, rep
     return new JsConstruct(parts, syncWrapper);
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param body
+ */
+JsConstruct.makeContinuation = function (body) {
+
+    return new JsConstruct(["var cc = function () {\n", body, "\n};\n"]);
+};
+
 module.exports = JsConstruct;
 
 // escape the cyclic dependency

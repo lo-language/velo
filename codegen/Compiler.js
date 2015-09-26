@@ -131,13 +131,13 @@ __['stmt_list'] = function (node, scope) {
 
         if (node.head.type == 'conditional') {
 
+            // todo see if the conditional contains any async code before making continuation
+
             // grab a continuation before diving into a conditional
-            var cont = scope.pushContinuation(tail);
+            var cont = JsConstruct.makeContinuation(tail);
 
             // recompile the head with a continuation
-            head = __.compile(node.head, scope);
-
-            scope.popContinuation();
+            head = __.compile(node.head, scope.bud(cont));
 
             // define the continuation before we use it
             return new JsConstruct([cont, head]).resolve();
@@ -147,11 +147,14 @@ __['stmt_list'] = function (node, scope) {
         // is captured within any wrappers required by the head
         return new JsConstruct([head, tail]).resolve();
     }
-    else if (scope.continuations.length > 0) {
+    else if (scope.hasContinuation()) {
 
         // call the continuation as the last thing we do in each block
-        // todo probably have to qualify this
-        return new JsConstruct([head, scope.getContinuation()]).resolve();
+        // scope.addContinuation? to create the construct?
+
+        if (node.head.type !== "response") {
+            return new JsConstruct([head, scope.getCallCont()]).resolve();
+        }
     }
 
     return head.resolve();
@@ -257,8 +260,8 @@ __['conditional'] = function (node, scope) {
     if (node.otherwise) {
         negBlock = __.compile(node.otherwise, scope);
     }
-    else if (scope.continuations.length > 0) {
-        negBlock = scope.getContinuation();
+    else if (scope.hasContinuation()) {
+        negBlock = scope.getCallCont();
     }
 
     var parts = ['if (', predicate, ') ', {block: consequent}, '\n\n'];

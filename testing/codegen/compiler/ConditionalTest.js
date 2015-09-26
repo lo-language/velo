@@ -6,10 +6,11 @@
 "use strict";
 
 var Compiler = require('../../../codegen/Compiler');
+var JsConstruct = require('../../../codegen/JsConstruct');
 var Scope = require('../../../codegen/Scope');
 var util = require('util');
 
-module.exports["conditional"] = {
+module.exports["basics"] = {
 
     "positive only": function (test) {
 
@@ -74,29 +75,61 @@ module.exports["conditional"] = {
         test.equal(Compiler.compile(node).render(),
             'if ($foo) {$bar = 42;\n}\n\nelse {if ($bar) {$bar = 32;\n}\n\nelse {$baz = 82;\n}\n\n}\n\n');
         test.done();
+    }
+}
+
+module.exports["async"] = {
+
+    "positive with continuation creates else": function (test) {
+
+        // should create a context
+        // should call compile on each statement
+
+        var node = {
+            type: 'conditional',
+            predicate: {type: 'id', name: 'foo'},
+            consequent: {
+                type: 'stmt_list',
+                head: {type: 'assign', op: '=',
+                    left: {type: 'id', name: 'bar'},
+                    right: {type: 'application', address: {type: 'id', name: 'foo'}, args: []}},
+                tail: null}
+        };
+
+        var cont = JsConstruct.makeContinuation("hi there;");
+
+        var scope = new Scope(null, cont);
+
+        test.equal(Compiler.compile(node, scope).render(),
+            "if ($foo) {this.sendMessage($foo, [], function (P0) {$bar = P0;\ncc.call(this);\n}, null);\n\n}\n\nelse {cc.call(this);\n}\n\n");
+        test.done();
     },
 
-//    "positive with async stmt": function (test) {
-//
-//        // should create a context
-//        // should call compile on each statement
-//
-//        var node = {
-//            type: 'conditional',
-//            predicate: {type: 'id', name: 'foo'},
-//            consequent: {
-//                type: 'stmt_list',
-//                head: {type: 'assign', op: '=',
-//                    left: {type: 'id', name: 'bar'},
-//                    right: {type: 'request', of: {type: 'id', name: 'foo'}, args: []}},
-//                tail: null}
-//        };
-//
-//        // patch sub nodes?
-//
-//        var scope = new Scope();
-//
-//        test.equal(Compiler.compile(node).render(), 'if ($foo) {\n$bar = 42;\n}');
-//        test.done();
-//    }
+    "continuation skipped after response": function (test) {
+
+        // should create a context
+        // should call compile on each statement
+
+        var node = {
+            type: 'conditional',
+            predicate: {type: 'id', name: 'foo'},
+            consequent: {
+                type: 'stmt_list',
+                head: {
+                    type: 'response',
+                    channel: 'reply',
+                    args: [
+                        {type: 'number', val: '42'}
+                    ]},
+                tail: null}
+        };
+
+        var cont = JsConstruct.makeContinuation("hi there;");
+
+        var scope = new Scope(null, cont);
+
+        test.equal(Compiler.compile(node, scope).render(),
+            "if ($foo) {this.reply(42);\nreturn;}\n\nelse {cc.call(this);\n}\n\n");
+        test.done();
+    }
 };
