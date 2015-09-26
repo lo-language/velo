@@ -84,25 +84,23 @@ module.exports["op"] = {
 
         test.equal(Compiler.compile(node).render(), "function (item, collection) {if (Array.isArray(collection)) return collection.indexOf(item) >= 0;else if (typeof val === 'object') return collection.hasOwnProperty(item);}('trillian',$dudes)");
         test.done();
-    }
+    },
 
-//    "with promises": function (test) {
-//
-//        // should create a context
-//        // should call compile on each statement
-//
-//        var node = {
-//            type: 'op',
-//            op: '+',
-//            left: {type: 'number', val: '1'},
-//            right: {type: 'number', val: '2'}
-//        };
-//
-//        // patch sub nodes?
-//
-//        compiler.handlers["op"](node);
-//
-//        test.deepEqual(node.js, {value: '(1 + 2)'});
-//        test.done();
-//    },
+    "equality is strict": function (test) {
+
+        // should create a context
+        // should call compile on each statement
+
+        var node = {
+            type: 'op',
+            op: '==',
+            left: {type: 'id', name: 'foo'},
+            right: {type: 'id', name: 'bar'}
+        };
+
+        // patch sub nodes?
+
+        test.equal(Compiler.compile(node).render(), "($foo === $bar)");
+        test.done();
+    }
 };

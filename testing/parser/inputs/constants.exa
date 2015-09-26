@@ -1,6 +1,6 @@
-define port 443;
+port is 443;
 
-define url "http://www.exalang.org";
+url is "http://www.exalang.org";
 
 distinguish black, white;
 

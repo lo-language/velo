@@ -103,7 +103,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "="                     return '='
 "?"                     return '?'
 "#"                     return '#'
-"define"                return 'DEFINE'
+"is"                    return 'IS'
 "distinguish"           return 'DISTINGUISH'
 "procedure"             return 'PROCEDURE'
 "receive"               return 'RECEIVE'
@@ -210,7 +210,7 @@ statement_list
 
 statement
     : RECEIVE (ID ',')* ID ';' -> {type: 'receive', names: $2.concat($3)}
-    | DEFINE ID literal ';' -> {type: 'constant', name: $2, value: $3}
+    | ID IS literal ';' -> {type: 'constant', name: $1, value: $3}
     | DISTINGUISH (ID ','?)+ ID ';' -> {type: 'range', variants: $2.concat($3)}
     | application contingency? ';' -> {type: 'application_stmt', application: $1, contingency: $2}
     | response ';'

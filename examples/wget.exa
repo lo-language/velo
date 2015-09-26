@@ -1,8 +1,8 @@
 receive args, io;
 
-define google "http://www.google.com";
-define apple "http://www.apple.com";
-define exa "http://www.exalang.org";
+exa     is "http://www.exalang.org";
+apple   is "http://www.apple.com";
+google  is "http://www.google.com";
 
 sendRequest = >>:
 

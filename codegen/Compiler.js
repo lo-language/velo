@@ -531,6 +531,10 @@ __['op'] = function (node, scope) {
                 left, ',', right, ')']);
     }
 
+    if (op == '==') {
+        op = '===';
+    }
+
 //    make sure both sides are defined
 //    could relax this if we want to allow declaration after usage
 //    should also factor this out into a getValue() maybe
