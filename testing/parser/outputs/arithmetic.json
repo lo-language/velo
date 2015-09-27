@@ -1,40 +1,84 @@
-{
-    "type":"procedure",
-    "body": {
-        "type": "stmt_list",
-        "head": {
-            "type": "assign",
-            "op": "=",
-            "left": {"type": "id","name":"qux"},
-            "right": {
-                "type": "op",
-                "op": "+",
-                "left": {
-                    "type": "op",
-                    "op": "+",
-                    "left": {"type":"number", "val":"2"},
-                    "right": {
-                        "type": "op",
-                        "op": "/",
-                        "left": {
-                            "type": "op",
-                            "op": "*",
-                            "left": {"type":"id","name":"foo"},
-                            "right": {"type":"id","name":"bar"}},
-                        "right": {"type":"number", "val":"-2"}
-                    }},
-                "right": {
-                    "type":"op",
-                    "op":"%",
-                    "left": {"type":"id","name":"baz"},
-                    "right": {
-                        "type": "op",
-                        "op": "-",
-                        "left": {"type":"id","name":"age"},
-                        "right": {"type":"number", "val":"4"}
-                    }}
-                }
+{"type":"procedure", "body":{
+    "type":"stmt_list",
+    "head":{
+        "type":"assign",
+        "op":"=",
+        "left":{
+            "type":"id",
+            "name":"qux"
         },
-        "tail": null
+        "right":{
+            "type":"op",
+            "op":"+",
+            "left":{
+                "type":"op",
+                "op":"+",
+                "left":{
+                    "type":"number",
+                    "val":"2"
+                },
+                "right":{
+                    "type":"op",
+                    "op":"/",
+                    "left":{
+                        "type":"op",
+                        "op":"*",
+                        "left":{
+                            "type":"id",
+                            "name":"foo"
+                        },
+                        "right":{
+                            "type":"id",
+                            "name":"bar"
+                        }
+                    },
+                    "right":{
+                        "type":"number",
+                        "val":"-2"
+                    }
+                }
+            },
+            "right":{
+                "type":"op",
+                "op":"%",
+                "left":{
+                    "type":"id",
+                    "name":"baz"
+                },
+                "right":{
+                    "type":"op",
+                    "op":"-",
+                    "left":{
+                        "type":"id",
+                        "name":"age"
+                    },
+                    "right":{
+                        "type":"number",
+                        "val":"4"
+                    }
+                }
+            }
+        }
+    },
+    "tail":{
+        "type":"stmt_list",
+        "head":{
+            "type":"increment",
+            "operand":{
+                "type":"id",
+                "name":"num"
+            }
+        },
+        "tail":{
+            "type":"stmt_list",
+            "head":{
+                "type":"decrement",
+                "operand":{
+                    "type":"id",
+                    "name":"num"
+                }
+            },
+            "tail":null
+        }
     }
-}
+}}

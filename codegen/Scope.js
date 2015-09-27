@@ -33,15 +33,15 @@
 /**
  *
  * @param parent    the parent scope, if any
- * @param continuation
+ * @param cont      the name of the continuation, if any
  * @private
  */
-var __ = function (parent, continuation) {
+var __ = function (parent, cont) {
 
     this.parent = parent;
     this.vars = {};
     this.constants = {};
-    this.cont = continuation;
+    this.cont = cont;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -178,7 +178,7 @@ __.prototype.getStatus = function (name) {
  *
  * @return {*}
  */
-__.prototype.bud = function (continuation) {
+__.prototype.bud = function (continuation) { // push? nest? inner? derive? pushDown?
 
     return new __(this, continuation);
 };
@@ -202,7 +202,8 @@ __.prototype.hasContinuation = function () {
  */
 __.prototype.getCallCont = function () {
 
-    return "cc.call(this);\n";
+    return this.cont + ".call(this);\n";
 };
 
 module.exports = __;
+

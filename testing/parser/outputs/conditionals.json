@@ -18,8 +18,7 @@
             "type":"stmt_list",
             "head":{
                 "type":"increment",
-                "op":"++",
-                "left":{
+                "operand":{
                     "type":"id",
                     "name":"x"
                 }
@@ -47,8 +46,7 @@
                 "type":"stmt_list",
                 "head":{
                     "type":"decrement",
-                    "op":"--",
-                    "left":{
+                    "operand":{
                         "type":"id",
                         "name":"x"
                     }
@@ -59,8 +57,7 @@
                 "type":"stmt_list",
                 "head":{
                     "type":"increment",
-                    "op":"++",
-                    "left":{
+                    "operand":{
                         "type":"id",
                         "name":"x"
                     }
@@ -88,8 +85,7 @@
                     "type":"stmt_list",
                     "head":{
                         "type":"increment",
-                        "op":"++",
-                        "left":{
+                        "operand":{
                             "type":"id",
                             "name":"x"
                         }
@@ -139,8 +135,7 @@
                         "type":"stmt_list",
                         "head":{
                             "type":"increment",
-                            "op":"++",
-                            "left":{
+                            "operand":{
                                 "type":"id",
                                 "name":"x"
                             }

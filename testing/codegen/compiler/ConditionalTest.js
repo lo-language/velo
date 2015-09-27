@@ -76,7 +76,7 @@ module.exports["basics"] = {
             'if ($foo) {$bar = 42;\n}\n\nelse {if ($bar) {$bar = 32;\n}\n\nelse {$baz = 82;\n}\n\n}\n\n');
         test.done();
     }
-}
+};
 
 module.exports["async"] = {
 
@@ -96,9 +96,7 @@ module.exports["async"] = {
                 tail: null}
         };
 
-        var cont = JsConstruct.makeContinuation("hi there;");
-
-        var scope = new Scope(null, cont);
+        var scope = new Scope(null, "cc");
 
         test.equal(Compiler.compile(node, scope).render(),
             "if ($foo) {this.sendMessage($foo, [], function (P0) {$bar = P0;\ncc.call(this);\n}, null);\n\n}\n\nelse {cc.call(this);\n}\n\n");
@@ -124,9 +122,7 @@ module.exports["async"] = {
                 tail: null}
         };
 
-        var cont = JsConstruct.makeContinuation("hi there;");
-
-        var scope = new Scope(null, cont);
+        var scope = new Scope(null, "cc");
 
         test.equal(Compiler.compile(node, scope).render(),
             "if ($foo) {this.reply(42);\nreturn;}\n\nelse {cc.call(this);\n}\n\n");

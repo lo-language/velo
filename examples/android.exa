@@ -1,0 +1,27 @@
+receive args, io;
+
+numPoints is 9;
+
+// recursively iterate
+// label points as 0-8
+
+num = 0;
+count = 0;
+
+explore = >>:
+
+    receive start, indent;
+
+    total = 0;
+
+    while start < numPoints:
+        found = explore(start + 1, "`indent`  ");
+        total = total + found;
+        count++;
+        start++;
+
+    reply total;
+;
+
+found = explore(0, "");
+io.stdout.write("\n\nfound: `count`\n");

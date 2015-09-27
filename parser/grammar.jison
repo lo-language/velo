@@ -220,9 +220,7 @@ statement
     | dispatch
     | conditional
     | iteration
-    | COMPLETE (expr ',')* expr ';' -> {type: 'complete', futures: $2.concat([$3])}
     | SKIP ';' -> {type: 'skip'}
-    | STOP ';' -> {type: 'stop'}
     ;
 
 response
@@ -249,8 +247,8 @@ assignment_op
 
 // NOT expressions
 step
-    : lvalue '++' -> {type: 'increment', op: $2, left: $1}
-    | lvalue '--' -> {type: 'decrement', op: $2, left: $1}
+    : lvalue '++' -> {type: 'increment', operand: $1}
+    | lvalue '--' -> {type: 'decrement', operand: $1}
     ;
 
 conditional

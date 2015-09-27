@@ -129,15 +129,16 @@ __['stmt_list'] = function (node, scope) {
 
         var tail = __.compile(node.tail, scope);
 
-        if (node.head.type == 'conditional') {
+        if (node.head.type == 'conditional' || node.head.type == 'iteration') {
 
             // todo see if the conditional contains any async code before making continuation
 
             // grab a continuation before diving into a conditional
-            var cont = JsConstruct.makeContinuation(tail);
+            var contName = "cc";
+            var cont = JsConstruct.makeContinuation(contName, tail);
 
-            // recompile the head with a continuation
-            head = __.compile(node.head, scope.bud(cont));
+            // recompile the head with the continuation
+            head = __.compile(node.head, scope.bud(contName));
 
             // define the continuation before we use it
             return new JsConstruct([cont, head]).resolve();
@@ -180,7 +181,7 @@ __['receive'] = function (node, scope) {
 
         return '$' + name + ' = ' + 'args.shift()';
 
-    }).join(',\n') + ';\n\n']);
+    }).join(';\n') + ';\n\n']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -289,38 +290,27 @@ __['conditional'] = function (node, scope) {
  * @param scope
  * @param node
  */
-//__['iteration'] = function (node, scope) {
-//
-//    var condition = __.compile(node.condition, scope);
-////    var statements = __.compile(node.statements, scope);
-//
-//    return new JsSyncMessage(function (resolver) {
-////        return source.renderExpr(stmtContext) + '.call(null,' + sink.renderExpr(stmtContext) + ')'
-//    });
-//};
+__['iteration'] = function (node, scope) {
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Selective synchronization barrier.
- *
- * @param scope
- * @param node
- */
-//__['complete'] = function (node, scope) {
-//
-//    // complete always needs to wrap its followers (children)
-//
-//    // should we pass each node a parse tree for it to subsume when we compile it?
-//    // or should it pass back something that can subsume a node?
-//
-//    var self = this;
-//
-//    var promises = node.promises.map(function (expr) {
-//        return self.compile(expr, scope);
-//    });
-//
-//    return new Complete(promises);
-//};
+    var condition = __.compile(node.condition, scope);
+
+    // set a continuation
+    var cont = JsConstruct.makeContinuation(node.statements);
+
+    // we want to compile this with the continuation we'll make next
+    var statements = __.compile(node.statements, scope.bud("w"));
+
+    var cond = scope.hasContinuation()?
+        new JsConstruct(["if (", condition, ") ", {block: statements}, "\nelse ", {block: scope.getCallCont()}]):
+        new JsConstruct(["if (", condition, ") ", {block: statements}]);
+
+    return new JsConstruct([
+
+        "var w = function () ",
+        {block: cond}, ";\n\n",
+        "w.call(this);\n"
+    ]);
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Message dispatch
@@ -532,13 +522,13 @@ __['op'] = function (node, scope) {
     else if (op === 'or') {
         op = '||';
     }
-    else if (op == '+') {
-
-        // todo drop this in favor of combination operator ><
-        return new JsConstruct(['function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {' +
-                'return left.concat(right);} else return left + right;}(',
-                left, ',', right, ')']);
-    }
+//    else if (op == '+') {
+//
+//        // todo drop this in favor of combination operator ><
+//        return new JsConstruct(['function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {' +
+//                'return left.concat(right);} else return left + right;}(',
+//                left, ',', right, ')']);
+//    }
 
     if (op == '==') {
         op = '===';
@@ -688,6 +678,16 @@ __['dynastring'] = function (node, scope) {
 
     return new JsConstruct([__.compile(node.left, scope), " + '", node.middle, "' + ",
         __.compile(node.right, scope)]);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+__['increment'] = function (node, scope) {
+    return new JsConstruct([ __.compile(node.operand, scope), "++;"]);
+};
+
+__['decrement'] = function (node, scope) {
+    return new JsConstruct([ __.compile(node.operand, scope), "--;"]);
 };
 
 module.exports = __;

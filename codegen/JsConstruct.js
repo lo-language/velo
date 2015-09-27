@@ -249,9 +249,9 @@ JsConstruct.buildMessage = function (address, args, subsequent, contingency, rep
  *
  * @param body
  */
-JsConstruct.makeContinuation = function (body) {
+JsConstruct.makeContinuation = function (name, body) {
 
-    return new JsConstruct(["var cc = function () {\n", body, "\n};\n"]);
+    return new JsConstruct(["var " + name + " = function () {\n", body, "\n};\n"]);
 };
 
 module.exports = JsConstruct;

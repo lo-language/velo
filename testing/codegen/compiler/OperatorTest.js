@@ -52,23 +52,23 @@ module.exports["op"] = {
         test.done();
     },
 
-    "addition handles lists": function (test) {
-
-        // should create a context
-        // should call compile on each statement
-
-        var node = {
-            type: 'op',
-            op: '+',
-            left: {type: 'id', name: 'foo'},
-            right: {type: 'id', name: 'bar'}
-        };
-
-        // patch sub nodes?
-
-        test.equal(Compiler.compile(node).render(), "function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {return left.concat(right);} else return left + right;}($foo,$bar)");
-        test.done();
-    },
+//    "addition handles lists": function (test) {
+//
+//        // should create a context
+//        // should call compile on each statement
+//
+//        var node = {
+//            type: 'op',
+//            op: '+',
+//            left: {type: 'id', name: 'foo'},
+//            right: {type: 'id', name: 'bar'}
+//        };
+//
+//        // patch sub nodes?
+//
+//        test.equal(Compiler.compile(node).render(), "function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {return left.concat(right);} else return left + right;}($foo,$bar)");
+//        test.done();
+//    },
 
     "in operator": function (test) {
 
