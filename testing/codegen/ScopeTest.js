@@ -31,6 +31,25 @@ module.exports["basics"] = {
         test.done();
     },
 
+    'declare var that collides with JS': function (test) {
+
+        var scope = new Scope();
+
+        test.equal(scope.has('constructor'), false);
+        test.deepEqual(scope.getJsVars(), []);
+
+        scope.declare('constructor');
+        test.equal(scope.has('constructor'), true);
+        test.deepEqual(scope.getJsVars(), ['$constructor']);
+
+        // test idempotency
+        scope.declare('constructor');
+        test.equal(scope.has('constructor'), true);
+        test.deepEqual(scope.getJsVars(), ['$constructor']);
+
+        test.done();
+    },
+
     'define constant': function (test) {
 
         var scope = new Scope();

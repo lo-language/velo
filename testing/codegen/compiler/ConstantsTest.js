@@ -53,5 +53,27 @@ module.exports["constants"] = {
         test.equal(scope.resolve('album'), "'Melon Collie'");
 
         test.done();
+    },
+
+    "prevents JS collisions": function (test) {
+
+        var node = {
+            "type":"constant",
+            "name":"constructor",
+            "value": {type: "string", val: "Melon Collie"}
+        };
+
+        var scope = new Scope();
+
+        test.equal(scope.has('constructor'), false);
+        test.equal(scope.isConstant('constructor'), false);
+
+        test.equal(Compiler.compile(node, scope), '');
+
+        test.equal(scope.has('constructor'), true);
+        test.ok(scope.isConstant('constructor'));
+        test.equal(scope.resolve('constructor'), "'Melon Collie'");
+
+        test.done();
     }
 };

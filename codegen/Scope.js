@@ -52,11 +52,11 @@ var __ = function (parent, continuation) {
  */
 __.prototype.declare = function (name) {
 
-    if (this.constants[name] !== undefined) {
+    if (this.constants['@' + name] !== undefined) {
         throw new Error(name + " is a constant in this scope");
     }
 
-    this.vars[name] = '$' + name;
+    this.vars['@' + name] = '$' + name;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,11 +68,15 @@ __.prototype.declare = function (name) {
  */
 __.prototype.define = function (name, value) {
 
-    if (this.vars[name] !== undefined) {
-        throw new Error(name + " is a var in this scope");
+    if (this.constants['@' + name] !== undefined) {
+        throw new Error(name + " is a constant in this scope");
     }
 
-    this.constants[name] = value;
+    if (this.vars['@' + name] !== undefined) {
+        throw new Error(name + " is a variable in this scope");
+    }
+
+    this.constants['@' + name] = value;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,11 +85,11 @@ __.prototype.define = function (name, value) {
  */
 __.prototype.has = function (name) {
 
-    if (this.vars[name] !== undefined) {
+    if (this.vars['@' + name] !== undefined) {
         return true;
     }
 
-    if (this.constants[name] !== undefined) {
+    if (this.constants['@' + name] !== undefined) {
         return true;
     }
 
@@ -116,7 +120,7 @@ __.prototype.getJsVars = function (name) {
  */
 __.prototype.isConstant = function (name) {
 
-    if (this.constants[name] !== undefined) {
+    if (this.constants['@' + name] !== undefined) {
         return true;
     }
 
@@ -136,8 +140,8 @@ __.prototype.isConstant = function (name) {
  */
 __.prototype.resolve = function (name) {
 
-    if (this.constants[name] !== undefined) {
-        return this.constants[name];
+    if (this.constants['@' + name] !== undefined) {
+        return this.constants['@' + name];
     }
 
     if (this.parent) {
@@ -156,7 +160,7 @@ __.prototype.resolve = function (name) {
  */
 __.prototype.getStatus = function (name) {
 
-    if (this.vars[name] === undefined) {
+    if (this.vars['@' + name] === undefined) {
 
         if (this.parent) {
             return this.parent.getStatus(name);
@@ -165,7 +169,7 @@ __.prototype.getStatus = function (name) {
         throw new Error("symbol (" + name + ") is not defined in this scope");
     }
 
-    return this.vars[name];
+    return this.vars['@' + name];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

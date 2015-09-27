@@ -236,7 +236,7 @@ __['assign'] = function (node, scope) {
 
         // validate we're not assigning to a constant
         if (scope.isConstant(node.left.name)) {
-            throw new Error("can't assign to a constant");
+            throw new Error("can't assign to a constant (" + node.left.name + ")");
         }
 
         // declare if a new var
