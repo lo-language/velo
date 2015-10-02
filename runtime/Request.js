@@ -64,7 +64,7 @@ __.prototype.reply = function (args) {
         // send the reply message, with this bound to this request
         var response = this.onReply;
         var t = this;
-        process.nextTick(function () {
+        setImmediate(function () {
             response(args);
 
 //            console.error("signaling completion of: " + t.name);
@@ -92,7 +92,7 @@ __.prototype.fail = function (args) {
         // send the fail message, with this bound to the *parent* request
         var response = this.onFail.bind(this, args);
         var t = this;
-        process.nextTick(function () {
+        setImmediate(function () {
             response();
 
 //            console.error("signaling completion of: " + t.name);
@@ -171,7 +171,7 @@ __.prototype.sendMessage = function (fn, args, onReply, onFail) {
     // send the message by calling the JS function for the procedure with 'this' bound to this Request
     // we also bind the subtask to the handlers so they can call sendMessage and tryClose via 'this'
 //console.error("scheduling request: " + request.name + " (" + args + ")");
-    process.nextTick(fn.bind(request, fn, args));
+    setImmediate(fn.bind(request, fn, args));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,7 +189,7 @@ __.sendRootRequest = function (fn, args, onReply, onFail) {
 
     request.name = 'root';
 
-    process.nextTick(fn.bind(request, fn, args));
+    setImmediate(fn.bind(request, fn, args));
 };
 
 module.exports = __;

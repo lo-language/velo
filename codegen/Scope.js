@@ -202,7 +202,11 @@ __.prototype.hasContinuation = function () {
  */
 __.prototype.getCallCont = function () {
 
-    return this.cont + ".call(this);\n";
+    // we definitely need to call setImmediate within a loop to avoid running out of stack
+    // but can probably get away with it inside a conditional - could run out of stack if
+    // there are enough nested conditionals, but that seems unlikely
+
+    return "setImmediate(" + this.cont + ".bind(this));\n";
 };
 
 module.exports = __;

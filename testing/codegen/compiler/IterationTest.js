@@ -24,7 +24,7 @@ module.exports["basics"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node, scope).render(), 'var w = function () {if ($foo) {$bar = 42;\nw.call(this);\n}};\n\nw.call(this);\n');
+        test.equal(Compiler.compile(node, scope).render(), 'var w = function () {if ($foo) {$bar = 42;\nsetImmediate(w.bind(this));\n}};\n\nsetImmediate(w.bind(this));\n');
         test.done();
     },
 
@@ -40,7 +40,7 @@ module.exports["basics"] = {
 
         var scope = new Scope(null, "cc");
 
-        test.equal(Compiler.compile(node, scope).render(), 'var w = function () {if ($foo) {$bar = 42;\nw.call(this);\n}\nelse {cc.call(this);\n}};\n\nw.call(this);\n');
+        test.equal(Compiler.compile(node, scope).render(), 'var w = function () {if ($foo) {$bar = 42;\nsetImmediate(w.bind(this));\n}\nelse {setImmediate(cc.bind(this));\n}};\n\nsetImmediate(w.bind(this));\n');
         test.done();
     }
 };

@@ -308,7 +308,7 @@ __['iteration'] = function (node, scope) {
 
         "var w = function () ",
         {block: cond}, ";\n\n",
-        "w.call(this);\n"
+        "setImmediate(w.bind(this));\n"
     ]);
 };
 
