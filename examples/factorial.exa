@@ -13,4 +13,4 @@ factorial = >>:
     reply num * factorial(num - 1);
 ;
 
-io.stdout.write ~ "`factorial(args[2])`\n";
+io.stdout.write ~ "`factorial(args[0])`\n";

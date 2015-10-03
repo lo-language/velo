@@ -71,7 +71,7 @@ __.prototype.getModule = function (path) {
 
 //            console.error("loading module: " + fullPath);
 
-            return Q.denodeify(fs.readFile)(fullPath, 'utf-8').then(
+            return Q.denodeify(fs.readFile)(fullPath, 'utf8').then(
                 function (source) {
 
                     return new Module(source, self);

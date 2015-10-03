@@ -32,87 +32,108 @@ var Loader = require('./../runtime/Loader');
 var util = require('util');
 var path = require('path');
 var http = require('http');
+var fs = require('fs');
+var Q = require('q');
+var argv = require('minimist')(process.argv.slice(2));
 
-var sourceFile = process.argv[2];
+var sourceFile = argv._.shift();
 
 if (sourceFile == null) {
     console.error("error: no source file specified");
     process.exit();
 }
 
-// get the path of the main module
+// get the path of the module
 var modulePath = path.dirname(sourceFile);
 var moduleName = path.basename(sourceFile, '.exa');
 
 // todo support specifying more libs on the command line and add to the dir of the main module
 var loader = new Loader(modulePath);
 
-var io = {
-    stdout: {
-        write: function (recur, args, attach) {
+if (argv.build != null) {
 
-            process.stdout.write.apply(process.stdout, args);
-            this.reply();
-        }
-    },
-    http: {
-        get: function (recur, args) {
+    var targetPath = argv.build;
 
-            var exaRequest = this;
+    loader.getModule(moduleName).then(
+        function (main) {
 
-            http.get(args[0], function (res) {
+            return main.getJs();
 
-//                console.log("Got response: " + res.statusCode);
+        }).then(function (js) {
 
-                var body = '';
+            // write the runtime into the file?
 
-                res.setEncoding('utf8');
-                res.on('data', function (chunk) {
-                    body += chunk;
-                });
-                res.on('end', function () {
-                    exaRequest.reply([res, body]);
-                });
-            });
-        }
-    }
-};
+            // write the object file
 
-loader.getModule(moduleName).then(
-    function (main) {
+            var output = '"use strict";\n\
+\n\
+var Request = require("./runtime/Request");\n\
+\n\
+var main = function (ignored, rootArgs) {\n\
+    var root = ' + js + ';\n\
+};\n\
+\n\
+Request.sendRootRequest(main, [10],\n\
+    function () {\n\
+        process.exit(0);\n\
+    },\n\
+    function () {\n\
+        process.exit(1);\n\
+    });';
 
-//        console.log(util.inspect(main.parse(), {depth: null, colors: true}));
-        console.error(main.getJs() + '\n\n');
+            return Q.denodeify(fs.writeFile)(targetPath, output, {encoding: 'utf8'});
 
-        // cut node off the arglist
-        var args = Array.prototype.slice.call(process.argv, 1);
+        }).done();
+}
+else {
 
-        main.run([args, io]).then(
-            function (result) {
-//                console.log(result);
-            },
-            function (msg) {
-                console.error(msg);
+    var io = {
+        stdout: {
+            write: function (recur, args, attach) {
+
+                process.stdout.write.apply(process.stdout, args);
+                this.reply();
             }
-        );
-    }).done();
+        },
+        http: {
+            get: function (recur, args) {
 
+                var exaRequest = this;
 
-//module.run(process.argv, io, process.env).then(function () {
-//
-//    console.error("success!");
-//
-//    // handle program success
-//    console.log(util.inspect(arguments));
-//
-//}, function () {
-//
-//    console.error("failure!");
-//
-//    // handle program failure
-//
-//    console.log(util.inspect(arguments));
-//
-//    // inform the OS
-//    process.exit(1);
-//});
+                http.get(args[0], function (res) {
+
+    //                console.log("Got response: " + res.statusCode);
+
+                    var body = '';
+
+                    res.setEncoding('utf8');
+                    res.on('data', function (chunk) {
+                        body += chunk;
+                    });
+                    res.on('end', function () {
+                        exaRequest.reply([res, body]);
+                    });
+                });
+            }
+        }
+    };
+
+    loader.getModule(moduleName).then(
+        function (main) {
+
+    //        console.log(util.inspect(main.parse(), {depth: null, colors: true}));
+    //        console.error(main.getJs() + '\n\n');
+
+            main.run([argv._, io]).then(
+                function (result) {
+    //                console.log(result);
+                },
+                function (msg) {
+                    console.error(msg);
+
+                    // inform the OS
+                    process.exit(1);
+                }
+            );
+        }).done();
+    }

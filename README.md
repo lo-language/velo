@@ -1,13 +1,25 @@
-## ExaJS: The Exa-to-JavaScript Compiler
+## Exa
 
-This system compiles Exa programs into JavaScript.
+Exa is a message-oriented programming language designed to make building secure, scalable software simple. This is an implementation of Exa as a transpiler to JavaScript.
+
+The exa binary is a load-and-go compilier, but you can also use it to generate Node.js executables.
 
 #### Installation
 
-Standard Node: clone the repo then in the project root folder:
+Clone the repo then in the project root folder do:
 
     $ npm install -g
-    
+
+#### To run an Exa program
+
+    $ exa <source file>
+
+This will compile the Exa source, load it, and run.
+
+#### To build a Node executable
+
+    $ exa --build <target file> <source file>
+
 #### To run the examples
 
 	$ cd examples

@@ -1,25 +1,26 @@
 {
-    "name": "exa",
-    "private": true,
-    "description": "A prototype implementation of the Exa programming language",
-    "version": "0.2.0",
-    "author": "Seth Purcell",
-    "preferGlobal": true,
-    "engines": {
-        "node": ">=0.8"
-    },
-    "dependencies": {
-        "q": ""
-    },
-    "devDependencies": {
-        "nodeunit": "",
-        "jison": "0.4.x"
-    },
-    "scripts": {
-        "test": "nodeunit testing/parser testing/codegen/* testing/runtime testing/programs"
-    },
-    "bin": {
-        "exa": "./bin/exa"
-    },
-    "license": "MIT"
+  "name": "exa",
+  "private": true,
+  "description": "A prototype implementation of the Exa programming language",
+  "version": "0.2.0",
+  "author": "Seth Purcell",
+  "preferGlobal": true,
+  "engines": {
+    "node": ">=0.8"
+  },
+  "dependencies": {
+    "minimist": "^1.2.0",
+    "q": ""
+  },
+  "devDependencies": {
+    "nodeunit": "",
+    "jison": "0.4.x"
+  },
+  "scripts": {
+    "test": "nodeunit testing/parser testing/codegen/* testing/runtime testing/programs"
+  },
+  "bin": {
+    "exa": "./bin/exa"
+  },
+  "license": "MIT"
 }

@@ -28,6 +28,13 @@ var Compiler = require('./../codegen/Compiler');
 var Request = require('./../runtime/Request');
 var Q = require('q');
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param source
+ * @param loader
+ * @private
+ */
 var __ = function (source, loader) {
 
     this.source = source;

@@ -2,9 +2,13 @@ receive args, io;
 
 num = 0;
 
-max is 10000000;
+max is 1000;
 
 while num < max:
+
+//    if num == 599:
+//        num++;
+
     num++;
 
 io.stdout.write("`num`\n");
