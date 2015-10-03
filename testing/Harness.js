@@ -56,7 +56,6 @@ __.prototype.testSuccess = function (test, input, expected) {
         function (result) {
 
             if (expected !== undefined) {
-                console.log(result);
                 test.equal(result, expected);
             }
 

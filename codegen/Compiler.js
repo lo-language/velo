@@ -87,11 +87,11 @@ __['procedure'] = function (node, scope) {
     // if there's no enclosing scope, we're at the root of the scope tree
     // todo not sure we should do this (supply a scope here)
     if (scope === undefined) {
-        localScope = new Scope();
+        localScope = new Scope(null, "this.tryClose();\n");
     }
     else {
         // create a nested scope for the procedure's statements
-        localScope = scope.bud();
+        localScope = scope.bud("this.tryClose();\n");
     }
 
     // compile the statement(s) in the context of the local scope
@@ -105,8 +105,6 @@ __['procedure'] = function (node, scope) {
     if (localVars.length > 0) {
         body = ['var ' + localVars.join(', ') + ';\n\n', body];
     }
-
-    body = [body, '\nthis.tryClose();'];
 
     // nixing implicit "connect" for now...
     return new JsConstruct([
@@ -136,9 +134,21 @@ __['stmt_list'] = function (node, scope) {
             // grab a continuation before diving into a conditional
             var contName = "cc";
             var cont = JsConstruct.makeContinuation(contName, tail);
+            var call = contName + ".call(this);\n";
+
+            if (node.head.type == 'iteration') {
+
+                // we need to call setImmediate within a no-async-calls loop to avoid running out of stack
+                // but can probably get away with it inside a conditional - could run out of stack if
+                // there are enough nested conditionals, but that seems unlikely
+
+                // todo - do we need to do this? isn't the continuation set in the iteration compile step?
+
+                call = "setImmediate(" + contName + ".bind(this));\n"
+            }
 
             // recompile the head with the continuation
-            head = __.compile(node.head, scope.bud(contName));
+            head = __.compile(node.head, scope.bud(call));
 
             // define the continuation before we use it
             return new JsConstruct([cont, head]).resolve();
@@ -298,7 +308,7 @@ __['iteration'] = function (node, scope) {
     var cont = JsConstruct.makeContinuation(node.statements);
 
     // we want to compile this with the continuation we'll make next
-    var statements = __.compile(node.statements, scope.bud("w"));
+    var statements = __.compile(node.statements, scope.bud("setImmediate(loop.bind(this));"));
 
     var cond = scope.hasContinuation()?
         new JsConstruct(["if (", condition, ") ", {block: statements}, "\nelse ", {block: scope.getCallCont()}]):
@@ -306,9 +316,9 @@ __['iteration'] = function (node, scope) {
 
     return new JsConstruct([
 
-        "var w = function () ",
+        "var loop = function () ",
         {block: cond}, ";\n\n",
-        "setImmediate(w.bind(this));\n"
+        "loop.call(this);\n"
     ]);
 };
 

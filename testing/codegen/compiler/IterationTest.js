@@ -24,7 +24,7 @@ module.exports["basics"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node, scope).render(), 'var w = function () {if ($foo) {$bar = 42;\nsetImmediate(w.bind(this));\n}};\n\nsetImmediate(w.bind(this));\n');
+        test.equal(Compiler.compile(node, scope).render(), 'var loop = function () {if ($foo) {$bar = 42;\nsetImmediate(loop.bind(this));}};\n\nloop.call(this);\n');
         test.done();
     },
 
@@ -38,9 +38,9 @@ module.exports["basics"] = {
 
         // patch sub nodes?
 
-        var scope = new Scope(null, "cc");
+        var scope = new Scope(null, "cc"); // not a valid continuation call, but it's just subbed in
 
-        test.equal(Compiler.compile(node, scope).render(), 'var w = function () {if ($foo) {$bar = 42;\nsetImmediate(w.bind(this));\n}\nelse {setImmediate(cc.bind(this));\n}};\n\nsetImmediate(w.bind(this));\n');
+        test.equal(Compiler.compile(node, scope).render(), 'var loop = function () {if ($foo) {$bar = 42;\nsetImmediate(loop.bind(this));}\nelse {cc}};\n\nloop.call(this);\n');
         test.done();
     }
 };

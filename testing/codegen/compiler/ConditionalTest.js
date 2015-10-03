@@ -96,10 +96,10 @@ module.exports["async"] = {
                 tail: null}
         };
 
-        var scope = new Scope(null, "cc");
+        var scope = new Scope(null, "cc.call(this);");
 
         test.equal(Compiler.compile(node, scope).render(),
-            "if ($foo) {this.sendMessage($foo, [], function (P0) {$bar = P0;\nsetImmediate(cc.bind(this));\n}, null);\n\n}\n\nelse {setImmediate(cc.bind(this));\n}\n\n");
+            "if ($foo) {this.sendMessage($foo, [], function (P0) {$bar = P0;\ncc.call(this);}, null);\n\n}\n\nelse {cc.call(this);}\n\n");
         test.done();
     },
 
@@ -122,10 +122,10 @@ module.exports["async"] = {
                 tail: null}
         };
 
-        var scope = new Scope(null, "cc");
+        var scope = new Scope(null, "cc.call(this);");
 
         test.equal(Compiler.compile(node, scope).render(),
-            "if ($foo) {this.reply(42);\nreturn;}\n\nelse {setImmediate(cc.bind(this));\n}\n\n");
+            "if ($foo) {this.reply(42);\nreturn;}\n\nelse {cc.call(this);}\n\n");
         test.done();
     }
 };

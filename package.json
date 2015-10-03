@@ -12,7 +12,7 @@
         "q": ""
     },
     "devDependencies": {
-        "nodeunit": "0.6.x",
+        "nodeunit": "",
         "jison": "0.4.x"
     },
     "scripts": {

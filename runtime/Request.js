@@ -125,7 +125,7 @@ __.prototype.tryClose = function (name) {
         return;
     }
 
-//    console.error("...closing!");
+//    console.error("closing with default reply");
     this.onReply && this.reply();
 };
 
