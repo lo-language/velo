@@ -28,13 +28,13 @@
 
 process.title = 'exa';
 
-var Loader = require('./../runtime/Loader');
 var util = require('util');
 var path = require('path');
-var http = require('http');
 var fs = require('fs');
 var Q = require('q');
 var argv = require('minimist')(process.argv.slice(2));
+var Loader = require('../runtime/Loader');
+var IO = require('../runtime/IO');
 
 var sourceFile = argv._.shift();
 
@@ -68,12 +68,15 @@ if (argv.build != null) {
             var output = '"use strict";\n\
 \n\
 var Request = require("./runtime/Request");\n\
+var IO = require("./runtime/IO");\n\
+var argv = require("minimist")(process.argv.slice(2));\n\
 \n\
 var main = function (ignored, rootArgs) {\n\
     var root = ' + js + ';\n\
+    root.call(this, root, rootArgs);\n\
 };\n\
 \n\
-Request.sendRootRequest(main, [10],\n\
+Request.sendRootRequest(main, [argv._, IO],\n\
     function () {\n\
         process.exit(0);\n\
     },\n\
@@ -87,44 +90,13 @@ Request.sendRootRequest(main, [10],\n\
 }
 else {
 
-    var io = {
-        stdout: {
-            write: function (recur, args, attach) {
-
-                process.stdout.write.apply(process.stdout, args);
-                this.reply();
-            }
-        },
-        http: {
-            get: function (recur, args) {
-
-                var exaRequest = this;
-
-                http.get(args[0], function (res) {
-
-    //                console.log("Got response: " + res.statusCode);
-
-                    var body = '';
-
-                    res.setEncoding('utf8');
-                    res.on('data', function (chunk) {
-                        body += chunk;
-                    });
-                    res.on('end', function () {
-                        exaRequest.reply([res, body]);
-                    });
-                });
-            }
-        }
-    };
-
     loader.getModule(moduleName).then(
         function (main) {
 
     //        console.log(util.inspect(main.parse(), {depth: null, colors: true}));
     //        console.error(main.getJs() + '\n\n');
 
-            main.run([argv._, io]).then(
+            main.run([argv._, IO]).then(
                 function (result) {
     //                console.log(result);
                 },

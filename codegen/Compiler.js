@@ -144,7 +144,7 @@ __['stmt_list'] = function (node, scope) {
 
                 // todo - do we need to do this? isn't the continuation set in the iteration compile step?
 
-                call = "setImmediate(" + contName + ".bind(this));\n"
+//                call = "setImmediate(" + contName + ".bind(this));\n"
             }
 
             // recompile the head with the continuation

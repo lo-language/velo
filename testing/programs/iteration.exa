@@ -1,65 +1,8 @@
-/**
- * Created by: spurcell
- * 2/7/15
- */
+receive max;
 
-x = 55;
+num = 0;
 
-foo:
-    reply x;
+while num < max:
+    num++;
 
-reply foo();
-
-/**
-while foo() < 5:
-    x++;
-
-reply(x);
-
-//since foo is async, this should compile to
-
-var x = 0;
-
-var foo = function () {
-
-    return(x);
-};
-
-function loop() {
-
-    // realize condition promises here
-
-    foo().then(function (val) {
-
-        if (val < 5) {
-
-            // do loop body
-            x++;
-
-            // recur on a fresh stack
-            process.nextTick(loop);
-        }
-        else {
-
-            continue();
-        }
-    });
-}
-
-
-
-
-
-x = 0;
-
-foo =
-    reply(x);
-;
-
-bar =
-    reply(x);
-;
-
-while foo() + bar() < 5:
-    x++;
-*/
+reply num;

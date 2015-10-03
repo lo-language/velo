@@ -12,31 +12,29 @@
 
 var Loader = require('../../runtime/Loader');
 var Harness = require('../Harness');
-var Q = require('q');
 var util = require('util');
 
 var loader = new Loader(__dirname);
 
-//module.exports['errors'] = {
-//
-//    // test that uncaught errors are properly escalated out of the program
-//
-//    "setUp": function (cb) {
-//
-//        this.harness = new Harness(loader, 'errors');
-//
-//        this.harness.setUp(cb);
-//    },
-//
-//    'failure': function (test) {
-//
-////        console.log(util.inspect(this.harness.getJs(), {depth: null, colors: true}));
-//        console.log(this.harness.getJs().render(true));
-//        this.harness.testFailure(test, [], "oh no!");
-//    }
-//};
+module.exports['iteration'] = {
 
-//module.exports['connect'] = {
+    // test that uncaught errors are properly escalated out of the program
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(loader, 'iteration');
+
+        this.harness.setUp(cb);
+    },
+
+    "stack doesn't overflow": function (test) {
+
+        //console.log(this.harness.getJs().render(true));
+        this.harness.testSuccess(test, [100000], 100000);
+    }
+};
+
+//module.exports['acquire'] = {
 //
 //    "setUp": function (cb) {
 //
@@ -98,27 +96,27 @@ module.exports['io'] = {
 //    }
 //};
 
-//module.exports['conditionals'] = {
-//
-//    "setUp": function (cb) {
-//
-//        this.harness = new Harness(loader, 'conditionals');
-//
-//        this.harness.setUp(cb);
-//    },
-//
-//    'neg': function (test) {
-//        this.harness.testSuccess(test, [-1], 'negative');
-//    },
-//
-//    'zero': function (test) {
-//        this.harness.testSuccess(test, [0], 'zero!');
-//    },
-//
-//    'pos': function (test) {
-//        this.harness.testSuccess(test, [1], 'positive');
-//    }
-//};
+module.exports['conditionals'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(loader, 'conditionals');
+
+        this.harness.setUp(cb);
+    },
+
+    'neg': function (test) {
+        this.harness.testSuccess(test, [-1], 'negative');
+    },
+
+    'zero': function (test) {
+        this.harness.testSuccess(test, [0], 'zero!');
+    },
+
+    'pos': function (test) {
+        this.harness.testSuccess(test, [1], 'positive');
+    }
+};
 
 module.exports['factorial'] = {
 
