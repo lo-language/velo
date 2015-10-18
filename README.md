@@ -1,8 +1,6 @@
-Exa is a message-oriented programming language designed to make building secure, scalable software simple. This is an implementation of Exa as a transpiler to JavaScript.
+Exa is a message-oriented programming language designed to make building secure, scalable software simple. To learn about the Exa language, see the [docs](docs).
 
-To learn about the Exa language, see the [docs](docs).
-
-The exa binary is a load-and-go compiler, but you can also use it to generate Node.js executables. Modules are parsed and compiled when loaded.
+This is an implementation of Exa as a transpiler to JavaScript. The exa "binary" is a load-and-go compiler, but you can also use it to generate Node.js executables. Modules are parsed and compiled when loaded.
 
 #### Installation
 
