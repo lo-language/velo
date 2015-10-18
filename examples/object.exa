@@ -2,32 +2,39 @@ receive args, io;
 
 squareSide is 100;
 
-makeRect = >>:
+makeRect = address:
+// address? label? receptacle? receptor? receiver? path? endpoint? terminal? ->? sink? entry? entrance? reference? ref? target? destination?
+// this basically produces the same thing as "acquire" does - so what's a good counterpart to acquire?
+// accessor? handle? pointer? is it a location, or a type? it's like a routable type?
+// address has really good message-passing connotations
+// target? destination? ship to? like email address
+// label is good, but can you pass labels *around*??
+// what if it's a *shipping label*? those are usually used once.
 
     receive width, height, name;
 
     reply {
-        getHeight: >>:
+        getHeight: address:
             reply height;
         ,
-        getWidth: >>:
+        getWidth: address:
             reply width;
         ,
-        getArea: >>:
+        getArea: address:
             reply height * width;
         ,
-        setHeight: >>:
+        setHeight: address:
             receive height;
         ,
-        setWidth: >>:
+        setWidth: address:
             receive width;
         ,
-        toString: >>:
+        toString: address:
             reply "`name`: `width` x `height`";
     };
 ;
 
-makeSquare = >>:
+makeSquare = address:
 
     receive side;
 
@@ -42,12 +49,12 @@ makeSquare = >>:
 
         toString: rect.toString,
 
-        setSide: >>:
+        setSide: address:
             receive side;
             rect.setHeight(side);
             rect.setWidth(side);
         ,
-        getSide: >>:
+        getSide: address:
             reply side;
     };
 ;

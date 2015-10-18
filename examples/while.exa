@@ -6,8 +6,8 @@ max is 1000;
 
 while num < max:
 
-    if num == 599:
-        num++;
+//    if num % 1000 == 0:
+        io.stdout.write ~ "nork\n";
 
     num++;
 
