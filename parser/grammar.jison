@@ -9,8 +9,8 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 %%
 
-"//".*                  /* line comment */
-"/*"                    this.begin("comment");
+\s*"//".*                  /* line comment */
+\s*"/*"                    this.begin("comment");
 <comment><<EOF>>        throw new Error("unclosed block comment");
 <comment>"*/"           this.popState();
 <comment>.              /* skip comment */
