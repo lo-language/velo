@@ -1,4 +1,17 @@
-Exa is a message-oriented programming language designed to make building secure, scalable software simple. To learn about the Exa language, see the [docs](docs).
+Exa is a simple and practical programming language designed for building secure, scalable software systems in the real world – where failures are commonplace and testability is essential.
+
+The central thesis of Exa is that with proper isolation between modules, security and concurrency - two notoriously difficult aspects of software engineering neglected by virtually all popular languages - are free. Not just easy, but an automatic consequence of modularity. And this isn't even a new idea.
+
+The language rests on a simple and intuitive model of computation - communicating event loops - and is designed to feel familiar despite rejecting some core assumptions shared by most languages; Exa is a friendly syntax wrapping radically different semantics:
+
+- All modules are totally isolated from each other, except for asynchronous requests.
+- Failure is a clear, simple, first-class concept: every request can succeed or fail.
+- All procedures can be invoked synchronously or asynchronously at the caller's discretion.
+- There are no classes; objects are derived from procedure environments rather than data structures - you can't hold a direct reference to an object, only an interface to it.
+
+To learn about the language, see the [docs](docs).
+
+#### Implementation
 
 This is an implementation of Exa as a transpiler to JavaScript. The exa "binary" is a load-and-go compiler, but you can also use it to generate Node.js executables. Modules are parsed and compiled when loaded.
 
@@ -6,7 +19,7 @@ This is an implementation of Exa as a transpiler to JavaScript. The exa "binary"
 
 Clone the repo then in the project root folder do:
 
-    $ npm link -g
+    $ npm install -g
 
 #### To run an Exa program
 

@@ -43,7 +43,7 @@ message = "You circle has area `PI * r * r`";
 And converted to strings with bare backticks.**
 
 ```
-log(`height`);
+write(`height`);
 ```
 
 ##### Collections
@@ -65,7 +65,7 @@ fibs <+ 13;		// pushes a value onto the back of the array **
 0 +> fibs;		// pushes a value onto the front of the array **
 ```
 
-**Maps** are unordered collections of any number of heterogeneous elements which are retrievable in constant time by unique scalar index (string or number). Map literals are also delimited by square brackets.
+**Maps** are unordered collections of any number of homogeneous elements which are retrievable in constant time by unique scalar index (string or number). Map literals are also delimited by square brackets.
 
 ```
 greats = [
@@ -75,11 +75,14 @@ greats = [
 	"Jelly Roll Morton":	"Piano"
 	"Louis Armstrong":		"Trumpet"
 ];
+
+bennyInstrument = greats["Benny Goodman"]; // Clarinet
 ```
 
 You can get the length of any collection in constant time with the cardinality operator `#`.
 
 ```
+numFibs = #fibs; // 7
 numPlayers = #greats; // 5
 ```
 
