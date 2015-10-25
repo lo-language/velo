@@ -1,19 +1,23 @@
-Exa is a simple and practical programming language designed for building secure, scalable software systems in the real world – where failures are commonplace and testability is essential.
+Exa is a simple and practical programming language intended for building secure, scalable services in the real world – where threats are pervasive, failures are commonplace and testability is essential. Despite having radically different semantics from most languages, Exa has a friendly and familiar syntax and in general has been designed with programmer happiness – presuming high productivity as a major component thereof – as its paramount objective.
 
-The central thesis of Exa is that with proper isolation between modules, security and concurrency - two notoriously difficult aspects of software engineering neglected by virtually all popular languages - are free. Not just easy, but an automatic consequence of modularity. And this isn't even a new idea.
+The central thesis of Exa is that with proper isolation between modules, security and concurrency – those notoriously difficult aspects of software engineering neglected by virtually all popular languages – are free. Not just easy, but an automatic consequence of modularity. This beautiful idea has been kicking around academia for decades but has never made it into widespread practice; Exa's mission is to change that.
 
-The language rests on a simple and intuitive model of computation - communicating event loops - and is designed to feel familiar despite rejecting some core assumptions shared by most languages; Exa is a friendly syntax wrapping radically different semantics:
+Some highlights of Exa's design:
 
-- All modules are totally isolated from each other, except for asynchronous requests.
-- Failure is a clear, simple, first-class concept: every request can succeed or fail.
-- All procedures can be invoked synchronously or asynchronously at the caller's discretion.
-- There are no classes; objects are derived from procedure environments rather than data structures - you can't hold a direct reference to an object, only an interface to it.
+- Modules are isolated from each other except for asynchronous messages, usually in request-response pairs.
+- Failure is – finally – a clear and explicit concept: every request can succeed or fail.
+- Asynchronous logic is explicit: continuations are a  distinct concept from procedures.
+- All procedures can be invoked sync-over-async at the caller's discretion.
+
+And the really big one:
+
+- Objects are re-conceived as procedure environments rather than data structures: there are no classes, only constructors, and you can't hold a reference to an object, only an interface to it.
 
 To learn about the language, see the [docs](docs).
 
 #### Implementation
 
-This is an implementation of Exa as a transpiler to JavaScript. The exa "binary" is a load-and-go compiler, but you can also use it to generate Node.js executables. Modules are parsed and compiled when loaded.
+This is an implementation of Exa as a transpiler to JavaScript. The exa "binary" is a load-and-go compiler that can also be used to generate Node.js executables. Modules are parsed and compiled when loaded.
 
 #### Installation
 
