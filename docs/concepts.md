@@ -1,14 +1,18 @@
 ## Concepts
 
-Imagine an inbox having an **address** and a **procedure** to be performed for each message received. Assume there's a mail system that routes messages to the inbox. Now imagine there's a worker – let's call her Rosie – attending the inbox, pulling messages out in the order in which they arrive and performing the procedure for each one as its own discrete **task**. In doing so, she's performing a **service** defined by the procedure and accessible via the address, as shown below.
+Imagine a worker – let's call her Rosie – with an inbox having an **address**, and a **procedure** to be performed for each message received. Assume there's a mail system that routes messages into the inbox. Rosie attends the inbox, pulling messages out in the order in which they arrive and performing her procedure for each one as a distinct **task**. In doing so, she's performing a **service** defined by the procedure and accessible via the address, as shown below. If there are no messages she sits idly.
 
 ![an exa service](images/concepts1.png "an exa service")
 
-Since a person can only do one thing at a time, Rosie is only ever working on one task at a time, and as a **sequential** process, one instruction at a time.
+Rosie also has access to an outbox where she can drop messages for delivery, so long as she has an address to send them to. These messages are always either a **request** to be sent to another service or a **reply** in response to a request made of her service. Whenever she sends a reply it must indicate either success or failure, and she can only send one reply per request.
 
-Rosie is very organized, so when she starts a task she sets aside a space called a **frame** to keep track of the state of the task – everything related to it, such as intermediate results. Rosie also has access to an outbox where she can place messages for delivery, and in the course of performing a task may make a **request** of any service whose address is available.
+Since a person can only do one thing at a time, Rosie is only ever working on one task at a time, and as a **sequential** process – one instruction at a time. So if she is occupied with a task when more messages arrive, those messages will sit in her inbox until she has time to get to them. This will either be when she's done with her current task or when that task becomes *blocked*, meaning she can't do anything more on it until she receives a reply to a request she sent. If it's the latter situation, she'll temporarily set her current task aside and pick up the next message in her queue, if any.
 
-Since every request can succeed or fail, before sending the request Rosie must choose to listen for a success reply, a failure reply, both, or neither. If she wants to listen for a success reply, she creates a special temporary inbox (a **continuation**) just for this purpose and includes its address on the request, like a return address on an envelope. Likewise, if she wants to listen for a failure reply she creates a similar temporary inbox and includes its address on the request, as shown below.
+Rosie is very organized, so when she starts on a task she prepares a space called a **frame** to keep track of the state of the task; if she has to put the task aside, the frame keeps everything in place, ready to be picked up again.
+
+### Making Requests
+
+Depending on the instructions in her procedure, when she makes a request Rosie may or may not need to listen for a reply. If she wants to listen for a success reply, she creates a special temporary inbox (a **continuation**) just for this purpose and includes its address on the request, like a return address on an envelope. Likewise, if she wants to listen for a failure reply she creates a similar temporary inbox and includes its address on the request, as shown below.
 
 ![a request](images/concepts2.png "an exa request")
 
@@ -18,7 +22,6 @@ Note:
 - If the worker doesn't care about receiving a reply of either type, she can fire off the request without any reply addresses.
 - Without a reply address, the communication is one-way.
  
-Since a person can only do one thing at a time, if the worker is occupied processing one message when more arrive, those messages will sit in the inbox until she has time to get to them. This will either be when she's done with her current task or when that task is *blocked*, meaning she can't do anything more on it until receiving a reply to a request she has sent. If it's the latter situation, she'll temporarily set her current task aside and pick up the next message in her queue. If that message entails a new task, she'll start in on it. If on the other hand it's a response to a request she has sent as part of one of her tasks, she'll pick up the relevant task and start cranking away where she left off.
 
  Rosie is also very organized and when she starts working on a task she puts the message on a clean tray and keeps track of the state of the task separate from , and makes sure nothing from one task ever "leaks" into another.
 
