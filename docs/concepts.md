@@ -1,10 +1,10 @@
-## Concepts
+## Exa Concepts
 
 Imagine a worker – let's call her Rosie – with an inbox having an **address**, and a **procedure** to be performed for each message received. Assume there's a mail system that routes messages into the inbox. Rosie attends the inbox, pulling messages out in the order in which they arrive and performing her procedure for each one as a distinct **task**. In doing so, she's performing a **service** defined by the procedure and accessible via the address, as shown below. If there are no messages she sits idly.
 
 ![an exa service](images/concepts1.png "an exa service")
 
-Rosie also has access to an outbox where she can drop messages for delivery, so long as she has an address to send them to. These messages are always either a **request** to be sent to another service or a **reply** in response to a request made of her service. Whenever she sends a reply it must indicate either success or failure, and she can only send one reply per request.
+Rosie also has access to an outbox where she can drop messages for delivery, so long as she has an address to send them to. These messages are always either a **request** to be sent to another service or a **reply** in response to a request made of her service. Whenever she sends a reply she indicates either success or failure, and she can only send one reply per request; *success or failure is indicated by the address to which her reply is sent* – every request can include two reply addresses, one for reporting success and one for reporting failure.
 
 Since a person can only do one thing at a time, Rosie is only ever working on one task at a time, and as a **sequential** process – one instruction at a time. So if she is occupied with a task when more messages arrive, those messages will sit in her inbox until she has time to get to them. This will either be when she's done with her current task or when that task becomes *blocked*, meaning she can't do anything more on it until she receives a reply to a request she sent. If it's the latter situation, she'll temporarily set her current task aside and pick up the next message in her queue, if any.
 
@@ -12,24 +12,21 @@ Rosie is very organized, so when she starts on a task she prepares a space calle
 
 ### Making Requests
 
-Depending on the instructions in her procedure, when she makes a request Rosie may or may not need to listen for a reply. If she wants to listen for a success reply, she creates a special temporary inbox (a **continuation**) just for this purpose and includes its address on the request, like a return address on an envelope. Likewise, if she wants to listen for a failure reply she creates a similar temporary inbox and includes its address on the request, as shown below.
+Depending on the instructions in her procedure, Rosie may or may not need to receive a reply when she makes a request. If she needs a reply, she creates a special temporary inbox (a **continuation**) just for this purpose and includes its address on the request, like a return address on an envelope. Likewise, if she wants to listen for a failure reply she creates a similar temporary inbox and includes its address on the request, as shown below.
 
 ![a request](images/concepts2.png "an exa request")
 
 Note:
 
-- Even if the worker listens for both replies she's guaranteed to only ever receive one or the other or neither – in no case will a request produce both a success reply and a failure reply.
+- Even if Rosie listens for both replies she's guaranteed to only ever receive one or the other or neither – in no case will a request produce both a success reply and a failure reply.
 - If the worker doesn't care about receiving a reply of either type, she can fire off the request without any reply addresses.
 - Without a reply address, the communication is one-way.
- 
 
- Rosie is also very organized and when she starts working on a task she puts the message on a clean tray and keeps track of the state of the task separate from , and makes sure nothing from one task ever "leaks" into another.
 
 ![a suspended task](images/concepts3.png "a suspended request")
 
 
 Nested contexts.
-Do continuations have their own context?
 
 Now it may be the case that the worker's procedure says: in the course of handling a message, create a new inbox, and when you receive messages on it, perform a certain procedure. This has the effect of creating a new service in the context of the task.
 
