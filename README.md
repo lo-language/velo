@@ -1,13 +1,13 @@
 Exa is a simple and practical programming language intended for building secure, scalable services in the real world – where threats are pervasive, failures are commonplace and testability is essential. Despite having radically different semantics from most languages, Exa has a friendly and familiar syntax and in general has been designed with programmer happiness – presuming high productivity as a major component thereof – as its paramount objective.
 
-The central thesis of Exa is that with proper isolation between modules, security and concurrency – those notoriously difficult aspects of software engineering neglected by virtually all popular languages – are free. Not just easy, but an automatic consequence of modularity. This beautiful idea has been kicking around academia for decades but has never made it into widespread practice; Exa's mission is to change that.
+The central thesis of Exa is that with proper isolation between modules, security and concurrency – those notoriously difficult aspects of software engineering utterly ignored by almost every popular language – are free. Not just easy, but an automatic consequence of modularity. This beautiful idea has been kicking around academia for decades but has never made it into widespread practice; Exa's mission is to change that.
 
 Some highlights of Exa's design:
 
-- Modules are isolated from each other except for asynchronous messages, usually in request-response pairs.
+- Modules and objects are isolated from each other except for asynchronous messages, usually in request-response pairs.
 - Failure is – finally – a clear and explicit concept: every request can succeed or fail.
 - Asynchronous logic is explicit: continuations are a  distinct concept from procedures.
-- All procedures can be invoked sync-over-async at the caller's discretion.
+- All procedures can be invoked synchronously or asynchronously at the caller's discretion.
 
 And the really big one:
 
