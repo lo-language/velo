@@ -2,39 +2,39 @@ receive args, io;
 
 squareSide is 100;
 
-makeRect = address:
-// address? label? receptacle? receptor? receiver? path? endpoint? terminal? ->? sink? entry? entrance? reference? ref? target? destination?
+makeRect = >>:
+// >>? label? receptacle? receptor? receiver? path? endpoint? terminal? ->? sink? entry? entrance? reference? ref? target? destination?
 // this basically produces the same thing as "acquire" does - so what's a good counterpart to acquire?
 // accessor? handle? pointer? is it a location, or a type? it's like a routable type?
-// address has really good message-passing connotations
-// target? destination? ship to? like email address
+// >> has really good message-passing connotations
+// target? destination? ship to? like email >>
 // label is good, but can you pass labels *around*??
 // what if it's a *shipping label*? those are usually used once.
 
     receive width, height, name;
 
     reply {
-        getHeight: address:
+        getHeight: >>:
             reply height;
         ,
-        getWidth: address:
+        getWidth: >>:
             reply width;
         ,
-        getArea: address:
+        getArea: >>:
             reply height * width;
         ,
-        setHeight: address:
+        setHeight: >>:
             receive height;
         ,
-        setWidth: address:
+        setWidth: >>:
             receive width;
         ,
-        toString: address:
+        toString: >>:
             reply "`name`: `width` x `height`";
     };
 ;
 
-makeSquare = address:
+makeSquare = >>:
 
     receive side;
 
@@ -49,12 +49,12 @@ makeSquare = address:
 
         toString: rect.toString,
 
-        setSide: address:
+        setSide: >>:
             receive side;
             rect.setHeight(side);
             rect.setWidth(side);
         ,
-        getSide: address:
+        getSide: >>:
             reply side;
     };
 ;
@@ -65,7 +65,7 @@ area = square.getSide();
 
 io.stdout.write("`area`\n");
 
-square.setSide(5);
+square.setSide(6);
 
 //square.setHeight(99) catch:
 //    io.stdout.write("I guess that didn't work!");

@@ -65,7 +65,7 @@ fibs <+ 13;		// pushes a value onto the back of the array **
 0 +> fibs;		// pushes a value onto the front of the array **
 ```
 
-**Maps** are unordered collections of any number of homogeneous elements which are retrievable in constant time by unique scalar index (string or number). Map literals are also delimited by square brackets.
+**Maps** are unordered collections of any number of homogeneous elements which are retrievable by unique scalar index (string or number). Map literals are also delimited by square brackets.
 
 ```
 greats = [
