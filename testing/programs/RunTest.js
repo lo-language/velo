@@ -34,21 +34,21 @@ module.exports['iteration'] = {
     }
 };
 
-//module.exports['acquire'] = {
-//
-//    "setUp": function (cb) {
-//
-//        this.harness = new Harness(loader, 'modules');
-//
-//        this.harness.setUp(cb);
-//    },
-//
-//    'success': function (test) {
-//
-////        console.log(util.inspect(this.harness.module.parse(), {depth: null, colors: true}));
-//        this.harness.testSuccess(test, [], 120);
-//    }
-//};
+module.exports['acquire'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(loader, 'acquire');
+
+        this.harness.setUp(cb);
+    },
+
+    'success': function (test) {
+
+//        console.log(util.inspect(this.harness.module.parse(), {depth: null, colors: true}));
+        this.harness.testSuccess(test, [5, loader.acquire], 120);
+    }
+};
 
 module.exports['io'] = {
 

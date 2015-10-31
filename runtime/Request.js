@@ -152,7 +152,7 @@ __.prototype.sendMessage = function (fn, args, onReply, onFail) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Creates and sends a root request.
+ * Creates and sends a root request with the given args.
  *
  * @param fn
  * @param args

@@ -1,3 +1,11 @@
+/**
+ * To be callable from within exa, a JS function needs to adhere to the signature:
+ *
+ * foo(recur, args);
+ *
+ * should we make an ExaService class? and have a Loader be a factory for such things? and maybe Module is a subclass?
+ */
+
 "use strict";
 
 var Module = require('./Module');
@@ -13,6 +21,40 @@ var Q = require('q');
 var __ = function (libs) {
 
     this.libs = libs;
+
+    // stash
+    var loader = this;
+
+    /**
+     * Has the signature to be called as a procedure from Exa, and returns a fn
+     * that also has the signature to be called as a procedure from Exa.
+     *
+     * @param recur
+     * @param args
+     * @return {*}
+     */
+    this.acquire = function (recur, args) {
+
+        // since we're being called from exa, 'this' is now bound to a request
+        var request = this;
+        var modulePath = args[0];
+
+        loader.getModule(modulePath).then(
+            function (module) {
+
+                // might want to refactor this class so we don't need this bind
+                return module.load();
+            },
+            function (error) {
+                console.error("error loading " + modulePath);
+            }
+        ).then(
+            function (procedure) {
+
+                request.reply(procedure);
+            }
+        ).done();
+    };
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -60,31 +102,6 @@ __.prototype.getModule = function (path) {
             throw new Error("couldn't find module " + path);
         }
     );
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Has the signature to be called as a procedure from Exa.
- *
- * @param recur
- * @param args
- * @return {*}
- */
-__.prototype.acquire = function (recur, args) {
-
-    this.getModule(args[0]).then(
-        function (module) {
-
-            // might want to refactor this class so we don't need this bind
-            return module.load();
-        }
-    ).then(
-        function () {
-
-
-
-        }
-    ).end();
 };
 
 module.exports = __;

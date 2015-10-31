@@ -9,21 +9,11 @@ var Q = require('q');
 /**
  *
  * @param source
- * @param loader
  * @private
  */
-var __ = function (source, loader) {
+var __ = function (source) {
 
     this.source = source;
-    this.loader = loader;
-
-    // will be called from within exa, which means with args of (recur, args) and object context of a request
-
-    this.acquire = function (recur, args) {
-
-        console.log('schmoopy');
-        this.reply();
-    };
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,9 +81,7 @@ __.prototype.load = function () {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Runs the program, passing in the arguments we're given, returning a promise for the result.
- * Note that this is only called on the 'main' module for a program! All other modules are called
- * from this module, directly or indirectly.
+ * Runs the program by sending the arguments we're given as the root request, returning a promise for the result.
  *
  * @param args  arguments array to pass into the procedure
  * @return {promise}
@@ -105,6 +93,8 @@ __.prototype.run = function (args) {
     }
 
     var d = Q.defer();
+
+    // should this function inject acquire? or should that be optional
 
     Request.sendRootRequest(this.procedure, args, d.resolve.bind(d), d.reject.bind(d));
 
