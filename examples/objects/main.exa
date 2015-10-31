@@ -1,0 +1,18 @@
+/*
+ * usage: exa main.exa <side length>
+ */
+
+receive args, io, acquire;
+
+makeSquare = acquire("Square");
+
+squareSide = args[0];
+
+square = makeSquare(squareSide, acquire);
+
+io.stdout.write("side length is `square.getSide()`\n");
+
+area = square.getArea();
+
+io.stdout.write(square.toString());
+io.stdout.write("\n`area`\n");

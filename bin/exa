@@ -96,7 +96,7 @@ else {
     //        console.log(util.inspect(main.parse(), {depth: null, colors: true}));
     //        console.error(main.getJs() + '\n\n');
 
-            main.run([argv._, IO]).then(
+            main.run([argv._, IO, loader.acquire]).then(
                 function (result) {
     //                console.log(result);
                 },
