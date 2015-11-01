@@ -19,7 +19,7 @@ module.exports["application"] = {
             args: []
         };
 
-        test.equal(Compiler.compile(node).resolve().render(), 'this.sendMessage($foo, [], function (P0) {P0}, null);\n\n');
+        test.equal(Compiler.compile(node).resolve().render(), 'task.sendMessage($foo, [], function (P0) {P0}, null);\n\n');
         test.done();
     },
 
@@ -33,7 +33,7 @@ module.exports["application"] = {
             ]
         };
 
-        test.equal(Compiler.compile(node).resolve().render(), 'this.sendMessage($foo, [42], function (P0) {P0}, null);\n\n');
+        test.equal(Compiler.compile(node).resolve().render(), 'task.sendMessage($foo, [42], function (P0) {P0}, null);\n\n');
         test.done();
     },
 
@@ -48,7 +48,7 @@ module.exports["application"] = {
             ]
         };
 
-        test.equal(Compiler.compile(node).resolve().render(), "this.sendMessage($foo, [42, 'hi there'], function (P0) {P0}, null);\n\n");
+        test.equal(Compiler.compile(node).resolve().render(), "task.sendMessage($foo, [42, 'hi there'], function (P0) {P0}, null);\n\n");
         test.done();
     },
 
@@ -70,7 +70,7 @@ module.exports["application"] = {
 
         // patch sub nodes?
 
-        test.equal(Compiler.compile(node).resolve().render(), "this.sendMessage($foo, [], function (P1) {this.sendMessage($bar, [], function (P2) {this.sendMessage($baz, [P1, P2], function (P0) {P0}, null);\n\n}, null);\n\n}, null);\n\n");
+        test.equal(Compiler.compile(node).resolve().render(), "task.sendMessage($foo, [], function (P1) {task.sendMessage($bar, [], function (P2) {task.sendMessage($baz, [P1, P2], function (P0) {P0}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     }
 };
@@ -89,7 +89,7 @@ module.exports["application statements"] = {
                 ]}
         };
 
-        test.equal(Compiler.compile(node).resolve().render(), 'this.sendMessage($foo, [42], function (P0) {P0;\n}, null);\n\n');
+        test.equal(Compiler.compile(node).resolve().render(), 'task.sendMessage($foo, [42], function (P0) {P0;\n}, null);\n\n');
         test.done();
     },
 
@@ -119,7 +119,7 @@ module.exports["application statements"] = {
         // patch sub nodes?
 
         test.equal(Compiler.compile(node).resolve().render(),
-            "this.sendMessage($foo, [], function (P1) {this.sendMessage($bar, [], function (P2) {this.sendMessage($baz, [(P1 - P2)], function (P0) {P0;\n}, null);\n\n}, null);\n\n}, null);\n\n");
+            "task.sendMessage($foo, [], function (P1) {task.sendMessage($bar, [], function (P2) {task.sendMessage($baz, [(P1 - P2)], function (P0) {P0;\n}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     },
 
@@ -152,7 +152,7 @@ module.exports["application statements"] = {
         // patch sub nodes?
 
         test.equal(Compiler.compile(node).resolve().render(),
-            "this.sendMessage($foo, [], function (P2) {this.sendMessage($bar, [], function (P3) {this.sendMessage($baz, [(P2 - P3)], function (P1) {this.sendMessage($quux, [P1], function (P0) {P0;\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n");
+            "task.sendMessage($foo, [], function (P2) {task.sendMessage($bar, [], function (P3) {task.sendMessage($baz, [(P2 - P3)], function (P1) {task.sendMessage($quux, [P1], function (P0) {P0;\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     }
 };

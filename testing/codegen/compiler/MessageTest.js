@@ -21,7 +21,7 @@ module.exports["message"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [], null, null);\n\n');
+        test.equal(Compiler.compile(node).render(), 'task.sendMessage($foo, [], null, null);\n\n');
         test.done();
     },
 
@@ -46,7 +46,7 @@ module.exports["message"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [$url], function (args) {$res = args.shift();\n$body = args.shift();\n$bar = $body;\n}, null);\n\n');
+        test.equal(Compiler.compile(node).render(), 'task.sendMessage($foo, [$url], function (args) {$res = args.shift();\n$body = args.shift();\n$bar = $body;\n}, null);\n\n');
         test.done();
     },
 
@@ -62,7 +62,7 @@ module.exports["message"] = {
             futures: [{type: 'id', name: 'res'}, {type: 'id', name: 'body'}]
         };
 
-        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [$url], function (args) {$res = args.shift();\n\$body = args.shift();\n}, null);\n\n');
+        test.equal(Compiler.compile(node).render(), 'task.sendMessage($foo, [$url], function (args) {$res = args.shift();\n\$body = args.shift();\n}, null);\n\n');
         test.done();
     }
 

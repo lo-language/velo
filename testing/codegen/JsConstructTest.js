@@ -102,7 +102,7 @@ module.exports["resolve"] = {
 
         var expr = new JsConstruct([new SyncMessage('$foo'), ' + ', '3']).resolve();
 
-        test.equal(expr.render(), 'this.sendMessage($foo, [], function (P0) {P0 + 3}, null);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0 + 3}, null);\n\n');
         test.done();
     },
 
@@ -110,7 +110,7 @@ module.exports["resolve"] = {
 
         var expr = new JsConstruct([new SyncMessage('$foo'), ';']).resolve();
 
-        test.equal(expr.render(), 'this.sendMessage($foo, [], function (P0) {P0;}, null);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0;}, null);\n\n');
         test.done();
     },
 
@@ -118,7 +118,7 @@ module.exports["resolve"] = {
 
         var expr = new JsConstruct([new SyncMessage('$foo'), ' + ', new SyncMessage('$bar')]).resolve();
 
-        test.equal(expr.render(), "this.sendMessage($foo, [], function (P0) {this.sendMessage($bar, [], function (P1) {P0 + P1}, null);\n\n}, null);\n\n");
+        test.equal(expr.render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {P0 + P1}, null);\n\n}, null);\n\n");
         test.done();
     },
 
@@ -126,7 +126,7 @@ module.exports["resolve"] = {
 
         var expr = new JsConstruct(['Math.min(', {csv: [new SyncMessage('$foo'), new SyncMessage('$bar')]}, ')']).resolve();
 
-        test.equal(expr.render(), "this.sendMessage($foo, [], function (P0) {this.sendMessage($bar, [], function (P1) {Math.min(P0, P1)}, null);\n\n}, null);\n\n");
+        test.equal(expr.render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {Math.min(P0, P1)}, null);\n\n}, null);\n\n");
         test.done();
     },
 
@@ -142,7 +142,7 @@ module.exports["resolve"] = {
 
         var expr = new JsConstruct([new SyncMessage('$foo', [new SyncMessage('$bar')]), ';']).resolve();
 
-        test.equal(expr.render(), 'this.sendMessage($bar, [], function (P1) {this.sendMessage($foo, [P1], function (P0) {P0;}, null);\n\n}, null);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($bar, [], function (P1) {task.sendMessage($foo, [P1], function (P0) {P0;}, null);\n\n}, null);\n\n');
         test.done();
     },
 
@@ -154,7 +154,7 @@ module.exports["resolve"] = {
                 new SyncMessage('$quux', [new SyncMessage('$snux')])
             ]), ';']).resolve();
 
-        test.equal(expr.render(), 'this.sendMessage($baz, [], function (P3) {this.sendMessage($bar, [P3], function (P1) {this.sendMessage($snux, [], function (P3) {this.sendMessage($quux, [P3], function (P2) {this.sendMessage($foo, [P1, P2], function (P0) {P0;}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($baz, [], function (P3) {task.sendMessage($bar, [P3], function (P1) {task.sendMessage($snux, [], function (P3) {task.sendMessage($quux, [P3], function (P2) {task.sendMessage($foo, [P1, P2], function (P0) {P0;}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n');
         test.done();
     }
 };
@@ -165,7 +165,7 @@ module.exports["build message"] = {
 
         var msg = JsConstruct.buildMessage('$foo', []);
 
-        test.equal(msg.render(), 'this.sendMessage($foo, [], null, null);\n\n');
+        test.equal(msg.render(), 'task.sendMessage($foo, [], null, null);\n\n');
         test.equal(msg.isSync(), false);
         test.done();
     },
@@ -174,7 +174,7 @@ module.exports["build message"] = {
 
         var msg = JsConstruct.buildMessage('$foo', [], "x = 1;", null, 'scragh', 'args');
 
-        test.equal(msg.render(), 'this.sendMessage($foo, [], function (scragh) {x = 1;}, null);\n\n');
+        test.equal(msg.render(), 'task.sendMessage($foo, [], function (scragh) {x = 1;}, null);\n\n');
         test.equal(msg.isSync(), false);
         test.done();
     },
@@ -183,7 +183,7 @@ module.exports["build message"] = {
 
         var msg = JsConstruct.buildMessage('$foo', [], "x = 1;", null, 'scragh', 'args', true);
 
-        test.equal(msg.render(), 'this.sendMessage($foo, [], function (scragh) {x = 1;}, null);\n\n');
+        test.equal(msg.render(), 'task.sendMessage($foo, [], function (scragh) {x = 1;}, null);\n\n');
         test.ok(msg.isSync());
         test.done();
     }

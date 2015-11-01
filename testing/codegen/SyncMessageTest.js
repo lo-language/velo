@@ -17,7 +17,7 @@ module.exports["message"] = {
 
         sm.placeholder = 'boba';
 
-        test.equal(sm.wrap('hola').resolve().render(), 'this.sendMessage($foo, [], function (boba) {hola}, null);\n\n');
+        test.equal(sm.wrap('hola').resolve().render(), 'task.sendMessage($foo, [], function (boba) {hola}, null);\n\n');
         test.done();
     }
 };

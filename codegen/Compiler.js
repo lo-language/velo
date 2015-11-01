@@ -65,11 +65,11 @@ __['procedure'] = function (node, scope) {
     // if there's no enclosing scope, we're at the root of the scope tree
     // todo not sure we should do this (supply a scope here)
     if (scope === undefined) {
-        localScope = new Scope(null, "this.tryClose();\n");
+        localScope = new Scope(null, "task.tryClose();\n");
     }
     else {
         // create a nested scope for the procedure's statements
-        localScope = scope.bud("this.tryClose();\n");
+        localScope = scope.bud("task.tryClose();\n");
     }
 
     // compile the statement(s) in the context of the local scope
@@ -86,7 +86,7 @@ __['procedure'] = function (node, scope) {
 
     // nixing implicit "connect" for now...
     return new JsConstruct([
-        'function ($recur, args) ', {block: body}], false);
+        'function ($recur, args, task) ', {block: body}], false);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -112,7 +112,7 @@ __['stmt_list'] = function (node, scope) {
             // grab a continuation before diving into a conditional
             var contName = "cc";
             var cont = JsConstruct.makeContinuation(contName, tail);
-            var call = contName + ".call(this);\n";
+            var call = contName + ".call();\n";
 
             if (node.head.type == 'iteration') {
 
@@ -199,10 +199,10 @@ __['response'] = function (node, scope) {
     // we assume the existence of a Task object named 'task'
 
     if (node.channel === 'fail') {
-        return new JsConstruct(['this.fail(', {csv: args}, ');\nreturn;']);
+        return new JsConstruct(['task.fail(', {csv: args}, ');\nreturn;']);
     }
 
-    return new JsConstruct(['this.reply(', {csv: args}, ');\nreturn;']);
+    return new JsConstruct(['task.reply(', {csv: args}, ');\nreturn;']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -287,7 +287,7 @@ __['iteration'] = function (node, scope) {
     var cont = JsConstruct.makeContinuation(node.statements);
 
     // we want to compile this with the continuation we'll make next
-    var statements = __.compile(node.statements, scope.bud("setImmediate(loop.bind(this));"));
+    var statements = __.compile(node.statements, scope.bud("setImmediate(loop.bind());"));
 
     var cond = scope.hasContinuation()?
         new JsConstruct(["if (", condition, ") ", {block: statements}, "\nelse ", {block: scope.getCallCont()}]):
@@ -297,7 +297,7 @@ __['iteration'] = function (node, scope) {
 
         "var loop = function () ",
         {block: cond}, ";\n\n",
-        "loop.call(this);\n"
+        "loop.call();\n"
     ]);
 };
 

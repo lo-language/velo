@@ -33,10 +33,8 @@ var __ = function (libs) {
      * @param args
      * @return {*}
      */
-    this.acquire = function (recur, args) {
+    this.acquire = function (recur, args, task) {
 
-        // since we're being called from exa, 'this' is now bound to a request
-        var request = this;
         var modulePath = args[0];
 
         loader.getModule(modulePath).then(
@@ -51,7 +49,7 @@ var __ = function (libs) {
         ).then(
             function (procedure) {
 
-                request.reply(procedure);
+                task.reply(procedure);
             }
         ).done();
     };

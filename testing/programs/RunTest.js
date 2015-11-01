@@ -73,9 +73,9 @@ module.exports['io'] = {
 
         this.harness.testSuccess(test, [[], {
             stdout: {
-                write: function (recur, args) {
+                write: function (recur, args, task) {
                     test.ok(true);
-                    this.tryClose();
+                    task.tryClose();
                 }
             }
         }, {}]);

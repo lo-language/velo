@@ -32,7 +32,7 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [], function (args) {$foo = 42;\n}, null);\n\n');
+        test.equal(Compiler.compile(node).render(), 'task.sendMessage($foo, [], function (args) {$foo = 42;\n}, null);\n\n');
         test.done();
     },
 
@@ -57,7 +57,7 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [], null, function (args) {$foo = 42;\n});\n\n');
+        test.equal(Compiler.compile(node).render(), 'task.sendMessage($foo, [], null, function (args) {$foo = 42;\n});\n\n');
         test.done();
     },
 
@@ -92,7 +92,7 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), 'this.sendMessage($foo, [], function (args) {$foo = 42;\n}, function (args) {$bar = 57;\n});\n\n');
+        test.equal(Compiler.compile(node).render(), 'task.sendMessage($foo, [], function (args) {$foo = 42;\n}, function (args) {$bar = 57;\n});\n\n');
         test.done();
     }
 };

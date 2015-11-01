@@ -73,7 +73,7 @@ module.exports["assignment"] = {
         var scope = new Scope();
 
         test.equal(scope.has('foo'), false);
-        test.equal(Compiler.compile(node, scope).resolve().render(), 'this.sendMessage($bar, [], function (P0) {$foo = P0;\n}, null);\n\n');
+        test.equal(Compiler.compile(node, scope).resolve().render(), 'task.sendMessage($bar, [], function (P0) {$foo = P0;\n}, null);\n\n');
         test.equal(scope.has('foo'), true);
 
         test.done();

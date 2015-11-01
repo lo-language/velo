@@ -200,7 +200,7 @@ JsConstruct.buildMessage = function (address, args, subsequent, contingency, rep
         failParams = 'args';
     }
 
-    var parts = ['this.sendMessage(', address, ', [', {csv: args}, ']'];
+    var parts = ['task.sendMessage(', address, ', [', {csv: args}, ']'];
 
     if (subsequent) {
         parts.push([', ', 'function (', replyParams, ') ', {block: subsequent}]);

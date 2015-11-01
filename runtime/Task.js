@@ -39,9 +39,11 @@ __.prototype.reply = function (args) {
 
 //        console.error("scheduling reply for " + this.name);
 
-        // send the reply message, with this bound to this request
+        // send the reply message
+
         var response = this.onReply;
         var t = this;
+
         setImmediate(function () {
             response(args);
 
@@ -130,17 +132,17 @@ __.prototype.checkOff = function () {
  */
 __.prototype.sendMessage = function (fn, args, onReply, onFail) {
 
-    // todo don't track this request if no response handlers were provided
+    // todo don't track this request if no reply handlers were provided
 
 
     this.children = this.children || 1;
 
     // create the subrequest and if it has handlers, wire it up to check itself off when it responds
-    // also wire up onReply and onFail to this (parent) request
+    // also wire up onReply and onFail to this (parent) task
     // todo - clean this up - not sure this is the best place to bind to parent request
 
-    var request = new __(onReply ? onReply.bind(this) : null, onFail ? onFail.bind(this) : null, this.checkOff.bind(this));
-    request.name = this.name + ':child' + this.children++;
+    var task = new __(onReply ? onReply.bind(this) : null, onFail ? onFail.bind(this) : null, this.checkOff.bind(this));
+    task.name = this.name + ':child' + this.children++;
 
     if (onReply || onFail) {
         this.subTasks++;
@@ -149,14 +151,7 @@ __.prototype.sendMessage = function (fn, args, onReply, onFail) {
     // send the message by calling the JS function for the procedure with 'this' bound to this Request
     // we also bind the subtask to the handlers so they can call sendMessage and tryClose via 'this'
 //console.error("scheduling request: " + request.name + " (" + args + ")");
-    setImmediate(fn.bind(request, fn, args));
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-__.send = function () {
-
-    setImmediate(this.fn);
+    setImmediate(fn.bind(null, fn, args, task));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -170,9 +165,9 @@ __.send = function () {
  */
 __.sendRootRequest = function (fn, args, onReply, onFail) {
 
-    var request = new __(onReply, onFail);
+    var task = new __(onReply, onFail);
 
-    request.name = 'root';
+    task.name = 'root';
 
     // maybe a request is something you can call send on?
     // and that calls setimmediate?
@@ -182,7 +177,11 @@ __.sendRootRequest = function (fn, args, onReply, onFail) {
     // so it's the target fn bound to its args?
     //setImmediate(request);
 
-    setImmediate(fn.bind(request, fn, args));
+    // should a proc get both a request and a task?
+    // calls reply/fail on request and sendmessage/tryclose on task?
+    // or should a task have the request built into it?
+
+    setImmediate(fn.bind(null, fn, args, task));
 };
 
 module.exports = __;

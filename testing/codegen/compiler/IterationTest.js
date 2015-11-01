@@ -24,7 +24,7 @@ module.exports["basics"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node, scope).render(), 'var loop = function () {if ($foo) {$bar = 42;\nsetImmediate(loop.bind(this));}};\n\nloop.call(this);\n');
+        test.equal(Compiler.compile(node, scope).render(), 'var loop = function () {if ($foo) {$bar = 42;\nsetImmediate(loop.bind());}};\n\nloop.call();\n');
         test.done();
     },
 
@@ -40,7 +40,7 @@ module.exports["basics"] = {
 
         var scope = new Scope(null, "cc"); // not a valid continuation call, but it's just subbed in
 
-        test.equal(Compiler.compile(node, scope).render(), 'var loop = function () {if ($foo) {$bar = 42;\nsetImmediate(loop.bind(this));}\nelse {cc}};\n\nloop.call(this);\n');
+        test.equal(Compiler.compile(node, scope).render(), 'var loop = function () {if ($foo) {$bar = 42;\nsetImmediate(loop.bind());}\nelse {cc}};\n\nloop.call();\n');
         test.done();
     }
 };
