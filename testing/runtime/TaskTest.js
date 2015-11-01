@@ -6,7 +6,7 @@
 
 "use strict";
 
-var Request = require('../../runtime/Request');
+var Request = require('../../runtime/Task');
 var util = require('util');
 
 module.exports = {

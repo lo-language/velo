@@ -2,9 +2,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Models an Exa request to handle the bookkeeping.
+ * Models an Exa task to handle the bookkeeping.
  *
- * Both request handlers and response handlers can send subrequests, but all subrequests are attached to a parent request.
+ * Both request handlers and response handlers can send subTasks, but all subTasks are attached to a parent request.
  * This creates a request tree which serves a similar purpose to a call stack.
  *
  * Takes a reply handler and a fail handler.
@@ -18,8 +18,10 @@ var __ = function (onReply, onFail, onComplete) {
     // todo inherit parent's onReply and onFail??
 
     // should recur be part of the request, not an arg?
+    // proc sig should be function (args, task) or we can try to make a task in each proc?
+    // where task has reply, fail, etc.
 
-    this.subRequests = 0;
+    this.subTasks = 0;
     this.onReply = onReply; // already bound to parent request
     this.onFail = onFail;   // ditto
     this.onComplete = onComplete;
@@ -85,7 +87,7 @@ __.prototype.fail = function (args) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Tries to close this task - it will close unless there are open subrequests.
+ * Tries to close this task - it will close unless there are open subTasks.
  * Close in this case is the bookkeeping sense.
  * When we close, we trigger a default reply.
  *
@@ -95,9 +97,9 @@ __.prototype.tryClose = function (name) {
 
 //    console.error("trying to close " + this.name);
 
-    // make sure there aren't any open subrequests
-    if (this.subRequests > 0) {
-//        console.error("... but has " + this.subRequests + " pending subrequests");
+    // make sure there aren't any open subTasks
+    if (this.subTasks > 0) {
+//        console.error("... but has " + this.subTasks + " pending subTasks");
         return;
     }
 
@@ -111,8 +113,8 @@ __.prototype.tryClose = function (name) {
  */
 __.prototype.checkOff = function () {
 
-//    console.error("checking off subrequest of: " + this.name);
-    this.subRequests--;
+//    console.error("checking off subtask of: " + this.name);
+    this.subTasks--;
     this.tryClose();
 };
 
@@ -141,13 +143,20 @@ __.prototype.sendMessage = function (fn, args, onReply, onFail) {
     request.name = this.name + ':child' + this.children++;
 
     if (onReply || onFail) {
-        this.subRequests++;
+        this.subTasks++;
     }
 
     // send the message by calling the JS function for the procedure with 'this' bound to this Request
     // we also bind the subtask to the handlers so they can call sendMessage and tryClose via 'this'
 //console.error("scheduling request: " + request.name + " (" + args + ")");
     setImmediate(fn.bind(request, fn, args));
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+__.send = function () {
+
+    setImmediate(this.fn);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -164,6 +173,14 @@ __.sendRootRequest = function (fn, args, onReply, onFail) {
     var request = new __(onReply, onFail);
 
     request.name = 'root';
+
+    // maybe a request is something you can call send on?
+    // and that calls setimmediate?
+    //request.send();
+
+    // or maybe a request is something you can call setImmediate on?
+    // so it's the target fn bound to its args?
+    //setImmediate(request);
 
     setImmediate(fn.bind(request, fn, args));
 };

@@ -2,7 +2,7 @@
 
 var parser = require('./../parser/Parser');
 var Compiler = require('./../codegen/Compiler');
-var Request = require('./../runtime/Request');
+var Request = require('./Task');
 var Q = require('q');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
