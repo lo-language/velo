@@ -1,12 +1,13 @@
 receive args, io;
 
-numPoints is 9;
+numPoints is 2;
 
 // recursively iterate
 // label points as 0-8
 
 num = 0;
 count = 0;
+path = [];
 
 explore = >>:
 
@@ -15,9 +16,8 @@ explore = >>:
     total = 0;
 
     while start < numPoints:
-        found = explore(start + 1, "`indent`  ");
+//        found = explore(start + 1, "`indent`  ");
         total = total + found;
-        count++;
         start++;
 
     reply total;

@@ -92,7 +92,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "%="                    return '%='
 "->"                    return '->'
 "=>"                    return '=>' // future connector
-">>"                    return 'PROCEDURE'
+">>"                    return 'SERVICE'
 "+"                     return '+'
 "-"                     return '-'
 "*"                     return '*'
@@ -105,7 +105,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "#"                     return '#'
 "is"                    return 'IS'
 "distinguish"           return 'DISTINGUISH'
-"procedure"             return 'PROCEDURE'
+"service"               return 'SERVICE'
 "receive"               return 'RECEIVE'
 "if"                    return 'IF'
 "else"                  return 'ELSE'
@@ -289,7 +289,7 @@ literal
     | BOOLEAN -> {type: 'boolean', val: $1 == 'true'}
     | NUMBER -> {type: 'number', val: $1}
     | STRING -> {type: 'string', val: $1}
-    | PROCEDURE ':' block -> {type: 'procedure', body: $3}
+    | SERVICE ':' block -> {type: 'procedure', body: $3}
     | '[' BEGIN? (dyad ',')* dyad? END? ']' -> {type: 'list', elements: $4 ? $3.concat([$4]): []}
     | '{' BEGIN? (field ',')* field? END? '}' -> {type: 'record', fields: $4 ? $3.concat([$4]): []}
     ;
@@ -335,13 +335,12 @@ expr
     ;
 
 // a dispatch is like a switch statement
-// the subsequent/contingency blocks are not strictly procedures,
-// if we define procedures as having to receive requests, since sub/cont blocks receive responses
+// the subsequent/contingency blocks are continuations, not procedures
 
 dispatch
     : future ';'
     | future contingency
-    | AFTER future ':' block contingency? -> {type: 'message', address: $2.address, args: $2.args, subsequent: $4, contingency: $5}
+    | AFTER future ':' block contingency? {$2.subsequent = $4; $2.contingency = $5; $$ = $2;}
     ;
 
 // a future is like an IOU for a value - *any* lvalue can be a future
@@ -349,8 +348,8 @@ dispatch
 
 future
     : message
-    | message '=>' (lvalue ',')* lvalue -> $2
-    | value '=>'  (lvalue ',')* lvalue
+    | message '=>' (lvalue ',')* lvalue {$1.futures = $3.concat($4);}
+    | value '=>'  (lvalue ',')* lvalue // what's this one for?
     ;
 
 // messages are NOT expressions

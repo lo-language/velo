@@ -313,6 +313,8 @@ __['message'] = function (node, scope) {
 
     // compile the parts
 
+    console.log(node);
+
     var target = __.compile(node.address, scope);
 
     var args = node.args.map(function (arg) {

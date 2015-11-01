@@ -1,16 +1,14 @@
 receive args, io;
 
-exa     is "http://www.exalang.org";
+exa     is "http://www.1e18.org";
 apple   is "http://www.apple.com";
 google  is "http://www.google.com";
 
-sendRequest = >>:
+sendRequest = service:
 
     receive url;
 
-    after io.http.get ~ url:
-
-        receive res, body;
+    after io.http.get ~ url => res, body:
 
         io.stdout.write ~ "response from `url`: status = `res.statusCode`\n";
         io.stdout.write ~ "body length: `#body`\n";

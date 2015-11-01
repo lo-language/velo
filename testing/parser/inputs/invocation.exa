@@ -17,7 +17,7 @@ foo ~ 18;
 sessionStore.getByID ~ sessionID;
 
 foo => bar;
-foo ~ 47 => (bar, baz);  // destructuring
+foo ~ 47 => bar, baz;  // destructuring
 
 // handle success only
 after bar ~ 48:

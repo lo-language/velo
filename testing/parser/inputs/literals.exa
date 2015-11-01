@@ -16,7 +16,7 @@ homes = [
 ];
 
 // procedure literal
-HardyRamanujan = procedure:
+HardyRamanujan = service:
     reply 1729;
 ;
 

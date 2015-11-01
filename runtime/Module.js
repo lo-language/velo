@@ -43,7 +43,7 @@ __.prototype.getJs = function () {
             this.js = Compiler.compile(this.parse()).render();
         }
         catch (e) {
-            console.error(e);
+            console.error(e.stack);
         }
     }
 

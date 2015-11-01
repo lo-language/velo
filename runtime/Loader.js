@@ -92,7 +92,7 @@ __.prototype.getModule = function (path) {
             return Q.denodeify(fs.readFile)(fullPath, 'utf8').then(
                 function (source) {
 
-                    return new Module(source, self);
+                    return new Module(source);
                 },
                 function (err) {
                     throw new Error("failed to load module: " + path + "\n" + err);
