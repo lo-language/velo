@@ -15,7 +15,7 @@ module.exports = {
 
         test.expect(1);
 
-        var task = new Task(function (args) {
+        var task = new Task('root', null, null, function (args) {
             test.equal(args, "foo");
             test.done();
         }, function (args) {
@@ -33,7 +33,7 @@ module.exports = {
 
         test.expect(1);
 
-        var task = new Task(function (args) {
+        var task = new Task('root', null, null, function (args) {
             test.fail();
         }, function (args) {
             test.equal(args, "foo");
@@ -51,7 +51,7 @@ module.exports = {
 
         test.expect(1);
 
-        var task = new Task(function (args) {
+        var task = new Task('root', null, null, function (args) {
             test.equal(args, undefined);
             test.done();
         }, function (args) {
@@ -65,7 +65,7 @@ module.exports = {
 
         test.expect(1);
 
-        var task = new Task(function (args) {
+        var task = new Task('root', null, null, function (args) {
             test.equal(args, "foo");
             test.done();
         }, function (args) {
@@ -80,7 +80,7 @@ module.exports = {
 
         test.expect(1);
 
-        var task = new Task(function (args) {
+        var task = new Task('root', null, null, function (args) {
             test.fail();
         }, function (args) {
             test.equal(args, "boo");
@@ -98,7 +98,7 @@ module.exports = {
         var collector = '';
 
         // create a fake root task
-        var task = new Task(function (args) {
+        var task = new Task('root', null, null, function (args) {
             test.equal(args, undefined); // implicit reply sends no args
             test.equal(collector, 'foobar');
             test.done();
@@ -160,7 +160,7 @@ module.exports = {
 
         test.expect(7);
 
-        var task = new Task(function (args) {
+        var task = new Task('root', null, null, function (args) {
             test.equal(expected.length, 0);
             test.done();
         }, function (args) {
@@ -219,7 +219,7 @@ module.exports = {
 
         // create the root task
         //console.error("create root");
-        var task = new Task(function (args) {
+        var task = new Task('root', null, null, function (args) {
 
             test.deepEqual(results, [
                 'call1',
@@ -242,8 +242,6 @@ module.exports = {
         }, function (args) {
             test.fail();
         });
-
-        task.name = 'root';
 
         var passTheBuck = function (task) {
 

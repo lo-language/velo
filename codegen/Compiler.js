@@ -76,7 +76,7 @@ __['procedure'] = function (node, scope) {
     var body = __.compile(node.body, localScope);
 
     // todo make this conditional - only include if recur is used in this scope
-    body = ['var $recur = task.recur;\n', body];
+    body = ['var $recur = task.service;\n', body];
 
     // declare our local vars
     // todo move to block-level scoping with 'let'

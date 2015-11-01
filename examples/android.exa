@@ -5,23 +5,27 @@ numPoints is 2;
 // recursively iterate
 // label points as 0-8
 
-num = 0;
-count = 0;
-path = [];
-
 explore = >>:
 
-    receive start, indent;
+    receive path, indent;
 
-    total = 0;
+    point = 0;
 
-    while start < numPoints:
-//        found = explore(start + 1, "`indent`  ");
-        total = total + found;
-        start++;
+    // iterate over the points
+    while point < numPoints:
 
-    reply total;
+        if point in path:
+            // can't reuse the point
+            io.stdout.write("bummer\n");
+        else:
+            io.stdout.write("`point` -> ");
+//            path <+ point;
+//            explore(path, "`indent`  ");
+
+        point++;
+
+    if indent == "":
+        io.stdout.write("\n");
 ;
 
-found = explore(0, "");
-io.stdout.write("\n\nfound: `count`\n");
+found = explore([], "");

@@ -35,7 +35,7 @@ module.exports["procedure"] = {
         var obj = Compiler.compile(node);
 
         test.equal(obj.render(),
-            'function (task) {var $next, $result;\n\nvar $recur = task.recur;\n$next = task.args.shift();\n\ntask.sendMessage($bar, [42], function (P0) {$result *= P0;\ntask.tryClose();\n}, null);\n\n}');
+            'function (task) {var $next, $result;\n\nvar $recur = task.service;\n$next = task.args.shift();\n\ntask.sendMessage($bar, [42], function (P0) {$result *= P0;\ntask.tryClose();\n}, null);\n\n}');
         test.done();
     }
 };

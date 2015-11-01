@@ -12,8 +12,8 @@ module.exports = {
 
             process.stdout.write.apply(process.stdout, task.args);
 
-            // we expect to be called with a Request bound to this;
             // we need to reply so the caller doesn't hang waiting for a response
+            // todo - call this function as a dispatch?
             task.reply();
         }
     },

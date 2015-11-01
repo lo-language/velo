@@ -11,7 +11,7 @@
  *
  * @return {*}
  */
-var __ = function (onReply, onFail, onComplete) {
+var __ = function (name, service, args, onReply, onFail, onComplete) {
 
     // todo should we take the target fn and args in this constructor?
 
@@ -21,10 +21,15 @@ var __ = function (onReply, onFail, onComplete) {
     // proc sig should be function (args, task) or we can try to make a task in each proc?
     // where task has reply, fail, etc.
 
-    this.subTasks = 0;
+    this.name = name;
+    this.service = service;
+    this.args = args;
+
     this.onReply = onReply; // already bound to parent request
     this.onFail = onFail;   // ditto
     this.onComplete = onComplete;
+
+    this.subTasks = 0;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -125,15 +130,12 @@ __.prototype.checkOff = function () {
  * Sends a message after creating a subrequest under this request, since we can't consider our task complete
  * if there are still child tasks kicking around for which we're expecting a response.
  *
- * @param fn        target Exa service (JS function that takes a task)
+ * @param service   target Exa service (JS function that takes a task)
  * @param args      array of args for the function
  * @param onReply   callback for success response
  * @param onFail    callback for failure response
  */
-__.prototype.sendMessage = function (fn, args, onReply, onFail) {
-
-    // todo don't track this request if no reply handlers were provided
-
+__.prototype.sendMessage = function (service, args, onReply, onFail) {
 
     this.children = this.children || 1;
 
@@ -141,39 +143,31 @@ __.prototype.sendMessage = function (fn, args, onReply, onFail) {
     // also wire up onReply and onFail to this (parent) task
     // todo - clean this up - not sure this is the best place to bind to parent request
 
-    var task = new __(onReply ? onReply.bind(this) : null, onFail ? onFail.bind(this) : null, this.checkOff.bind(this));
-    task.name = this.name + ':child' + this.children++;
-    task.recur = fn;
-    task.args = args;
+    var name = this.name + ':child' + this.children++;
+
+    var task = new __(name, service, args, onReply ? onReply.bind(this) : null, onFail ? onFail.bind(this) : null, this.checkOff.bind(this));
 
     if (onReply || onFail) {
         this.subTasks++;
     }
 
-    // send the message by calling the JS function for the procedure with 'this' bound to this Request
-    // we also bind the subtask to the handlers so they can call sendMessage and tryClose via 'this'
-//console.error("scheduling request: " + request.name + " (" + args + ")");
-    setImmediate(fn.bind(null, task));
+    setImmediate(service.bind(null, task));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Creates and sends a root request with the given args.
  *
- * @param fn        an Exa service function (takes a task)
- * @param args
+ * @param service   an Exa service function (takes a task)
+ * @param args      request args
  * @param onReply
  * @param onFail
  */
-__.sendRootRequest = function (fn, args, onReply, onFail) {
+__.sendRootRequest = function (service, args, onReply, onFail) {
 
     // create the root task
 
-    var task = new __(onReply, onFail);
-
-    task.name = 'root';
-    task.recur = fn;
-    task.args = args;
+    var task = new __('root', service, args, onReply, onFail);
 
     // maybe a request is something you can call send on?
     // and that calls setimmediate?
@@ -183,12 +177,16 @@ __.sendRootRequest = function (fn, args, onReply, onFail) {
     // so it's the target fn bound to its args?
     //setImmediate(request);
 
-    // should a proc get both a request and a task?
+    // how are request and task releated?
+    // seems like you should pass a request to a service
+    // and maybe call reply and fail on the request
+    // but what about tryclose? that should be on the task, and call request.reply if necessary
+    // the caller makes a request and sends it - the system delivers a task??
+    // should a service get both a request and a task?
     // calls reply/fail on request and sendmessage/tryclose on task?
     // or should a task have the request built into it?
 
-    // todo just call immediately
-    setImmediate(fn.bind(null, task));
+    service(task);
 };
 
 module.exports = __;

@@ -174,7 +174,7 @@ failure => error:
 	log("error reading `fileName`: `error`");
 ```
 
-An async request can be thought of as a hybrid language construct that fuses a message dispatch with a specialized conditional.
+An async request can be thought of as a hybrid language construct that fuses a message dispatch with a specialized conditional; if you've worked with promises this approach will feel familiar to you.
 
 A failure continuation can easily swap in its own value for one that was expected from a success reply using `substitute`.**
 
