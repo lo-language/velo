@@ -7,21 +7,19 @@ var http = require('http');
 module.exports = {
 
     stdout: {
-        write: function (recur, args) {
+        write: function (recur, args, task) {
 
             process.stdout.write.apply(process.stdout, args);
 
             // we expect to be called with a Request bound to this;
             // we need to reply so the caller doesn't hang waiting for a response
-            this.reply();
+            task.reply();
         }
     },
 
     http: {
 
-        get: function (recur, args) {
-
-            var exaRequest = this;
+        get: function (recur, args, task) {
 
             http.get(args[0], function (res) {
 
@@ -34,7 +32,7 @@ module.exports = {
                     body += chunk;
                 });
                 res.on('end', function () {
-                    exaRequest.reply([res, body]);
+                    task.reply([res, body]);
                 });
             });
         }
