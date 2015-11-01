@@ -2,7 +2,7 @@
 
 var parser = require('./../parser/Parser');
 var Compiler = require('./../codegen/Compiler');
-var Request = require('./Task');
+var Task = require('./Task');
 var Q = require('q');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,11 +69,10 @@ __.prototype.load = function () {
         var body =
             '"use strict";\n\n' +
             'var root = ' + this.getJs() + ';\n\n' +
-            'root.call(null, rootArgs, rootTask);\n';
+            'root(rootTask);\n';
 
-        // prepare a function with the same signature as a standard procedure so it can be returned from acquire
-
-        this.procedure = new Function('rootArgs, rootTask', body);
+        // create an Exa service (JS fn that takes a task) from the compiled module
+        this.procedure = new Function('rootTask', body);
     }
 
     return this.procedure;
@@ -81,7 +80,7 @@ __.prototype.load = function () {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Runs the program by sending the arguments we're given as the root request, returning a promise for the result.
+ * Runs the program by sending the arguments we're given as the root task, returning a promise for the result.
  *
  * @param args  arguments array to pass into the procedure
  * @return {promise}
@@ -96,7 +95,7 @@ __.prototype.run = function (args) {
 
     // should this function inject acquire? or should that be optional
 
-    Request.sendRootRequest(this.procedure, args, d.resolve.bind(d), d.reject.bind(d));
+    Task.sendRootRequest(this.procedure, args, d.resolve.bind(d), d.reject.bind(d));
 
     return d.promise;
 };

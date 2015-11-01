@@ -28,13 +28,12 @@ var __ = function (libs) {
     /**
      * An Exa service (JS fn that takes a task) that returns an Exa service.
      *
-     * @param recur
-     * @param args
+     * @param task
      * @return {*}
      */
-    this.acquire = function (args, task) {
+    this.acquire = function (task) {
 
-        var modulePath = args[0];
+        var modulePath = task.args[0];
 
         loader.getModule(modulePath).then(
             function (module) {

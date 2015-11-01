@@ -153,7 +153,7 @@ __.prototype.sendMessage = function (fn, args, onReply, onFail) {
     // send the message by calling the JS function for the procedure with 'this' bound to this Request
     // we also bind the subtask to the handlers so they can call sendMessage and tryClose via 'this'
 //console.error("scheduling request: " + request.name + " (" + args + ")");
-    setImmediate(fn.bind(null, args, task));
+    setImmediate(fn.bind(null, task));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -187,7 +187,8 @@ __.sendRootRequest = function (fn, args, onReply, onFail) {
     // calls reply/fail on request and sendmessage/tryclose on task?
     // or should a task have the request built into it?
 
-    setImmediate(fn.bind(null, args, task));
+    // todo just call immediately
+    setImmediate(fn.bind(null, task));
 };
 
 module.exports = __;

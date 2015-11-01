@@ -89,7 +89,7 @@ __['procedure'] = function (node, scope) {
 
     // implements an exa service as a JS function that takes a task
     return new JsConstruct([
-        'function (args, task) ', {block: body}], false);
+        'function (task) ', {block: body}], false);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -170,7 +170,7 @@ __['receive'] = function (node, scope) {
             scope.declare(name);
         }
 
-        return '$' + name + ' = ' + 'args.shift()';
+        return '$' + name + ' = ' + 'task.args.shift()';
 
     }).join(';\n') + ';\n\n']);
 };

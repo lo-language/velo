@@ -8,9 +8,9 @@ module.exports = {
 
     stdout: {
 
-        write: function (args, task) {
+        write: function (task) {
 
-            process.stdout.write.apply(process.stdout, args);
+            process.stdout.write.apply(process.stdout, task.args);
 
             // we expect to be called with a Request bound to this;
             // we need to reply so the caller doesn't hang waiting for a response
@@ -20,9 +20,9 @@ module.exports = {
 
     http: {
 
-        get: function (args, task) {
+        get: function (task) {
 
-            http.get(args[0], function (res) {
+            http.get(task.args[0], function (res) {
 
                 var body = '';
 

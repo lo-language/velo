@@ -97,6 +97,7 @@ module.exports = {
 
         var collector = '';
 
+        // create a fake root task
         var task = new Task(function (args) {
             test.equal(args, undefined); // implicit reply sends no args
             test.equal(collector, 'foobar');
@@ -106,22 +107,22 @@ module.exports = {
         });
 
         // create an ersatz service
-        var service = function (args, task) {
+        var service = function (task) {
 
-            test.equal(args, 'foo');
+            test.equal(task.args, 'foo');
             test.equal(collector, '');
-            collector += args;
+            collector += task.args;
 
             task.reply('bar');
             task.tryClose();
         };
 
-        // send a message from this task
-        task.sendMessage(service, 'foo', function (args) {
+        // send a message from our fake root task
+        task.sendMessage(service, 'foo', function (result) {
 
-            test.equal(args, 'bar');
+            test.equal(result, 'bar');
             test.equal(collector, 'foo');
-            collector += args;
+            collector += result;
 
             // handlers need to close their subtasks
             task.tryClose();
@@ -134,7 +135,7 @@ module.exports = {
     "close doesn't wait for message with no handlers": function (test) {
 
         // model the message receiver
-        var service = function (args, task) {
+        var service = function (task) {
 
             // send a message from this task
             task.sendMessage(function (args) {
@@ -171,36 +172,36 @@ module.exports = {
 
         // model a service
 
-        var transmogrify = function (args, task) {
+        var transmogrify = function (task) {
 
-            test.equal(args, expected.shift());
+            test.equal(task.args, expected.shift());
             task.reply(replies.shift());
 
             task.tryClose();
         };
 
         // send a message from this task
-        task.sendMessage(transmogrify, 'foo', function (args) {
+        task.sendMessage(transmogrify, 'foo', function (result) {
 
-            test.equal(args, 'boo');
-
-            // handlers need to close their subtasks
-            task.tryClose();
-        });
-
-        // send a message from this task
-        task.sendMessage(transmogrify, 'bar', function (args) {
-
-            test.equal(args, 'zar');
+            test.equal(result, 'boo');
 
             // handlers need to close their subtasks
             task.tryClose();
         });
 
         // send a message from this task
-        task.sendMessage(transmogrify, 'baz', function (args) {
+        task.sendMessage(transmogrify, 'bar', function (result) {
 
-            test.equal(args, 'maz');
+            test.equal(result, 'zar');
+
+            // handlers need to close their subtasks
+            task.tryClose();
+        });
+
+        // send a message from this task
+        task.sendMessage(transmogrify, 'baz', function (result) {
+
+            test.equal(result, 'maz');
 
             // handlers need to close their subtasks
             task.tryClose();
@@ -244,24 +245,24 @@ module.exports = {
 
         task.name = 'root';
 
-        var passTheBuck = function (args, task) {
+        var passTheBuck = function (task) {
 
             //console.error('task handler B for ' + task.name);
 
             // send a submessage
 
-            results.push(args + ':pre');
+            results.push(task.args + ':pre');
 
             // send a message from this task - root:child2:child1
-            task.sendMessage(buckStopsHere, args + ':subcall', function (response) {
+            task.sendMessage(buckStopsHere, task.args + ':subcall', function (response) {
 
                 //console.error('response handler Z for ' + task.name);
                 results.push(response + ':handler');
 
-                task.reply(args);
+                task.reply(task.args);
             });
 
-            results.push(args + ':post');
+            results.push(task.args + ':post');
 
             // this is a weird and tricky case! because we're scheduling a reply before we hear back
             // from the message we just sent, but which has a handler!!
@@ -269,40 +270,40 @@ module.exports = {
             task.tryClose();
         };
 
-        var buckStopsHere = function (args, task) {
+        var buckStopsHere = function (task) {
 
             //console.error('task handler A for ' + task.name);
 
-            results.push(args);
+            results.push(task.args);
 
-            task.reply(args);
+            task.reply(task.args);
             task.tryClose();
         };
 
         // send a message from this task - root:child1
-        task.sendMessage(buckStopsHere, 'call1', function (args) {
+        task.sendMessage(buckStopsHere, 'call1', function (result) {
 
             //console.error('response handler X for ' + task.name);
-            results.push(args + ':handler');
+            results.push(result + ':handler');
         });
 
         // send a message from this task - root:child2
-        task.sendMessage(passTheBuck, 'call2', function (args) {
+        task.sendMessage(passTheBuck, 'call2', function (result) {
 
             //console.error('response handler Y for ' + task.name);
-            results.push(args + ':handler');
+            results.push(result + ':handler');
         });
 
         // send a message from this task
-        task.sendMessage(passTheBuck, 'call3', function (args) {
+        task.sendMessage(passTheBuck, 'call3', function (result) {
 
-            results.push(args + ':handler');
+            results.push(result + ':handler');
         });
 
         // send a message from this task
-        task.sendMessage(buckStopsHere, 'call4', function (args) {
+        task.sendMessage(buckStopsHere, 'call4', function (result) {
 
-            results.push(args + ':handler');
+            results.push(result + ':handler');
         });
 
         task.tryClose('c');
@@ -318,20 +319,20 @@ module.exports = {
 
         // mock up a task handler - this would be generated by the compiler
 
-        var service = function (args, task) {
+        var service = function (task) {
 
             // here's how we make a task
 
-            task.sendMessage(foo, args, function (args) { // a response handler doesn't need an envelope
+            task.sendMessage(foo, task.args, function (result) { // a response handler doesn't need an envelope
 
                 // make another task - with no reply handler
 
-                task.sendMessage(bar, args, null, function (args) {  // an error handler
+                task.sendMessage(bar, result, null, function () {  // an error handler
 
                     console.log("what?! a failure?!");
                 });
 
-                task.sendMessage(baz, args, function (args) {  // a response handler doesn't need an envelope
+                task.sendMessage(baz, result, function () {  // a response handler doesn't need an envelope
                 });
 
                 task.tryClose();
@@ -346,17 +347,17 @@ module.exports = {
 
         // set up some stub services for our task handler to send messages to
 
-        var foo = function (args, task) {
+        var foo = function (task) {
             console.log("i am foo");
             task.reply();
         };
 
-        var bar = function (args, task) {
+        var bar = function (task) {
             console.log("i am bar!");
             task.fail();
         };
 
-        var baz = function (args, task) {
+        var baz = function (task) {
             console.log("I am a BANANA!");
             task.reply();
         };
