@@ -69,11 +69,11 @@ __.prototype.load = function () {
         var body =
             '"use strict";\n\n' +
             'var root = ' + this.getJs() + ';\n\n' +
-            'root.call(this, root, rootArgs, rootTask);\n';
+            'root.call(null, rootArgs, rootTask);\n';
 
         // prepare a function with the same signature as a standard procedure so it can be returned from acquire
 
-        this.procedure = new Function('ignored, rootArgs, rootTask', body);
+        this.procedure = new Function('rootArgs, rootTask', body);
     }
 
     return this.procedure;

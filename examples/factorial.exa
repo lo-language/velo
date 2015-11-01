@@ -10,7 +10,7 @@ factorial = >>:
     if num <= 1:
         reply 1;
 
-    reply num * factorial(num - 1);
+    reply num * recur(num - 1);
 ;
 
 io.stdout.write ~ "`factorial(args[0])`\n";

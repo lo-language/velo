@@ -75,6 +75,9 @@ __['procedure'] = function (node, scope) {
     // compile the statement(s) in the context of the local scope
     var body = __.compile(node.body, localScope);
 
+    // todo make this conditional - only include if recur is used in this scope
+    body = ['var $recur = task.recur;\n', body];
+
     // declare our local vars
     // todo move to block-level scoping with 'let'
 
@@ -84,9 +87,9 @@ __['procedure'] = function (node, scope) {
         body = ['var ' + localVars.join(', ') + ';\n\n', body];
     }
 
-    // nixing implicit "connect" for now...
+    // implements an exa service as a JS function that takes a task
     return new JsConstruct([
-        'function ($recur, args, task) ', {block: body}], false);
+        'function (args, task) ', {block: body}], false);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -287,7 +290,7 @@ __['iteration'] = function (node, scope) {
     var cont = JsConstruct.makeContinuation(node.statements);
 
     // we want to compile this with the continuation we'll make next
-    var statements = __.compile(node.statements, scope.bud("setImmediate(loop.bind());"));
+    var statements = __.compile(node.statements, scope.bud("setImmediate(loop);"));
 
     var cond = scope.hasContinuation()?
         new JsConstruct(["if (", condition, ") ", {block: statements}, "\nelse ", {block: scope.getCallCont()}]):
@@ -297,7 +300,7 @@ __['iteration'] = function (node, scope) {
 
         "var loop = function () ",
         {block: cond}, ";\n\n",
-        "loop.call();\n"
+        "loop.call();\n" // enter the loop
     ]);
 };
 

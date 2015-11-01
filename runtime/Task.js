@@ -125,7 +125,7 @@ __.prototype.checkOff = function () {
  * Sends a message after creating a subrequest under this request, since we can't consider our task complete
  * if there are still child tasks kicking around for which we're expecting a response.
  *
- * @param fn        function to be called for this request
+ * @param fn        target Exa service (JS function that takes a task)
  * @param args      array of args for the function
  * @param onReply   callback for success response
  * @param onFail    callback for failure response
@@ -143,6 +143,8 @@ __.prototype.sendMessage = function (fn, args, onReply, onFail) {
 
     var task = new __(onReply ? onReply.bind(this) : null, onFail ? onFail.bind(this) : null, this.checkOff.bind(this));
     task.name = this.name + ':child' + this.children++;
+    task.recur = fn;
+    task.args = args;
 
     if (onReply || onFail) {
         this.subTasks++;
@@ -151,23 +153,27 @@ __.prototype.sendMessage = function (fn, args, onReply, onFail) {
     // send the message by calling the JS function for the procedure with 'this' bound to this Request
     // we also bind the subtask to the handlers so they can call sendMessage and tryClose via 'this'
 //console.error("scheduling request: " + request.name + " (" + args + ")");
-    setImmediate(fn.bind(null, fn, args, task));
+    setImmediate(fn.bind(null, args, task));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Creates and sends a root request with the given args.
  *
- * @param fn
+ * @param fn        an Exa service function (takes a task)
  * @param args
  * @param onReply
  * @param onFail
  */
 __.sendRootRequest = function (fn, args, onReply, onFail) {
 
+    // create the root task
+
     var task = new __(onReply, onFail);
 
     task.name = 'root';
+    task.recur = fn;
+    task.args = args;
 
     // maybe a request is something you can call send on?
     // and that calls setimmediate?
@@ -181,7 +187,7 @@ __.sendRootRequest = function (fn, args, onReply, onFail) {
     // calls reply/fail on request and sendmessage/tryclose on task?
     // or should a task have the request built into it?
 
-    setImmediate(fn.bind(null, fn, args, task));
+    setImmediate(fn.bind(null, args, task));
 };
 
 module.exports = __;

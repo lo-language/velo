@@ -26,14 +26,13 @@ var __ = function (libs) {
     var loader = this;
 
     /**
-     * Has the signature to be called as a procedure from Exa, and returns a fn
-     * that also has the signature to be called as a procedure from Exa.
+     * An Exa service (JS fn that takes a task) that returns an Exa service.
      *
      * @param recur
      * @param args
      * @return {*}
      */
-    this.acquire = function (recur, args, task) {
+    this.acquire = function (args, task) {
 
         var modulePath = args[0];
 
