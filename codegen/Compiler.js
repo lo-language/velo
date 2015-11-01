@@ -229,6 +229,7 @@ __['assign'] = function (node, scope) {
         }
 
         // declare if a new var
+        // can this not be idempotent?
         if (scope.has(node.left.name) == false) {
             scope.declare(node.left.name);
         }
@@ -313,17 +314,41 @@ __['message'] = function (node, scope) {
 
     // compile the parts
 
-    console.log(node);
-
     var target = __.compile(node.address, scope);
 
     var args = node.args.map(function (arg) {
         return __.compile(arg, scope);
     });
 
-    return JsConstruct.buildMessage(target, args,
-        node.subsequent ? __.compile(node.subsequent) : null,
-        node.contingency ? __.compile(node.contingency) : null);
+    var subsequent = node.subsequent ? __.compile(node.subsequent) : null;
+    var contingency = node.contingency ? __.compile(node.contingency) : null;
+
+    // put the futures in scope, then the continuation callback will assign to them
+
+    if (node.futures) {
+
+        var captures = [];
+
+        node.futures.forEach(function (future) {
+
+            if (future.type == 'id' && scope.has(future.name) == false) {
+                scope.declare(future.name);
+            }
+
+            captures.push([__.compile(future), ' = args.shift();\n']);
+        });
+
+        // if there's a subsequent, throw the capture assignments in there at the top, otherwise make one
+
+        if (subsequent) {
+            subsequent = [captures, subsequent];
+        }
+        else {
+            subsequent = captures;
+        }
+    }
+
+    return JsConstruct.buildMessage(target, args, subsequent, contingency);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

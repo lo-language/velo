@@ -42,6 +42,10 @@ And since the procedure can access not just its own state but the state of its e
 
 Note that it wouldn't make sense to create a service without assigning its address to anything - this would be doing the work of setting up a new inbox and then throwing away its address.
 
+### Continuations
+
+Think of continuations as part of the main flow of the procedure, like an if/else block, rather than as a sub-procedure. They share the same scope as their enclosing procedure.
+
 Modules only provide ability, not authority.
 
 ### Acquire

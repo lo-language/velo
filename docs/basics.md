@@ -50,7 +50,7 @@ write(`height`);
 
 Collections in Exa are not objects; they're local values that can be directly modified by the current procedure. For this reason, if you pass a collection to a different context in an async message, it may need to be copied.
 
-**Arrays** are ordered collections of any number of homogeneous elements, retrievable in constant time by zero-based integer index. Arrays dynamically expand and contract as necessary in constant time and support literals delimited by square brackets. 
+**Arrays** provide random-access, ordered collections of any number of homogeneous elements, retrievable in constant time by zero-based integer index. Arrays dynamically expand and contract as necessary in constant time and support literals delimited by square brackets. 
 
 ```
 fibs = [0, 1, 1, 2, 3, 5, 8];

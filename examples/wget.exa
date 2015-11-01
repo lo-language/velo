@@ -1,6 +1,6 @@
 receive args, io;
 
-exa     is "http://www.1e18.org";
+exa     is "http://www.exalang.org";
 apple   is "http://www.apple.com";
 google  is "http://www.google.com";
 

@@ -25,7 +25,7 @@ Note:
 
 ![a suspended task](images/concepts3.png "a suspended request")
 
-### Summarizing the Exa Model of Computation
+### Summarizing the Exa Model of Distributed Computation
 
 - A service has an inbox with an address and a procedure
   - The inbox is attended by one or more workers who collectively provide the service, but these are invisible within the system.
