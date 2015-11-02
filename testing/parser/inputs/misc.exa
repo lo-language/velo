@@ -16,7 +16,7 @@ foo %= 360;
 
 doSomething();
 
-foo[] = 17;
+foo[-1] = 17;
 
 monkeys["chickens"][15].wow({ ready: true, height: 72, answer: 42 })[17](57);
 

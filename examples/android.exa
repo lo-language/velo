@@ -11,6 +11,8 @@ explore = >>:
 
     point = 0;
 
+    path{8};
+
     // iterate over the points
     while point < numPoints:
 

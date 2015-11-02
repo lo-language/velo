@@ -90,7 +90,8 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "*="                    return '*='
 "/="                    return '/='
 "%="                    return '%='
-"->"                    return '->'
+"<+"                    return '<+'
+"+>"                    return '+>'
 "=>"                    return '=>' // future connector
 ">>"                    return 'SERVICE'
 "+"                     return '+'
@@ -132,7 +133,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 %options token-stack
 
-%left '->' '=>'
+%left '<+' '+>' '=>'
 %left 'SEQ' 'AND' 'OR' 'IN'
 %left '==' '!=' '<' '>' '<=' '>='
 %left '+' '-'
@@ -279,7 +280,8 @@ dynastring
 
 lvalue
     : ID -> {type: 'id', name: $1}
-    | value '[' expr? ']' -> {type: 'subscript', list: $1, index: $3}
+    | value '[' expr ']' -> {type: 'subscript', list: $1, index: $3}
+    | value '{' expr '}' -> {type: 'extraction', list: $1, index: $3}
     | value '.' ID -> {type: 'select', set: $1, member: $3}
     | '(' lvalue (',' lvalue)+ ')' -> {type: 'destructure', members: $3.concat([$2])}
     ;

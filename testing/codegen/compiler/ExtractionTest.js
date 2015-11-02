@@ -9,28 +9,28 @@ var Compiler = require('../../../codegen/Compiler');
 var Scope = require('../../../codegen/Scope');
 var util = require('util');
 
-module.exports["subscript"] = {
+module.exports["basics"] = {
 
-    "basic": function (test) {
+    "normal": function (test) {
 
         var node = {
-            type: 'subscript',
+            type: 'extraction',
             list: {type: 'id', name: 'foo'},
             index: {type: 'number', val: '1'}
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo[1]');
+        test.equal(Compiler.compile(node).render(), '$foo.splice(1, 1)[0]');
         test.done();
     },
 
     "reverse indexing": function (test) {
 
         var node = {
-            type: 'subscript',
+            type: 'extraction',
             list: { type: 'id', name: 'foo' },
             index: {type: 'number', val: '-1'} };
 
-        test.equal(Compiler.compile(node).render(), '$foo[$foo.length-1]');
+        test.equal(Compiler.compile(node).render(), '$foo.splice(-1, 1)[0]');
         test.done();
     }
 };

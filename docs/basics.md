@@ -63,7 +63,12 @@ fibs[-2];		// syntactic sugar for 2nd-to-last element **
 
 fibs <+ 13;		// pushes a value onto the back of the array **
 0 +> fibs;		// pushes a value onto the front of the array **
+
+x = fibs{0};	// extract the first element
+y = fibs{-1};	// extract the last element
 ```
+
+The extraction operator `{}` removes the specified element from a collection and evaluates to the value of the removed element. If an array, the collection then resizes - there can't be "gaps" in arrays.
 
 **Maps** are unordered collections of any number of homogeneous elements which are retrievable by unique scalar index (string or number). Map literals are also delimited by square brackets.
 
@@ -84,13 +89,6 @@ You can get the length of any collection in constant time with the cardinality o
 ```
 numFibs = #fibs; // 7
 numPlayers = #greats; // 5
-```
-
-The unary operator `cut`** removes the specified element from a collection and evaluates to the value of the removed element. If an array, the collection then resizes - there can't be "gaps" in arrays.
-
-```
-x = cut fibs[0];	// snip off the first element
-y = cut fibs[-1];	// snip off the last element
 ```
 
 ##### Records

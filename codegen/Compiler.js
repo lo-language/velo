@@ -456,16 +456,35 @@ __['subscript'] = function (node, scope) {
     // this is guaranteed to be a statement
 
     var list = __.compile(node.list, scope);
-    var index = undefined;
+    var index = __.compile(node.index, scope);
 
-    if (node.index !== undefined) {
-        index = __.compile(node.index, scope);
+    // to do this properly we'd have to catch it at runtime - could probably do that with splice
+    if (node.index.type == 'number' && parseInt(node.index.val) < 0) {
+        index = list + '.length' + node.index.val;
     }
 
     // todo - what if the list expression is a request or somesuch? can't resolve it twice
     // wrap it in a helper function?
 
-    return new JsConstruct([list, '[', (index === undefined ? list + '.length - 1' : index), ']']);
+    return new JsConstruct([list, '[', index, ']']);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * An extraction is a mutating expression.
+ *
+ * @param scope
+ * @param node
+ */
+__['extraction'] = function (node, scope) {
+
+    var list = __.compile(node.list, scope);
+    var index = __.compile(node.index, scope);
+
+    // todo - what if the list expression is a request or somesuch? can't resolve it twice
+    // wrap it in a helper function?
+
+    return new JsConstruct([list, '.splice(', index, ', 1)[0]']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
