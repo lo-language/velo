@@ -875,7 +875,7 @@ case 65:return 109      // failed?
 break;
 case 66:return 51
 break;
-case 67:return 101      // when, on, release, send, dispatch, fire?
+case 67:return 101
 break;
 case 68:return 98
 break;

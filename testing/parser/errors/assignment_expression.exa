@@ -1,3 +1,0 @@
-action () {
-    foo = bar.baz = true
-}

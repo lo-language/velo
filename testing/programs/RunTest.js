@@ -16,6 +16,8 @@ var util = require('util');
 
 var loader = new Loader(__dirname);
 
+// if parser runs first, first test in here fails with a parse error - how are we putting the parser in a bad state?
+
 module.exports['iteration'] = {
 
     // test that uncaught errors are properly escalated out of the program
@@ -81,20 +83,6 @@ module.exports['io'] = {
         }, {}]);
     }
 };
-
-//module.exports['deps'] = {
-//
-//    "setUp": function (cb) {
-//
-//        this.harness = new Harness(loader, 'deps');
-//
-//        this.harness.setUp(cb);
-//    },
-//
-//    'success': function (test) {
-//        this.harness.testSuccess(test, [], 14);
-//    }
-//};
 
 module.exports['conditionals'] = {
 

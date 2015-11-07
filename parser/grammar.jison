@@ -112,7 +112,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "else"                  return 'ELSE'
 "catch"                 return 'CATCH'      // failed?
 "while"                 return 'WHILE'
-"after"                 return 'AFTER'      // when, on, release, send, dispatch, fire?
+"after"                 return 'AFTER'
 "in"                    return 'IN'
 "skip"                  return 'SKIP'
 "reply"                 return 'REPLY'
