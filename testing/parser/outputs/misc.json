@@ -59,89 +59,105 @@
           "tail": {
             "type": "stmt_list",
             "head": {
-              "type": "increment",
-              "operand": {
+              "type": "assign",
+              "op": "+=",
+              "left": {
                 "type": "id",
                 "name": "foo"
+              },
+              "right": {
+                "type": "number",
+                "val": "5"
               }
             },
             "tail": {
               "type": "stmt_list",
               "head": {
-                "type": "decrement",
-                "operand": {
+                "type": "assign",
+                "op": "-=",
+                "left": {
                   "type": "id",
                   "name": "foo"
+                },
+                "right": {
+                  "type": "number",
+                  "val": "7"
                 }
               },
               "tail": {
                 "type": "stmt_list",
                 "head": {
                   "type": "assign",
-                  "op": "+=",
+                  "op": "*=",
                   "left": {
                     "type": "id",
                     "name": "foo"
                   },
                   "right": {
                     "type": "number",
-                    "val": "5"
+                    "val": "10"
                   }
                 },
                 "tail": {
                   "type": "stmt_list",
                   "head": {
                     "type": "assign",
-                    "op": "-=",
+                    "op": "/=",
                     "left": {
                       "type": "id",
                       "name": "foo"
                     },
                     "right": {
                       "type": "number",
-                      "val": "7"
+                      "val": "4"
                     }
                   },
                   "tail": {
                     "type": "stmt_list",
                     "head": {
                       "type": "assign",
-                      "op": "*=",
+                      "op": "%=",
                       "left": {
                         "type": "id",
                         "name": "foo"
                       },
                       "right": {
                         "type": "number",
-                        "val": "10"
+                        "val": "360"
                       }
                     },
                     "tail": {
                       "type": "stmt_list",
                       "head": {
-                        "type": "assign",
-                        "op": "/=",
-                        "left": {
-                          "type": "id",
-                          "name": "foo"
-                        },
-                        "right": {
-                          "type": "number",
-                          "val": "4"
+                        "type": "application_stmt",
+                        "application": {
+                          "type": "application",
+                          "address": {
+                            "type": "id",
+                            "name": "doSomething"
+                          },
+                          "args": []
                         }
                       },
                       "tail": {
                         "type": "stmt_list",
                         "head": {
                           "type": "assign",
-                          "op": "%=",
+                          "op": "=",
                           "left": {
-                            "type": "id",
-                            "name": "foo"
+                            "type": "subscript",
+                            "list": {
+                              "type": "id",
+                              "name": "foo"
+                            },
+                            "index": {
+                              "type": "number",
+                              "val": "-1"
+                            }
                           },
                           "right": {
                             "type": "number",
-                            "val": "360"
+                            "val": "17"
                           }
                         },
                         "tail": {
@@ -151,10 +167,74 @@
                             "application": {
                               "type": "application",
                               "address": {
-                                "type": "id",
-                                "name": "doSomething"
+                                "type": "subscript",
+                                "list": {
+                                  "type": "application",
+                                  "address": {
+                                    "type": "select",
+                                    "set": {
+                                      "type": "subscript",
+                                      "list": {
+                                        "type": "subscript",
+                                        "list": {
+                                          "type": "id",
+                                          "name": "monkeys"
+                                        },
+                                        "index": {
+                                          "type": "string",
+                                          "val": "chickens"
+                                        }
+                                      },
+                                      "index": {
+                                        "type": "number",
+                                        "val": "15"
+                                      }
+                                    },
+                                    "member": "wow"
+                                  },
+                                  "args": [
+                                    {
+                                      "type": "record",
+                                      "fields": [
+                                        {
+                                          "type": "field",
+                                          "name": "ready",
+                                          "value": {
+                                            "type": "boolean",
+                                            "val": true
+                                          }
+                                        },
+                                        {
+                                          "type": "field",
+                                          "name": "height",
+                                          "value": {
+                                            "type": "number",
+                                            "val": "72"
+                                          }
+                                        },
+                                        {
+                                          "type": "field",
+                                          "name": "answer",
+                                          "value": {
+                                            "type": "number",
+                                            "val": "42"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                "index": {
+                                  "type": "number",
+                                  "val": "17"
+                                }
                               },
-                              "args": []
+                              "args": [
+                                {
+                                  "type": "number",
+                                  "val": "57"
+                                }
+                              ]
                             }
                           },
                           "tail": {
@@ -163,123 +243,99 @@
                               "type": "assign",
                               "op": "=",
                               "left": {
-                                "type": "subscript",
-                                "list": {
-                                  "type": "id",
-                                  "name": "foo"
-                                },
-                                "index": {
-                                  "type": "number",
-                                  "val": "-1"
-                                }
+                                "type": "id",
+                                "name": "block"
                               },
                               "right": {
-                                "type": "number",
-                                "val": "17"
+                                "type": "application",
+                                "address": {
+                                  "type": "application",
+                                  "address": {
+                                    "type": "id",
+                                    "name": "connect"
+                                  },
+                                  "args": [
+                                    {
+                                      "type": "string",
+                                      "val": "Block"
+                                    }
+                                  ]
+                                },
+                                "args": []
                               }
                             },
                             "tail": {
                               "type": "stmt_list",
                               "head": {
-                                "type": "application_stmt",
-                                "application": {
-                                  "type": "application",
-                                  "address": {
-                                    "type": "subscript",
-                                    "list": {
-                                      "type": "application",
-                                      "address": {
-                                        "type": "select",
-                                        "set": {
-                                          "type": "subscript",
-                                          "list": {
-                                            "type": "subscript",
-                                            "list": {
-                                              "type": "id",
-                                              "name": "monkeys"
-                                            },
-                                            "index": {
-                                              "type": "string",
-                                              "val": "chickens"
-                                            }
-                                          },
-                                          "index": {
-                                            "type": "number",
-                                            "val": "15"
-                                          }
-                                        },
-                                        "member": "wow"
-                                      },
-                                      "args": [
-                                        {
-                                          "type": "record",
-                                          "fields": [
-                                            {
-                                              "type": "field",
-                                              "name": "ready",
-                                              "value": {
-                                                "type": "boolean",
-                                                "val": true
-                                              }
-                                            },
-                                            {
-                                              "type": "field",
-                                              "name": "height",
-                                              "value": {
-                                                "type": "number",
-                                                "val": "72"
-                                              }
-                                            },
-                                            {
-                                              "type": "field",
-                                              "name": "answer",
-                                              "value": {
-                                                "type": "number",
-                                                "val": "42"
-                                              }
-                                            }
-                                          ]
-                                        }
-                                      ]
-                                    },
-                                    "index": {
-                                      "type": "number",
-                                      "val": "17"
-                                    }
-                                  },
-                                  "args": [
-                                    {
-                                      "type": "number",
-                                      "val": "57"
-                                    }
-                                  ]
+                                "type": "assign",
+                                "op": "=",
+                                "left": {
+                                  "type": "id",
+                                  "name": "monkeys"
+                                },
+                                "right": {
+                                  "type": "number",
+                                  "val": "72"
                                 }
                               },
                               "tail": {
                                 "type": "stmt_list",
                                 "head": {
-                                  "type": "assign",
+                                  "type": "recovery",
                                   "op": "=",
                                   "left": {
                                     "type": "id",
-                                    "name": "block"
+                                    "name": "result"
                                   },
-                                  "right": {
+                                  "application": {
                                     "type": "application",
                                     "address": {
-                                      "type": "application",
-                                      "address": {
-                                        "type": "id",
-                                        "name": "connect"
-                                      },
-                                      "args": [
-                                        {
-                                          "type": "string",
-                                          "val": "Block"
-                                        }
-                                      ]
+                                      "type": "id",
+                                      "name": "foo"
                                     },
                                     "args": []
+                                  },
+                                  "contingency": {
+                                    "type": "stmt_list",
+                                    "head": {
+                                      "type": "receive",
+                                      "names": [
+                                        "err"
+                                      ]
+                                    },
+                                    "tail": {
+                                      "type": "stmt_list",
+                                      "head": {
+                                        "type": "application_stmt",
+                                        "application": {
+                                          "type": "application",
+                                          "address": {
+                                            "type": "id",
+                                            "name": "log"
+                                          },
+                                          "args": [
+                                            {
+                                              "type": "id",
+                                              "name": "err"
+                                            }
+                                          ]
+                                        }
+                                      },
+                                      "tail": {
+                                        "type": "stmt_list",
+                                        "head": {
+                                          "type": "response",
+                                          "channel": "reply",
+                                          "args": [
+                                            {
+                                              "type": "id",
+                                              "name": "fixed"
+                                            }
+                                          ]
+                                        },
+                                        "tail": null
+                                      }
+                                    }
                                   }
                                 },
                                 "tail": {
@@ -289,67 +345,51 @@
                                     "op": "=",
                                     "left": {
                                       "type": "id",
-                                      "name": "monkeys"
+                                      "name": "index"
                                     },
                                     "right": {
                                       "type": "number",
-                                      "val": "72"
+                                      "val": "0"
                                     }
                                   },
                                   "tail": {
                                     "type": "stmt_list",
                                     "head": {
-                                      "type": "recovery",
+                                      "type": "assign",
                                       "op": "=",
                                       "left": {
                                         "type": "id",
-                                        "name": "result"
+                                        "name": "iterator"
                                       },
-                                      "application": {
-                                        "type": "application",
-                                        "address": {
-                                          "type": "id",
-                                          "name": "foo"
-                                        },
-                                        "args": []
-                                      },
-                                      "contingency": {
-                                        "type": "stmt_list",
-                                        "head": {
-                                          "type": "receive",
-                                          "names": [
-                                            "err"
-                                          ]
-                                        },
-                                        "tail": {
+                                      "right": {
+                                        "type": "procedure",
+                                        "body": {
                                           "type": "stmt_list",
                                           "head": {
-                                            "type": "application_stmt",
-                                            "application": {
-                                              "type": "application",
-                                              "address": {
-                                                "type": "id",
-                                                "name": "log"
-                                              },
-                                              "args": [
-                                                {
+                                            "type": "response",
+                                            "channel": "reply",
+                                            "args": [
+                                              {
+                                                "type": "subscript",
+                                                "list": {
                                                   "type": "id",
-                                                  "name": "err"
+                                                  "name": "items"
+                                                },
+                                                "index": {
+                                                  "type": "id",
+                                                  "name": "index"
                                                 }
-                                              ]
-                                            }
+                                              }
+                                            ]
                                           },
                                           "tail": {
                                             "type": "stmt_list",
                                             "head": {
-                                              "type": "response",
-                                              "channel": "reply",
-                                              "args": [
-                                                {
-                                                  "type": "id",
-                                                  "name": "fixed"
-                                                }
-                                              ]
+                                              "type": "increment",
+                                              "operand": {
+                                                "type": "id",
+                                                "name": "index"
+                                              }
                                             },
                                             "tail": null
                                           }
@@ -359,76 +399,16 @@
                                     "tail": {
                                       "type": "stmt_list",
                                       "head": {
-                                        "type": "assign",
-                                        "op": "=",
-                                        "left": {
-                                          "type": "id",
-                                          "name": "index"
-                                        },
-                                        "right": {
-                                          "type": "number",
-                                          "val": "0"
-                                        }
-                                      },
-                                      "tail": {
-                                        "type": "stmt_list",
-                                        "head": {
-                                          "type": "assign",
-                                          "op": "=",
-                                          "left": {
+                                        "type": "response",
+                                        "channel": "reply",
+                                        "args": [
+                                          {
                                             "type": "id",
                                             "name": "iterator"
-                                          },
-                                          "right": {
-                                            "type": "procedure",
-                                            "body": {
-                                              "type": "stmt_list",
-                                              "head": {
-                                                "type": "response",
-                                                "channel": "reply",
-                                                "args": [
-                                                  {
-                                                    "type": "subscript",
-                                                    "list": {
-                                                      "type": "id",
-                                                      "name": "items"
-                                                    },
-                                                    "index": {
-                                                      "type": "id",
-                                                      "name": "index"
-                                                    }
-                                                  }
-                                                ]
-                                              },
-                                              "tail": {
-                                                "type": "stmt_list",
-                                                "head": {
-                                                  "type": "increment",
-                                                  "operand": {
-                                                    "type": "id",
-                                                    "name": "index"
-                                                  }
-                                                },
-                                                "tail": null
-                                              }
-                                            }
                                           }
-                                        },
-                                        "tail": {
-                                          "type": "stmt_list",
-                                          "head": {
-                                            "type": "response",
-                                            "channel": "reply",
-                                            "args": [
-                                              {
-                                                "type": "id",
-                                                "name": "iterator"
-                                              }
-                                            ]
-                                          },
-                                          "tail": null
-                                        }
-                                      }
+                                        ]
+                                      },
+                                      "tail": null
                                     }
                                   }
                                 }

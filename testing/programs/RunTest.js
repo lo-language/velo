@@ -173,6 +173,21 @@ module.exports['procedure'] = {
     }
 };
 
+//module.exports['conditional in loop'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.harness = new Harness(loader, 'condInLoop');
+//
+//        this.harness.setUp(cb);
+//    },
+//
+//    'success': function (test) {
+//
+//        this.harness.testSuccess(test, [], 60);
+//    }
+//};
+
 
 //module.exports['recovery'] = {
 //

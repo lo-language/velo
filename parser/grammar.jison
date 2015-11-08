@@ -90,10 +90,11 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "*="                    return '*='
 "/="                    return '/='
 "%="                    return '%='
-"<+"                    return '<+'
-"+>"                    return '+>'
+"<+"                    return 'PUSH_BACK'
+"+>"                    return 'PUSH_FRONT'
 "=>"                    return '=>' // future connector
 ">>"                    return 'SERVICE'
+"><"                    return 'CONS'
 "+"                     return '+'
 "-"                     return '-'
 "*"                     return '*'
@@ -133,7 +134,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 %options token-stack
 
-%left '<+' '+>' '=>'
+%left 'PUSH_BACK' 'PUSH_FRONT' '=>'
 %left 'SEQ' 'AND' 'OR' 'IN'
 %left '==' '!=' '<' '>' '<=' '>='
 %left '+' '-'
@@ -216,7 +217,7 @@ statement
     | application contingency? ';' -> {type: 'application_stmt', application: $1, contingency: $2}
     | response ';'
     | assignment
-    | step ';'
+    | edit ';'
     | lvalue ';'    // this is an attempt to be able to send messages just by using the procvar
     | dispatch
     | conditional
@@ -237,6 +238,8 @@ assignment
     | lvalue assignment_op application contingency -> {type: 'recovery', op: $2, left: $1, application: $3, contingency: $4}
     ;
 
+// assignments are NOT expressions
+// all but = should probably be considered edits instead of assignments
 assignment_op
     : '='
     | '+='
@@ -246,10 +249,12 @@ assignment_op
     | '%='
     ;
 
-// NOT expressions
-step
+// edits are NOT expressions
+edit
     : lvalue '++' -> {type: 'increment', operand: $1}
     | lvalue '--' -> {type: 'decrement', operand: $1}
+    | lvalue PUSH_BACK expr -> {type: 'push_back', list: $1, item: $3}
+    | expr PUSH_FRONT lvalue -> {type: 'push_front', list: $3, item: $1}
     ;
 
 conditional

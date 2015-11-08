@@ -7,19 +7,21 @@
 
 "use strict";
 
+var JsConstruct = require('./JsConstruct');
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
  * @param parent    the parent scope, if any
- * @param cont      the name of the continuation, if any
+ * @param cont      the tail of a statement list (optional)
  * @private
  */
-var __ = function (parent, cont) {
+var __ = function (parent, tail) {
 
     this.parent = parent;
     this.vars = {};
     this.constants = {};
-    this.cont = cont;
+    this.cont = tail;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -178,7 +180,7 @@ __.prototype.hasContinuation = function () {
  *
  * @return {String}
  */
-__.prototype.getCallCont = function () {
+__.prototype.callToCont = function () {
 
     return this.cont;
 };

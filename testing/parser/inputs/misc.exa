@@ -5,9 +5,6 @@ foo = true;
 foo = false;
 foo = 10;
 
-foo++;
-foo--;
-
 foo += 5;
 foo -= 7;
 foo *= 10;

@@ -1,0 +1,16 @@
+/**
+ * this is dumb logic just meant to trigger a call to a loop continuation where that loop has a cond in it
+ */
+
+num = 4;
+
+while num < 2:
+
+    if num > 3:
+        num++;
+    else:
+        num = 3;
+
+    num++;
+
+reply 45;

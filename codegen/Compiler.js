@@ -75,7 +75,7 @@ __['procedure'] = function (node, scope) {
     // compile the statement(s) in the context of the local scope
     var body = __.compile(node.body, localScope);
 
-    // todo make this conditional - only include if recur is used in this scope
+    // todo remove this
     body = ['var $recur = task.service;\n', body];
 
     // declare our local vars
@@ -115,7 +115,7 @@ __['stmt_list'] = function (node, scope) {
             // grab a continuation before diving into a conditional
             var contName = "cc";
             var cont = JsConstruct.makeContinuation(contName, tail);
-            var call = contName + ".call();\n";
+            var call = contName + "();\n";
 
             if (node.head.type == 'iteration') {
 
@@ -145,7 +145,7 @@ __['stmt_list'] = function (node, scope) {
         // scope.addContinuation? to create the construct?
 
         if (node.head.type !== "response") {
-            return new JsConstruct([head, scope.getCallCont()]).resolve();
+            return new JsConstruct([head, scope.callToCont()]).resolve();
         }
     }
 
@@ -263,7 +263,7 @@ __['conditional'] = function (node, scope) {
         negBlock = __.compile(node.otherwise, scope);
     }
     else if (scope.hasContinuation()) {
-        negBlock = scope.getCallCont();
+        negBlock = scope.callToCont();
     }
 
     var parts = ['if (', predicate, ') ', {block: consequent}, '\n\n'];
@@ -293,14 +293,14 @@ __['iteration'] = function (node, scope) {
     var statements = __.compile(node.statements, scope.bud("setImmediate(loop);"));
 
     var cond = scope.hasContinuation()?
-        new JsConstruct(["if (", condition, ") ", {block: statements}, "\nelse ", {block: scope.getCallCont()}]):
+        new JsConstruct(["if (", condition, ") ", {block: statements}, "\nelse ", {block: scope.callToCont()}]):
         new JsConstruct(["if (", condition, ") ", {block: statements}]);
 
     return new JsConstruct([
 
         "var loop = function () ",
         {block: cond}, ";\n\n",
-        "loop.call();\n" // enter the loop
+        "loop();\n" // enter the loop
     ]);
 };
 
@@ -720,11 +720,19 @@ __['dynastring'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 __['increment'] = function (node, scope) {
-    return new JsConstruct([ __.compile(node.operand, scope), "++;"]);
+    return new JsConstruct([ __.compile(node.operand, scope), "++;\n"]);
 };
 
 __['decrement'] = function (node, scope) {
-    return new JsConstruct([ __.compile(node.operand, scope), "--;"]);
+    return new JsConstruct([ __.compile(node.operand, scope), "--;\n"]);
+};
+
+__['push_back'] = function (node, scope) {
+    return new JsConstruct([ __.compile(node.list, scope), ".push(", __.compile(node.item, scope), ");\n"]);
+};
+
+__['push_front'] = function (node, scope) {
+    return new JsConstruct([ __.compile(node.list, scope), ".unshift(", __.compile(node.item, scope), ");\n"]);
 };
 
 module.exports = __;

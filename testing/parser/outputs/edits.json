@@ -1,0 +1,52 @@
+{
+  "type": "procedure",
+  "body": {
+    "type": "stmt_list",
+    "head": {
+      "type": "increment",
+      "operand": {
+        "type": "id",
+        "name": "foo"
+      }
+    },
+    "tail": {
+      "type": "stmt_list",
+      "head": {
+        "type": "decrement",
+        "operand": {
+          "type": "id",
+          "name": "foo"
+        }
+      },
+      "tail": {
+        "type": "stmt_list",
+        "head": {
+          "type": "push_back",
+          "list": {
+            "type": "id",
+            "name": "list"
+          },
+          "item": {
+            "type": "id",
+            "name": "item"
+          }
+        },
+        "tail": {
+          "type": "stmt_list",
+          "head": {
+            "type": "push_front",
+            "list": {
+              "type": "id",
+              "name": "list"
+            },
+            "item": {
+              "type": "id",
+              "name": "item"
+            }
+          },
+          "tail": null
+        }
+      }
+    }
+  }
+}

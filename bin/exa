@@ -67,16 +67,13 @@ if (argv.build != null) {
 
             var output = '"use strict";\n\
 \n\
-var Request = require("./runtime/Request");\n\
+var Task = require("./runtime/Task");\n\
 var IO = require("./runtime/IO");\n\
 var argv = require("minimist")(process.argv.slice(2));\n\
 \n\
-var main = function (ignored, rootArgs) {\n\
-    var root = ' + js + ';\n\
-    root.call(this, root, rootArgs);\n\
-};\n\
+var root = ' + js + ';\n\
 \n\
-Request.sendRootRequest(main, [argv._, IO],\n\
+Task.sendRootRequest(root, [argv._, IO],\n\
     function () {\n\
         process.exit(0);\n\
     },\n\

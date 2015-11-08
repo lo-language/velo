@@ -7,27 +7,22 @@ numPoints is 2;
 
 explore = >>:
 
-    receive path, indent;
+    receive path;
 
     point = 0;
 
-    path{8};
-
-    // iterate over the points
     while point < numPoints:
 
         if point in path:
-            // can't reuse the point
             io.stdout.write("bummer\n");
         else:
-            io.stdout.write("`point` -> ");
-//            path <+ point;
-//            explore(path, "`indent`  ");
+            path <+ point;
+            explore(path);
 
         point++;
 
-    if indent == "":
-        io.stdout.write("\n");
+    io.stdout.write("`path`\n");
+    reply 45;
 ;
 
-found = explore([], "");
+found = explore([]);
