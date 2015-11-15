@@ -95,9 +95,15 @@ __['stmt_list'] = function (node, scope) {
 
     // hooray for Lisp!
 
-    return node.tail ?
-        __.compile(node.head, scope).attach(__.compile(node.tail, scope)) :
-        __.compile(node.head, scope);
+    try {
+        return node.tail ?
+            __.compile(node.head, scope).attach(__.compile(node.tail, scope)) :
+            __.compile(node.head, scope);
+    }
+    catch (e) {
+        console.error(e + " while compiling: ");
+        console.error(node);
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -375,7 +381,7 @@ __['constant'] = function (node, scope) {
 
     scope.define(node.name, __.compile(node.value, scope));
 
-    return '';
+    return new JsConstruct();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
