@@ -6,6 +6,8 @@
 "use strict";
 
 var Compiler = require('../../../codegen/Compiler');
+var JsConstruct = require('../../../codegen/JsConstruct');
+var SyncMessage = require('../../../codegen/SyncMessage');
 var Scope = require('../../../codegen/Scope');
 var util = require('util');
 
@@ -19,7 +21,10 @@ module.exports["application"] = {
             args: []
         };
 
-        test.equal(Compiler.compile(node).resolve().render(), 'task.sendMessage($foo, [], function (P0) {P0}, null);\n\n');
+        var result = Compiler.compile(node);
+
+        test.ok(result instanceof SyncMessage);
+        test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [], function (P0) {P0}, null);\n\n');
         test.done();
     },
 
@@ -33,7 +38,10 @@ module.exports["application"] = {
             ]
         };
 
-        test.equal(Compiler.compile(node).resolve().render(), 'task.sendMessage($foo, [42], function (P0) {P0}, null);\n\n');
+        var result = Compiler.compile(node);
+
+        test.ok(result instanceof SyncMessage);
+        test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [42], function (P0) {P0}, null);\n\n');
         test.done();
     },
 
@@ -48,7 +56,10 @@ module.exports["application"] = {
             ]
         };
 
-        test.equal(Compiler.compile(node).resolve().render(), "task.sendMessage($foo, [42, 'hi there'], function (P0) {P0}, null);\n\n");
+        var result = Compiler.compile(node);
+
+        test.ok(result instanceof SyncMessage);
+        test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [42, 'hi there'], function (P0) {P0}, null);\n\n");
         test.done();
     },
 
@@ -68,9 +79,10 @@ module.exports["application"] = {
             }]
         };
 
-        // patch sub nodes?
+        var result = Compiler.compile(node);
 
-        test.equal(Compiler.compile(node).resolve().render(), "task.sendMessage($foo, [], function (P1) {task.sendMessage($bar, [], function (P2) {task.sendMessage($baz, [P1, P2], function (P0) {P0}, null);\n\n}, null);\n\n}, null);\n\n");
+        test.ok(result instanceof SyncMessage);
+        test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [P0, P1], function (P0) {P0}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     }
 };
@@ -89,7 +101,19 @@ module.exports["application statements"] = {
                 ]}
         };
 
-        test.equal(Compiler.compile(node).resolve().render(), 'task.sendMessage($foo, [42], function (P0) {P0;\n}, null);\n\n');
+        var a = Compiler.compile(node).resolve();
+        test.equal(a.render(), 'task.sendMessage($foo, [42], function (P0) {P0;\n}, null);\n\n');
+        test.ok(a.async);
+
+        // we don't have a good interaction between resolve & attach because of nesting
+        // attach only looks at the top structure to see if it has pre and post; but resolve
+        // creates nested structures
+        // what does resolving do to a sync message?
+
+        // add a statement after resolving
+        a.attach(new JsConstruct("foo = bar;"));
+        test.equal(a.render(), 'task.sendMessage($foo, [42], function (P0) {P0;\nfoo = bar;}, null);\n\n');
+
         test.done();
     },
 
@@ -119,7 +143,7 @@ module.exports["application statements"] = {
         // patch sub nodes?
 
         test.equal(Compiler.compile(node).resolve().render(),
-            "task.sendMessage($foo, [], function (P1) {task.sendMessage($bar, [], function (P2) {task.sendMessage($baz, [(P1 - P2)], function (P0) {P0;\n}, null);\n\n}, null);\n\n}, null);\n\n");
+            "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [(P0 - P1)], function (P0) {P0;\n}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     },
 
@@ -152,7 +176,7 @@ module.exports["application statements"] = {
         // patch sub nodes?
 
         test.equal(Compiler.compile(node).resolve().render(),
-            "task.sendMessage($foo, [], function (P2) {task.sendMessage($bar, [], function (P3) {task.sendMessage($baz, [(P2 - P3)], function (P1) {task.sendMessage($quux, [P1], function (P0) {P0;\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n");
+            "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [(P0 - P1)], function (P0) {task.sendMessage($quux, [P0], function (P0) {P0;\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     }
 };

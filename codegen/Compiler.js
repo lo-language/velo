@@ -60,22 +60,15 @@ __['nil'] = function (node, scope) {
  */
 __['procedure'] = function (node, scope) {
 
-    var localScope;
-
+    // create a new Exa scope for this procedure
     // if there's no enclosing scope, we're at the root of the scope tree
-    // todo not sure we should do this (supply a scope here)
-    if (scope === undefined) {
-        localScope = new Scope(null, "task.tryClose();\n");
-    }
-    else {
-        // create a nested scope for the procedure's statements
-        localScope = scope.bud("task.tryClose();\n");
-    }
+    var localScope = scope ? scope.bud() : new Scope(null);
 
     // compile the statement(s) in the context of the local scope
-    var body = __.compile(node.body, localScope);
+    var body = __.compile(node.body, localScope)
+        .attach(new JsConstruct("task.tryClose();\n"));
 
-    // todo remove this
+    // todo remove this feature
     body = ['var $recur = task.service;\n', body];
 
     // declare our local vars
@@ -102,54 +95,9 @@ __['stmt_list'] = function (node, scope) {
 
     // hooray for Lisp!
 
-    var head = __.compile(node.head, scope);
-
-    if (node.tail) {
-
-        var tail = __.compile(node.tail, scope);
-
-        if (node.head.type == 'conditional' || node.head.type == 'iteration') {
-
-            // todo see if the conditional contains any async code before making continuation
-
-            // grab a continuation before diving into a conditional
-            var contName = "cc";
-            var cont = JsConstruct.makeContinuation(contName, tail);
-            var call = contName + "();\n";
-
-            if (node.head.type == 'iteration') {
-
-                // we need to call setImmediate within a no-async-calls loop to avoid running out of stack
-                // but can probably get away with it inside a conditional - could run out of stack if
-                // there are enough nested conditionals, but that seems unlikely
-
-                // todo - do we need to do this? isn't the continuation set in the iteration compile step?
-
-//                call = "setImmediate(" + contName + ".bind(this));\n"
-            }
-
-            // recompile the head with the continuation
-            head = __.compile(node.head, scope.bud(call));
-
-            // define the continuation before we use it
-            return new JsConstruct([cont, head]).resolve();
-        }
-
-        // we resolve *after* joining the tail on the head so that the tail
-        // is captured within any wrappers required by the head
-        return new JsConstruct([head, tail]).resolve();
-    }
-    else if (scope.hasContinuation()) {
-
-        // call the continuation as the last thing we do in each block
-        // scope.addContinuation? to create the construct?
-
-        if (node.head.type !== "response") {
-            return new JsConstruct([head, scope.callToCont()]).resolve();
-        }
-    }
-
-    return head.resolve();
+    return node.tail ?
+        __.compile(node.head, scope).attach(__.compile(node.tail, scope)) :
+        __.compile(node.head, scope);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,7 +111,7 @@ __['receive'] = function (node, scope) {
 
     // todo do we always want the declaration? could use receive to clobber existing values...
 
-    return new JsConstruct([node.names.map(function (name) {
+    return JsConstruct.makeStatement([node.names.map(function (name) {
 
         // declare if a new var
         if (scope.has(name) == false) {
@@ -173,14 +121,6 @@ __['receive'] = function (node, scope) {
         return '$' + name + ' = ' + 'task.args.shift()';
 
     }).join(';\n') + ';\n\n']);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-__['application_stmt'] = function (node, scope) {
-
-    // slap a semicolon on that bad boy
-    return new JsConstruct([__.compile(node.application, scope), ';\n']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -202,10 +142,11 @@ __['response'] = function (node, scope) {
     // we assume the existence of a Task object named 'task'
 
     if (node.channel === 'fail') {
-        return new JsConstruct(['task.fail(', {csv: args}, ');\nreturn;']);
+        return JsConstruct.makeStatement(['task.fail(', {csv: args}, ');\nreturn;']);
     }
 
-    return new JsConstruct(['task.reply(', {csv: args}, ');\nreturn;']);
+    // not rendered as a statement because we can't put anything after it
+    return JsConstruct.makeStatement(['task.reply(', {csv: args}, ');\nreturn;']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -238,7 +179,7 @@ __['assign'] = function (node, scope) {
         }
     }
 
-    return new JsConstruct([left, ' ' + node.op + ' ', right, ';\n']);
+    return JsConstruct.makeStatement([left, ' ' + node.op + ' ', right, ';\n']);
     // this was genius
     // above comment inserted by my slightly tipsy wife regarding code later removed - SP
  };
@@ -259,11 +200,23 @@ __['conditional'] = function (node, scope) {
     var consequent = __.compile(node.consequent, scope);
     var negBlock = false;
 
+    var async = consequent.async;
+
     if (node.otherwise) {
         negBlock = __.compile(node.otherwise, scope);
+        async = async || negBlock.async;
     }
-    else if (scope.hasContinuation()) {
-        negBlock = scope.callToCont();
+
+    if (async) {
+
+        // we need both branches
+        if (negBlock == false) {
+            negBlock = new JsConstruct([]);
+        }
+
+        // and need to call the continuation as the last statement in both branches
+        consequent.attach(new JsConstruct("cont();"));
+        negBlock.attach(new JsConstruct("cont();"));
     }
 
     var parts = ['if (', predicate, ') ', {block: consequent}, '\n\n'];
@@ -272,7 +225,11 @@ __['conditional'] = function (node, scope) {
         parts.push('else ', {block: negBlock}, '\n\n');
     }
 
-    return new JsConstruct(parts);
+    if (async) {
+        return JsConstruct.makeStatement(['var cont = function () {'], ['};'].concat(parts));
+    }
+
+    return JsConstruct.makeStatement(parts);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -285,21 +242,19 @@ __['conditional'] = function (node, scope) {
 __['iteration'] = function (node, scope) {
 
     var condition = __.compile(node.condition, scope);
+    var body = __.compile(node.statements, scope);
 
-    // set a continuation
-    var cont = JsConstruct.makeContinuation(node.statements);
+    // todo render a while loop if body is non-async!
 
-    // we want to compile this with the continuation we'll make next
-    var statements = __.compile(node.statements, scope.bud("setImmediate(loop);"));
+    // join the body to the wrapper function via setImmediate to form the loop in a way that won't break the stack
+    body.attach(new JsConstruct("setImmediate(loop);"));
 
-    var cond = scope.hasContinuation()?
-        new JsConstruct(["if (", condition, ") ", {block: statements}, "\nelse ", {block: scope.callToCont()}]):
-        new JsConstruct(["if (", condition, ") ", {block: statements}]);
+    return JsConstruct.makeStatement([
 
-    return new JsConstruct([
-
-        "var loop = function () ",
-        {block: cond}, ";\n\n",
+        "var loop = function () {",
+            "if (", condition, ") ",
+                {block: body},
+            "else {"], ["}};\n\n",
         "loop();\n" // enter the loop
     ]);
 };
@@ -308,7 +263,7 @@ __['iteration'] = function (node, scope) {
 // Message dispatch
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Generates code to send messages via Request.sendMessage().
+ * Generates code to send messages via Task#sendMessage().
  *
  * @param scope
  * @param node
@@ -355,6 +310,14 @@ __['message'] = function (node, scope) {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+__['application_stmt'] = function (node, scope) {
+
+    // slap a semicolon on that bad boy
+    return JsConstruct.makeStatement([__.compile(node.application, scope), ';\n']);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Application
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -371,7 +334,7 @@ __['application'] = function (node, scope) {
     });
 
     // return a wrapped placeholder
-    return new JsConstruct(new SyncMessage(target, args));
+    return new SyncMessage(target, args);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -402,6 +365,7 @@ __['id'] = function (node, scope) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * This just puts a mapping in the scope; it doesn't compile "to" anything.
  *
  * @param node
  * @param scope
@@ -494,8 +458,6 @@ __['extraction'] = function (node, scope) {
  * @param node
  */
 __['select'] = function (node, scope) {
-
-    // this is guaranteed to be a statement
 
     var set = __.compile(node.set, scope);
 
@@ -720,19 +682,19 @@ __['dynastring'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 __['increment'] = function (node, scope) {
-    return new JsConstruct([ __.compile(node.operand, scope), "++;\n"]);
+    return JsConstruct.makeStatement([ __.compile(node.operand, scope), "++;\n"]);
 };
 
 __['decrement'] = function (node, scope) {
-    return new JsConstruct([ __.compile(node.operand, scope), "--;\n"]);
+    return JsConstruct.makeStatement([ __.compile(node.operand, scope), "--;\n"]);
 };
 
 __['push_back'] = function (node, scope) {
-    return new JsConstruct([ __.compile(node.list, scope), ".push(", __.compile(node.item, scope), ");\n"]);
+    return JsConstruct.makeStatement([ __.compile(node.list, scope), ".push(", __.compile(node.item, scope), ");\n"]);
 };
 
 __['push_front'] = function (node, scope) {
-    return new JsConstruct([ __.compile(node.list, scope), ".unshift(", __.compile(node.item, scope), ");\n"]);
+    return JsConstruct.makeStatement([ __.compile(node.list, scope), ".unshift(", __.compile(node.item, scope), ");\n"]);
 };
 
 module.exports = __;

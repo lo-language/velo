@@ -12,7 +12,7 @@ var util = require('util');
 
 module.exports["basics"] = {
 
-    "no outer continuation": function (test) {
+    "sync loop": function (test) {
 
         var node = {
             type: 'iteration',
@@ -24,23 +24,24 @@ module.exports["basics"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node, scope).render(), 'var loop = function () {if ($foo) {$bar = 42;\nsetImmediate(loop);}};\n\nloop();\n');
-        test.done();
-    },
+        var a = Compiler.compile(node, scope);
 
-    "with outer continuation": function (test) {
+        test.equal(a.render(),
+            'var loop = function () {if ($foo) {$bar = 42;\nsetImmediate(loop);}else {}};\n\nloop();\n');
 
-        var node = {
-            type: 'iteration',
-            condition: {type: 'id', name: 'foo'},
-            statements: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null}
-        };
+        // try attaching a statement
+        a.attach(new JsConstruct("var z = 57;"));
 
-        // patch sub nodes?
+        test.equal(a.render(),
+            'var loop = function () {if ($foo) {$bar = 42;\nsetImmediate(loop);}else {var z = 57;}};\n\nloop();\n');
 
-        var scope = new Scope(null, "cc"); // not a valid continuation call, but it's just subbed in
+        // try attaching another statement
+        a.attach(new JsConstruct("var bee = 27;"));
 
-        test.equal(Compiler.compile(node, scope).render(), 'var loop = function () {if ($foo) {$bar = 42;\nsetImmediate(loop);}\nelse {cc}};\n\nloop();\n');
+        test.equal(a.render(),
+            'var loop = function () {if ($foo) {$bar = 42;\nsetImmediate(loop);}else {var z = 57;var bee = 27;}};\n\nloop();\n');
+
+
         test.done();
     }
 };

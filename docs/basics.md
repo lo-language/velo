@@ -2,7 +2,7 @@
 
 Exa has a concise syntax that should be familiar to most users. Statements are separated by semicolons and indentation is used to delimit blocks.
 
-##### Numbers
+### Numbers
 
 Exa supports signed integers and IEEE-794 floating point numbers and provides the literal values `true` and `false` for booleans.
 
@@ -13,7 +13,7 @@ myHexInt = 0x2A;
 ```
 *Note: assignments in Exa are statements, not expressions.*
 
-##### Operators
+### Operators
 
 Exa provides the usual operators for:
 
@@ -26,7 +26,7 @@ Exa provides the usual operators for:
 
 Exa also provides a few operators for working with collections; these will be explained below.
 
-##### Strings
+### Strings
 
 Strings are arrays of Unicode characters with literals defined using double quotes.
 
@@ -46,7 +46,7 @@ And converted to strings with bare backticks.**
 write(`height`);
 ```
 
-##### Collections
+### Collections
 
 Collections in Exa are not objects; they're local values that can be directly modified by the current procedure. For this reason, if you pass a collection to a different context in an async message, it may need to be copied.
 
@@ -91,7 +91,7 @@ numFibs = #fibs; // 7
 numPlayers = #greats; // 5
 ```
 
-##### Records
+### Records
 
 Records provide a way to create structures of heterogeneous data elements. Fields are accessed using dot notation. Literals are delimited by braces. Records can be nested.
 
@@ -109,7 +109,7 @@ student = {
 fullName = "`student.name.first` `student.name.last`";
 ```
 
-##### Conditionals and Iteration
+### Conditionals and Iteration
 
 Exa provides the usual `if`/`else if`/`else` construct.
 
@@ -130,9 +130,9 @@ while z > 0:
 	z--;
 ```
 
-##### Procedure Invocation
+### Requests
 
-A procedure is invoked by sending a request to an address. A request can be sent synchronously with the usual function application syntax:
+A [procedure](procedures.md) is invoked by sending a request to an address. A request can be sent synchronously with the familiar function application syntax:
 
 ```
 doSomething(arg1, arg2);
@@ -193,5 +193,11 @@ failure:
 timeout 5ms:
 	log("failed to read the file");
 ```
+
+### Continuations
+
+Think of continuations as part of the main flow of the procedure, like an if/else block, rather than as a sub-procedure. They share the same scope as their enclosing procedure.
+
+Modules only provide ability, not authority.
 
 ** not yet implemented and design subject to change

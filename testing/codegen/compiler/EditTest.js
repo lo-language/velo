@@ -47,9 +47,7 @@ module.exports["basics"] = {
             }
         };
 
-        var scope = new Scope();
-
-        test.equal(Compiler.compile(node, scope).render(), '$list.push($item);\n');
+        test.equal(Compiler.compile(node).render(), '$list.push($item);\n');
         test.done();
     },
 
@@ -67,9 +65,7 @@ module.exports["basics"] = {
             }
         };
 
-        var scope = new Scope();
-
-        test.equal(Compiler.compile(node, scope).render(), '$list.unshift($item);\n');
+        test.equal(Compiler.compile(node).render(), '$list.unshift($item);\n');
         test.done();
     }
 };

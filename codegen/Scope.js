@@ -16,12 +16,11 @@ var JsConstruct = require('./JsConstruct');
  * @param cont      the tail of a statement list (optional)
  * @private
  */
-var __ = function (parent, tail) {
+var __ = function (parent) {
 
     this.parent = parent;
     this.vars = {};
     this.constants = {};
-    this.cont = tail;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -158,31 +157,9 @@ __.prototype.getStatus = function (name) {
  *
  * @return {*}
  */
-__.prototype.bud = function (continuation) { // push? nest? inner? derive? pushDown?
+__.prototype.bud = function () { // push? nest? inner? derive? pushDown?
 
-    return new __(this, continuation);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Returns true if this scope has a current continuation.
- *
- * @return {Boolean}
- */
-__.prototype.hasContinuation = function () {
-
-    return this.cont ? true : false;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Returns a call to the current continuation.
- *
- * @return {String}
- */
-__.prototype.callToCont = function () {
-
-    return this.cont;
+    return new __(this);
 };
 
 module.exports = __;

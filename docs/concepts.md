@@ -1,4 +1,4 @@
-## Exa Concepts
+## The Service Model
 
 Imagine a worker – let's call her Rosie – with an inbox having an **address**, and a **procedure** to be performed for each message she receives. Assume there's a mail system that routes messages into the inbox. Rosie attends the inbox, pulling messages out in the order in which they arrive and performing her procedure for each one as a distinct **task**. In doing so, she's performing a **service** defined by the procedure and accessible via the address, as shown below. If there are no messages she sits idly.
 

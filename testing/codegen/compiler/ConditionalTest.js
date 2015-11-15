@@ -27,7 +27,8 @@ module.exports["basics"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).render(), 'if ($foo) {$bar = 42;\n}\n\n');
+        test.equal(Compiler.compile(node).render(),
+            'if ($foo) {$bar = 42;\n}\n\n');
         test.done();
     },
 
@@ -47,7 +48,8 @@ module.exports["basics"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node).render(), 'if ($foo) {$bar = 42;\n}\n\nelse {$bar = 32;\n}\n\n');
+        test.equal(Compiler.compile(node).render(),
+            'if ($foo) {$bar = 42;\n}\n\nelse {$bar = 32;\n}\n\n');
         test.done();
     },
 
@@ -80,7 +82,7 @@ module.exports["basics"] = {
 
 module.exports["async"] = {
 
-    "positive with continuation creates else": function (test) {
+    "positive with async body creates else": function (test) {
 
         // should create a context
         // should call compile on each statement
@@ -96,10 +98,10 @@ module.exports["async"] = {
                 tail: null}
         };
 
-        var scope = new Scope(null, "cc.call();");
+        var scope = new Scope();
 
         test.equal(Compiler.compile(node, scope).render(),
-            "if ($foo) {task.sendMessage($foo, [], function (P0) {$bar = P0;\ncc.call();}, null);\n\n}\n\nelse {cc.call();}\n\n");
+            "var cont = function () {};if ($foo) {task.sendMessage($foo, [], function (P0) {$bar = P0;\ncont();}, null);\n\n}\n\nelse {cont();}\n\n");
         test.done();
     },
 
@@ -122,10 +124,10 @@ module.exports["async"] = {
                 tail: null}
         };
 
-        var scope = new Scope(null, "cc.call();");
+        var scope = new Scope();
 
         test.equal(Compiler.compile(node, scope).render(),
-            "if ($foo) {task.reply(42);\nreturn;}\n\nelse {cc.call();}\n\n");
+            "if ($foo) {task.reply(42);\nreturn;}\n\n");
         test.done();
     }
 };

@@ -1,9 +1,10 @@
 /**
  * Here's how this works:
  *
- * constructs contain fragments of JS, some with annotations, that can be rendered into JS
+ * Constructs contain fragments of JS, some with annotations, that can be rendered into JS
  *
- * for sync message expressions, we need to wrap the enclosing JS in a callback
+ * A construct can be attach()ed to another one, assuming they're both statements. In the
+ * simple case this just concatenates them, but it could also infix the following statement.
  */
 
 "use strict";
@@ -14,36 +15,27 @@ var util = require('util');
 /**
  *
  * @param parts     an array of strings or JsConstructs
- * @param sync      true if this construct contains or implements sync calls
+ * @param post      any parts of this construct that need to come *after* following statements
+ * @param async
  */
-var JsConstruct = function (parts, sync) {
+var JsConstruct = function (parts, post, async) {
 
     // enable a single fragment to be passed in directly
-    this.parts = Array.isArray(parts) ? parts : [parts];
 
-    this.sync = sync || false;
-};
+    this.parts = Array.isArray(parts) ? parts : (parts ? [parts] : []);
+    this.post = Array.isArray(post) ? post : (post ? [post] : []);
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @return {Boolean}
- */
-JsConstruct.prototype.isSync = function () {
-    return this.sync;
+    // do we need this explicit, or can we infer from looking at post?
+    this.async = async || false;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Returns a JsConstruct with SyncMessages resolved by wrapping the construct in as many Messages as required.
  */
-JsConstruct.prototype.resolve = function (placeholderNum) {
+JsConstruct.prototype.resolve = function () {
 
     var wrappers = [];
-
-    if (placeholderNum === undefined) {
-        placeholderNum = 0;
-    }
 
     // scan the fragments swapping SyncMessages for placeholders
 
@@ -66,15 +58,17 @@ JsConstruct.prototype.resolve = function (placeholderNum) {
         if (typeof part === 'object') {
 
             if (part instanceof SyncMessage) {
-                wrappers.unshift(part);
-                part.placeholder = 'P' + placeholderNum++;
-                return part.placeholder; // todo - maybe we can let the wrapper know its position here?
+                var placeholderName = 'P' + wrappers.length;
+                wrappers.push(part);
+                return placeholderName;
             }
-            else if (part instanceof JsConstruct) {
+
+            if (part instanceof JsConstruct) {
                 // try flattening for now
                 return analyze(part.parts);
             }
-            else if (part.csv !== undefined) {
+
+            if (part.csv !== undefined) {
                 return {csv: analyze(part.csv)};
             }
 
@@ -86,23 +80,59 @@ JsConstruct.prototype.resolve = function (placeholderNum) {
         throw new Error("unexpected JS part in resolve: " + util.inspect(part, {depth: null}));
     };
 
-    var parts = this.parts.reduce(function (accum, current) {
+    // filter the parts
+    // could we lose our async flag here?
+    var stmt = new JsConstruct(this.parts.reduce(function (accum, current) {
         return accum.concat(analyze(current));
-    }, []);
-
-    // no change
+    }, []), this.post);
 
     if (wrappers.length == 0) {
         return this;
     }
 
-    // render any necessary wrappers
+    // might be a nicer way to do this using reduce
 
-    wrappers.forEach(function (sm) {
-        parts = sm.wrap(parts).resolve(placeholderNum);
-    });
+    var wrap = function (stmt, wrappers, index) {
 
-    return new JsConstruct(parts);
+        if (index === undefined) {
+            index = 0;
+        }
+
+        if (index == wrappers.length) {
+            return stmt;
+        }
+
+        var sm = wrappers[index];
+
+        var parts = ['task.sendMessage(',
+            sm.address, ', [', {csv: sm.args}, '], function (P' + index + ') {'];
+
+        var post = ['}, null);\n\n'];
+
+        var wrapper = new JsConstruct(parts, post, true);
+
+        return wrapper.attach(wrap(stmt, wrappers, index + 1));
+    };
+
+    return wrap(stmt, wrappers).resolve();
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Attach the given statement to this statement.
+ *
+ * @param stmt
+ */
+JsConstruct.prototype.attach = function (stmt) {
+
+    this.parts = this.parts.concat(stmt.parts);
+    this.post = stmt.post.concat(this.post);
+
+    this.async = this.async || stmt.async;
+
+    // be fluent
+    // could alternatively be functional about it and return a new construct
+    return this;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,7 +143,9 @@ JsConstruct.prototype.resolve = function (placeholderNum) {
  */
 JsConstruct.prototype.render = function (pretty) {
 
-    return JsConstruct.renderFragment(this.parts, pretty);
+    //console.log(util.inspect(this, {depth: null}));
+    return JsConstruct.renderFragment(this.parts, pretty) +
+        JsConstruct.renderFragment(this.post, pretty);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -185,12 +217,9 @@ JsConstruct.renderFragment = function (fragment, pretty) {
  * @param contingency
  * @param replyParams
  * @param failParams
- * @param syncWrapper
  * @return {*}
  */
-JsConstruct.buildMessage = function (address, args, subsequent, contingency, replyParams, failParams, syncWrapper) {
-
-    // render an async call
+JsConstruct.buildMessage = function (address, args, subsequent, contingency, replyParams, failParams) {
 
     if (replyParams === undefined) {
         replyParams = 'args';
@@ -218,20 +247,21 @@ JsConstruct.buildMessage = function (address, args, subsequent, contingency, rep
 
     parts.push(');\n\n');
 
-    return new JsConstruct(parts, syncWrapper);
+    return new JsConstruct(parts);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param body
+ * @param pre
+ * @param post
  */
-JsConstruct.makeContinuation = function (name, body) {
+JsConstruct.makeStatement = function (pre, post) {
 
-    return new JsConstruct(["var " + name + " = function () {\n", body, "\n};\n"]);
+    return new JsConstruct(pre, post).resolve();
 };
 
 module.exports = JsConstruct;
 
-// escape the cyclic dependency
+// end the cycle of dependency
 var SyncMessage = require('./SyncMessage');

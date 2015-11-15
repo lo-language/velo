@@ -33,7 +33,8 @@ module.exports["statement lists"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo = 42;\n$bar = 57;\n');
+        test.equal(Compiler.compile(node).render(),
+            '$foo = 42;\n$bar = 57;\n');
         test.done();
     },
 
@@ -64,7 +65,8 @@ module.exports["statement lists"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), 'task.sendMessage($bar, [42], function (P0) {$foo = P0;\n$baz = 57;\n}, null);\n\n');
+        test.equal(Compiler.compile(node).render(),
+            'task.sendMessage($bar, [42], function (P0) {$foo = P0;\n$baz = 57;\n}, null);\n\n');
         test.done();
     }
 };

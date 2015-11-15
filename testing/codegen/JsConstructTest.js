@@ -84,7 +84,7 @@ module.exports["resolve"] = {
 
     "one part passthrough": function (test) {
 
-        var expr = new JsConstruct('var x = args.shift();').resolve();
+        var expr = new JsConstruct(['var x = args.shift();']).resolve();
 
         test.equal(expr.render(), 'var x = args.shift();');
         test.done();
@@ -142,7 +142,7 @@ module.exports["resolve"] = {
 
         var expr = new JsConstruct([new SyncMessage('$foo', [new SyncMessage('$bar')]), ';']).resolve();
 
-        test.equal(expr.render(), 'task.sendMessage($bar, [], function (P1) {task.sendMessage($foo, [P1], function (P0) {P0;}, null);\n\n}, null);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($bar, [], function (P0) {task.sendMessage($foo, [P0], function (P0) {P0;}, null);\n\n}, null);\n\n');
         test.done();
     },
 
@@ -154,7 +154,73 @@ module.exports["resolve"] = {
                 new SyncMessage('$quux', [new SyncMessage('$snux')])
             ]), ';']).resolve();
 
-        test.equal(expr.render(), 'task.sendMessage($baz, [], function (P3) {task.sendMessage($bar, [P3], function (P1) {task.sendMessage($snux, [], function (P3) {task.sendMessage($quux, [P3], function (P2) {task.sendMessage($foo, [P1, P2], function (P0) {P0;}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($baz, [], function (P0) {task.sendMessage($snux, [], function (P1) {task.sendMessage($bar, [P0], function (P0) {task.sendMessage($quux, [P1], function (P1) {task.sendMessage($foo, [P0, P1], function (P0) {P0;}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n');
+        test.done();
+    }
+};
+
+module.exports["attach"] = {
+
+    "sync head and tail": function (test) {
+
+        var a = new JsConstruct('var x = args.shift();');
+        var b = new JsConstruct('var y = args.shift();');
+
+        a.attach(b);
+
+        test.equal(a.render(), 'var x = args.shift();var y = args.shift();');
+        test.equal(a.async, false);
+        test.done();
+    },
+
+    "sync head async tail": function (test) {
+
+        var a = new JsConstruct('var x = args.shift();');
+        var b = new JsConstruct('task.sendMessage([], function (p0) {p0;', '});', true);
+
+        a.attach(b);
+
+        test.equal(a.render(), 'var x = args.shift();task.sendMessage([], function (p0) {p0;});');
+        test.equal(a.async, true);
+        test.done();
+    },
+
+    "async head sync tail": function (test) {
+
+        var a = new JsConstruct('task.sendMessage([], function (p0) {p0;', '});', true);
+        var b = new JsConstruct('var x = args.shift();');
+
+        a.attach(b);
+
+        test.equal(a.render(), 'task.sendMessage([], function (p0) {p0;var x = args.shift();});');
+        test.equal(a.async, true);
+        test.done();
+    },
+
+    "async head and tail": function (test) {
+
+        var a = new JsConstruct('task.sendMessage([], function (p0) {p0;', '});', true);
+        var b = new JsConstruct('task.sendMessage([], function (p1) {p1;', '});', true);
+
+        a.attach(b);
+
+        test.equal(a.render(), 'task.sendMessage([], function (p0) {p0;task.sendMessage([], function (p1) {p1;});});');
+        test.equal(a.async, true);
+        test.done();
+    },
+
+    "triple threat": function (test) {
+
+        var a = new JsConstruct('task.sendMessage([], function (p0) {p0;', '});', true);
+        var b = new JsConstruct('task.sendMessage([], function (p1) {p1;', '});', true);
+        var c = new JsConstruct('task.sendMessage([], function (p2) {p2;', '});', true);
+
+        // the compiler would do them in this order
+        b.attach(c);
+        a.attach(b);
+
+        test.equal(a.render(), 'task.sendMessage([], function (p0) {p0;task.sendMessage([], function (p1) {p1;task.sendMessage([], function (p2) {p2;});});});');
+        test.equal(a.async, true);
         test.done();
     }
 };
@@ -166,7 +232,7 @@ module.exports["build message"] = {
         var msg = JsConstruct.buildMessage('$foo', []);
 
         test.equal(msg.render(), 'task.sendMessage($foo, [], null, null);\n\n');
-        test.equal(msg.isSync(), false);
+        //test.equal(msg.isSync(), false);
         test.done();
     },
 
@@ -175,7 +241,7 @@ module.exports["build message"] = {
         var msg = JsConstruct.buildMessage('$foo', [], "x = 1;", null, 'scragh', 'args');
 
         test.equal(msg.render(), 'task.sendMessage($foo, [], function (scragh) {x = 1;}, null);\n\n');
-        test.equal(msg.isSync(), false);
+        //test.equal(msg.isSync(), false);
         test.done();
     },
 
@@ -184,7 +250,7 @@ module.exports["build message"] = {
         var msg = JsConstruct.buildMessage('$foo', [], "x = 1;", null, 'scragh', 'args', true);
 
         test.equal(msg.render(), 'task.sendMessage($foo, [], function (scragh) {x = 1;}, null);\n\n');
-        test.ok(msg.isSync());
+        //test.ok(msg.isSync());
         test.done();
     }
 };
