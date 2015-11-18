@@ -297,13 +297,28 @@ literal
     | NUMBER -> {type: 'number', val: $1}
     | STRING -> {type: 'string', val: $1}
     | SERVICE ':' block -> {type: 'procedure', body: $3}
-    | '[' BEGIN? (dyad ',')* dyad? END? ']' -> {type: 'list', elements: $4 ? $3.concat([$4]): []}
+    | '[' BEGIN? list_items END? ']' -> {type: 'list', elements: $3}
     | '{' BEGIN? (field ',')* field? END? '}' -> {type: 'record', fields: $4 ? $3.concat([$4]): []}
     ;
 
+list_items
+    : -> []
+    | expr_list
+    | dyad_list
+    ;
+
+expr_list
+    : expr -> [$1]
+    | expr_list ',' expr -> $1.concat($3)
+    ;
+
+dyad_list
+    : dyad -> [$1]
+    | dyad_list ',' dyad -> $1.concat($3)
+    ;
+
 dyad
-    : expr
-    | expr ':' expr -> {type: 'dyad', key: $1, value: $3};
+    : expr ':' expr -> {type: 'dyad', key: $1, value: $3}
     ;
 
 field
