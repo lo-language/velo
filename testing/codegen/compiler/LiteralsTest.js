@@ -46,7 +46,7 @@ module.exports["literals"] = {
     "list": function (test) {
 
         var node = {
-            type: 'list',
+            type: 'array',
             elements:
                 [ { type: 'string', val: 'foo' },
                     { type: 'string', val: 'mani' },
@@ -60,7 +60,7 @@ module.exports["literals"] = {
     "map": function (test) {
 
         var node = {
-            type: 'list',
+            type: 'map',
             elements:
                 [ { type: 'dyad',
                     key: { type: 'string', val: 'Zaphod' },

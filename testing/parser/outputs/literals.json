@@ -1,222 +1,225 @@
-{"type":"procedure", "body":{
-    "type":"stmt_list",
-    "head":{
-        "type":"assign",
-        "op":"=",
-        "left":{
-            "type":"id",
-            "name":"x"
-        },
-        "right":{
-            "type":"boolean",
-            "val":true
-        }
-    },
-    "tail":{
-        "type":"stmt_list",
-        "head":{
-            "type":"assign",
-            "op":"=",
-            "left":{
-                "type":"id",
-                "name":"y"
+{
+    "type": "procedure",
+    "body": {
+        "type": "stmt_list",
+        "head": {
+            "type": "assign",
+            "op": "=",
+            "left": {
+                "type": "id",
+                "name": "x"
             },
-            "right":{
-                "type":"boolean",
-                "val":false
+            "right": {
+                "type": "boolean",
+                "val": true
             }
         },
-        "tail":{
-            "type":"stmt_list",
-            "head":{
-                "type":"assign",
-                "op":"=",
-                "left":{
-                    "type":"id",
-                    "name":"answer"
+        "tail": {
+            "type": "stmt_list",
+            "head": {
+                "type": "assign",
+                "op": "=",
+                "left": {
+                    "type": "id",
+                    "name": "y"
                 },
-                "right":{
-                    "type":"number",
-                    "val":"42"
+                "right": {
+                    "type": "boolean",
+                    "val": false
                 }
             },
-            "tail":{
-                "type":"stmt_list",
-                "head":{
-                    "type":"assign",
-                    "op":"=",
-                    "left":{
-                        "type":"id",
-                        "name":"age"
+            "tail": {
+                "type": "stmt_list",
+                "head": {
+                    "type": "assign",
+                    "op": "=",
+                    "left": {
+                        "type": "id",
+                        "name": "answer"
                     },
-                    "right":{
-                        "type":"number",
-                        "val":"63.4"
+                    "right": {
+                        "type": "number",
+                        "val": "42"
                     }
                 },
-                "tail":{
-                    "type":"stmt_list",
-                    "head":{
-                        "type":"assign",
-                        "op":"=",
-                        "left":{
-                            "type":"id",
-                            "name":"message"
+                "tail": {
+                    "type": "stmt_list",
+                    "head": {
+                        "type": "assign",
+                        "op": "=",
+                        "left": {
+                            "type": "id",
+                            "name": "age"
                         },
-                        "right":{
-                            "type":"string",
-                            "val":"hello, world!"
+                        "right": {
+                            "type": "number",
+                            "val": "63.4"
                         }
                     },
-                    "tail":{
-                        "type":"stmt_list",
-                        "head":{
-                            "type":"assign",
-                            "op":"=",
-                            "left":{
-                                "type":"id",
-                                "name":"names"
+                    "tail": {
+                        "type": "stmt_list",
+                        "head": {
+                            "type": "assign",
+                            "op": "=",
+                            "left": {
+                                "type": "id",
+                                "name": "message"
                             },
-                            "right":{
-                                "type":"list",
-                                "elements":[
-                                    {
-                                        "type":"string",
-                                        "val":"Ford"
-                                    },
-                                    {
-                                        "type":"string",
-                                        "val":"Arthur"
-                                    },
-                                    {
-                                        "type":"string",
-                                        "val":"Trillian"
-                                    },
-                                    {
-                                        "type":"string",
-                                        "val":"Zaphod"
-                                    }
-                                ]
+                            "right": {
+                                "type": "string",
+                                "val": "hello, world!"
                             }
                         },
-                        "tail":{
-                            "type":"stmt_list",
-                            "head":{
-                                "type":"assign",
-                                "op":"=",
-                                "left":{
-                                    "type":"id",
-                                    "name":"homes"
+                        "tail": {
+                            "type": "stmt_list",
+                            "head": {
+                                "type": "assign",
+                                "op": "=",
+                                "left": {
+                                    "type": "id",
+                                    "name": "names"
                                 },
-                                "right":{
-                                    "type":"list",
-                                    "elements":[
+                                "right": {
+                                    "type": "array",
+                                    "elements": [
                                         {
-                                            "type":"dyad",
-                                            "key":{
-                                                "type":"string",
-                                                "val":"Ford"
-                                            },
-                                            "value":{
-                                                "type":"string",
-                                                "val":"Betelgeuse"
-                                            }
+                                            "type": "string",
+                                            "val": "Ford"
                                         },
                                         {
-                                            "type":"dyad",
-                                            "key":{
-                                                "type":"string",
-                                                "val":"Arthur"
-                                            },
-                                            "value":{
-                                                "type":"string",
-                                                "val":"Earth"
-                                            }
+                                            "type": "string",
+                                            "val": "Arthur"
                                         },
                                         {
-                                            "type":"dyad",
-                                            "key":{
-                                                "type":"string",
-                                                "val":"Trillian"
-                                            },
-                                            "value":{
-                                                "type":"string",
-                                                "val":"Earth"
-                                            }
+                                            "type": "string",
+                                            "val": "Trillian"
                                         },
                                         {
-                                            "type":"dyad",
-                                            "key":{
-                                                "type":"string",
-                                                "val":"Zaphod"
-                                            },
-                                            "value":{
-                                                "type":"string",
-                                                "val":"Betelgeuse"
-                                            }
+                                            "type": "string",
+                                            "val": "Zaphod"
                                         }
                                     ]
                                 }
                             },
-                            "tail":{
-                                "type":"stmt_list",
-                                "head":{
-                                    "type":"assign",
-                                    "op":"=",
-                                    "left":{
-                                        "type":"id",
-                                        "name":"HardyRamanujan"
+                            "tail": {
+                                "type": "stmt_list",
+                                "head": {
+                                    "type": "assign",
+                                    "op": "=",
+                                    "left": {
+                                        "type": "id",
+                                        "name": "homes"
                                     },
-                                    "right":{
-                                        "type":"procedure",
-                                        "body":{
-                                            "type":"stmt_list",
-                                            "head":{
-                                                "type":"response",
-                                                "channel":"reply",
-                                                "args":[
-                                                    {
-                                                        "type":"number",
-                                                        "val":"1729"
-                                                    }
-                                                ]
+                                    "right": {
+                                        "type": "map",
+                                        "elements": [
+                                            {
+                                                "type": "dyad",
+                                                "key": {
+                                                    "type": "string",
+                                                    "val": "Ford"
+                                                },
+                                                "value": {
+                                                    "type": "string",
+                                                    "val": "Betelgeuse"
+                                                }
                                             },
-                                            "tail":null
-                                        }
+                                            {
+                                                "type": "dyad",
+                                                "key": {
+                                                    "type": "string",
+                                                    "val": "Arthur"
+                                                },
+                                                "value": {
+                                                    "type": "string",
+                                                    "val": "Earth"
+                                                }
+                                            },
+                                            {
+                                                "type": "dyad",
+                                                "key": {
+                                                    "type": "string",
+                                                    "val": "Trillian"
+                                                },
+                                                "value": {
+                                                    "type": "string",
+                                                    "val": "Earth"
+                                                }
+                                            },
+                                            {
+                                                "type": "dyad",
+                                                "key": {
+                                                    "type": "string",
+                                                    "val": "Zaphod"
+                                                },
+                                                "value": {
+                                                    "type": "string",
+                                                    "val": "Betelgeuse"
+                                                }
+                                            }
+                                        ]
                                     }
                                 },
-                                "tail":{
-                                    "type":"stmt_list",
-                                    "head":{
-                                        "type":"assign",
-                                        "op":"=",
-                                        "left":{
-                                            "type":"id",
-                                            "name":"pairs"
+                                "tail": {
+                                    "type": "stmt_list",
+                                    "head": {
+                                        "type": "assign",
+                                        "op": "=",
+                                        "left": {
+                                            "type": "id",
+                                            "name": "HardyRamanujan"
                                         },
-                                        "right":{
-                                            "type":"record",
-                                            "fields":[
-                                                {
-                                                    "type":"field",
-                                                    "name":"key1",
-                                                    "value":{
-                                                        "type":"string",
-                                                        "val":"alpha"
-                                                    }
+                                        "right": {
+                                            "type": "procedure",
+                                            "body": {
+                                                "type": "stmt_list",
+                                                "head": {
+                                                    "type": "response",
+                                                    "channel": "reply",
+                                                    "args": [
+                                                        {
+                                                            "type": "number",
+                                                            "val": "1729"
+                                                        }
+                                                    ]
                                                 },
-                                                {
-                                                    "type":"field",
-                                                    "name":"key2",
-                                                    "value":{
-                                                        "type":"string",
-                                                        "val":"bravo"
-                                                    }
-                                                }
-                                            ]
+                                                "tail": null
+                                            }
                                         }
                                     },
-                                    "tail":null
+                                    "tail": {
+                                        "type": "stmt_list",
+                                        "head": {
+                                            "type": "assign",
+                                            "op": "=",
+                                            "left": {
+                                                "type": "id",
+                                                "name": "pairs"
+                                            },
+                                            "right": {
+                                                "type": "record",
+                                                "fields": [
+                                                    {
+                                                        "type": "field",
+                                                        "name": "key1",
+                                                        "value": {
+                                                            "type": "string",
+                                                            "val": "alpha"
+                                                        }
+                                                    },
+                                                    {
+                                                        "type": "field",
+                                                        "name": "key2",
+                                                        "value": {
+                                                            "type": "string",
+                                                            "val": "bravo"
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        "tail": null
+                                    }
                                 }
                             }
                         }
@@ -225,4 +228,4 @@
             }
         }
     }
-}}
+}

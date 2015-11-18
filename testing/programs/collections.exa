@@ -3,18 +3,42 @@
  * 12/25/14
  */
 
-// list literal
+// Array literal (including empty), access, and cardinality
+array = [];
 words = ["foo", "mani", "padme", "hum"];
 
-// test cardinality
+if #array != 0:
+    fail "problem";
 
+if words[2] != "padme":
+    fail "oh me oh my";
+
+if #words != 4:
+    fail "what the deuce?!";
+
+// Map literal (including empty), access, and cardinality
+map = [:];
+cities = ["nyc":"New York", "phi":"Philadelphia"];
+
+if #map != 0:
+    fail "problem";
+
+if cities.nyc != "New York":
+    fail "something happened";
+
+if cities["nyc"] != "New York":
+    fail "whoops";
+
+if #cities != 2:
+    fail "what the deuce?!";
+
+
+// String cardinality
 name = "snooks";
 
 if #name < 6:
     fail "WHAT?!";
 
-if #words != 4:
-    fail "what the deuce?!";
 
 //if #dudes < 3:
 //    fail "not very froody";

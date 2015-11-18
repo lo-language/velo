@@ -600,29 +600,25 @@ __['string'] = function (node) {
  * @param scope
  * @param node
  */
-__['list'] = function (node, scope) {
+var compileList = function (node, scope) {
 
     // list literals might have members that need to be realized
 
     var self = this;
 
-    var isMap = false;
-
     var items = node.elements.map(function (item) {
-
-        if (item.type == 'dyad') {
-            isMap = true;
-        }
-
         return self.compile(item, scope);
     });
 
-    if (isMap) {
+    if (node.type == 'map') {
         return new JsConstruct(['{', {csv: items}, '}']);
     }
 
     return new JsConstruct(['[', {csv: items}, ']']);
 };
+
+__['array'] = compileList;
+__['map'] = compileList;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
