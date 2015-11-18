@@ -47,7 +47,7 @@ __.prototype.declare = function (name) {
  */
 __.prototype.define = function (name, value) {
 
-    if (this.constants['@' + name] !== undefined) {
+    if (this.isConstant(name)) {
         throw new Error(name + " is a constant in this scope");
     }
 
