@@ -103,6 +103,10 @@ __.prototype.isConstant = function (name) {
         return true;
     }
 
+    if (this.vars['@' + name] !== undefined) {
+        return false;
+    }
+
     if (this.parent) {
         return this.parent.isConstant(name);
     }
