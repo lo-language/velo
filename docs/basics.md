@@ -55,6 +55,7 @@ Collections in Exa are not objects; they're local values that can be directly mo
 ```
 fibs = [0, 1, 1, 2, 3, 5, 8];
 articles = ["a", "an", "the"];
+empty = [];
 
 fibs[3];		// 2
 fibs[fibs[3]]	// 1
@@ -68,6 +69,8 @@ x = fibs{0};	// extract the first element
 y = fibs{-1};	// extract the last element
 ```
 
+You can create an empty array with the syntax `[]`.
+
 The extraction operator `{}` removes the specified element from a collection and evaluates to the value of the removed element. If an array, the collection then resizes - there can't be "gaps" in arrays.
 
 **Maps** are unordered collections of any number of homogeneous elements which are retrievable by unique scalar index (string or number). Map literals are also delimited by square brackets.
@@ -80,9 +83,12 @@ greats = [
 	"Jelly Roll Morton":	"Piano"
 	"Louis Armstrong":		"Trumpet"
 ];
+empty = [:];
 
 bennyInstrument = greats["Benny Goodman"]; // Clarinet
 ```
+
+You can create an empty map with the syntax `[:]`.
 
 You can get the length of any collection in constant time with the cardinality operator `#`.
 
