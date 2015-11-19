@@ -127,6 +127,11 @@ module.exports["child scope"] = {
         // should not be defined in the parent
         test.equal(parent.has('bar'), false);
 
+        // override constant with a var in child is permitted
+        child.declare('foo');
+        test.equal(child.has('foo'), true);
+        test.equal(child.isConstant('foo'), false);
+ 
         test.done();
     }
 };
