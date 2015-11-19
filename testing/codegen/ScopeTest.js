@@ -113,6 +113,9 @@ module.exports["child scope"] = {
         test.ok(child.isConstant('foo'));
         test.equal(child.resolve('foo'), 42);
 
+        // redfine constant in child fails
+        test.throws(function () {child.define('foo', 3.14);});
+
         // define bar in the child
         child.define('bar', "53");
         test.equal(child.has('bar'), true);
