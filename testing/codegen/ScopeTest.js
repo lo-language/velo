@@ -25,7 +25,7 @@ module.exports["basics"] = {
         test.equal(scope.has('foo'), true);
         test.deepEqual(scope.getJsVars(), ['$foo']);
 
-        // redefine as constant fails
+        // define a constant with the same name fails
         test.throws(function () {scope.define('foo', 42);});
 
         test.done();
@@ -67,6 +67,9 @@ module.exports["basics"] = {
         // declare as var now fails
         test.throws(function () {scope.declare('port');});
 
+        // define another constant with the same name fails
+        test.throws(function() {scope.define('port', 8000);});
+
         test.done();
     }
 };
@@ -95,6 +98,9 @@ module.exports["child scope"] = {
         // should not be defined in the parent
         test.equal(parent.has('bar'), false);
 
+        // define a constant in child with the same name as a parent var fails
+        test.throws(function() {child.define('foo', 42);});
+
         test.done();
     },
 
@@ -112,6 +118,12 @@ module.exports["child scope"] = {
         test.ok(child.has('foo'));
         test.ok(child.isConstant('foo'));
         test.equal(child.resolve('foo'), 42);
+
+        // define constant in child with same name as parent constant fails
+        test.throws(function () {child.define('foo', 3.14);});
+
+        // declare var in child with same name as parent constant fails
+        test.throws(function() {child.declare('foo');})
 
         // define bar in the child
         child.define('bar', "53");
