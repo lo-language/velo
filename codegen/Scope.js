@@ -31,7 +31,7 @@ var __ = function (parent) {
  */
 __.prototype.declare = function (name) {
 
-    if (this.constants['@' + name] !== undefined) {
+    if (this.isConstant(name)) {
         throw new Error(name + " is a constant in this scope");
     }
 
@@ -47,12 +47,8 @@ __.prototype.declare = function (name) {
  */
 __.prototype.define = function (name, value) {
 
-    if (this.isConstant(name)) {
-        throw new Error(name + " is a constant in this scope");
-    }
-
-    if (this.vars['@' + name] !== undefined) {
-        throw new Error(name + " is a variable in this scope");
+    if (this.has(name)) {
+        throw new Error(name + " is a constant or variable in this scope");
     }
 
     this.constants['@' + name] = value;
@@ -101,10 +97,6 @@ __.prototype.isConstant = function (name) {
 
     if (this.constants['@' + name] !== undefined) {
         return true;
-    }
-
-    if (this.vars['@' + name] !== undefined) {
-        return false;
     }
 
     if (this.parent) {
