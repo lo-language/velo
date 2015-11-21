@@ -1,14 +1,15 @@
 receive args, io;
 
+path = [];
 num = 0;
 
-max is 1000;
+max is 10001;
 
 while num < max:
 
-//    if num % 1000 == 0:
-        io.stdout.write ~ "nork\n";
+    if num % 1000 == 0:
+        num -> path;
 
     num++;
 
-io.stdout.write("`num`\n");
+io.stdout.write("`path`\n");

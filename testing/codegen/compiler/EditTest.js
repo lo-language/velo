@@ -33,10 +33,16 @@ module.exports["basics"] = {
         test.done();
     },
 
-    "push back": function (test) {
+    "splice": function (test) {
+
+        // weld is very runtime-dependent
+        // item -> list appends item
+        // item -> list[0] prepends item, etc.
+        // item -> item creates list of two items
+        // list -> list appends lists
 
         var node = {
-            "type": "push_back",
+            "type": "splice",
             "list": {
                 "type": "id",
                 "name": "list"
@@ -48,24 +54,6 @@ module.exports["basics"] = {
         };
 
         test.equal(Compiler.compile(node).render(), '$list.push($item);\n');
-        test.done();
-    },
-
-    "push front": function (test) {
-
-        var node = {
-            "type": "push_front",
-            "list": {
-                "type": "id",
-                "name": "list"
-            },
-            "item": {
-                "type": "id",
-                "name": "item"
-            }
-        };
-
-        test.equal(Compiler.compile(node).render(), '$list.unshift($item);\n');
         test.done();
     }
 };

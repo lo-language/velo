@@ -90,11 +90,9 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "*="                    return '*='
 "/="                    return '/='
 "%="                    return '%='
-"<+"                    return 'PUSH_BACK'
-"+>"                    return 'PUSH_FRONT'
+"->"                    return 'SPLICE'
 "=>"                    return '=>' // future connector
 ">>"                    return 'SERVICE'
-"><"                    return 'CONS'
 "+"                     return '+'
 "-"                     return '-'
 "*"                     return '*'
@@ -134,7 +132,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 
 %options token-stack
 
-%left 'PUSH_BACK' 'PUSH_FRONT' '=>'
+%left 'SPLICE' '=>'
 %left 'SEQ' 'AND' 'OR' 'IN'
 %left '==' '!=' '<' '>' '<=' '>='
 %left '+' '-'
@@ -253,8 +251,7 @@ assignment_op
 edit
     : lvalue '++' -> {type: 'increment', operand: $1}
     | lvalue '--' -> {type: 'decrement', operand: $1}
-    | lvalue PUSH_BACK expr -> {type: 'push_back', list: $1, item: $3}
-    | expr PUSH_FRONT lvalue -> {type: 'push_front', list: $3, item: $1}
+    | expr SPLICE lvalue -> {type: 'splice', item: $1, list: $3}
     ;
 
 conditional
@@ -358,7 +355,7 @@ expr
     ;
 
 // a dispatch is like a switch statement
-// the subsequent/contingency blocks are continuations, not procedures
+// the subsequent/contingency blocks are handlers, not services
 
 dispatch
     : future ';'

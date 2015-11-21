@@ -16,7 +16,7 @@ explore = >>:
         if point in path:
             io.stdout.write("bummer\n");
         else:
-            path <+ point;
+            point -> path;
             explore(path);
 
         point++;

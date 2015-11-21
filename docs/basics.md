@@ -55,23 +55,31 @@ Collections in Exa are not objects; they're local values that can be directly mo
 ```
 fibs = [0, 1, 1, 2, 3, 5, 8];
 articles = ["a", "an", "the"];
-empty = [];
 
 fibs[3];		// 2
 fibs[fibs[3]]	// 1
 fibs[-1];		// syntactic sugar for terminal value (8) **
 fibs[-2];		// syntactic sugar for 2nd-to-last element **
 
-fibs <+ 13;		// pushes a value onto the back of the array **
-0 +> fibs;		// pushes a value onto the front of the array **
+mountains = [];                // create an empty array
+"Denali" -> mountains;         // pushes a value onto the back
+"Everest" -> mountains[0];     // pushes a value onto the front **
+"Kanchenjunga" -> mountains[1] // pushes a value between elements 0 and 1 **
 
 x = fibs{0};	// extract the first element
 y = fibs{-1};	// extract the last element
 ```
 
-You can create an empty array with the syntax `[]`.
+The extraction operator `{}` removes the specified element from a collection and evaluates to the value of the removed element. If an array, the length is decreased – extraction doesn't leave a "hole" in an array.
 
-The extraction operator `{}` removes the specified element from a collection and evaluates to the value of the removed element. If an array, the collection then resizes - there can't be "gaps" in arrays.
+The splice operator `->` splices elements and lists together as if they were pieces of paper. Elements and arrays can be spliced into arrays at the front, back, or in the middle.
+
+```
+mountains = [];                // create an empty array
+"Denali" -> mountains;         // pushes a value onto the back
+"Everest" -> mountains[0];     // pushes a value onto the front **
+"Kanchenjunga" -> mountains[1] // pushes a value between elements 0 and 1 **
+```
 
 **Maps** are unordered collections of any number of homogeneous elements which are retrievable by unique scalar index (string or number). Map literals are also delimited by square brackets.
 

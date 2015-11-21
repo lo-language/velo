@@ -21,27 +21,34 @@
       "tail": {
         "type": "stmt_list",
         "head": {
-          "type": "push_back",
+          "type": "splice",
           "list": {
-            "type": "id",
-            "name": "list"
+            "type": "subscript",
+            "list": {
+              "type": "id",
+              "name": "foo"
+            },
+            "index": {
+              "type": "number",
+              "val": "0"
+            }
           },
           "item": {
-            "type": "id",
-            "name": "item"
+            "type": "number",
+            "val": "42"
           }
         },
         "tail": {
           "type": "stmt_list",
           "head": {
-            "type": "push_front",
+            "type": "splice",
             "list": {
               "type": "id",
-              "name": "list"
+              "name": "mountains"
             },
             "item": {
-              "type": "id",
-              "name": "item"
+              "type": "string",
+              "val": "Denali"
             }
           },
           "tail": null

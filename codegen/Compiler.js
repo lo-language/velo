@@ -691,12 +691,8 @@ __['decrement'] = function (node, scope) {
     return JsConstruct.makeStatement([ __.compile(node.operand, scope), "--;\n"]);
 };
 
-__['push_back'] = function (node, scope) {
+__['splice'] = function (node, scope) {
     return JsConstruct.makeStatement([ __.compile(node.list, scope), ".push(", __.compile(node.item, scope), ");\n"]);
-};
-
-__['push_front'] = function (node, scope) {
-    return JsConstruct.makeStatement([ __.compile(node.list, scope), ".unshift(", __.compile(node.item, scope), ");\n"]);
 };
 
 module.exports = __;

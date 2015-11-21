@@ -1,5 +1,5 @@
 foo++;
 foo--;
 
-list <+ item;
-item +> list;
+42 -> foo[0];
+"Denali" -> mountains;
