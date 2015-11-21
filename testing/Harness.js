@@ -50,7 +50,7 @@ __.prototype.testSuccess = function (test, input, expected) {
 
     var _this = this;
 
-    Q().then(function () {
+    return Q().then(function () {
         return module.run(input);
     }).then(
         function (result) {
@@ -65,7 +65,7 @@ __.prototype.testSuccess = function (test, input, expected) {
             console.error("error running " + _this.program + ".exa: " + err);
             console.log(_this.getJs());
         }
-    ).done();
+    );
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,16 +1,19 @@
-/**
- * this is dumb logic just meant to trigger a call to a loop continuation where that loop has a cond in it
- */
+receive log;
 
-num = 4;
+num = 0;
+val = 0;
 
-while num < 2:
+while num < 3:
 
-    if num > 3:
-        num++;
+    if num > 1:
+        log ~ "hello hello!\n";
     else:
-        num = 3;
+        log ~ "howdy!\n";
 
     num++;
 
-reply 45;
+while num < 5:
+    log ~ "ok.\n";
+    num++;
+
+reply num;

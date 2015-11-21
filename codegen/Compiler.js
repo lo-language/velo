@@ -249,15 +249,22 @@ __['iteration'] = function (node, scope) {
 
     var condition = __.compile(node.condition, scope);
     var body = __.compile(node.statements, scope);
+    var async = body.async;
 
-    // todo render a while loop if body is non-async!
+    // can render as a while loop if body isn't async
+    if (!async) {
+
+        return JsConstruct.makeStatement([
+            'while (', condition, ')',
+                {block: body}]);
+    }
 
     // join the body to the wrapper function via setImmediate to form the loop in a way that won't break the stack
     body.attach(new JsConstruct("setImmediate(loop);"));
 
     return JsConstruct.makeStatement([
 
-        "var loop = function () {",
+        "let loop = function () {",
             "if (", condition, ") ",
                 {block: body},
             "else {"], ["}};\n\n",

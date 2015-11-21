@@ -173,20 +173,31 @@ module.exports['procedure'] = {
     }
 };
 
-//module.exports['conditional in loop'] = {
-//
-//    "setUp": function (cb) {
-//
-//        this.harness = new Harness(loader, 'condInLoop');
-//
-//        this.harness.setUp(cb);
-//    },
-//
-//    'success': function (test) {
-//
-//        this.harness.testSuccess(test, [], 60);
-//    }
-//};
+module.exports['conditional in loop'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(loader, 'condInLoop');
+
+        this.harness.setUp(cb);
+    },
+
+    'success': function (test) {
+
+        var logMessages = [];
+
+        this.harness.testSuccess(test, [
+            function (task) {
+
+                logMessages.push(task.args[0]);
+                task.tryClose();
+            }
+        ], 5).then(function () {
+
+            test.deepEqual(logMessages, [ 'howdy!\n', 'howdy!\n', 'hello hello!\n', 'ok.\n', 'ok.\n' ]);
+        });
+    }
+};
 
 
 //module.exports['recovery'] = {
