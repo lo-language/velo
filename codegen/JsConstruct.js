@@ -18,15 +18,14 @@ var util = require('util');
  * @param post      any parts of this construct that need to come *after* following statements
  * @param async
  */
-var JsConstruct = function (parts, post, async) {
+var JsConstruct = function (parts, post) {
 
     // enable a single fragment to be passed in directly
 
     this.parts = Array.isArray(parts) ? parts : (parts ? [parts] : []);
     this.post = Array.isArray(post) ? post : (post ? [post] : []);
 
-    // do we need this explicit, or can we infer from looking at post?
-    this.async = async || false;
+    this.async = post ? (post.length > 0) : false;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,7 +108,7 @@ JsConstruct.prototype.resolve = function () {
 
         var post = ['}, null);\n\n'];
 
-        var wrapper = new JsConstruct(parts, post, true);
+        var wrapper = new JsConstruct(parts, post);
 
         return wrapper.attach(wrap(stmt, wrappers, index + 1));
     };

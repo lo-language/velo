@@ -9,20 +9,21 @@ explore = >>:
 
     receive path;
 
+    io.stdout.write ~ "exploring from `path`\n";
+
     point = 0;
 
     while point < numPoints:
 
         if point in path:
-            io.stdout.write("bummer\n");
+            io.stdout.write ~ "`point` exists in `path`\n";
         else:
             point -> path;
             explore(path);
 
         point++;
-
-    io.stdout.write("`path`\n");
-    reply 45;
 ;
 
 found = explore([]);
+
+io.stdout.write("`found`\n");
