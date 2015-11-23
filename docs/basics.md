@@ -166,7 +166,7 @@ As you'd expect, a synchronous request is an expression that evaluates to the va
 foo = sqrt(25);	// foo will be assigned 5
 ```
 
-If a request is sent asynchronously, the next statement will be executed immediately, without waiting for a reply, but a **continuation** to be executed after a reply is received can be attached to the request using the `after` construct.
+If a request is sent asynchronously, the next statement will be executed immediately, without waiting for a reply, but a **consequent** to be executed after a reply is received can be attached to the request using the `after` construct.
 
 ```
 after readFile(fileName):
@@ -175,9 +175,9 @@ after readFile(fileName):
 log("this will be logged first");
 ```
 
-*Note: all statements following an asynchronous request are executed before any continuation is run. Replies to async requests are enqueued as they are received.*
+*Note: all statements following an asynchronous request are executed before any consequent is run. Replies to async requests are enqueued as they are received.*
 
-Like most protocols, but unlike most languages, Exa has a clear and explicit concept of failure: *every request can succeed or fail.* This is implemented not by [somehow](https://en.wikipedia.org/wiki/Semipredicate_problem) marking or categorizing a reply as success or failure, but by providing a dedicated channel for failure replies: every request includes neither, either, or both of two distinct continuations - a success continuation, introduced by the `after` construct, and a failure continuation, introduced by the `failure` construct.
+Like most protocols, but unlike most languages, Exa has a clear and explicit concept of failure: *every request can succeed or fail.* This is implemented not by [somehow](https://en.wikipedia.org/wiki/Semipredicate_problem) marking or categorizing a reply as success or failure, but by providing a dedicated channel for failure replies: every request includes neither, either, or both of two distinct consequents - a success consequent, introduced by the `after` construct, and a failure consequent, introduced by the `failure` construct.
 
 ```
 after readFile(fileName):
@@ -188,7 +188,7 @@ failure => error:
 
 An async request can be thought of as a hybrid language construct that fuses a message dispatch with a specialized conditional; if you've worked with promises this approach will feel familiar to you.
 
-A failure continuation can easily swap in its own value for one that was expected from a success reply using `substitute`.**
+A failure consequent can easily swap in its own value for one that was expected from a success reply using `substitute`.**
 
 ```
 after getAnswer => answer:
@@ -208,9 +208,9 @@ timeout 5ms:
 	log("failed to read the file");
 ```
 
-### Continuations
+### consequents
 
-Think of continuations as part of the main flow of the procedure, like an if/else block, rather than as a sub-procedure. They share the same scope as their enclosing procedure.
+Think of consequents as part of the main flow of the procedure, like an if/else block, rather than as a sub-procedure. They share the same scope as their enclosing procedure.
 
 Modules only provide ability, not authority.
 

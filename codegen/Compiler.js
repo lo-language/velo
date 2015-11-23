@@ -461,7 +461,7 @@ __['extraction'] = function (node, scope) {
     // todo - what if the list expression is a request or somesuch? can't resolve it twice
     // wrap it in a helper function?
 
-    return new JsConstruct([list, '.splice(', index, ', 1)[0]']);
+    return new JsConstruct([list, '.splice(', index, ' < 0 ? ', index, ' + ', list, '.length : ', index, ', 1)[0];']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

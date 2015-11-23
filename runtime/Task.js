@@ -29,6 +29,7 @@ var __ = function (name, service, args, onReply, onFail, onComplete) {
     this.onFail = onFail;   // ditto
     this.onComplete = onComplete;
 
+    // this is just a count of pending tasks, not refs to the actual tasks, since they could be remote
     this.subTasks = 0;
 };
 

@@ -1,29 +1,42 @@
 receive args, io;
 
-numPoints is 2;
+minPoints is 3;
+numPoints is 3;
 
 // recursively iterate
 // label points as 0-8
 
 explore = >>:
 
-    receive path;
+    receive path, indent;
 
-    io.stdout.write ~ "exploring from `path`\n";
+    io.stdout.write ~ "`indent`exploring from `path`\n";
 
     point = 0;
+    found = 0;
 
     while point < numPoints:
 
         if point in path:
-            io.stdout.write ~ "`point` exists in `path`\n";
+            io.stdout.write ~ "`indent``point` exists in `path`\n";
         else:
             point -> path;
-            explore(path);
+            explore(path, "`indent`  ");
+            path{-1};
 
         point++;
+
+    // we might have a runtime issue
+    // seems like this proc's tryclose is getting ahead of some of the recursive calls
+    // maybe because of setImmediate()?
+    // why would this differ between compiled and just run?
+    // maybe because of setImmediate()?
+
+    io.stdout.write ~ "`indent`bailed out at `point`\n";
 ;
 
-found = explore([]);
+found = explore([], "");
 
-io.stdout.write("`found`\n");
+// we have an ordering bug!
+io.stdout.write("found: `found`\n");
+//io.stdout.write ~ "found: `found`\n";
