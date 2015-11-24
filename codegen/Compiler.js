@@ -450,6 +450,35 @@ __['subscript'] = function (node, scope) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ *
+ * @param scope
+ * @param node
+ */
+__['slice'] = function (node, scope) {
+
+    var list = __.compile(node.list, scope);
+    var start = __.compile(node.start, scope);
+    var end = __.compile(node.end, scope);
+
+    // Allows experimental syntax with negative indices referring to
+    // positions from the end, but only for number literals.
+    // To do this properly we'd have to catch it at runtime
+    if (node.start.type == 'number' && parseInt(node.start.val) < 0) {
+        start = list + '.length' + node.start.val;
+    }
+
+    if (node.end.type == 'number' && parseInt(node.end.val) < 0) {
+        end = list + '.length' + node.end.val;
+    }
+
+    // todo - what if the list expression is a request or somesuch? can't resolve it twice
+    // wrap it in a helper function?
+
+    return new JsConstruct([list, '.slice(', start, ',', end, ')']);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
  * An extraction is a mutating expression.
  *
  * @param scope
