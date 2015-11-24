@@ -16,6 +16,19 @@ if words[2] != "padme":
 if #words != 4:
     fail "what the deuce?!";
 
+// Array slicing
+subset = words[1:3];
+
+if #subset != 2:
+    fail "darn";
+
+if subset[0] != words[1]:
+    fail "uh oh";
+
+if subset[1] != words[2]:
+    fail "how could that be?"; 
+
+
 // Map literal (including empty), access, and cardinality
 map = [:];
 cities = ["nyc":"New York", "phi":"Philadelphia"];
