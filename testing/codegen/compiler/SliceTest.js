@@ -11,7 +11,7 @@ var util = require('util');
 
 module.exports["slice"] = {
 
-    "basic": function (test) {
+    "basic slice": function (test) {
 
         var node = {
             type: 'slice',
@@ -24,7 +24,7 @@ module.exports["slice"] = {
         test.done();
     },
 
-    "shorthand": function (test) {
+    "shorthand slice": function (test) {
 
         var node = {
             type: 'slice',
@@ -35,7 +35,7 @@ module.exports["slice"] = {
         test.done();
     },
 
-    "reverse indexing": function (test) {
+    "reverse indexing slice": function (test) {
 
         var node = {
             type: 'slice',
@@ -44,8 +44,44 @@ module.exports["slice"] = {
             end: {type: 'number', val: '-1'}
         };
 
-
         test.equal(Compiler.compile(node).render(), '$foo.slice($foo.length-3,$foo.length-1)');
+        test.done();
+    },
+
+    "basic excision": function (test) {
+
+        var node = {
+            type: 'excision',
+            list: {type: 'id', name: 'foo'},
+            start: {type: 'number', val: '1'},
+            end: {type: 'number', val: '3'},
+        };
+
+        test.equal(Compiler.compile(node).render(), '$foo.splice(1,(3)-(1))');
+        test.done();
+    },
+
+    "shorthand excision": function (test) {
+
+        var node = {
+            type: 'excision',
+            list: {type: 'id', name: 'foo'},
+        };
+
+        test.equal(Compiler.compile(node).render(), '$foo.splice(0,($foo.length)-(0))');
+        test.done();
+    },
+
+    "reverse indexing excision": function (test) {
+
+        var node = {
+            type: 'excision',
+            list: {type: 'id', name: 'foo' },
+            start: {type: 'number', val: '-3'},
+            end: {type: 'number', val: '-1'}
+        };
+
+        test.equal(Compiler.compile(node).render(), '$foo.splice($foo.length-3,($foo.length-1)-($foo.length-3))');
         test.done();
     }
 };
