@@ -57,9 +57,14 @@ fibs = [0, 1, 1, 2, 3, 5, 8];
 articles = ["a", "an", "the"];
 
 fibs[3];		// 2
-fibs[fibs[3]]	// 1
+fibs[fibs[3]];	// 1
 fibs[-1];		// syntactic sugar for terminal value (8) **
 fibs[-2];		// syntactic sugar for 2nd-to-last element **
+
+fibs[1:4];              // [1, 1, 2]
+fibs[:3];		// [0, 1, 1]
+fibs[5:];		// [5, 8]
+copy = fibs[:];         // create a shallow copy
 
 mountains = [];                // create an empty array
 "Denali" -> mountains;         // pushes a value onto the back
@@ -68,18 +73,15 @@ mountains = [];                // create an empty array
 
 x = fibs{0};	// extract the first element
 y = fibs{-1};	// extract the last element
+z = fibs{1:4};	// extract from index 1 up to but not including index 4
 ```
-
-The extraction operator `{}` removes the specified element from a collection and evaluates to the value of the removed element. If an array, the length is decreased – extraction doesn't leave a "hole" in an array.
 
 The splice operator `->` splices elements and lists together as if they were pieces of paper. Elements and arrays can be spliced into arrays at the front, back, or in the middle.
 
-```
-mountains = [];                // create an empty array
-"Denali" -> mountains;         // pushes a value onto the back
-"Everest" -> mountains[0];     // pushes a value onto the front **
-"Kanchenjunga" -> mountains[1] // pushes a value between elements 0 and 1 **
-```
+The extraction operator `{}` removes the specified element from a collection and evaluates to the value of the removed element. If an array, the length is decreased – extraction doesn't leave a "hole" in an array.
+
+The slice operator `:` retrieves a portion of an array from the first index up to but not including the second index.  The indices can be omitted as a shorthand for the beginning and end of the array.  When used within square brackets, the array is not modified, but when used within the extraction operator `{}`, the specified slice is removed.
+
 
 **Maps** are unordered collections of any number of homogeneous elements which are retrievable by unique scalar index (string or number). Map literals are also delimited by square brackets.
 
