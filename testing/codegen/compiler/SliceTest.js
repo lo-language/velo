@@ -24,6 +24,17 @@ module.exports["slice"] = {
         test.done();
     },
 
+    "shorthand": function (test) {
+
+        var node = {
+            type: 'slice',
+            list: {type: 'id', name: 'foo'},
+        };
+
+        test.equal(Compiler.compile(node).render(), '$foo.slice(0,$foo.length)');
+        test.done();
+    },
+
     "reverse indexing": function (test) {
 
         var node = {

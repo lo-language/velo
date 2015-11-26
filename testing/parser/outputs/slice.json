@@ -50,7 +50,25 @@
                     }
                 }
             },
-            "tail": null
+            "tail": {
+                "type": "stmt_list",
+                "head": {
+                    "type": "assign",
+                    "op": "=",
+                    "left": {
+                        "type": "id",
+                        "name": "z"
+                    },
+                    "right": {
+                        "type": "slice",
+                        "list": {
+                            "type": "id",
+                            "name": "meh"
+                        }
+                    }
+                },
+                "tail": null
+            }
         }
     }
 }

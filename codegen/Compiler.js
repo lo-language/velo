@@ -457,18 +457,34 @@ __['subscript'] = function (node, scope) {
 __['slice'] = function (node, scope) {
 
     var list = __.compile(node.list, scope);
-    var start = __.compile(node.start, scope);
-    var end = __.compile(node.end, scope);
+    var start; // optional, so compile only if present
+    var end;   // optional, so compile only if present
 
-    // Allows experimental syntax with negative indices referring to
+    // Handles shorthand where start or end of slice
+    // is omitted as shorthand for the start or end
+    // of the array
+    // Also allows experimental syntax with negative indices referring to
     // positions from the end, but only for number literals.
     // To do this properly we'd have to catch it at runtime
-    if (node.start.type == 'number' && parseInt(node.start.val) < 0) {
-        start = list + '.length' + node.start.val;
+
+    if (node.start === undefined) {
+        start = '0';
+    } else {
+        start = __.compile(node.start, scope);
+
+        if (node.start.type == 'number' && parseInt(node.start.val) < 0) {
+            start = list + '.length' + node.start.val;
+        }
     }
 
-    if (node.end.type == 'number' && parseInt(node.end.val) < 0) {
-        end = list + '.length' + node.end.val;
+    if (node.end === undefined) {
+        end = list + '.length';
+    } else {
+        end = __.compile(node.end, scope);
+
+        if (node.end.type == 'number' && parseInt(node.end.val) < 0) {
+            end = list + '.length' + node.end.val;
+        }
     }
 
     // todo - what if the list expression is a request or somesuch? can't resolve it twice

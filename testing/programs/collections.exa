@@ -28,6 +28,14 @@ if subset[0] != words[1]:
 if subset[1] != words[2]:
     fail "how could that be?"; 
 
+// Array slicing shorthand
+subset = words[:];
+
+if #subset != #words:
+    fail "dang";
+
+if subset[1] != words[1]:
+    fail "that's weird";
 
 // Map literal (including empty), access, and cardinality
 map = [:];
