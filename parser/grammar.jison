@@ -285,6 +285,7 @@ lvalue
     | value '[' expr ']' -> {type: 'subscript', list: $1, index: $3}
     | value '[' expr? ':' expr? ']' -> {type: 'slice', list: $1, start: $3, end: $5}
     | value '{' expr '}' -> {type: 'extraction', list: $1, index: $3}
+    | value '{' expr? ':' expr? '}' -> {type: 'excision', list: $1, start: $3, end: $5}
     | value '.' ID -> {type: 'select', set: $1, member: $3}
     | '(' lvalue (',' lvalue)+ ')' -> {type: 'destructure', members: $3.concat([$2])}
     ;

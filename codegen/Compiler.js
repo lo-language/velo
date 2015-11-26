@@ -450,17 +450,18 @@ __['subscript'] = function (node, scope) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * Handles both non-mutating slice of a list and mutating excision of a list.
  *
  * @param scope
  * @param node
  */
-__['slice'] = function (node, scope) {
+var compileSlice = function (node, scope) {
 
     var list = __.compile(node.list, scope);
     var start; // optional, so compile only if present
     var end;   // optional, so compile only if present
 
-    // Handles shorthand where start or end of slice
+    // Handles shorthand where start or end
     // is omitted as shorthand for the start or end
     // of the array
     // Also allows experimental syntax with negative indices referring to
@@ -489,9 +490,16 @@ __['slice'] = function (node, scope) {
 
     // todo - what if the list expression is a request or somesuch? can't resolve it twice
     // wrap it in a helper function?
+    if (node.type == 'excision') {
+      return new JsConstruct([list, '.splice(', start, ',(', end, ')-(' , start, '))']);
+    }
 
+    // slice
     return new JsConstruct([list, '.slice(', start, ',', end, ')']);
 };
+
+__['slice'] = compileSlice;
+__['excision'] = compileSlice;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
