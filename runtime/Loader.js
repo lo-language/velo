@@ -8,9 +8,9 @@
 
 "use strict";
 
-var Module = require('./Module');
-var fs = require('fs');
-var Q = require('q');
+const Module = require('./Module');
+const fs = require('fs');
+const Q = require('q');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -22,11 +22,10 @@ var __ = function (libs) {
 
     this.libs = libs;
 
-    // stash
-    var loader = this;
+    var _this = this;
 
     /**
-     * An Exa service (JS fn that takes a task) that returns an Exa service.
+     * An Exa service function (JS fn that takes a task) that returns an Exa service function.
      *
      * @param task
      * @return {*}
@@ -35,7 +34,7 @@ var __ = function (libs) {
 
         var modulePath = task.args[0];
 
-        loader.getModule(modulePath).then(
+        _this.getModule(modulePath).then(
             function (module) {
 
                 // might want to refactor this class so we don't need this bind
@@ -47,7 +46,7 @@ var __ = function (libs) {
         ).then(
             function (procedure) {
 
-                task.reply(procedure);
+                task.respond("reply", procedure);
             }
         ).done();
     };

@@ -66,21 +66,21 @@ module.exports["basics"] = {
 
         test.equal(a.render(),
             'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
-            'function (P0) {P0;\nsetImmediate(loop);}, null);\n\n}else {}};\n\nloop();\n');
+            'function (P0) {P0;\nsetImmediate(loop);}, null, true);\n\n}else {}};\n\nloop();\n');
 
         // try attaching a statement
         a.attach(new JsConstruct("var z = 57;"));
 
         test.equal(a.render(),
             'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
-            'function (P0) {P0;\nsetImmediate(loop);}, null);\n\n}else {var z = 57;}};\n\nloop();\n');
+            'function (P0) {P0;\nsetImmediate(loop);}, null, true);\n\n}else {var z = 57;}};\n\nloop();\n');
 
         // try attaching another statement
         a.attach(new JsConstruct("var bee = 27;"));
 
         test.equal(a.render(),
             'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
-            'function (P0) {P0;\nsetImmediate(loop);}, null);\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
+            'function (P0) {P0;\nsetImmediate(loop);}, null, true);\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
 
         test.done();
     },
@@ -127,7 +127,7 @@ module.exports["basics"] = {
         test.equal(a.render(),
             'let loop = function () {if ($foo) {var cont = function () {setImmediate(loop);};' +
             'if ($bar) {$baz = 4;\ncont();}\n\nelse {task.sendMessage($foo, [57], function (P0) ' +
-            '{P0;\ncont();}, null);\n\n}\n\n}else {}};\n\nloop();\n');
+            '{P0;\ncont();}, null, true);\n\n}\n\n}else {}};\n\nloop();\n');
 
         // try attaching a statement
         a.attach(new JsConstruct("var z = 57;"));
@@ -135,7 +135,7 @@ module.exports["basics"] = {
         test.equal(a.render(),
             'let loop = function () {if ($foo) {var cont = function () {setImmediate(loop);};' +
             'if ($bar) {$baz = 4;\ncont();}\n\nelse {task.sendMessage($foo, [57], function (P0) ' +
-            '{P0;\ncont();}, null);\n\n}\n\n}else {var z = 57;}};\n\nloop();\n');
+            '{P0;\ncont();}, null, true);\n\n}\n\n}else {var z = 57;}};\n\nloop();\n');
 
         // try attaching another statement
         a.attach(new JsConstruct("var bee = 27;"));
@@ -143,7 +143,7 @@ module.exports["basics"] = {
         test.equal(a.render(),
             'let loop = function () {if ($foo) {var cont = function () {setImmediate(loop);};' +
             'if ($bar) {$baz = 4;\ncont();}\n\nelse {task.sendMessage($foo, [57], function (P0) ' +
-            '{P0;\ncont();}, null);\n\n}\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
+            '{P0;\ncont();}, null, true);\n\n}\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
         test.done();
     }
 };

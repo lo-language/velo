@@ -106,7 +106,7 @@ JsConstruct.prototype.resolve = function () {
         var parts = ['task.sendMessage(',
             sm.address, ', [', {csv: sm.args}, '], function (P' + index + ') {'];
 
-        var post = ['}, null);\n\n'];
+        var post = ['}, null, true);\n\n'];
 
         var wrapper = new JsConstruct(parts, post);
 
@@ -246,7 +246,7 @@ JsConstruct.buildMessage = function (address, args, subsequent, contingency, rep
 
     parts.push(');\n\n');
 
-    return new JsConstruct(parts);
+    return JsConstruct.makeStatement(parts);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

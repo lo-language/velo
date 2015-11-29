@@ -65,8 +65,8 @@ __['procedure'] = function (node, scope) {
     var localScope = scope ? scope.bud() : new Scope(null);
 
     // compile the statement(s) in the context of the local scope
-    var body = __.compile(node.body, localScope)
-        .attach(new JsConstruct("task.tryClose();\n"));
+    // we can't use attach for pickupReplies because then it could wind up inside a callback, and thus never be called
+    var body = [__.compile(node.body, localScope), new JsConstruct("task.pickupReplies();\n")];
 
     // todo remove this feature
     body = ['var $recur = task.service;\n', body];
@@ -147,12 +147,8 @@ __['response'] = function (node, scope) {
 
     // we assume the existence of a Task object named 'task'
 
-    if (node.channel === 'fail') {
-        return JsConstruct.makeStatement(['task.fail(', {csv: args}, ');\nreturn;']);
-    }
-
-    // not rendered as a statement because we can't put anything after it
-    return JsConstruct.makeStatement(['task.reply(', {csv: args}, ');\nreturn;']);
+    // todo throw a compiler warning if anything is attach()'d to this statement
+    return JsConstruct.makeStatement(['task.respond("', node.channel, '", ', {csv: args}, ');\nreturn;']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

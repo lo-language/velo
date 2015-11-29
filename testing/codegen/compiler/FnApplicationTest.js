@@ -24,7 +24,7 @@ module.exports["application"] = {
         var result = Compiler.compile(node);
 
         test.ok(result instanceof SyncMessage);
-        test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [], function (P0) {P0}, null);\n\n');
+        test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [], function (P0) {P0}, null, true);\n\n');
         test.done();
     },
 
@@ -41,7 +41,7 @@ module.exports["application"] = {
         var result = Compiler.compile(node);
 
         test.ok(result instanceof SyncMessage);
-        test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [42], function (P0) {P0}, null);\n\n');
+        test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [42], function (P0) {P0}, null, true);\n\n');
         test.done();
     },
 
@@ -59,7 +59,7 @@ module.exports["application"] = {
         var result = Compiler.compile(node);
 
         test.ok(result instanceof SyncMessage);
-        test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [42, 'hi there'], function (P0) {P0}, null);\n\n");
+        test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [42, 'hi there'], function (P0) {P0}, null, true);\n\n");
         test.done();
     },
 
@@ -82,7 +82,7 @@ module.exports["application"] = {
         var result = Compiler.compile(node);
 
         test.ok(result instanceof SyncMessage);
-        test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [P0, P1], function (P0) {P0}, null);\n\n}, null);\n\n}, null);\n\n");
+        test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [P0, P1], function (P0) {P0}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n");
         test.done();
     }
 };
@@ -101,8 +101,8 @@ module.exports["application statements"] = {
                 ]}
         };
 
-        var a = Compiler.compile(node).resolve();
-        test.equal(a.render(), 'task.sendMessage($foo, [42], function (P0) {P0;\n}, null);\n\n');
+        var a = Compiler.compile(node);
+        test.equal(a.render(), 'task.sendMessage($foo, [42], function (P0) {P0;\n}, null, true);\n\n');
         test.ok(a.async);
 
         // we don't have a good interaction between resolve & attach because of nesting
@@ -112,7 +112,7 @@ module.exports["application statements"] = {
 
         // add a statement after resolving
         a.attach(new JsConstruct("foo = bar;"));
-        test.equal(a.render(), 'task.sendMessage($foo, [42], function (P0) {P0;\nfoo = bar;}, null);\n\n');
+        test.equal(a.render(), 'task.sendMessage($foo, [42], function (P0) {P0;\nfoo = bar;}, null, true);\n\n');
 
         test.done();
     },
@@ -140,10 +140,8 @@ module.exports["application statements"] = {
                 }]}
         };
 
-        // patch sub nodes?
-
-        test.equal(Compiler.compile(node).resolve().render(),
-            "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [(P0 - P1)], function (P0) {P0;\n}, null);\n\n}, null);\n\n}, null);\n\n");
+        test.equal(Compiler.compile(node).render(),
+            "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [(P0 - P1)], function (P0) {P0;\n}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n");
         test.done();
     },
 
@@ -173,10 +171,47 @@ module.exports["application statements"] = {
                     }]}]}
         };
 
-        // patch sub nodes?
+        test.equal(Compiler.compile(node).render(),
+            "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [(P0 - P1)], function (P0) {task.sendMessage($quux, [P0], function (P0) {P0;\n}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n");
+        test.done();
+    },
 
-        test.equal(Compiler.compile(node).resolve().render(),
-            "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [(P0 - P1)], function (P0) {task.sendMessage($quux, [P0], function (P0) {P0;\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n");
+    "application in async message": function (test) {
+
+        var node = {
+            type: 'stmt_list',
+            head: {
+                type: 'message',
+                address: {
+                    type: 'select',
+                    set: {
+                        type: 'select',
+                        set: {type: 'id', name: 'io'},
+                        member: 'stdout'
+                    },
+                    member: 'write'
+                },
+                args: [{
+                    type: 'interpolation',
+                    left: '',
+                    middle: {
+                        type: 'application',
+                        address: {type: 'id', name: 'factorial'},
+                        args: [{
+                            type: 'subscript',
+                            list: {type: 'id', name: 'args'},
+                            index: {type: 'number', val: '0'}
+                        }]
+                    },
+                    right: '\\n'
+                }]
+            },
+            tail: null
+        };
+
+        test.equal(Compiler.compile(node).render(),
+            "task.sendMessage($factorial, [$args[0]], function (P0) {task.sendMessage($io.stdout.write, ['' + P0 + '\\n'], null, null);\n\n}, null, true);\n\n");
+
         test.done();
     }
 };

@@ -1,7 +1,7 @@
 receive args, io;
 
 minPoints is 3;
-numPoints is 3;
+numPoints is 6;
 
 // recursively iterate
 // label points as 0-8

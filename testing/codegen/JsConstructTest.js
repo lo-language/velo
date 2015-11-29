@@ -107,7 +107,7 @@ module.exports["resolve"] = {
 
         var expr = new JsConstruct([new SyncMessage('$foo'), ' + ', '3']).resolve();
 
-        test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0 + 3}, null);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0 + 3}, null, true);\n\n');
         test.equal(expr.async, true);
         test.done();
     },
@@ -116,7 +116,7 @@ module.exports["resolve"] = {
 
         var expr = new JsConstruct([new SyncMessage('$foo'), ';']).resolve();
 
-        test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0;}, null);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0;}, null, true);\n\n');
         test.equal(expr.async, true);
         test.done();
     },
@@ -125,7 +125,7 @@ module.exports["resolve"] = {
 
         var expr = new JsConstruct([new SyncMessage('$foo'), ' + ', new SyncMessage('$bar')]).resolve();
 
-        test.equal(expr.render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {P0 + P1}, null);\n\n}, null);\n\n");
+        test.equal(expr.render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {P0 + P1}, null, true);\n\n}, null, true);\n\n");
         test.equal(expr.async, true);
         test.done();
     },
@@ -134,7 +134,7 @@ module.exports["resolve"] = {
 
         var expr = new JsConstruct(['Math.min(', {csv: [new SyncMessage('$foo'), new SyncMessage('$bar')]}, ')']).resolve();
 
-        test.equal(expr.render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {Math.min(P0, P1)}, null);\n\n}, null);\n\n");
+        test.equal(expr.render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {Math.min(P0, P1)}, null, true);\n\n}, null, true);\n\n");
         test.equal(expr.async, true);
         test.done();
     },
@@ -152,7 +152,7 @@ module.exports["resolve"] = {
 
         var expr = new JsConstruct([new SyncMessage('$foo', [new SyncMessage('$bar')]), ';']).resolve();
 
-        test.equal(expr.render(), 'task.sendMessage($bar, [], function (P0) {task.sendMessage($foo, [P0], function (P0) {P0;}, null);\n\n}, null);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($bar, [], function (P0) {task.sendMessage($foo, [P0], function (P0) {P0;}, null, true);\n\n}, null, true);\n\n');
         test.equal(expr.async, true);
         test.done();
     },
@@ -165,7 +165,7 @@ module.exports["resolve"] = {
                 new SyncMessage('$quux', [new SyncMessage('$snux')])
             ]), ';']).resolve();
 
-        test.equal(expr.render(), 'task.sendMessage($baz, [], function (P0) {task.sendMessage($snux, [], function (P1) {task.sendMessage($bar, [P0], function (P0) {task.sendMessage($quux, [P1], function (P1) {task.sendMessage($foo, [P0, P1], function (P0) {P0;}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($baz, [], function (P0) {task.sendMessage($snux, [], function (P1) {task.sendMessage($bar, [P0], function (P0) {task.sendMessage($quux, [P1], function (P1) {task.sendMessage($foo, [P0, P1], function (P0) {P0;}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n');
         test.equal(expr.async, true);
         test.done();
     }

@@ -16,8 +16,6 @@ var util = require('util');
 
 var loader = new Loader(__dirname);
 
-// if parser runs first, first test in here fails with a parse error - how are we putting the parser in a bad state?
-
 module.exports['iteration'] = {
 
     // test that uncaught errors are properly escalated out of the program
@@ -65,7 +63,6 @@ module.exports['io'] = {
 
         test.expect(1);
 
-
         try {
             this.harness.getJs();
         }
@@ -76,11 +73,51 @@ module.exports['io'] = {
         this.harness.testSuccess(test, [[], {
             stdout: {
                 write: function (task) {
+                    console.error("snark");
                     test.ok(true);
-                    task.tryClose();
+                    task.pickupReplies();
                 }
             }
         }, {}]);
+    }
+};
+
+module.exports['reply handling'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(loader, 'replyHandling');
+
+        this.harness.setUp(cb);
+    },
+
+    'success': function (test) {
+
+        test.expect(1);
+
+
+        try {
+            this.harness.getJs();
+        }
+        catch (e) {
+            console.error(e.stack);
+        }
+
+        // both functions just reply immediately
+        // todo add a test that does this experiment within a reply handler
+
+        this.harness.testSuccess(test, [
+
+            function (task) {
+                task.respond("reply");
+                task.pickupReplies();
+            },
+
+            function (task) {
+                task.respond("reply", 42);
+                task.pickupReplies();
+            }
+        ], 42);
     }
 };
 
@@ -116,7 +153,7 @@ module.exports['factorial'] = {
     },
 
     'success': function (test) {
-//        console.log(this.harness.getJs());
+        console.log(this.harness.getJs());
         this.harness.testSuccess(test, [10], 3628800);
     },
 
@@ -173,32 +210,31 @@ module.exports['procedure'] = {
     }
 };
 
-module.exports['conditional in loop'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(loader, 'condInLoop');
-
-        this.harness.setUp(cb);
-    },
-
-    'success': function (test) {
-
-        var logMessages = [];
-
-        this.harness.testSuccess(test, [
-            function (task) {
-
-                logMessages.push(task.args[0]);
-                task.tryClose();
-            }
-        ], 5).then(function () {
-
-            test.deepEqual(logMessages, [ 'howdy!\n', 'howdy!\n', 'hello hello!\n', 'ok.\n', 'ok.\n' ]);
-        });
-    }
-};
-
+//module.exports['conditional in loop'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.harness = new Harness(loader, 'condInLoop');
+//
+//        this.harness.setUp(cb);
+//    },
+//
+//    'success': function (test) {
+//
+//        var logMessages = [];
+//
+//        this.harness.testSuccess(test, [
+//            function (task) {
+//
+//                logMessages.push(task.args[0]);
+//                task.pickupReplies();
+//            }
+//        ], 5).then(function () {
+//
+//            test.deepEqual(logMessages, [ 'howdy!\n', 'howdy!\n', 'hello hello!\n', 'ok.\n', 'ok.\n' ]);
+//        });
+//    }
+//};
 
 //module.exports['recovery'] = {
 //
@@ -217,26 +253,34 @@ module.exports['conditional in loop'] = {
 //    }
 //};
 
-//module.exports['factorial2'] = {
-//
-//    "setUp": function (cb) {
-//
-//        this.harness = new Harness(loader, 'factorial2');
-//
-//        this.harness.setUp(cb);
-//    },
-//
-//    'success': function (test) {
-//
-//        this.harness.testSuccess(test, 10, 3628800);
-//    },
-//
-//    'failure': function (test) {
-//
-//        this.harness.testFailure(test, -1, "I pity the fool!");
-//    }
-//};
-//
+module.exports['factorial2'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(loader, 'factorial2');
+
+        this.io = {
+            stdout: {
+                write: function (task) {
+                    task.pickupReplies();
+                }
+            }
+        };
+
+        this.harness.setUp(cb);
+    },
+
+    'success': function (test) {
+
+        this.harness.testSuccess(test, [[10], this.io], undefined);
+    },
+
+    //'failure': function (test) {
+    //
+    //    this.harness.testFailure(test, [[-1], this.io]);
+    //}
+};
+
 //module.exports['fibonacci2'] = {
 //
 //    "setUp": function (cb) {

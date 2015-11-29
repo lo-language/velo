@@ -59,11 +59,12 @@ __.prototype.testSuccess = function (test, input, expected) {
                 test.equal(result, expected);
             }
 
-            test.done();
+            // this is in here to let us wait on tests that end with a dispatch
+            setImmediate(test.done.bind(test));
         },
         function (err) {
             console.error("error running " + _this.program + ".exa: " + err);
-            console.log(_this.getJs());
+            console.error(_this.getJs());
         }
     );
 };

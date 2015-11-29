@@ -3,7 +3,4 @@
 foo is:
     fail "oh no!";
 
-// we want any call to be able to break us out
-// should we abandon promises for normal calls, and only use them where we use promises?
-
 foo();

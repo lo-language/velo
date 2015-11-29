@@ -1,9 +1,10 @@
 "use strict";
 
-var parser = require('./../parser/Parser');
-var Compiler = require('./../codegen/Compiler');
-var Task = require('./Task');
-var Q = require('q');
+const parser = require('./../parser/Parser');
+const Compiler = require('./../codegen/Compiler');
+const Task = require('./Task');
+const Q = require('q');
+const util = require('util');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -43,7 +44,9 @@ __.prototype.getJs = function () {
             this.js = Compiler.compile(this.parse()).render();
         }
         catch (e) {
+            console.error("error compiling module");
             console.error(e.stack);
+            console.error(util.inspect(this.parse(), {depth: null}));
         }
     }
 

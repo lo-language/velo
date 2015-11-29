@@ -9,86 +9,130 @@
 var Task = require('../../runtime/Task');
 var util = require('util');
 
-module.exports = {
+module.exports['replies'] = {
+
+    "new reply not processed in working state": function (test) {
+
+        var task = new Task('root');
+
+        test.equal(task.outstandingRequests, 0);
+        test.done();
+    },
+
+    //"new reply processed in waiting state": function (test) {
+    //
+    //    var task = new Task('root', null, null, function (args) {
+    //        test.equal(args, "foo");
+    //        test.done();
+    //    }, function (args) {
+    //        test.fail();
+    //    });
+    //
+    //    test.equal(task.pendingReplies.length, 0);
+    //    task.enqueueReply('snork');
+    //
+    //    test.equal(task.pendingReplies.length, 1);
+    //
+    //    test.done();
+    //}
+};
+
+module.exports['basics'] = {
 
     "reply kills further response": function (test) {
 
         test.expect(1);
 
-        var task = new Task('root', null, null, function (args) {
+        var task = new Task('root');
+
+        task.on("reply", function (args) {
             test.equal(args, "foo");
             test.done();
-        }, function (args) {
+        });
+
+        task.on("fail", function (args) {
             test.fail();
         });
 
-        task.reply("foo");
-        task.reply("boo");
-        task.fail("boo");
-        task.fail("foo");
-        task.reply("foo");
+        task.respond("reply", "foo");
+        task.respond("reply", "boo");
+        task.respond("fail", "boo");
+        task.respond("fail", "foo");
+        task.respond("reply", "foo");
     },
 
     "fail kills further response": function (test) {
 
         test.expect(1);
 
-        var task = new Task('root', null, null, function (args) {
+        var task = new Task('root');
+
+        task.on("reply", function (args) {
             test.fail();
-        }, function (args) {
+        });
+
+        task.on("fail", function (args) {
             test.equal(args, "foo");
             test.done();
         });
 
-        task.fail("foo");
-        task.reply("foo");
-        task.reply("boo");
-        task.fail("foo");
-        task.reply("foo");
+        task.respond("fail", "foo");
+        task.respond("reply", "foo");
+        task.respond("reply", "boo");
+        task.respond("fail", "foo");
+        task.respond("reply", "foo");
     },
 
     "implicit reply on close": function (test) {
 
         test.expect(1);
 
-        var task = new Task('root', null, null, function (args) {
+        var task = new Task('root');
+
+        task.on("reply", function (args) {
             test.equal(args, undefined);
             test.done();
-        }, function (args) {
-            test.fail();
         });
 
-        task.tryClose();
+        task.pickupReplies();
     },
 
     "no implicit reply after reply": function (test) {
 
         test.expect(1);
 
-        var task = new Task('root', null, null, function (args) {
+        var task = new Task('root');
+
+        task.on("reply", function (args) {
             test.equal(args, "foo");
             test.done();
-        }, function (args) {
+        });
+
+        task.on("fail", function (args) {
             test.fail();
         });
 
-        task.reply("foo");
-        task.tryClose();
+        task.respond("reply", "foo");
+        task.pickupReplies();
     },
 
     "no implicit reply after fail": function (test) {
 
         test.expect(1);
 
-        var task = new Task('root', null, null, function (args) {
+        var task = new Task('root');
+
+        task.on("reply", function (args) {
             test.fail();
-        }, function (args) {
+        });
+
+        task.on("fail", function (args) {
             test.equal(args, "boo");
             test.done();
         });
 
-        task.fail("boo");
-        task.tryClose();
+        task.respond("fail", "boo");
+        task.pickupReplies();
     },
 
     "close waits for one message": function (test) {
@@ -97,12 +141,16 @@ module.exports = {
 
         var collector = '';
 
-        // create a fake root task
-        var task = new Task('root', null, null, function (args) {
+        // create a root task
+        var task = new Task('root');
+
+        task.on("reply", function (args) {
             test.equal(args, undefined); // implicit reply sends no args
             test.equal(collector, 'foobar');
             test.done();
-        }, function (args) {
+        });
+
+        task.on("fail", function (args) {
             test.fail();
         });
 
@@ -113,23 +161,20 @@ module.exports = {
             test.equal(collector, '');
             collector += task.args;
 
-            task.reply('bar');
-            task.tryClose();
+            task.respond("reply", 'bar');
+            task.pickupReplies();
         };
 
-        // send a message from our fake root task
+        // send a message from our root task
         task.sendMessage(service, 'foo', function (result) {
 
             test.equal(result, 'bar');
             test.equal(collector, 'foo');
             collector += result;
-
-            // handlers need to close their subtasks
-            task.tryClose();
         });
 
         // shouldn't fire implicit reply until the message has been processed
-        task.tryClose();
+        task.pickupReplies();
     },
 
     "close doesn't wait for message with no handlers": function (test) {
@@ -145,7 +190,7 @@ module.exports = {
             }, 'foo', null, null);
 
             // should succeed because we didn't attach handlers to that message
-            task.tryClose();
+            task.pickupReplies();
         };
 
         // todo send a root task
@@ -156,14 +201,18 @@ module.exports = {
         });
     },
 
-    "close waits for multiple subtasks": function (test) {
+    "implicit reply waits for multiple subtasks": function (test) {
 
         test.expect(7);
 
-        var task = new Task('root', null, null, function (args) {
+        var task = new Task('root');
+
+        task.on("reply", function (args) {
             test.equal(expected.length, 0);
             test.done();
-        }, function (args) {
+        });
+
+        task.on("fail", function (args) {
             test.fail();
         });
 
@@ -175,40 +224,25 @@ module.exports = {
         var transmogrify = function (task) {
 
             test.equal(task.args, expected.shift());
-            task.reply(replies.shift());
+            task.respond("reply", replies.shift());
 
-            task.tryClose();
+            task.pickupReplies();
         };
 
-        // send a message from this task
         task.sendMessage(transmogrify, 'foo', function (result) {
-
             test.equal(result, 'boo');
-
-            // handlers need to close their subtasks
-            task.tryClose();
         });
 
-        // send a message from this task
         task.sendMessage(transmogrify, 'bar', function (result) {
-
             test.equal(result, 'zar');
-
-            // handlers need to close their subtasks
-            task.tryClose();
         });
 
-        // send a message from this task
         task.sendMessage(transmogrify, 'baz', function (result) {
-
             test.equal(result, 'maz');
-
-            // handlers need to close their subtasks
-            task.tryClose();
         });
 
         // shouldn't fire implicit reply
-        task.tryClose();
+        task.pickupReplies();
     },
 
     "close waits for subtasks": function (test) {
@@ -219,7 +253,13 @@ module.exports = {
 
         // create the root task
         //console.error("create root");
-        var task = new Task('root', null, null, function (args) {
+        var task = new Task('root');
+
+        task.on("reply", function (args) {
+
+            // there are actually *several* valid orderings of the tasks in this test because
+            // the calls are all supposed to be concurrent - but I'm enforcing a BFS ordering for now;
+            // a previously-valid ordering is commented out below
 
             test.deepEqual(results, [
                 'call1',
@@ -229,17 +269,35 @@ module.exports = {
                 'call3:post',
                 'call4',
                 'call1:handler',
+                'call4:handler',
                 'call2:subcall',
                 'call3:subcall',
-                'call4:handler',
                 'call2:subcall:handler',
                 'call3:subcall:handler',
                 'call2:handler',
-                'call3:handler'
-            ]);
+                'call3:handler']);
+
+            //test.deepEqual(results, [
+            //    'call1',
+            //    'call2:pre',
+            //    'call2:post',
+            //    'call3:pre',
+            //    'call3:post',
+            //    'call4',
+            //    'call1:handler',
+            //    'call2:subcall',
+            //    'call3:subcall',
+            //    'call4:handler',
+            //    'call2:subcall:handler',
+            //    'call3:subcall:handler',
+            //    'call2:handler',
+            //    'call3:handler'
+            //]);
 
             test.done();
-        }, function (args) {
+        });
+
+        task.on("fail", function (args) {
             test.fail();
         });
 
@@ -257,7 +315,7 @@ module.exports = {
                 //console.error('response handler Z for ' + task.name);
                 results.push(response + ':handler');
 
-                task.reply(task.args);
+                task.respond("reply", task.args);
             });
 
             results.push(task.args + ':post');
@@ -265,7 +323,7 @@ module.exports = {
             // this is a weird and tricky case! because we're scheduling a reply before we hear back
             // from the message we just sent, but which has a handler!!
 //            this.reply(args);
-            task.tryClose();
+            task.pickupReplies();
         };
 
         var buckStopsHere = function (task) {
@@ -274,8 +332,8 @@ module.exports = {
 
             results.push(task.args);
 
-            task.reply(task.args);
-            task.tryClose();
+            task.respond("reply", task.args);
+            task.pickupReplies();
         };
 
         // send a message from this task - root:child1
@@ -304,7 +362,7 @@ module.exports = {
             results.push(result + ':handler');
         });
 
-        task.tryClose('c');
+        task.pickupReplies();
     },
 
     "implicit fail handler": function (test) {
@@ -330,34 +388,32 @@ module.exports = {
                     console.log("what?! a failure?!");
                 });
 
+                // send a message with an empty handler
                 task.sendMessage(baz, result, function () {  // a response handler doesn't need an envelope
                 });
-
-                task.tryClose();
-
             });
 
             // another task at this level could just overwrite subtask - we're done with that value
             // or we could do something where creating a subtask takes the handlers and binds them itself...
 
-            task.tryClose();
+            task.pickupReplies();
         };
 
         // set up some stub services for our task handler to send messages to
 
         var foo = function (task) {
             console.log("i am foo");
-            task.reply();
+            task.respond("reply");
         };
 
         var bar = function (task) {
             console.log("i am bar!");
-            task.fail();
+            task.respond("fail");
         };
 
         var baz = function (task) {
             console.log("I am a BANANA!");
-            task.reply();
+            task.respond("reply");
         };
 
         // todo send a root task

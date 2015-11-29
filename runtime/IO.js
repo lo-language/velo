@@ -14,7 +14,7 @@ module.exports = {
 
             // we need to reply so the caller doesn't hang waiting for a response
             // todo - call this function as a dispatch?
-            task.reply();
+            task.respond("reply");
         }
     },
 
@@ -33,7 +33,7 @@ module.exports = {
                 });
 
                 res.on('end', function () {
-                    task.reply([res, body]);
+                    task.respond("reply", [res, body]);
                 });
             });
         }

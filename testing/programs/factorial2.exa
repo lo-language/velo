@@ -1,15 +1,16 @@
-/*
- * iterative factorial calculator
- */
+receive args, io;
 
-receive num;
+factorial = >>:
 
-if num < 0:
-    fail "I pity the fool!";
+    receive num;
 
-if num <= 1:
-    reply 1;
+    if num < 0:
+        fail "I pity the fool!";
 
-result = 1;
+    if num <= 1:
+        reply 1;
 
-reply result;
+    reply num * recur(num - 1);
+;
+
+io.stdout.write ~ "`factorial(args[0])`\n";

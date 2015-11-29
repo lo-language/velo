@@ -1,5 +1,22 @@
 "use strict";
 
+// Exa Messages are implemented in JS as closures bound to the single argument that is the message body.
+// So they're basically little self-contained capsules of logic that just need to be executed at the right time.
+
+// A task has two states: busy and waiting
+// busy is when the task is operating; waiting is when it's waiting for replies
+// it flips between them based on its activity
+
+// Exa closures (handlers & nested services) are implemented directly as JS closures for now.
+
+// The Task Tree grows bread-first, except for sync messages, that are explored depth-first.
+// is the Task Tree created *breadth-first*, or does it explore down depth first but not wait for replies?
+// we could actually have a run-time switch to set the task-processing strategy, and thus test a program for
+// dangerous assumptions
+
+const util = require('util');
+const EventEmitter = require('events');
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Models an Exa task to handle the bookkeeping.
@@ -11,119 +28,44 @@
  *
  * @return {*}
  */
-var __ = function (name, service, args, onReply, onFail, onComplete) {
+var __ = function (name, service, args) {
 
-    // todo should we take the target fn and args in this constructor?
-
-    // todo inherit parent's onReply and onFail??
-
-    // should recur be part of the request, not an arg?
-    // proc sig should be function (args, task) or we can try to make a task in each proc?
-    // where task has reply, fail, etc.
+    EventEmitter.call(this);
 
     this.name = name;
     this.service = service;
     this.args = args;
 
-    this.onReply = onReply; // already bound to parent request
-    this.onFail = onFail;   // ditto
-    this.onComplete = onComplete;
+    this.hasResponded = false;
 
-    // this is just a count of pending tasks, not refs to the actual tasks, since they could be remote
-    this.subTasks = 0;
+    this.sentMessages = 0;
+    this.outstandingRequests = 0;
+    this.pendingReplies = [];
+    this.busy = true;
+
+    this.log = function () {}; //console.error;
 };
+
+util.inherits(__, EventEmitter);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Sends a reply to the requestor, provided we haven't already responded.
+ * Emits a response, provided we haven't already responded.
  *
+ * @param type  "reply" or "fail"
  * @param args
  */
-__.prototype.reply = function (args) {
+__.prototype.respond = function (type, args) {
 
-    if (this.onReply !== null && typeof this.onReply !== "undefined") {
+    // todo this method is so simple we should probably inline it in codegen
 
-//        console.error("scheduling reply for " + this.name);
-
-        // send the reply message
-
-        var response = this.onReply;
-        var t = this;
-
-        setImmediate(function () {
-            response(args);
-
-//            console.error("signaling completion of: " + t.name);
-
-            // report back to the parent request that we've completed
-            // onComplete is actually bound to the parent, despite how we're calling it
-            t.onComplete && t.onComplete();
-        });
-
-        // immediately destroy our ability to respond again
-        this.onFail = this.onReply = null;
-    }
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Sends a failure message to the requestor, provided we haven't already responded.
- *
- * @param args
- */
-__.prototype.fail = function (args) {
-
-    if (this.onFail !== null && typeof this.onFail !== "undefined") {
-
-        // send the fail message, with this bound to the *parent* request
-        var response = this.onFail.bind(this, args);
-        var t = this;
-        setImmediate(function () {
-            response();
-
-//            console.error("signaling completion of: " + t.name);
-
-            // report back to the parent request that we've completed
-            // onComplete is actually bound to the parent, despite how we're calling it
-            t.onComplete && t.onComplete();
-        });
-
-        // immediately destroy our ability to respond again
-        this.onReply = this.onFail = null;
-    }
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Tries to close this task - it will close unless there are open subTasks.
- * Close in this case is the bookkeeping sense.
- * When we close, we trigger a default reply.
- *
- * We shouldn't need to track the closed state separately since that's just subtasks == 0
- */
-__.prototype.tryClose = function (name) {
-
-//    console.error("trying to close " + this.name);
-
-    // make sure there aren't any open subTasks
-    if (this.subTasks > 0) {
-//        console.error("... but has " + this.subTasks + " pending subTasks");
+    if (this.hasResponded) {
+        // todo throw a warning
         return;
     }
 
-//    console.error("closing with default reply");
-    this.onReply && this.reply();
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Marks a subtask complete for bookkeeping. We don't care about which subtask.
- */
-__.prototype.checkOff = function () {
-
-//    console.error("checking off subtask of: " + this.name);
-    this.subTasks--;
-    this.tryClose();
+    this.hasResponded = true;
+    this.emit(type, args);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,24 +77,136 @@ __.prototype.checkOff = function () {
  * @param args      array of args for the function
  * @param onReply   callback for success response
  * @param onFail    callback for failure response
+ * @param doSync    message is synchronous; skip the replies queue
  */
-__.prototype.sendMessage = function (service, args, onReply, onFail) {
+__.prototype.sendMessage = function (service, args, onReply, onFail, doSync) {
 
-    this.children = this.children || 1;
+    var task = new __('xx', service, args);
 
-    // create the subrequest and if it has handlers, wire it up to check itself off when it responds
-    // also wire up onReply and onFail to this (parent) task
-    // todo - clean this up - not sure this is the best place to bind to parent request
+    var requestId = this.sentMessages++;
 
-    var name = this.name + ':child' + this.children++;
+    var _this = this;
 
-    var task = new __(name, service, args, onReply ? onReply.bind(this) : null, onFail ? onFail.bind(this) : null, this.checkOff.bind(this));
+    if (onReply) {
 
-    if (onReply || onFail) {
-        this.subTasks++;
+        task.on('reply', function (args) {
+
+            _this.log(["received REPLY for request " + requestId, args]);
+
+            if (doSync) {
+
+                // skip the queue!
+                onReply(args);
+            }
+            else {
+                _this.acceptResponse(onReply.bind(null, args));
+            }
+        });
     }
 
-    setImmediate(service.bind(null, task));
+    if (onFail) {
+
+        task.on('fail', function (args) {
+
+            _this.log(["received FAIL for request " + requestId, args]);
+
+            if (doSync) {
+
+                // skip the queue!
+                onFail(args);
+            }
+            else {
+                _this.acceptResponse(onFail.bind(null, args));
+            }
+        });
+    }
+
+    // todo either explore depth-first or do a BFS without setImmediate
+    //service(task);
+
+    if (onFail || onReply) {
+        this.log(["sending request " + requestId, task]);
+
+        // record the outstanding request in our ledger
+        this.outstandingRequests++;
+    }
+    else {
+        this.log(["dispatching message " + requestId, task]);
+        // we make no record of a message dispatched without the ability to respond
+    }
+
+    // send the message
+
+    if (doSync) {
+        service(task);
+    }
+    else {
+        setImmediate(service, task);
+    }
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Enqueue the response.
+ */
+__.prototype.acceptResponse = function (handler) {
+
+    // debit the outstanding requests account
+    this.outstandingRequests--;
+
+    // credit the pending replies account
+    this.pendingReplies.push(handler);
+
+    if (this.busy == false) {
+        setImmediate(this.processReplies.bind(this));
+    }
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Changes state to start processing replies.
+ */
+__.prototype.pickupReplies = function () {
+
+    this.busy = false;
+
+    // see if our work is already complete
+
+    if (this.outstandingRequests == 0 &&
+        this.pendingReplies.length == 0) {
+
+        // issue a default reply
+        this.respond("reply");
+        return;
+    }
+
+    // process any replies we've already received
+    this.processReplies();
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Process all enqueued replies.
+ */
+__.prototype.processReplies = function () {
+
+    if (this.pendingReplies.length == 0) {
+        return;
+    }
+
+    // we're busy when we're in a response handler
+    this.busy = true;
+
+    this.pendingReplies.forEach(function (responseHandler) {
+
+        // a pending reply is a handler closure bound to the reply body so we just have to execute it
+        responseHandler();
+    });
+
+    this.pendingReplies = [];
+
+    // ok, we're not busy anymore - go back to waiting
+    this.pickupReplies();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,26 +222,16 @@ __.sendRootRequest = function (service, args, onReply, onFail) {
 
     // create the root task
 
-    var task = new __('root', service, args, onReply, onFail);
+    var task = new __('root', service, args);
 
-    // maybe a request is something you can call send on?
-    // and that calls setimmediate?
-    //request.send();
+    task.on("reply", onReply);
+    task.on("fail", onFail);
 
-    // or maybe a request is something you can call setImmediate on?
-    // so it's the target fn bound to its args?
-    //setImmediate(request);
-
-    // how are request and task releated?
-    // seems like you should pass a request to a service
-    // and maybe call reply and fail on the request
-    // but what about tryclose? that should be on the task, and call request.reply if necessary
-    // the caller makes a request and sends it - the system delivers a task??
-    // should a service get both a request and a task?
-    // calls reply/fail on request and sendmessage/tryclose on task?
-    // or should a task have the request built into it?
-
+    // kick it off
     service(task);
+
+    // wait a turn to process the replies
+    setImmediate(task.pickupReplies.bind(task));
 };
 
 module.exports = __;

@@ -101,7 +101,7 @@ module.exports["async"] = {
         var scope = new Scope();
 
         test.equal(Compiler.compile(node, scope).render(),
-            "var cont = function () {};if ($foo) {task.sendMessage($foo, [], function (P0) {$bar = P0;\ncont();}, null);\n\n}\n\nelse {cont();}\n\n");
+            "var cont = function () {};if ($foo) {task.sendMessage($foo, [], function (P0) {$bar = P0;\ncont();}, null, true);\n\n}\n\nelse {cont();}\n\n");
         test.done();
     },
 
@@ -127,7 +127,7 @@ module.exports["async"] = {
         var scope = new Scope();
 
         test.equal(Compiler.compile(node, scope).render(),
-            "if ($foo) {task.reply(42);\nreturn;}\n\n");
+            'if ($foo) {task.respond("reply", 42);\nreturn;}\n\n');
         test.done();
     }
 };
