@@ -1,42 +1,101 @@
+/**
+ * This program is the answer to an interview question I like to ask:
+ * how many valid android lockscreen patterns are there?
+ *
+ * Created by: spurcell
+ * 12/6/2015
+ */
+
 receive args, io;
 
-minPoints is 3;
-numPoints is 6;
+// could construct faster by tracking remaining choices explicitly
+
+minPoints is 4;
+numPoints is 9;
 
 // recursively iterate
 // label points as 0-8
 
-explore = >>:
+explore = service:
 
-    receive path, indent;
-
-    io.stdout.write ~ "`indent`exploring from `path`\n";
+    receive path;
 
     point = 0;
     found = 0;
 
     while point < numPoints:
 
-        if point in path:
-            io.stdout.write ~ "`indent``point` exists in `path`\n";
-        else:
+        valid = true;
+
+        if point in path:   // point already used
+            valid = false;
+
+        // top edge
+        else if path[-1] == 0 and point == 2:
+            valid = 1 in path;
+        else if path[-1] == 2 and point == 0:
+            valid = 1 in path;
+
+        // middle horizontal
+        else if path[-1] == 3 and point == 5:
+            valid = 4 in path;
+        else if path[-1] == 5 and point == 3:
+            valid = 4 in path;
+
+        // bottom edge
+        else if path[-1] == 6 and point == 8:
+            valid = 7 in path;
+        else if path[-1] == 8 and point == 6:
+            valid = 7 in path;
+
+        // left edge
+        else if path[-1] == 0 and point == 6:
+            valid = 3 in path;
+        else if path[-1] == 6 and point == 0:
+            valid = 3 in path;
+
+        // middle vertical
+        else if path[-1] == 1 and point == 7:
+            valid = 4 in path;
+        else if path[-1] == 7 and point == 1:
+            valid = 4 in path;
+
+        // right edge
+        else if path[-1] == 2 and point == 8:
+            valid = 5 in path;
+        else if path[-1] == 8 and point == 2:
+            valid = 5 in path;
+
+        // diagonals
+        else if path[-1] == 0 and point == 8:
+            valid = 4 in path;
+        else if path[-1] == 8 and point == 0:
+            valid = 4 in path;
+        else if path[-1] == 2 and point == 6:
+            valid = 4 in path;
+        else if path[-1] == 6 and point == 2:
+            valid = 4 in path;
+
+        if valid:
+
+            // add point to path
             point -> path;
-            explore(path, "`indent`  ");
+
+            // see if path is long enough
+            if #path >= minPoints:
+//                io.stdout.write("`path`\n");
+                found++;
+
+            // extend the path if possible
+            if #path < numPoints:
+                found += explore(path);
+
+            // pop the point off the path
             path{-1};
 
         point++;
 
-    // we might have a runtime issue
-    // seems like this proc's tryclose is getting ahead of some of the recursive calls
-    // maybe because of setImmediate()?
-    // why would this differ between compiled and just run?
-    // maybe because of setImmediate()?
-
-    io.stdout.write ~ "`indent`bailed out at `point`\n";
+    reply found;
 ;
 
-found = explore([], "");
-
-// we have an ordering bug!
-io.stdout.write("found: `found`\n");
-//io.stdout.write ~ "found: `found`\n";
+io.stdout.write("`explore([])`\n");
