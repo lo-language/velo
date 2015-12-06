@@ -10,9 +10,9 @@
 
 "use strict";
 
-var Loader = require('../../runtime/Loader');
-var Harness = require('../Harness');
-var util = require('util');
+const Loader = require('../../runtime/Loader');
+const Harness = require('../Harness');
+const util = require('util');
 
 var loader = new Loader(__dirname);
 
@@ -30,7 +30,12 @@ module.exports['iteration'] = {
     "stack doesn't overflow": function (test) {
 
         //console.log(this.harness.getJs().render(true));
-        this.harness.testSuccess(test, [100000], 100000);
+        this.harness.run([100000]).then(
+            function (res) {
+                test.equal(res, 100000);
+                test.done();
+            }
+        );
     }
 };
 
@@ -46,7 +51,11 @@ module.exports['acquire'] = {
     'success': function (test) {
 
 //        console.log(util.inspect(this.harness.module.parse(), {depth: null, colors: true}));
-        this.harness.testSuccess(test, [5, loader.acquire], 120);
+        this.harness.run([5, loader.acquire]).then(
+            function (res) {
+                test.equal(res, 120);
+                test.done();
+            });
     }
 };
 
@@ -63,22 +72,20 @@ module.exports['io'] = {
 
         test.expect(1);
 
-        try {
-            this.harness.getJs();
-        }
-        catch (e) {
-            console.error(e.stack);
-        }
-
-        this.harness.testSuccess(test, [[], {
+        var io = {
             stdout: {
                 write: function (task) {
-                    console.error("snark");
                     test.ok(true);
-                    task.pickupReplies();
+                    task.respond("reply");
                 }
             }
-        }, {}]);
+        };
+
+        this.harness.run([[], io, {}]).then(
+            function (res) {
+                test.done();
+            }
+        );
     }
 };
 
@@ -95,29 +102,23 @@ module.exports['reply handling'] = {
 
         test.expect(1);
 
-
-        try {
-            this.harness.getJs();
-        }
-        catch (e) {
-            console.error(e.stack);
-        }
-
         // both functions just reply immediately
         // todo add a test that does this experiment within a reply handler
 
-        this.harness.testSuccess(test, [
+        this.harness.run([
 
             function (task) {
                 task.respond("reply");
-                task.pickupReplies();
             },
 
             function (task) {
                 task.respond("reply", 42);
-                task.pickupReplies();
             }
-        ], 42);
+        ]).then(
+            function (res) {
+                test.equal(res, 42);
+                test.done();
+            });
     }
 };
 
@@ -153,7 +154,7 @@ module.exports['factorial'] = {
     },
 
     'success': function (test) {
-        console.log(this.harness.getJs());
+        //console.log(this.harness.getJs());
         this.harness.testSuccess(test, [10], 3628800);
     },
 
@@ -210,31 +211,31 @@ module.exports['procedure'] = {
     }
 };
 
-//module.exports['conditional in loop'] = {
-//
-//    "setUp": function (cb) {
-//
-//        this.harness = new Harness(loader, 'condInLoop');
-//
-//        this.harness.setUp(cb);
-//    },
-//
-//    'success': function (test) {
-//
-//        var logMessages = [];
-//
-//        this.harness.testSuccess(test, [
-//            function (task) {
-//
-//                logMessages.push(task.args[0]);
-//                task.pickupReplies();
-//            }
-//        ], 5).then(function () {
-//
-//            test.deepEqual(logMessages, [ 'howdy!\n', 'howdy!\n', 'hello hello!\n', 'ok.\n', 'ok.\n' ]);
-//        });
-//    }
-//};
+module.exports['conditional in loop'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(loader, 'condInLoop');
+
+        this.harness.setUp(cb);
+    },
+
+    'success': function (test) {
+
+        var logMessages = [];
+
+        this.harness.testSuccess(test, [
+            function (task) {
+
+                logMessages.push(task.args[0]);
+                task.respond("reply");
+            }
+        ], 5).then(function () {
+
+            test.deepEqual(logMessages, [ 'howdy!\n', 'howdy!\n', 'hello hello!\n', 'ok.\n', 'ok.\n' ]);
+        });
+    }
+};
 
 //module.exports['recovery'] = {
 //
@@ -259,20 +260,21 @@ module.exports['factorial2'] = {
 
         this.harness = new Harness(loader, 'factorial2');
 
-        this.io = {
-            stdout: {
-                write: function (task) {
-                    task.pickupReplies();
-                }
-            }
-        };
-
         this.harness.setUp(cb);
     },
 
     'success': function (test) {
 
-        this.harness.testSuccess(test, [[10], this.io], undefined);
+        var io = {
+            stdout: {
+                write: function (task) {
+                    test.equal(task.args[0], '3628800\n');
+                    task.respond("reply");
+                }
+            }
+        };
+
+        this.harness.testSuccess(test, [[10], io]);
     },
 
     //'failure': function (test) {

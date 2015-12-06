@@ -16,6 +16,7 @@
 
 const util = require('util');
 const EventEmitter = require('events');
+const LOG_ENABLE = false;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -43,7 +44,7 @@ var __ = function (name, service, args) {
     this.pendingReplies = [];
     this.busy = true;
 
-    this.log = function () {}; //console.error;
+    this.log = LOG_ENABLE ? console.error : function () {};
 };
 
 util.inherits(__, EventEmitter);
@@ -121,14 +122,14 @@ __.prototype.sendMessage = function (service, args, onReply, onFail, doSync) {
         });
     }
 
-    // todo either explore depth-first or do a BFS without setImmediate
-    //service(task);
-
     if (onFail || onReply) {
         this.log(["sending request " + requestId, task]);
 
-        // record the outstanding request in our ledger
-        this.outstandingRequests++;
+        if (!doSync) {
+
+            // record the outstanding request in our ledger
+            this.outstandingRequests++;
+        }
     }
     else {
         this.log(["dispatching message " + requestId, task]);
@@ -136,13 +137,7 @@ __.prototype.sendMessage = function (service, args, onReply, onFail, doSync) {
     }
 
     // send the message
-
-    if (doSync) {
-        service(task);
-    }
-    else {
-        setImmediate(service, task);
-    }
+    service(task);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -169,6 +164,7 @@ __.prototype.acceptResponse = function (handler) {
 __.prototype.pickupReplies = function () {
 
     this.busy = false;
+    this.log(['picking up replies', this]);
 
     // see if our work is already complete
 
@@ -176,6 +172,7 @@ __.prototype.pickupReplies = function () {
         this.pendingReplies.length == 0) {
 
         // issue a default reply
+        this.log(['emmitting default reply']);
         this.respond("reply");
         return;
     }
@@ -194,6 +191,8 @@ __.prototype.processReplies = function () {
         return;
     }
 
+    this.log(['processing replies']);
+
     // we're busy when we're in a response handler
     this.busy = true;
 
@@ -204,6 +203,35 @@ __.prototype.processReplies = function () {
     });
 
     this.pendingReplies = [];
+
+    // ok, we're not busy anymore - go back to waiting
+    this.pickupReplies();
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Process the given reply
+ *
+ * @param reply
+ */
+__.prototype.processReply = function (responseHandler) {
+
+    this.log(['processing reply', reply]);
+
+    // we're busy when we're in a response handler
+    this.busy = true;
+    responseHandler();
+
+    // see if our work is now done
+
+    if (this.outstandingRequests == 0 &&
+        this.pendingReplies.length == 0) {
+
+        // issue a default reply
+        this.log(['emmitting default reply']);
+        this.respond("reply");
+        return;
+    }
 
     // ok, we're not busy anymore - go back to waiting
     this.pickupReplies();
@@ -231,7 +259,7 @@ __.sendRootRequest = function (service, args, onReply, onFail) {
     service(task);
 
     // wait a turn to process the replies
-    setImmediate(task.pickupReplies.bind(task));
+    //setImmediate(task.pickupReplies.bind(task));
 };
 
 module.exports = __;

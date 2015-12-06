@@ -98,7 +98,7 @@ __.prototype.run = function (args) {
 
     // should this function inject acquire? or should that be optional
 
-    Task.sendRootRequest(this.procedure, args, d.resolve.bind(d), d.reject.bind(d));
+    Task.sendRootRequest(this.procedure, args ? args : [], d.resolve.bind(d), d.reject.bind(d));
 
     return d.promise;
 };

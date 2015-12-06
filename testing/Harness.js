@@ -43,6 +43,15 @@ __.prototype.getJs = function () {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ */
+__.prototype.run = function (input) {
+
+    return this.module.run(input);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 __.prototype.testSuccess = function (test, input, expected) {
 
@@ -60,6 +69,7 @@ __.prototype.testSuccess = function (test, input, expected) {
             }
 
             // this is in here to let us wait on tests that end with a dispatch
+            // todo figure out a way to remove this
             setImmediate(test.done.bind(test));
         },
         function (err) {

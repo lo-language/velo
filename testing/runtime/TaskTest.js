@@ -257,25 +257,27 @@ module.exports['basics'] = {
 
         task.on("reply", function (args) {
 
+            // this test enforces a particular (expected) ordering of tasks, but
             // there are actually *several* valid orderings of the tasks in this test because
-            // the calls are all supposed to be concurrent - but I'm enforcing a BFS ordering for now;
-            // a previously-valid ordering is commented out below
+            // the calls are all supposed to be concurrent
+            // an also-valid, previously-expected ordering is commented out below
 
             test.deepEqual(results, [
-                'call1',
-                'call2:pre',
-                'call2:post',
-                'call3:pre',
-                'call3:post',
-                'call4',
-                'call1:handler',
-                'call4:handler',
-                'call2:subcall',
-                'call3:subcall',
-                'call2:subcall:handler',
-                'call3:subcall:handler',
-                'call2:handler',
-                'call3:handler']);
+                "call1",
+                "call2:pre",
+                "call2:subcall",
+                "call2:post",
+                "call2:subcall:handler",
+                "call3:pre",
+                "call3:subcall",
+                "call3:post",
+                "call3:subcall:handler",
+                "call4",
+                "call1:handler",
+                "call2:handler",
+                "call3:handler",
+                "call4:handler"
+            ]);
 
             //test.deepEqual(results, [
             //    'call1',

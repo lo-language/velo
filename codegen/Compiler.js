@@ -65,8 +65,7 @@ __['procedure'] = function (node, scope) {
     var localScope = scope ? scope.bud() : new Scope(null);
 
     // compile the statement(s) in the context of the local scope
-    // we can't use attach for pickupReplies because then it could wind up inside a callback, and thus never be called
-    var body = [__.compile(node.body, localScope), new JsConstruct("task.pickupReplies();\n")];
+    var body = __.compile(node.body, localScope).attach(new JsConstruct("task.pickupReplies();\n"));
 
     // todo remove this feature
     body = ['var $recur = task.service;\n', body];
