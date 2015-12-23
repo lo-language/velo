@@ -6,6 +6,7 @@
 "use strict";
 
 var Compiler = require('../../../codegen/Compiler');
+var Scope = require('../../../codegen/Scope');
 var util = require('util');
 
 module.exports["message"] = {
@@ -64,6 +65,35 @@ module.exports["message"] = {
         };
 
         test.equal(Compiler.compile(node).render(), 'task.sendMessage($foo, [$url], function (args) {$res = args.shift();\n\$body = args.shift();\n}, null);\n\n');
+        test.done();
+    },
+
+    "passes scope down": function (test) {
+
+        var node = {
+            type: 'message',
+            address: {
+                "type": "id",
+                "name": "foo"
+            },
+            args: [{type: 'id', name: 'url'}],
+            futures: [{type: 'id', name: 'res'}, {type: 'id', name: 'body'}],
+            subsequent: {
+                type: 'stmt_list',
+                head: { type: 'assign',
+                    op: '=',
+                    left: { type: 'id', name: 'bar' },
+                    right: { type: 'id', name: 'answer'}
+                },
+                tail: null
+            }
+        };
+
+        var scope = new Scope();
+        scope.define('answer', '42');
+
+        test.equal(Compiler.compile(node, scope.bud()).render(),
+            'task.sendMessage($foo, [$url], function (args) {$res = args.shift();\n$body = args.shift();\n$bar = 42;\n}, null);\n\n');
         test.done();
     }
 

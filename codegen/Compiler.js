@@ -293,8 +293,8 @@ __['message'] = function (node, scope) {
         return __.compile(arg, scope);
     });
 
-    var subsequent = node.subsequent ? __.compile(node.subsequent) : null;
-    var contingency = node.contingency ? __.compile(node.contingency) : null;
+    var subsequent = node.subsequent ? __.compile(node.subsequent, scope) : null;
+    var contingency = node.contingency ? __.compile(node.contingency, scope) : null;
 
     // put the futures in scope, then the continuation callback will assign to them
 
