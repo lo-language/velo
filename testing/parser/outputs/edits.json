@@ -22,6 +22,10 @@
         "type": "stmt_list",
         "head": {
           "type": "splice",
+          "item": {
+            "type": "number",
+            "val": "42"
+          },
           "list": {
             "type": "subscript",
             "list": {
@@ -32,23 +36,19 @@
               "type": "number",
               "val": "0"
             }
-          },
-          "item": {
-            "type": "number",
-            "val": "42"
           }
         },
         "tail": {
           "type": "stmt_list",
           "head": {
             "type": "splice",
-            "list": {
-              "type": "id",
-              "name": "mountains"
-            },
             "item": {
               "type": "string",
               "val": "Denali"
+            },
+            "list": {
+              "type": "id",
+              "name": "mountains"
             }
           },
           "tail": null

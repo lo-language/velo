@@ -126,7 +126,7 @@ case 29:
 this.$ = {type: 'decrement', operand: $$[$0-1]};
 break;
 case 30:
-this.$ = {type: 'splice', list: $$[$0], item: $$[$0-2]};
+this.$ = {type: 'splice', item: $$[$0-2], list: $$[$0]};
 break;
 case 31:
 this.$ = {type: 'conditional', predicate: $$[$0-2], consequent: $$[$0]};
