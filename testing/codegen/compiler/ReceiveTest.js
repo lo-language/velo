@@ -22,7 +22,7 @@ module.exports["receive"] = {
 
         test.equal(scope.has("foo"), false);
         test.equal(scope.has("mani"), false);
-        test.equal(Compiler.compile(node, scope).render(), '$foo = task.args.shift();\n$mani = task.args.shift();\n$padme = task.args.shift();\n$hum = task.args.shift();\n\n');
+        test.equal(scope.compile(node).render(), '$foo = task.args.shift();\n$mani = task.args.shift();\n$padme = task.args.shift();\n$hum = task.args.shift();\n\n');
 
         // params should now be declared in the scope
         test.equal(scope.has("foo"), true);

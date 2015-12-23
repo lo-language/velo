@@ -7,7 +7,7 @@
 
 "use strict";
 
-var JsConstruct = require('./JsConstruct');
+var Compiler = require('./Compiler');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -157,6 +157,21 @@ __.prototype.getStatus = function (name) {
 __.prototype.bud = function () { // push? nest? inner? derive? pushDown?
 
     return new __(this);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @return {*}
+ */
+__.prototype.compile = function (node) {
+
+    if (Compiler[node.type] === undefined) {
+        throw new Error("don't know how to compile node type '" + node.type + "'");
+    }
+
+    // dispatch to the appropriate AST node handler
+    return Compiler[node.type].call(this, node);
 };
 
 module.exports = __;

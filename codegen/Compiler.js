@@ -1,6 +1,8 @@
 /**
  * The Exa-to-JS compiler
  *
+ * This is a collection of stateless functions expecting to be called with a Scope as 'this'.
+ *
  * How it works:
  *
  * Each AST node is compiled into either a bare JS string or an array of strings, arrays, and objects.
@@ -10,43 +12,25 @@
  * Simple nodes, such as literals, compile into bare JS strings. More complex nodes compile into constructs,
  * e.g. an addition node would compile into the construct ['(', leftOperand, ' + ', rightOperand, ')']
  *
+ *
  * Note:
  * To compile an expression containing a request, we have to do a trick where we create a "resolver" block to wrap the expression.
  */
 
 'use strict';
 
-var Scope = require('./Scope');
 var JsConstruct = require('./JsConstruct');
 var SyncMessage = require('./SyncMessage');
 
+// this is a library, not a "class"
 var __ = {};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Dispatches to the appropriate node type handler. Returns a JSConstruct.
  *
  * @param node
- * @param scope
- * @return {*}
  */
-__.compile = function (node, scope) {
-
-    if (this[node.type] === undefined) {
-        throw new Error("don't know how to compile node type '" + node.type + "'");
-    }
-
-    // dispatch to the appropriate AST node handler
-    return __[node.type](node, scope || new Scope());
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param scope
- * @param node
- */
-__['nil'] = function (node, scope) {
+__['nil'] = function (node) {
 
     return "null";
 };
@@ -55,17 +39,15 @@ __['nil'] = function (node, scope) {
 /**
  * A procedure is an expression.
  *
- * @param scope
  * @param node
  */
-__['procedure'] = function (node, scope) {
+__['procedure'] = function (node) {
 
-    // create a new Exa scope for this procedure
-    // if there's no enclosing scope, we're at the root of the scope tree
-    var localScope = scope ? scope.bud() : new Scope(null);
+    // push a new scope onto the scope stack
+    var localScope = this.bud();
 
     // compile the statement(s) in the context of the local scope
-    var body = __.compile(node.body, localScope).attach(new JsConstruct("task.pickupReplies();\n"));
+    var body = localScope.compile(node.body).attach(new JsConstruct("task.pickupReplies();\n"));
 
     // todo only include where it's used (or just remove this feature)
     body = ['var $recur = task.service;\n', body];
@@ -87,40 +69,40 @@ __['procedure'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
-__['stmt_list'] = function (node, scope) {
+__['stmt_list'] = function (node) {
 
     // hooray for Lisp!
 
-    try {
+    //try {
         return node.tail ?
-            __.compile(node.head, scope).attach(__.compile(node.tail, scope)) :
-            __.compile(node.head, scope);
-    }
-    catch (e) {
-        console.error(e + " while compiling: ");
-        console.error(node);
-    }
+            this.compile(node.head).attach(this.compile(node.tail)) :
+            this.compile(node.head);
+    //}
+    //catch (e) {
+    //    console.error(e + " while compiling: ");
+    //    console.error(node);
+    //}
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Statements
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * @param scope
  * @param node
  */
-__['receive'] = function (node, scope) {
+__['receive'] = function (node) {
 
     // todo do we always want the declaration? could use receive to clobber existing values...
+
+    var _this = this;
 
     return JsConstruct.makeStatement([node.names.map(function (name) {
 
         // declare if a new var
-        if (scope.has(name) == false) {
-            scope.declare(name);
+        if (_this.has(name) == false) {
+            _this.declare(name);
         }
 
         return '$' + name + ' = ' + 'task.args.shift()';
@@ -131,13 +113,14 @@ __['receive'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
-__['response'] = function (node, scope) {
+__['response'] = function (node) {
+
+    var _this = this;
 
     var args = node.args.map(function (arg) {
-        return __.compile(arg, scope);
+        return _this.compile(arg);
     });
 
     if (args.length > 1) {
@@ -155,28 +138,27 @@ __['response'] = function (node, scope) {
  * An assignment may alter the current scope by defining a variable in it if the LHS of the assign
  * is an identifier.
  *
- * @param scope
  * @param node
  */
-__['assign'] = function (node, scope) {
+__['assign'] = function (node) {
 
     // this is guaranteed to be a statement
 
-    var left = __.compile(node.left, scope);
-    var right = __.compile(node.right, scope);
+    var left = this.compile(node.left);
+    var right = this.compile(node.right);
 
     // todo this implies block-level scoping
     if (node.left.type == 'id') {
 
         // validate we're not assigning to a constant
-        if (scope.isConstant(node.left.name)) {
+        if (this.isConstant(node.left.name)) {
             throw new Error("can't assign to a constant (" + node.left.name + ")");
         }
 
         // declare if a new var
         // can this not be idempotent?
-        if (scope.has(node.left.name) == false) {
-            scope.declare(node.left.name);
+        if (this.has(node.left.name) == false) {
+            this.declare(node.left.name);
         }
     }
 
@@ -188,10 +170,9 @@ __['assign'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
-__['conditional'] = function (node, scope) {
+__['conditional'] = function (node) {
 
     // if the predicate is sync that's easy because we always want to resolve it
     // the trick is sync logic in the branches because we only want to resolve if
@@ -200,14 +181,14 @@ __['conditional'] = function (node, scope) {
     // generate unique continuation names
     var contName;
 
-    var predicate = __.compile(node.predicate, scope);
-    var consequent = __.compile(node.consequent, scope);
+    var predicate = this.compile(node.predicate);
+    var consequent = this.compile(node.consequent);
     var negBlock = false;
 
     var async = consequent.async;
 
     if (node.otherwise) {
-        negBlock = __.compile(node.otherwise, scope);
+        negBlock = this.compile(node.otherwise);
         async = async || negBlock.async;
     }
 
@@ -221,7 +202,7 @@ __['conditional'] = function (node, scope) {
         // and need to call the continuation as the last statement in both branches
 
         // generate unique continuation names
-        contName = "cont" + scope.contNum++;
+        contName = "cont" + this.contNum++;
 
         consequent.attach(new JsConstruct(contName + "();"));
         negBlock.attach(new JsConstruct(contName + "();"));
@@ -244,13 +225,12 @@ __['conditional'] = function (node, scope) {
 /**
  * Loops while a condition is true.
  *
- * @param scope
  * @param node
  */
-__['iteration'] = function (node, scope) {
+__['iteration'] = function (node) {
 
-    var condition = __.compile(node.condition, scope);
-    var body = __.compile(node.statements, scope);
+    var condition = this.compile(node.condition);
+    var body = this.compile(node.statements);
     var async = body.async;
 
     // can render as a while loop if body isn't async
@@ -280,21 +260,22 @@ __['iteration'] = function (node, scope) {
 /**
  * Generates code to send messages via Task#sendMessage().
  *
- * @param scope
  * @param node
  */
-__['message'] = function (node, scope) {
+__['message'] = function (node) {
 
     // compile the parts
 
-    var target = __.compile(node.address, scope);
+    var target = this.compile(node.address);
+
+    var _this = this;
 
     var args = node.args.map(function (arg) {
-        return __.compile(arg, scope);
+        return _this.compile(arg);
     });
 
-    var subsequent = node.subsequent ? __.compile(node.subsequent, scope) : null;
-    var contingency = node.contingency ? __.compile(node.contingency, scope) : null;
+    var subsequent = node.subsequent ? this.compile(node.subsequent) : null;
+    var contingency = node.contingency ? this.compile(node.contingency) : null;
 
     // put the futures in scope, then the continuation callback will assign to them
 
@@ -304,11 +285,11 @@ __['message'] = function (node, scope) {
 
         node.futures.forEach(function (future) {
 
-            if (future.type == 'id' && scope.has(future.name) == false) {
-                scope.declare(future.name);
+            if (future.type == 'id' && _this.has(future.name) == false) {
+                _this.declare(future.name);
             }
 
-            captures.push([__.compile(future), ' = args.shift();\n']);
+            captures.push([_this.compile(future), ' = args.shift();\n']);
         });
 
         // if there's a subsequent, throw the capture assignments in there at the top, otherwise make one
@@ -326,10 +307,10 @@ __['message'] = function (node, scope) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__['application_stmt'] = function (node, scope) {
+__['application_stmt'] = function (node) {
 
     // slap a semicolon on that bad boy
-    return JsConstruct.makeStatement([__.compile(node.application, scope), ';\n']);
+    return JsConstruct.makeStatement([this.compile(node.application), ';\n']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -337,15 +318,16 @@ __['application_stmt'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
-__['application'] = function (node, scope) {
+__['application'] = function (node) {
 
-    var target = __.compile(node.address, scope);
+    var target = this.compile(node.address);
+
+    var _this = this;
 
     var args = node.args.map(function (arg) {
-        return __.compile(arg, scope);
+        return _this.compile(arg);
     });
 
     // return a wrapped placeholder
@@ -357,10 +339,9 @@ __['application'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
-__['id'] = function (node, scope) {
+__['id'] = function (node) {
 
     // we know we're not rendering an lvalue because we're defended from that
     // in the assignment code generator
@@ -369,8 +350,8 @@ __['id'] = function (node, scope) {
     // context could also let us know we're in string interpolation
     // as well as conditionals
 
-    if (scope.isConstant(node.name)) {
-        return scope.resolve(node.name);
+    if (this.isConstant(node.name)) {
+        return this.resolve(node.name);
     }
 
     // todo if we're in an eval
@@ -383,12 +364,11 @@ __['id'] = function (node, scope) {
  * This just puts a mapping in the scope; it doesn't compile "to" anything.
  *
  * @param node
- * @param scope
  * @return {String}
  */
-__['constant'] = function (node, scope) {
+__['constant'] = function (node) {
 
-    scope.define(node.name, __.compile(node.value, scope));
+    this.define(node.name, this.compile(node.value));
 
     return new JsConstruct();
 };
@@ -396,12 +376,11 @@ __['constant'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
-__['cardinality'] = function (node, scope) {
+__['cardinality'] = function (node) {
 
-    var right = __.compile(node.operand, scope);
+    var right = this.compile(node.operand);
 
     // todo factor this out into a call to a utility function
 
@@ -416,26 +395,24 @@ __['cardinality'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
-__['complement'] = function (node, scope) {
+__['complement'] = function (node) {
 
-    return new JsConstruct(['!', __.compile(node.operand, scope)]);
+    return new JsConstruct(['!', this.compile(node.operand)]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
-__['subscript'] = function (node, scope) {
+__['subscript'] = function (node) {
 
     // this is guaranteed to be a statement
 
-    var list = __.compile(node.list, scope);
-    var index = __.compile(node.index, scope);
+    var list = this.compile(node.list);
+    var index = this.compile(node.index);
 
     // to do this properly we'd have to catch it at runtime - could probably do that with splice
     if (node.index.type == 'number' && parseInt(node.index.val) < 0) {
@@ -452,12 +429,11 @@ __['subscript'] = function (node, scope) {
 /**
  * Handles both non-mutating slice of a list and mutating excision of a list.
  *
- * @param scope
  * @param node
  */
-var compileSlice = function (node, scope) {
+var compileSlice = function (node) {
 
-    var list = __.compile(node.list, scope);
+    var list = this.compile(node.list);
     var start; // optional, so compile only if present
     var end;   // optional, so compile only if present
 
@@ -471,7 +447,7 @@ var compileSlice = function (node, scope) {
     if (node.start === undefined) {
         start = '0';
     } else {
-        start = __.compile(node.start, scope);
+        start = this.compile(node.start);
 
         if (node.start.type == 'number' && parseInt(node.start.val) < 0) {
             start = list + '.length' + node.start.val;
@@ -481,7 +457,7 @@ var compileSlice = function (node, scope) {
     if (node.end === undefined) {
         end = list + '.length';
     } else {
-        end = __.compile(node.end, scope);
+        end = this.compile(node.end);
 
         if (node.end.type == 'number' && parseInt(node.end.val) < 0) {
             end = list + '.length' + node.end.val;
@@ -505,13 +481,12 @@ __['excision'] = compileSlice;
 /**
  * An extraction is a mutating expression.
  *
- * @param scope
  * @param node
  */
-__['extraction'] = function (node, scope) {
+__['extraction'] = function (node) {
 
-    var list = __.compile(node.list, scope);
-    var index = __.compile(node.index, scope);
+    var list = this.compile(node.list);
+    var index = this.compile(node.index);
 
     // todo - what if the list expression is a request or somesuch? can't resolve it twice
     // wrap it in a helper function?
@@ -522,12 +497,11 @@ __['extraction'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
-__['select'] = function (node, scope) {
+__['select'] = function (node) {
 
-    var set = __.compile(node.set, scope);
+    var set = this.compile(node.set);
 
     return new JsConstruct([set, '.', node.member]);
 };
@@ -535,15 +509,14 @@ __['select'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
-__['in'] = function (node, scope) {
+__['in'] = function (node) {
 
     // should holds apply to strings? maybe as 'contains'? or some non-word operator?
 
-    var left = __.compile(node.left, scope);
-    var right = __.compile(node.right, scope);
+    var left = this.compile(node.left);
+    var right = this.compile(node.right);
 
     return new JsConstruct(['function (item, collection) {' +
             "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
@@ -554,13 +527,12 @@ __['in'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
-__['sequence'] = function (node, scope) {
+__['sequence'] = function (node) {
 
-    var first = __.compile(node.first, scope);
-    var last = __.compile(node.last, scope);
+    var first = this.compile(node.first);
+    var last = this.compile(node.last);
 
     // renders an expression that is a function that takes a single arg -
     // the action to be performed
@@ -573,13 +545,12 @@ __['sequence'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
-__['op'] = function (node, scope) {
+__['op'] = function (node) {
 
-    var left = __.compile(node.left, scope);
-    var right = __.compile(node.right, scope);
+    var left = this.compile(node.left);
+    var right = this.compile(node.right);
 
     var op = node.op;
 
@@ -622,7 +593,6 @@ __['op'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
 __['boolean'] = function (node) {
@@ -634,7 +604,6 @@ __['boolean'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
 __['number'] = function (node) {
@@ -646,7 +615,6 @@ __['number'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
 __['string'] = function (node) {
@@ -659,17 +627,16 @@ __['string'] = function (node) {
 /**
  * Handles lists and maps.
  *
- * @param scope
  * @param node
  */
-var compileList = function (node, scope) {
+var compileList = function (node) {
 
     // list literals might have members that need to be realized
 
     var self = this;
 
     var items = node.elements.map(function (item) {
-        return self.compile(item, scope);
+        return self.compile(item);
     });
 
     if (node.type == 'map') {
@@ -685,13 +652,12 @@ __['map'] = compileList;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
-__['dyad'] = function (node, scope) {
+__['dyad'] = function (node) {
 
-    var key = __.compile(node.key, scope);
-    var value = __.compile(node.value, scope);
+    var key = this.compile(node.key);
+    var value = this.compile(node.value);
 
     return [key, ':', value];
 };
@@ -700,15 +666,14 @@ __['dyad'] = function (node, scope) {
 /**
  * Records are just implemented as JS objects of course.
  *
- * @param scope
  * @param node
  */
-__['record'] = function (node, scope) {
+__['record'] = function (node) {
 
     var self = this;
 
     var fields = node.fields.map(function (field) {
-        return self.compile(field, scope);
+        return self.compile(field);
     });
 
     // could use a block annotation here
@@ -718,12 +683,11 @@ __['record'] = function (node, scope) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param scope
  * @param node
  */
-__['field'] = function (node, scope) {
+__['field'] = function (node) {
 
-    var value = __.compile(node.value, scope);
+    var value = this.compile(node.value);
 
     // we don't qualify field names
     return [node.name, ':', value];
@@ -731,30 +695,30 @@ __['field'] = function (node, scope) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__['interpolation'] = function (node, scope) {
+__['interpolation'] = function (node) {
 
     return new JsConstruct(["'", node.left, "' + ",
-        __.compile(node.middle, scope), " + '", node.right, "'"]);
+        this.compile(node.middle), " + '", node.right, "'"]);
 };
 
-__['dynastring'] = function (node, scope) {
+__['dynastring'] = function (node) {
 
-    return new JsConstruct([__.compile(node.left, scope), " + '", node.middle, "' + ",
-        __.compile(node.right, scope)]);
+    return new JsConstruct([this.compile(node.left), " + '", node.middle, "' + ",
+        this.compile(node.right)]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__['increment'] = function (node, scope) {
-    return JsConstruct.makeStatement([ __.compile(node.operand, scope), "++;\n"]);
+__['increment'] = function (node) {
+    return JsConstruct.makeStatement([ this.compile(node.operand), "++;\n"]);
 };
 
-__['decrement'] = function (node, scope) {
-    return JsConstruct.makeStatement([ __.compile(node.operand, scope), "--;\n"]);
+__['decrement'] = function (node) {
+    return JsConstruct.makeStatement([ this.compile(node.operand), "--;\n"]);
 };
 
-__['splice'] = function (node, scope) {
-    return JsConstruct.makeStatement([ __.compile(node.list, scope), ".push(", __.compile(node.item, scope), ");\n"]);
+__['splice'] = function (node) {
+    return JsConstruct.makeStatement([ this.compile(node.list), ".push(", this.compile(node.item), ");\n"]);
 };
 
 module.exports = __;

@@ -5,7 +5,7 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
+var Scope = require('../../../codegen/Scope');
 var util = require('util');
 
 var ast = { type: 'procedure',
@@ -46,7 +46,7 @@ module.exports["basics"] = {
 
     "full": function (test) {
 
-        var js = Compiler.compile(ast);
+        var js = new Scope().compile(ast);
 
 //        console.log(require('util').inspect(js, {depth: null, colors: true}), '\n\n');
 //        console.log(js.render());

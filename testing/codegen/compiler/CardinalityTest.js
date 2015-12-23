@@ -21,7 +21,7 @@ module.exports["cardinality"] = {
         // todo throw runtime error if none match?
         // todo can get rid of function call here with conditional operator
 
-        test.equal(Compiler.compile(node).render(),
+        test.equal(new Scope().compile(node).render(),
             "function (val) {" +
                 "if (typeof val === 'string') return val.length;" +
                 "else if (Array.isArray(val)) return val.length;" +

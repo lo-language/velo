@@ -5,7 +5,6 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
 var Scope = require('../../../codegen/Scope');
 var util = require('util');
 
@@ -19,7 +18,7 @@ module.exports["sequence"] = {
             last: {type: 'id', name: 'n'}
         };
 
-        test.equal(Compiler.compile(node).render(), 'function (first, last, action) {\nfor (var num = first; num <= last; num++) { action(num); }}.bind(null,2,$n)');
+        test.equal(new Scope().compile(node).render(), 'function (first, last, action) {\nfor (var num = first; num <= last; num++) { action(num); }}.bind(null,2,$n)');
         test.done();
     }
 };

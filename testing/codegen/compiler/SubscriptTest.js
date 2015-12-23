@@ -5,7 +5,6 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
 var Scope = require('../../../codegen/Scope');
 var util = require('util');
 
@@ -19,7 +18,7 @@ module.exports["subscript"] = {
             index: {type: 'number', val: '1'}
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo[1]');
+        test.equal(new Scope().compile(node).render(), '$foo[1]');
         test.done();
     },
 
@@ -30,7 +29,7 @@ module.exports["subscript"] = {
             list: { type: 'id', name: 'foo' },
             index: {type: 'number', val: '-1'} };
 
-        test.equal(Compiler.compile(node).render(), '$foo[$foo.length-1]');
+        test.equal(new Scope().compile(node).render(), '$foo[$foo.length-1]');
         test.done();
     }
 };

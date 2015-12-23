@@ -5,7 +5,6 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
 var Scope = require('../../../codegen/Scope');
 var util = require('util');
 
@@ -32,7 +31,7 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(),
+        test.equal(new Scope().compile(node).render(),
             'task.sendMessage($foo, [], function (args) {$foo = 42;\n}, null);\n\n');
         test.done();
     },
@@ -58,7 +57,7 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(),
+        test.equal(new Scope().compile(node).render(),
             'task.sendMessage($foo, [], null, function (args) {$foo = 42;\n});\n\n');
         test.done();
     },
@@ -94,7 +93,7 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(),
+        test.equal(new Scope().compile(node).render(),
             'task.sendMessage($foo, [], function (args) {$foo = 42;\n}, function (args) {$bar = 57;\n});\n\n');
         test.done();
     }

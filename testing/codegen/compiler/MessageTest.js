@@ -5,7 +5,6 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
 var Scope = require('../../../codegen/Scope');
 var util = require('util');
 
@@ -22,7 +21,7 @@ module.exports["message"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), 'task.sendMessage($foo, [], null, null);\n\n');
+        test.equal(new Scope().compile(node).render(), 'task.sendMessage($foo, [], null, null);\n\n');
         test.done();
     },
 
@@ -47,7 +46,7 @@ module.exports["message"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(),
+        test.equal(new Scope().compile(node).render(),
             'task.sendMessage($foo, [$url], function (args) {$res = args.shift();\n$body = args.shift();\n$bar = $body;\n}, null);\n\n');
         test.done();
     },
@@ -64,7 +63,7 @@ module.exports["message"] = {
             futures: [{type: 'id', name: 'res'}, {type: 'id', name: 'body'}]
         };
 
-        test.equal(Compiler.compile(node).render(), 'task.sendMessage($foo, [$url], function (args) {$res = args.shift();\n\$body = args.shift();\n}, null);\n\n');
+        test.equal(new Scope().compile(node).render(), 'task.sendMessage($foo, [$url], function (args) {$res = args.shift();\n\$body = args.shift();\n}, null);\n\n');
         test.done();
     },
 
@@ -92,7 +91,7 @@ module.exports["message"] = {
         var scope = new Scope();
         scope.define('answer', '42');
 
-        test.equal(Compiler.compile(node, scope.bud()).render(),
+        test.equal(scope.bud().compile(node).render(),
             'task.sendMessage($foo, [$url], function (args) {$res = args.shift();\n$body = args.shift();\n$bar = 42;\n}, null);\n\n');
         test.done();
     }

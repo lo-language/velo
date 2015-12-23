@@ -18,7 +18,7 @@ module.exports["complement"] = {
             operand: {type: 'id', name: 'foo'}
         };
 
-        test.equal(Compiler.compile(node).render(), "!$foo");
+        test.equal(new Scope().compile(node).render(), "!$foo");
         test.done();
     }
 };

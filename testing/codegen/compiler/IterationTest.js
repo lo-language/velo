@@ -20,11 +20,7 @@ module.exports["basics"] = {
             statements: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null}
         };
 
-        // patch sub nodes?
-
-        var scope = new Scope();
-
-        var a = Compiler.compile(node, scope);
+        var a = new Scope().compile(node);
 
         test.equal(a.render(), 'while ($foo){$bar = 42;\n}');
 
@@ -58,11 +54,7 @@ module.exports["basics"] = {
                 tail: null}
         };
 
-        // patch sub nodes?
-
-        var scope = new Scope();
-
-        var a = Compiler.compile(node, scope);
+        var a = new Scope().compile(node);
 
         test.equal(a.render(),
             'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
@@ -118,11 +110,7 @@ module.exports["basics"] = {
                 tail: null}
         };
 
-        // patch sub nodes?
-
-        var scope = new Scope();
-
-        var a = Compiler.compile(node, scope);
+        var a = new Scope().compile(node);
 
         test.equal(a.render(),
             'let loop = function () {if ($foo) {var cont0 = function () {setImmediate(loop);};' +

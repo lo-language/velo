@@ -5,7 +5,6 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
 var Scope = require('../../../codegen/Scope');
 var util = require('util');
 
@@ -32,7 +31,7 @@ module.exports["procedure"] = {
             }
         };
 
-        var obj = Compiler.compile(node);
+        var obj = new Scope().compile(node);
 
         test.equal(obj.render(),
             'function (task) {var $next, $result;\n\nvar $recur = task.service;\n$next = task.args.shift();\n\n' +

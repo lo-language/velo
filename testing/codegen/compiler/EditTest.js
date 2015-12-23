@@ -18,7 +18,7 @@ module.exports["basics"] = {
             "operand":{type: "id", name: "bar"}
         };
 
-        test.equal(Compiler.compile(node).render(), '$bar++;\n');
+        test.equal(new Scope().compile(node).render(), '$bar++;\n');
         test.done();
     },
 
@@ -29,7 +29,7 @@ module.exports["basics"] = {
             "operand":{type: "id", name: "bar"}
         };
 
-        test.equal(Compiler.compile(node).render(), '$bar--;\n');
+        test.equal(new Scope().compile(node).render(), '$bar--;\n');
         test.done();
     },
 
@@ -53,7 +53,7 @@ module.exports["basics"] = {
             }
         };
 
-        test.equal(Compiler.compile(node).render(), '$list.push($item);\n');
+        test.equal(new Scope().compile(node).render(), '$list.push($item);\n');
         test.done();
     }
 };

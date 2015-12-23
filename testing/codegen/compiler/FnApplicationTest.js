@@ -21,7 +21,7 @@ module.exports["application"] = {
             args: []
         };
 
-        var result = Compiler.compile(node);
+        var result = new Scope().compile(node);
 
         test.ok(result instanceof SyncMessage);
         test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [], function (P0) {P0}, null, true);\n\n');
@@ -38,7 +38,7 @@ module.exports["application"] = {
             ]
         };
 
-        var result = Compiler.compile(node);
+        var result = new Scope().compile(node);
 
         test.ok(result instanceof SyncMessage);
         test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [42], function (P0) {P0}, null, true);\n\n');
@@ -56,7 +56,7 @@ module.exports["application"] = {
             ]
         };
 
-        var result = Compiler.compile(node);
+        var result = new Scope().compile(node);
 
         test.ok(result instanceof SyncMessage);
         test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [42, 'hi there'], function (P0) {P0}, null, true);\n\n");
@@ -79,7 +79,7 @@ module.exports["application"] = {
             }]
         };
 
-        var result = Compiler.compile(node);
+        var result = new Scope().compile(node);
 
         test.ok(result instanceof SyncMessage);
         test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [P0, P1], function (P0) {P0}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n");
@@ -101,7 +101,7 @@ module.exports["application statements"] = {
                 ]}
         };
 
-        var a = Compiler.compile(node);
+        var a = new Scope().compile(node);
         test.equal(a.render(), 'task.sendMessage($foo, [42], function (P0) {P0;\n}, null, true);\n\n');
         test.ok(a.async);
 
@@ -140,7 +140,7 @@ module.exports["application statements"] = {
                 }]}
         };
 
-        test.equal(Compiler.compile(node).render(),
+        test.equal(new Scope().compile(node).render(),
             "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [(P0 - P1)], function (P0) {P0;\n}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n");
         test.done();
     },
@@ -171,7 +171,7 @@ module.exports["application statements"] = {
                     }]}]}
         };
 
-        test.equal(Compiler.compile(node).render(),
+        test.equal(new Scope().compile(node).render(),
             "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [(P0 - P1)], function (P0) {task.sendMessage($quux, [P0], function (P0) {P0;\n}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n");
         test.done();
     },
@@ -209,7 +209,7 @@ module.exports["application statements"] = {
             tail: null
         };
 
-        test.equal(Compiler.compile(node).render(),
+        test.equal(new Scope().compile(node).render(),
             "task.sendMessage($factorial, [$args[0]], function (P0) {task.sendMessage($io.stdout.write, ['' + P0 + '\\n'], null, null);\n\n}, null, true);\n\n");
 
         test.done();

@@ -23,11 +23,7 @@ module.exports["sync"] = {
             consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null}
         };
 
-        // patch sub nodes?
-
-        var scope = new Scope();
-
-        test.equal(Compiler.compile(node).render(),
+        test.equal(new Scope().compile(node).render(),
             'if ($foo) {$bar = 42;\n}\n\n');
         test.done();
     },
@@ -44,11 +40,7 @@ module.exports["sync"] = {
             otherwise: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '32'}}, tail: null}
         };
 
-        // patch sub nodes?
-
-        var scope = new Scope();
-
-        test.equal(Compiler.compile(node).render(),
+        test.equal(new Scope().compile(node).render(),
             'if ($foo) {$bar = 42;\n}\n\nelse {$bar = 32;\n}\n\n');
         test.done();
     },
@@ -70,11 +62,7 @@ module.exports["sync"] = {
             }, tail: null}
         };
 
-        // patch sub nodes?
-
-        var scope = new Scope();
-
-        test.equal(Compiler.compile(node).render(),
+        test.equal(new Scope().compile(node).render(),
             'if ($foo) {$bar = 42;\n}\n\nelse {if ($bar) {$bar = 32;\n}\n\nelse {$baz = 82;\n}\n\n}\n\n');
         test.done();
     }
@@ -98,9 +86,7 @@ module.exports["async"] = {
                 tail: null}
         };
 
-        var scope = new Scope();
-
-        test.equal(Compiler.compile(node, scope).render(),
+        test.equal(new Scope().compile(node).render(),
             "var cont0 = function () {};if ($foo) {task.sendMessage($foo, [], function (P0) {$bar = P0;\ncont0();}, null, true);\n\n}\n\nelse {cont0();}\n\n");
         test.done();
     },
@@ -134,9 +120,7 @@ module.exports["async"] = {
                 tail: null}
         };
 
-        var scope = new Scope();
-
-        test.equal(Compiler.compile(node, scope).render(),
+        test.equal(new Scope().compile(node).render(),
             'if ($foo) {task.respond("reply", 42);\nreturn;}\n\n');
         test.done();
     }

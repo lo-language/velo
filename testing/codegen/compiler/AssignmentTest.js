@@ -24,7 +24,7 @@ module.exports["assignment"] = {
 
         test.equal(scope.has('foo'), false);
 
-        test.equal(Compiler.compile(node, scope).render(), '$foo = 57;\n');
+        test.equal(scope.compile(node).render(), '$foo = 57;\n');
         test.equal(scope.has('foo'), true);
         test.done();
     },
@@ -40,7 +40,7 @@ module.exports["assignment"] = {
 
         var scope = new Scope();
 
-        test.equal(Compiler.compile(node, scope).render(), '$foo[$bar] = 57;\n');
+        test.equal(scope.compile(node).render(), '$foo[$bar] = 57;\n');
         test.done();
     },
 
@@ -56,7 +56,7 @@ module.exports["assignment"] = {
         var scope = new Scope();
 
         test.equal(scope.has('foo'), false);
-        test.equal(Compiler.compile(node, scope).render(), '$foo = $bar;\n');
+        test.equal(scope.compile(node).render(), '$foo = $bar;\n');
         test.equal(scope.has('foo'), true);
         test.done();
     },
@@ -73,7 +73,7 @@ module.exports["assignment"] = {
         var scope = new Scope();
 
         test.equal(scope.has('foo'), false);
-        test.equal(Compiler.compile(node, scope).render(), 'task.sendMessage($bar, [], function (P0) {$foo = P0;\n}, null, true);\n\n');
+        test.equal(scope.compile(node).render(), 'task.sendMessage($bar, [], function (P0) {$foo = P0;\n}, null, true);\n\n');
         test.equal(scope.has('foo'), true);
 
         test.done();
@@ -96,7 +96,7 @@ module.exports["assignment"] = {
 
         test.equal(scope.has('foo'), true);
 
-        test.equal(Compiler.compile(node, scope).render(), '$foo = 57;\n');
+        test.equal(scope.compile(node).render(), '$foo = 57;\n');
         test.deepEqual(scope.getJsVars(), []);
         test.done();
     },

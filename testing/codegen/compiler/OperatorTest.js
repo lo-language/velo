@@ -5,7 +5,6 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
 var Scope = require('../../../codegen/Scope');
 var util = require('util');
 
@@ -23,9 +22,7 @@ module.exports["op"] = {
             right: {type: 'number', val: '2'}
         };
 
-        // patch sub nodes?
-
-        test.equal(Compiler.compile(node).render(), '(1 * 2)');
+        test.equal(new Scope().compile(node).render(), '(1 * 2)');
         test.done();
     },
 
@@ -46,9 +43,7 @@ module.exports["op"] = {
             right: {type: 'number', val: '3'}
         };
 
-        // patch sub nodes?
-
-        test.equal(Compiler.compile(node).render(), '((1 && 2) || 3)');
+        test.equal(new Scope().compile(node).render(), '((1 && 2) || 3)');
         test.done();
     },
 
@@ -66,7 +61,7 @@ module.exports["op"] = {
 //
 //        // patch sub nodes?
 //
-//        test.equal(Compiler.compile(node).render(), "function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {return left.concat(right);} else return left + right;}($foo,$bar)");
+//        test.equal(new Scope().compile(node).render(), "function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {return left.concat(right);} else return left + right;}($foo,$bar)");
 //        test.done();
 //    },
 
@@ -80,9 +75,7 @@ module.exports["op"] = {
             left: { type: 'string', val: 'trillian' },
             right: { type: 'id', name: 'dudes' } };
 
-        // patch sub nodes?
-
-        test.equal(Compiler.compile(node).render(), "function (item, collection) {if (Array.isArray(collection)) return collection.indexOf(item) >= 0;else if (typeof val === 'object') return collection.hasOwnProperty(item);}('trillian',$dudes)");
+        test.equal(new Scope().compile(node).render(), "function (item, collection) {if (Array.isArray(collection)) return collection.indexOf(item) >= 0;else if (typeof val === 'object') return collection.hasOwnProperty(item);}('trillian',$dudes)");
         test.done();
     },
 
@@ -98,9 +91,7 @@ module.exports["op"] = {
             right: {type: 'id', name: 'bar'}
         };
 
-        // patch sub nodes?
-
-        test.equal(Compiler.compile(node).render(), "($foo === $bar)");
+        test.equal(new Scope().compile(node).render(), "($foo === $bar)");
         test.done();
     }
 };

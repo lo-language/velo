@@ -1,7 +1,7 @@
 "use strict";
 
 const parser = require('./../parser/Parser');
-const Compiler = require('./../codegen/Compiler');
+const Scope = require('./../codegen/Scope');
 const Task = require('./Task');
 const Q = require('q');
 const util = require('util');
@@ -41,7 +41,7 @@ __.prototype.getJs = function () {
     if (this.js === undefined) {
 
         try {
-            this.js = Compiler.compile(this.parse()).render();
+            this.js = new Scope().compile(this.parse()).render();
         }
         catch (e) {
             console.error("error compiling module");

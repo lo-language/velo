@@ -25,9 +25,7 @@ module.exports["identifiers"] = {
 
         var node = {type: 'id', name: 'foo'};
 
-        var scope = new Scope();
-
-        test.equal(Compiler.compile(node, scope), '$foo');
+        test.equal(new Scope().compile(node), '$foo');
         test.done();
     },
 
@@ -39,7 +37,7 @@ module.exports["identifiers"] = {
 
         scope.define('foo', "42");
 
-        test.equal(Compiler.compile(node, scope), '42');
+        test.equal(scope.compile(node), '42');
         test.done();
     }
 };

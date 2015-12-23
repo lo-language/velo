@@ -5,7 +5,6 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
 var Scope = require('../../../codegen/Scope');
 var util = require('util');
 
@@ -20,7 +19,7 @@ module.exports["slice"] = {
             end: {type: 'number', val: '3'},
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo.slice(1,3)');
+        test.equal(new Scope().compile(node).render(), '$foo.slice(1,3)');
         test.done();
     },
 
@@ -31,7 +30,7 @@ module.exports["slice"] = {
             list: {type: 'id', name: 'foo'},
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo.slice(0,$foo.length)');
+        test.equal(new Scope().compile(node).render(), '$foo.slice(0,$foo.length)');
         test.done();
     },
 
@@ -44,7 +43,7 @@ module.exports["slice"] = {
             end: {type: 'number', val: '-1'}
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo.slice($foo.length-3,$foo.length-1)');
+        test.equal(new Scope().compile(node).render(), '$foo.slice($foo.length-3,$foo.length-1)');
         test.done();
     },
 
@@ -57,7 +56,7 @@ module.exports["slice"] = {
             end: {type: 'number', val: '3'},
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo.splice(1,(3)-(1))');
+        test.equal(new Scope().compile(node).render(), '$foo.splice(1,(3)-(1))');
         test.done();
     },
 
@@ -68,7 +67,7 @@ module.exports["slice"] = {
             list: {type: 'id', name: 'foo'},
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo.splice(0,($foo.length)-(0))');
+        test.equal(new Scope().compile(node).render(), '$foo.splice(0,($foo.length)-(0))');
         test.done();
     },
 
@@ -81,7 +80,7 @@ module.exports["slice"] = {
             end: {type: 'number', val: '-1'}
         };
 
-        test.equal(Compiler.compile(node).render(), '$foo.splice($foo.length-3,($foo.length-1)-($foo.length-3))');
+        test.equal(new Scope().compile(node).render(), '$foo.splice($foo.length-3,($foo.length-1)-($foo.length-3))');
         test.done();
     }
 };

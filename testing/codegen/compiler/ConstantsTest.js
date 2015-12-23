@@ -24,7 +24,7 @@ module.exports["constants"] = {
         test.equal(scope.has('port'), false);
         test.equal(scope.isConstant('port'), false);
 
-        test.equal(Compiler.compile(node, scope).render(), '');
+        test.equal(scope.compile(node).render(), '');
 
         test.equal(scope.has('port'), true);
         test.ok(scope.isConstant('port'));
@@ -46,7 +46,7 @@ module.exports["constants"] = {
         test.equal(scope.has('album'), false);
         test.equal(scope.isConstant('album'), false);
 
-        test.equal(Compiler.compile(node, scope).render(), '');
+        test.equal(scope.compile(node).render(), '');
 
         test.equal(scope.has('album'), true);
         test.ok(scope.isConstant('album'));
@@ -68,7 +68,7 @@ module.exports["constants"] = {
         test.equal(scope.has('constructor'), false);
         test.equal(scope.isConstant('constructor'), false);
 
-        test.equal(Compiler.compile(node, scope).render(), '');
+        test.equal(scope.compile(node).render(), '');
 
         test.equal(scope.has('constructor'), true);
         test.ok(scope.isConstant('constructor'));
