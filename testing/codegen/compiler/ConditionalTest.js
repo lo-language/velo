@@ -10,7 +10,7 @@ var JsConstruct = require('../../../codegen/JsConstruct');
 var Scope = require('../../../codegen/Scope');
 var util = require('util');
 
-module.exports["basics"] = {
+module.exports["sync"] = {
 
     "positive only": function (test) {
 
@@ -101,7 +101,17 @@ module.exports["async"] = {
         var scope = new Scope();
 
         test.equal(Compiler.compile(node, scope).render(),
-            "var cont = function () {};if ($foo) {task.sendMessage($foo, [], function (P0) {$bar = P0;\ncont();}, null, true);\n\n}\n\nelse {cont();}\n\n");
+            "var cont0 = function () {};if ($foo) {task.sendMessage($foo, [], function (P0) {$bar = P0;\ncont0();}, null, true);\n\n}\n\nelse {cont0();}\n\n");
+        test.done();
+    },
+
+    "nested ifs create separate continuations": function (test) {
+        // todo
+        test.done();
+    },
+
+    "nested ifs collapse to else if": function (test) {
+        // todo
         test.done();
     },
 

@@ -30,12 +30,7 @@ module.exports['iteration'] = {
     "stack doesn't overflow": function (test) {
 
         //console.log(this.harness.getJs().render(true));
-        this.harness.run([100000]).then(
-            function (res) {
-                test.equal(res, 100000);
-                test.done();
-            }
-        );
+        this.harness.testSuccess(test, [100000], 100000);
     }
 };
 
@@ -51,11 +46,7 @@ module.exports['acquire'] = {
     'success': function (test) {
 
 //        console.log(util.inspect(this.harness.module.parse(), {depth: null, colors: true}));
-        this.harness.run([5, loader.acquire]).then(
-            function (res) {
-                test.equal(res, 120);
-                test.done();
-            });
+        this.harness.testSuccess(test, [5, loader.acquire], 120);
     }
 };
 
@@ -81,11 +72,7 @@ module.exports['io'] = {
             }
         };
 
-        this.harness.run([[], io, {}]).then(
-            function (res) {
-                test.done();
-            }
-        );
+        this.harness.testSuccess(test, [[], io, {}]);
     }
 };
 
@@ -275,12 +262,7 @@ module.exports['factorial2'] = {
         };
 
         this.harness.testSuccess(test, [[10], io]);
-    },
-
-    //'failure': function (test) {
-    //
-    //    this.harness.testFailure(test, [[-1], this.io]);
-    //}
+    }
 };
 
 //module.exports['fibonacci2'] = {

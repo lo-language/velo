@@ -91,20 +91,3 @@ module.exports['basics'] = {
         ).done();
     }
 };
-
-//function (task) {
-//    var $sayHello;
-//
-//    var $recur = task.service;
-//    $sayHello = function (task) {
-//        var $recur = task.service;
-//        task.respond("reply", 'hullo!');
-//        return;
-//        task.pickupReplies();
-//    };
-//    task.sendMessage($sayHello, [], function (P0) {
-//        P0;
-//    }, null, true);
-//
-//    task.pickupReplies();
-//}

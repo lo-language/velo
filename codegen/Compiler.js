@@ -67,7 +67,7 @@ __['procedure'] = function (node, scope) {
     // compile the statement(s) in the context of the local scope
     var body = __.compile(node.body, localScope).attach(new JsConstruct("task.pickupReplies();\n"));
 
-    // todo remove this feature
+    // todo only include where it's used (or just remove this feature)
     body = ['var $recur = task.service;\n', body];
 
     // declare our local vars
@@ -197,6 +197,9 @@ __['conditional'] = function (node, scope) {
     // the trick is sync logic in the branches because we only want to resolve if
     // necessary
 
+    // generate unique continuation names
+    var contName;
+
     var predicate = __.compile(node.predicate, scope);
     var consequent = __.compile(node.consequent, scope);
     var negBlock = false;
@@ -216,8 +219,12 @@ __['conditional'] = function (node, scope) {
         }
 
         // and need to call the continuation as the last statement in both branches
-        consequent.attach(new JsConstruct("cont();"));
-        negBlock.attach(new JsConstruct("cont();"));
+
+        // generate unique continuation names
+        contName = "cont" + scope.contNum++;
+
+        consequent.attach(new JsConstruct(contName + "();"));
+        negBlock.attach(new JsConstruct(contName + "();"));
     }
 
     var parts = ['if (', predicate, ') ', {block: consequent}, '\n\n'];
@@ -227,7 +234,7 @@ __['conditional'] = function (node, scope) {
     }
 
     if (async) {
-        return JsConstruct.makeStatement(['var cont = function () {'], ['};'].concat(parts));
+        return JsConstruct.makeStatement(['var ' + contName + ' = function () {'], ['};'].concat(parts));
     }
 
     return JsConstruct.makeStatement(parts);
