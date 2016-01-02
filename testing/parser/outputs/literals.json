@@ -1,4 +1,4 @@
-{
+{"type":"module", "service": {
     "type": "procedure",
     "body": {
         "type": "stmt_list",
@@ -228,4 +228,4 @@
             }
         }
     }
-}
+}}

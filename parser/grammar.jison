@@ -116,7 +116,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "skip"                  return 'SKIP'
 "reply"                 return 'REPLY'
 "fail"                  return 'FAIL'
-"mute"                  return 'MUTE'
+"requires"              return 'REQUIRES'
 "replace"               return 'REPLACE'    // recovers from an error. recover? rebound?
 {id}                    return 'ID'
 .                       return 'INVALID'
@@ -190,8 +190,12 @@ could also be "on foo:"
 // STRUCTURE
 
 module
-    : statement_list EOF
-        { return {type: 'procedure', body: $1}; }
+    : deps? statement_list EOF
+        { return {type: 'module', deps: $1, service: {type: 'procedure', body: $2}}; }
+    ;
+
+deps
+    : REQUIRES (ID ',')* ID ';'? -> $2.concat($3);
     ;
 
 block

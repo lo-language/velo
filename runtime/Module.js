@@ -25,7 +25,12 @@ var __ = function (source) {
 __.prototype.parse = function () {
 
     if (this.ast === undefined) {
-        this.ast = parser.parse(this.source);
+
+        var module = parser.parse(this.source);
+
+        // strip off the dependencies from the AST
+        this.deps = module.deps;
+        this.ast = module.service;
     }
 
     return this.ast;
@@ -67,7 +72,7 @@ __.prototype.load = function () {
         // enable strict mode and wrap the compiled result so we can use it with the Function constructor,
         // but keep the same sig as what we're wrapping
 
-        // todo - how do we want to interface between our internal procedure style and JS?
+        // todo bind dependencies here?
 
         var body =
             '"use strict";\n\n' +

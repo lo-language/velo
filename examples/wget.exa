@@ -1,8 +1,13 @@
-receive args, io;
+//httpClient is @libs/http/Client
 
 exa     is "http://www.exalang.org";
 apple   is "http://www.apple.com";
 google  is "http://www.google.com";
+
+receive args, io, system;
+
+// connect authority with expertise
+//client = httpClient(system.net.out);
 
 sendRequest = service:
 
