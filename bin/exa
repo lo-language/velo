@@ -87,22 +87,15 @@ Task.sendRootRequest(root, [argv._, IO],\n\
 }
 else {
 
-    loader.getModule(moduleName).then(
-        function (main) {
+    loader.run(moduleName, [argv._, IO]).then(
+        function (result) {
+            //console.log(result);
+        },
+        function (msg) {
+            console.error(msg);
 
-    //        console.log(util.inspect(main.parse(), {depth: null, colors: true}));
-    //        console.error(main.getJs() + '\n\n');
-
-            main.run([argv._, IO, loader.acquire]).then(
-                function (result) {
-    //                console.log(result);
-                },
-                function (msg) {
-                    console.error(msg);
-
-                    // inform the OS
-                    process.exit(1);
-                }
-            );
-        }).done();
-    }
+            // inform the OS
+            process.exit(1);
+        }
+    );
+}

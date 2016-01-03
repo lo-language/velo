@@ -19,9 +19,33 @@ var Compiler = require('./Compiler');
 var __ = function (parent) {
 
     this.parent = parent;
+    this.deps = parent ? parent.deps : {};
     this.vars = {};
     this.constants = {};
     this.contNum = 0;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Registers a dependency in this scope.
+ *
+ * @param name
+ */
+__.prototype.registerDep = function (name) {
+
+    this.deps[name] = true;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns a list of all the dependencies declared in this scope, in no particular order.
+ *
+ * @param name
+ */
+__.prototype.getDeps = function (name) {
+
+    // we don't care about order
+    return Object.keys(this.deps);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,7 +81,7 @@ __.prototype.define = function (name, value) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Returns true
+ * Returns true if the given name is defined in this scope.
  */
 __.prototype.has = function (name) {
 

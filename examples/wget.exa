@@ -1,4 +1,4 @@
-//httpClient is @libs/http/Client
+createClient is <net:http:client>;
 
 exa     is "http://www.exalang.org";
 apple   is "http://www.apple.com";
@@ -7,13 +7,13 @@ google  is "http://www.google.com";
 receive args, io, system;
 
 // connect authority with expertise
-//client = httpClient(system.net.out);
+client = createClient();
 
 sendRequest = service:
 
     receive url;
 
-    after io.http.get ~ url => res, body:
+    after client.get ~ url => res, body:
 
         io.stdout.write ~ "response from `url`: status = `res.statusCode`\n";
         io.stdout.write ~ "body length: `#body`\n";

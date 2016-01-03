@@ -5,16 +5,14 @@
  *
  * How it works:
  *
- * Each AST node is compiled into either a bare JS string or an array of strings, arrays, and objects.
- *
  * In the compile phase, the AST is traversed and each node is compiled into either a bare JS string
- * or a JS "construct" which is a list of JS strings and sub-constructs produced by compiling sub-nodes.
+ * or a JS construct which is a list of JS strings and sub-constructs produced by compiling sub-nodes.
  * Simple nodes, such as literals, compile into bare JS strings. More complex nodes compile into constructs,
- * e.g. an addition node would compile into the construct ['(', leftOperand, ' + ', rightOperand, ')']
- *
+ * e.g. an addition node compiles into the construct ['(', leftOperand, ' + ', rightOperand, ')']
  *
  * Note:
- * To compile an expression containing a request, we have to do a trick where we create a "resolver" block to wrap the expression.
+ * To compile an expression containing a sync request, we have to do a trick where we create a "resolver"
+ * block to wrap the expression.
  */
 
 'use strict';
@@ -22,8 +20,24 @@
 var JsConstruct = require('./JsConstruct');
 var SyncMessage = require('./SyncMessage');
 
-// this is a library, not a "class"
+// this is a stateless library, not a "class"
 var __ = {};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Compiles a module into an Exa service factory, that is a JS function that you call to *create* an Exa service.
+ * This lets us bind a module registry into the module.
+ *
+ * @param node
+ */
+__['module'] = function (node) {
+
+    // enable strict mode
+
+    return new JsConstruct([
+        "'use strict';\n\n",
+        "return ", this.compile(node.service), ';']);
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -33,6 +47,27 @@ var __ = {};
 __['nil'] = function (node) {
 
     return "null";
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ */
+__['modref'] = function (node) {
+
+    // think of module literals as symbols on the schematic
+    // when we compile, we just need to validate internally
+    // when we RUN, we need to have the symbols' meanings to hand
+    // compilation generates the complete and final code for a module
+    // acquire used to be injected at the root, now it's ambient via this mechanism
+    // what's the advantage of modrefs over acquire? static analysis & eager validation & compilation - anything else?
+
+    // register the dependency with the current scope
+    this.registerDep(node.val);
+
+    // every module has MODS in scope which maps modrefs to service functions
+    return new JsConstruct(['MODS["' + node.val + '"]']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

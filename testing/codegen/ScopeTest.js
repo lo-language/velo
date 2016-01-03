@@ -71,6 +71,24 @@ module.exports["basics"] = {
         test.throws(function() {scope.define('port', 8000);});
 
         test.done();
+    },
+
+    "declare dependency": function (test) {
+
+        var scope = new Scope();
+
+        test.deepEqual(scope.getDeps(), {});
+
+        scope.registerDep("Square");
+        test.deepEqual(scope.getDeps(), ["Square"]);
+
+        scope.registerDep("Quadrangle");
+        test.deepEqual(scope.getDeps(), ["Square", "Quadrangle"]);
+
+        scope.registerDep("Pentagon");
+        test.deepEqual(scope.getDeps(), ["Square", "Quadrangle", "Pentagon"]);
+
+        test.done();
     }
 };
 

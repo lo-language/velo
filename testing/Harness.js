@@ -7,28 +7,14 @@
 
 "use strict";
 
-var Q = require('q');
+const Loader = require('../runtime/Loader');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var __ = function (loader, program) {
+var __ = function (sourceDir, program) {
 
-    this.loader = loader;
+    this.loader = new Loader(sourceDir);
     this.program = program;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-__.prototype.setUp = function (cb) {
-
-    var self = this;
-
-    this.loader.getModule(this.program).then(
-        function (module) {
-            self.module = module;
-            cb();
-        }
-    );
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,20 +34,16 @@ __.prototype.getJs = function () {
  */
 __.prototype.run = function (input) {
 
-    return this.module.run(input);
+    return this.loader.run(this.program, input);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 __.prototype.testSuccess = function (test, input, expected) {
 
-    var module = this.module;
-
     var _this = this;
 
-    return Q().then(function () {
-        return module.run(input);
-    }).then(
+    return this.run(input).then(
         function (result) {
 
             if (expected !== undefined) {
@@ -83,7 +65,7 @@ __.prototype.testSuccess = function (test, input, expected) {
 
 __.prototype.testFailure = function (test, input, expected) {
 
-    this.module.run(input).then(
+    this.run(input).then(
         function () {
             test.fail();
         },

@@ -1,0 +1,3 @@
+httpClient is <exa:net/http/client>;
+makeShape is <Shape>;
+makeSquare = <shapes/Square>;

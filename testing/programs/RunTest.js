@@ -10,11 +10,8 @@
 
 "use strict";
 
-const Loader = require('../../runtime/Loader');
 const Harness = require('../Harness');
 const util = require('util');
-
-var loader = new Loader(__dirname);
 
 module.exports['iteration'] = {
 
@@ -22,9 +19,8 @@ module.exports['iteration'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(loader, 'iteration');
-
-        this.harness.setUp(cb);
+        this.harness = new Harness(__dirname, 'iteration');
+        cb();
     },
 
     "stack doesn't overflow": function (test) {
@@ -34,29 +30,27 @@ module.exports['iteration'] = {
     }
 };
 
-module.exports['acquire'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(loader, 'acquire');
-
-        this.harness.setUp(cb);
-    },
-
-    'success': function (test) {
-
-//        console.log(util.inspect(this.harness.module.parse(), {depth: null, colors: true}));
-        this.harness.testSuccess(test, [5, loader.acquire], 120);
-    }
-};
+//module.exports['acquire'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.harness = new Harness(__dirname, 'acquire');
+//        cb();
+//    },
+//
+//    'success': function (test) {
+//
+////        console.log(util.inspect(this.harness.module.parse(), {depth: null, colors: true}));
+//        this.harness.testSuccess(test, [5, loader.acquire], 120);
+//    }
+//};
 
 module.exports['io'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(loader, 'helloWorld');
-
-        this.harness.setUp(cb);
+        this.harness = new Harness(__dirname, 'helloWorld');
+        cb();
     },
 
     'success': function (test) {
@@ -80,9 +74,8 @@ module.exports['reply handling'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(loader, 'replyHandling');
-
-        this.harness.setUp(cb);
+        this.harness = new Harness(__dirname, 'replyHandling');
+        cb();
     },
 
     'success': function (test) {
@@ -113,9 +106,8 @@ module.exports['conditionals'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(loader, 'conditionals');
-
-        this.harness.setUp(cb);
+        this.harness = new Harness(__dirname, 'conditionals');
+        cb();
     },
 
     'neg': function (test) {
@@ -135,9 +127,8 @@ module.exports['factorial'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(loader, 'factorial');
-
-        this.harness.setUp(cb);
+        this.harness = new Harness(__dirname, 'factorial');
+        cb();
     },
 
     'success': function (test) {
@@ -154,9 +145,8 @@ module.exports['fibonacci'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(loader, 'fibonacci');
-
-        this.harness.setUp(cb);
+        this.harness = new Harness(__dirname, 'fibonacci');
+        cb();
     },
 
     'success': function (test) {
@@ -172,9 +162,8 @@ module.exports['collections'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(loader, 'collections');
-
-        this.harness.setUp(cb);
+        this.harness = new Harness(__dirname, 'collections');
+        cb();
     },
 
     'all': function (test) {
@@ -187,9 +176,8 @@ module.exports['procedure'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(loader, 'procedure');
-
-        this.harness.setUp(cb);
+        this.harness = new Harness(__dirname, 'procedure');
+        cb();
     },
 
     'success': function (test) {
@@ -202,9 +190,8 @@ module.exports['conditional in loop'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(loader, 'condInLoop');
-
-        this.harness.setUp(cb);
+        this.harness = new Harness(__dirname, 'condInLoop');
+        cb();
     },
 
     'success': function (test) {
@@ -245,9 +232,8 @@ module.exports['factorial2'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(loader, 'factorial2');
-
-        this.harness.setUp(cb);
+        this.harness = new Harness(__dirname, 'factorial2');
+        cb();
     },
 
     'success': function (test) {

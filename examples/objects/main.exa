@@ -2,13 +2,13 @@
  * usage: exa main.exa <side length>
  */
 
-receive args, io, acquire;
+makeSquare is <Square>;
 
-makeSquare = acquire("Square");
+receive args, io, system;
 
 squareSide = args[0];
 
-square = makeSquare(squareSide, acquire);
+square = makeSquare(squareSide);
 
 io.stdout.write("side length is `square.getSide()`\n");
 

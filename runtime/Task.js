@@ -257,9 +257,6 @@ __.sendRootRequest = function (service, args, onReply, onFail) {
 
     // kick it off
     service(task);
-
-    // wait a turn to process the replies
-    //setImmediate(task.pickupReplies.bind(task));
 };
 
 module.exports = __;

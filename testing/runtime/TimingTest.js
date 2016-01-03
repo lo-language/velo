@@ -5,6 +5,7 @@
  */
 
 const Module = require('../../runtime/Module');
+const Task = require('../../runtime/Task');
 const util = require('util');
 
 module.exports['basics'] = {
@@ -14,13 +15,16 @@ module.exports['basics'] = {
         test.expect(1);
 
         var mod = new Module('reply "hullo!";');
+        var service = mod.makeService();
 
-        mod.run().then(
+        Task.sendRootRequest(service, null,
             function (res) {
                 test.equal(res, "hullo!");
                 test.done();
-            }
-        ).done();
+            },
+            function () {
+                test.fail();
+            });
     },
 
     "simple sync": function (test) {
@@ -32,12 +36,16 @@ module.exports['basics'] = {
             '    reply "hullo!";\n;\n' +
             'reply sayHello();\n');
 
-        mod.run().then(
+        var service = mod.makeService();
+
+        Task.sendRootRequest(service, null,
             function (res) {
                 test.equal(res, "hullo!");
                 test.done();
-            }
-        ).done();
+            },
+            function () {
+                test.fail();
+            });
     },
 
     "sync message, default reply": function (test) {
@@ -47,11 +55,16 @@ module.exports['basics'] = {
             '    reply "hullo!";\n;\n' +
             'sayHello();\n');
 
-        mod.run().then(
+        var service = mod.makeService();
+
+        Task.sendRootRequest(service, null,
             function (res) {
+                test.equal(res, undefined);
                 test.done();
-            }
-        ).done();
+            },
+            function () {
+                test.fail();
+            });
     },
 
     "sync message, explicit reply": function (test) {
@@ -63,12 +76,16 @@ module.exports['basics'] = {
             '    reply "hullo!";\n;\n' +
             'sayHello(); reply "howdy!";\n');
 
-        mod.run().then(
+        var service = mod.makeService();
+
+        Task.sendRootRequest(service, null,
             function (res) {
                 test.equal(res, "howdy!");
                 test.done();
-            }
-        ).done();
+            },
+            function () {
+                test.fail();
+            });
     },
 
     "simple dispatch": function (test) {
@@ -84,10 +101,14 @@ module.exports['basics'] = {
             'receive write;\n' +
             'write ~ "hi there!";\n');
 
-        mod.run([write]).then(
+        var service = mod.makeService();
+
+        Task.sendRootRequest(service, [write],
             function (res) {
                 setImmediate(test.done.bind(test));
-            }
-        ).done();
+            },
+            function () {
+                test.fail();
+            });
     }
 };

@@ -3,14 +3,15 @@
 %s comment
 %x indent
 
-digit                       [0-9]
-number                      \-?{digit}+("."{digit}+)?\b
-id                          [_a-zA-Z][_a-zA-Z0-9]*
+digit                   [0-9]
+number                  \-?{digit}+("."{digit}+)?\b
+id                      [_a-zA-Z][_a-zA-Z0-9]*
+modref                  \<[\._a-zA-Z0-9/:-]+\>
 
 %%
 
-\s*"//".*                  /* line comment */
-\s*"/*"                    this.begin("comment");
+\s*"//".*               /* line comment */
+\s*"/*"                 this.begin("comment");
 <comment><<EOF>>        throw new Error("unclosed block comment");
 <comment>"*/"           this.popState();
 <comment>.              /* skip comment */
@@ -58,6 +59,7 @@ id                          [_a-zA-Z][_a-zA-Z0-9]*
 "nil"                   return 'NIL' // none, null, void, empty, blank, nada, nothing, zip, nil, missing, undefined, undef? some symbol? () empty parens?
 "true"|"false"          return 'BOOLEAN'
 {number}                return 'NUMBER'
+{modref}                yytext = yytext.substr(1, yyleng-2); return 'MODREF'
 \"[^\`\"]*\"            yytext = yytext.substr(1, yyleng-2); return 'STRING'
 \"[^\`\"]*\`            yytext = yytext.substr(1, yyleng-2); return 'INTER_BEGIN'
 \`[^\`\"]*\`            yytext = yytext.substr(1, yyleng-2); return 'INTER_MID'
@@ -190,12 +192,8 @@ could also be "on foo:"
 // STRUCTURE
 
 module
-    : deps? statement_list EOF
-        { return {type: 'module', deps: $1, service: {type: 'procedure', body: $2}}; }
-    ;
-
-deps
-    : REQUIRES (ID ',')* ID ';'? -> $2.concat($3);
+    : statement_list EOF
+        { return {type: 'module', service: {type: 'procedure', body: $1}}; }
     ;
 
 block
@@ -299,6 +297,7 @@ literal
     | BOOLEAN -> {type: 'boolean', val: $1 == 'true'}
     | NUMBER -> {type: 'number', val: $1}
     | STRING -> {type: 'string', val: $1}
+    | MODREF -> {type: 'modref', val: $1}
     | SERVICE ':' block -> {type: 'procedure', body: $3}
     | '[' BEGIN? list_items END? ']' -> {type: $3.type, elements: $3.elements}
     | '{' BEGIN? (field ',')* field? END? '}' -> {type: 'record', fields: $4 ? $3.concat([$4]): []}
@@ -335,6 +334,7 @@ application
     : value '(' (expr ',')* expr? ')' -> {type: 'application', address: $1, args: $4 ? $3.concat([$4]) : []}
     ;
 
+// should cardinality be called "measurement" instead, since it applies to strings?
 unary_expr
     : value
     | '#' unary_expr -> {type: 'cardinality', operand: $2}

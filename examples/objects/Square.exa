@@ -1,6 +1,6 @@
-receive side, acquire;
+makeRect is <Rectangle>;
 
-makeRect = acquire("Rectangle");
+receive side;
 
 rect = makeRect(side, side, "square");
 

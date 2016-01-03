@@ -137,14 +137,12 @@ JsConstruct.prototype.attach = function (stmt) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Renders this construct into JS source.
- *
- * @param {boolean} pretty    format the code to make it more human-readable (default false)
  */
-JsConstruct.prototype.render = function (pretty) {
+JsConstruct.prototype.render = function () {
 
     //console.log(util.inspect(this, {depth: null}));
-    return JsConstruct.renderFragment(this.parts, pretty) +
-        JsConstruct.renderFragment(this.post, pretty);
+    return JsConstruct.renderFragment(this.parts) +
+        JsConstruct.renderFragment(this.post);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,7 +153,7 @@ JsConstruct.prototype.render = function (pretty) {
  *
  * todo - should we factor out the traversal, since resolver uses it, too?
  */
-JsConstruct.renderFragment = function (fragment, pretty) {
+JsConstruct.renderFragment = function (fragment) {
 
     if (typeof fragment == 'string') {
         return fragment;
@@ -164,14 +162,14 @@ JsConstruct.renderFragment = function (fragment, pretty) {
     if (Array.isArray(fragment)) {
 
         return fragment.reduce(function (accum, current) {
-            return accum + JsConstruct.renderFragment(current, pretty);
+            return accum + JsConstruct.renderFragment(current);
         }, '');
     }
 
     if (typeof fragment === 'object') {
 
         if (typeof fragment.render === 'function') {
-            return fragment.render(pretty);
+            return fragment.render();
         }
 
         // expand annotation objects
@@ -187,19 +185,11 @@ JsConstruct.renderFragment = function (fragment, pretty) {
 
                 return accum.concat(current);
 
-            }, []), pretty);
+            }, []));
         }
 
         if (fragment.block !== undefined) {
-            // todo - render the block and see if it's a one-liner before determining how many newlines?
-            // would have to move this expansion to the render phase then
-
-            if (pretty) {
-                return '{\n\n    ' + JsConstruct.renderFragment(fragment.block, pretty).replace(/\n/g, '\n    ') + '\n}';
-            }
-            else {
-                return '{' + JsConstruct.renderFragment(fragment.block, pretty) + '}';
-            }
+            return '{' + JsConstruct.renderFragment(fragment.block) + '}';
         }
     }
 

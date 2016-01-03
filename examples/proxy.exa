@@ -1,0 +1,20 @@
+makeServer is <net:http:server>;
+makeClient is <net:http:client>;
+
+receive args, io, system;
+
+client = makeClient();
+count = 0;
+
+// connect authority with expertise
+server = makeServer(8080, service:
+
+    receive request;
+
+    // log the request
+    io.stderr.write ~ "`request.method` `request.url`\n";
+
+    after client.get ~ "`args[0]``request.url`" => res, body:
+        io.stdout.write ~ "--> `res.statusCode` for `request.url`: `#body` bytes\n";
+        reply body;
+);

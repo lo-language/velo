@@ -9,7 +9,7 @@
 var Task = require('../../runtime/Task');
 var util = require('util');
 
-module.exports['replies'] = {
+module.exports['responses'] = {
 
     "new reply not processed in working state": function (test) {
 
@@ -35,9 +35,6 @@ module.exports['replies'] = {
     //
     //    test.done();
     //}
-};
-
-module.exports['basics'] = {
 
     "reply kills further response": function (test) {
 
@@ -133,7 +130,10 @@ module.exports['basics'] = {
 
         task.respond("fail", "boo");
         task.pickupReplies();
-    },
+    }
+};
+
+module.exports['closing'] = {
 
     "close waits for one message": function (test) {
 

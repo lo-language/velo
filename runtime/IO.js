@@ -2,8 +2,6 @@
 
 "use strict";
 
-var http = require('http');
-
 module.exports = {
 
     stdout: {
@@ -18,24 +16,15 @@ module.exports = {
         }
     },
 
-    http: {
+    stderr: {
 
-        get: function (task) {
+        write: function (task) {
 
-            http.get(task.args[0], function (res) {
+            process.stderr.write.apply(process.stderr, task.args);
 
-                var body = '';
-
-                res.setEncoding('utf8');
-
-                res.on('data', function (chunk) {
-                    body += chunk;
-                });
-
-                res.on('end', function () {
-                    task.respond("reply", [res, body]);
-                });
-            });
+            // we need to reply so the caller doesn't hang waiting for a response
+            // todo - call this function as a dispatch?
+            task.respond("reply");
         }
     }
 };

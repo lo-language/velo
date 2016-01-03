@@ -9,8 +9,10 @@
 "use strict";
 
 const Module = require('./Module');
+const Task = require('./Task');
 const fs = require('fs');
 const Q = require('q');
+const standardLibs = require('../libs');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -21,6 +23,7 @@ const Q = require('q');
 var __ = function (libs) {
 
     this.libs = libs;
+    this.modules = standardLibs;
 
     var _this = this;
 
@@ -30,71 +33,125 @@ var __ = function (libs) {
      * @param task
      * @return {*}
      */
-    this.acquire = function (task) {
-
-        var modulePath = task.args[0];
-
-        _this.getModule(modulePath).then(
-            function (module) {
-
-                // might want to refactor this class so we don't need this bind
-                return module.load();
-            },
-            function (error) {
-                console.error("error loading " + modulePath);
-            }
-        ).then(
-            function (procedure) {
-
-                task.respond("reply", procedure);
-            }
-        ).done();
-    };
+    //this.acquire = function (task) {
+    //
+    //    var modulePath = task.args[0];
+    //
+    //    _this.getModule(modulePath).then(
+    //        function (module) {
+    //
+    //            // might want to refactor this class so we don't need this bind
+    //            return module.load();
+    //        },
+    //        function (error) {
+    //            console.error("error loading " + modulePath);
+    //        }
+    //    ).then(
+    //        function (procedure) {
+    //
+    //            task.respond("reply", procedure);
+    //        }
+    //    ).done();
+    //};
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Searches our libraries and returns a promise for the full filesystem path to the specified module.
+ * Resolves a module reference to a module by locating and fetching it.
  *
- * @param path  logical path to the module
+ * @param ref
+ * @return {promise}
  */
-__.prototype.findModule = function (path) {
+__.prototype.getModule = function (ref) {
 
-//    console.error("locating module: " + path);
+    // limited to local files for now
+    var path = this.libs + '/' + ref + '.exa';
 
-    // todo actually search libs
-
-    return Q(this.libs + '/' + path + '.exa');
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Returns a promise for the specified module.
- *
- * @param path
- */
-__.prototype.getModule = function (path) {
-
-    // todo cache loaded modules
-
-    var self = this;
-
-    return this.findModule(path).then(
+    return Q(path).then(
         function (fullPath) {
 
-//            console.error("loading module: " + fullPath);
-
-            return Q.denodeify(fs.readFile)(fullPath, 'utf8').then(
-                function (source) {
-
-                    return new Module(source);
-                },
-                function (err) {
-                    throw new Error("failed to load module: " + path + "\n" + err);
-                });
+            // read the file
+            return Q.denodeify(fs.readFile)(fullPath, 'utf8');
         },
         function () {
             throw new Error("couldn't find module " + path);
+        }
+    ).then(
+        function (source) {
+            return new Module(source);
+        },
+        function (err) {
+            throw new Error("failed to load module: " + ref + "\n" + err);
+        });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Loads all dependencies for the given module.
+ */
+__.prototype.loadDeps = function (deps) {
+
+    return Q.all(deps.map(this.loadModule.bind(this)));
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Loads the specified Exa module into the JS environment for execution, checking our cache first.
+ * Recursively loads the module graph via BFS.
+ * Returns a promise for an Exa service function ready to run.
+ *
+ * @return {promise}
+ */
+__.prototype.loadModule = function (ref) {
+
+    console.error("LOADING", ref);
+
+    // see if we've already loaded the module
+    // todo test this
+    if (this.modules[ref]) {
+        console.error("ALREADY LOADED: ", ref);
+        return Q(this.modules[ref]);
+    }
+
+    var _this = this;
+
+    // resolve the ref to a module
+    return this.getModule(ref).then(
+        function (module) {
+
+            // make an Exa service from the module, bound to our module registry, and cache it
+            // do this before loading its deps so we don't fall into infinite recursion
+            _this.modules[ref] = module.makeService(_this.modules);
+
+            // the service is now loaded but it can't be run until its dependencies are loaded as well
+            // recursively load dependencies and after completion return the service, ready to run
+            return Q.all(module.getDeps().map(_this.loadModule.bind(_this))).then(
+                function () {
+                    return _this.modules[ref];
+                }
+            );
+        }
+    );
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Creates and sends a root request with the given args.
+ *
+ * @param modref    an exa module reference
+ * @param args      request args
+ * @return {promise}
+ */
+__.prototype.run = function (modref, args) {
+
+    return this.loadModule(modref).then(
+        function (service) {
+
+            var d = Q.defer();
+
+            Task.sendRootRequest(service, args, d.resolve.bind(d), d.reject.bind(d));
+
+            return d.promise;
         }
     );
 };
