@@ -1,3 +1,11 @@
+/**
+ * Very naive HTTP proxy.
+ *
+ * Usage: exa proxy.exa URL
+ *
+ * e.g. exa proxy.exa http://www.exalang.org
+ */
+
 makeServer is <net:http:server>;
 makeClient is <net:http:client>;
 

@@ -5,7 +5,42 @@
 const Task = require('../runtime/Task');
 const http = require('http');
 
+// todo some kind of CLI options parser?
+
 module.exports = {
+
+    /**
+     *
+     * param delay - ms until first message
+     * param interval - ms between successive messages; zero for one hit
+     */
+    ':setTimer': function (task) {
+
+        var delay = task.args[0];
+        var interval = task.args[1];
+
+        setTimeout(function () {
+
+            task.respond("reply");
+
+        }, delay);
+    },
+
+    /**
+     * Returns a pseudo-random number. True random consumes a potentially-limited system resource (entropy) and must therefore be injected.
+     */
+    ':getRandom': function (task) {
+
+        task.respond("reply", Math.random());
+    },
+
+    /**
+     * Returns a pseudo-random number. True random consumes a potentially-limited system resource (entropy) and must therefore be injected.
+     */
+    ':acquire': function (task) {
+
+        // todo
+    },
 
     'net:http:client': function (task) {
 

@@ -27,6 +27,9 @@ const LOG_ENABLE = false;
  *
  * Takes a reply handler and a fail handler.
  *
+ * @param name      a name for the task
+ * @param service   the service performing this task - we only need this to support recur()
+ * @param args      the args for this task
  * @return {*}
  */
 var __ = function (name, service, args) {

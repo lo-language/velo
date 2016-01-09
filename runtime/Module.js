@@ -28,44 +28,6 @@ var __ = function (source) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- *
- * @return {*}
- */
-//__.prototype.parse = function () {
-//
-//    if (this.ast === undefined) {
-//        this.ast = parser.parse(this.source);
-//    }
-//
-//    return this.ast;
-//};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @return {*}
- */
-//__.prototype.compile = function () {
-//
-//    try {
-//        var moduleScope = new Scope();
-//        var js = moduleScope.compile(this.parse()).render();
-//
-//        this.deps = moduleScope.getDeps();
-//
-//        // create a factory method to build a service bound to a registry
-//        // use new Function() so as not to leak the local scope (can't hide globals)
-//        this.makeService = new Function('MODS', this.getJs());
-//    }
-//    catch (e) {
-//        console.error("error compiling module");
-//        console.error(e.stack);
-//        console.error(util.inspect(this.parse(), {depth: null}));
-//    }
-//};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
  * Lean on JavaScript to recover the generated JS.
  *
  * @return {String}
