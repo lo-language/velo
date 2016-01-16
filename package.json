@@ -9,6 +9,7 @@
     "node": ">=0.8"
   },
   "dependencies": {
+    "antlr4": "^4.5.2",
     "minimist": "^1.2.0",
     "q": ""
   },

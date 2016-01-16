@@ -13,22 +13,22 @@ sendRequest = service:
 
     receive url;
 
-    after client.get ~ url => res, body:
+    res, body = @ client.get(url) then:
 
-        io.stdout.write ~ "response from `url`: status = `res.statusCode`\n";
-        io.stdout.write ~ "body length: `#body`\n";
+        @ io.stdout.write("response from `url`: status = `res.statusCode`\n");
+        @ io.stdout.write("body length: `#body`\n";)
 
         reply #body;
 
-    io.stdout.write ~ "sent request to `url`\n";
+    @ io.stdout.write("sent request to `url`\n");
 ;
 
 // race some requests
 
-sendRequest ~ google;
+@sendRequest(google);
 
 sendRequest(apple);
 
 //io.stdout.write ~ "apple length was: " + len + "\n\n";
 
-sendRequest ~ exa;
+@sendRequest(exa);

@@ -5,11 +5,13 @@ num = 0;
 
 max is 10001;
 
-while num < max:
+while num < max {
 
-    if num % 1000 == 0:
+    if num % 1000 == 0 {
         num -> path;
+    }
 
     num++;
+}
 
 io.stdout.write("`path`\n");
