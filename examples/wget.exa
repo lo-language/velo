@@ -9,26 +9,33 @@ receive args, io, system;
 // connect authority with expertise
 client = createClient();
 
-sendRequest = service:
+sendRequest = service {
 
     receive url;
 
-    res, body = @ client.get(url) then:
+    (res, body) = *client.get(url) then {
 
-        @ io.stdout.write("response from `url`: status = `res.statusCode`\n");
-        @ io.stdout.write("body length: `#body`\n";)
+        *io.stdout.write("response from `url`: status = `res.statusCode`\n");
+        *io.stdout.write("body length: `#body`\n");
 
         reply #body;
+    }
+    catch {
 
-    @ io.stdout.write("sent request to `url`\n");
-;
+        receive err;
+
+
+    };
+
+    *io.stdout.write("sent request to `url`\n");
+};
 
 // race some requests
 
-@sendRequest(google);
+*sendRequest(google);
 
 sendRequest(apple);
 
-//io.stdout.write ~ "apple length was: " + len + "\n\n";
+//io.stdout.write * "apple length was: " + len + "\n\n";
 
-@sendRequest(exa);
+*sendRequest(exa);

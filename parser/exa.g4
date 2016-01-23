@@ -35,20 +35,30 @@ ID_LETTER   : 'a'..'z'|'A'..'Z'|'_' ;
 MODREF      : '<' ~[ \t\r\n]+ '>';
 
 
-// todo allow modules to be records?
+// ??? allow modules to be records?
 module
-    : statement+
+    : statement_list {return {type: "module", service: {type: "procedure", body: $statement_list.retVal}};}
     ;
 
-statement
-    : 'receive' ID (',' ID)* ';'
-    | ID 'is' literal ';'
-    | 'distinguish' ID (',' ID)+ ';'
-    | response ';'
-    | assignment ';'
-    | conditional
-    | iteration
-    | expr ';'
+// we do this the old-fashioned way because that's what the compiler wants
+statement_list returns [retVal]
+    : statement {$retVal = {type: "stmt_list", head: $statement.retVal, tail: null};}
+    | statement statement_list {$retVal = {type: "stmt_list", head: $statement.retVal, tail: $statement_list.retVal};}
+    ;
+
+statement returns [retVal]
+    @init
+    {
+    	names = [];
+    }
+    : 'receive' ID {names.push($ID.text);} (',' ID {names.push($ID.text);})* ';'        {$retVal = {type: "receive", names: names};} # receive
+    | ID 'is' literal ';'               {$retVal = {type: "constant", name: $ID.text, value: $literal.text};} # define
+    | 'distinguish' ID (',' ID)+ ';'    # distinguish
+    | response ';'                      # responseStmt
+    | assignment ';'                    # assignmentStmt
+    | conditional                       # conditionalStmt
+    | iteration                         # iterationStmt
+    | expr ';'                          # exprStmt
     ;
 
 response
@@ -92,8 +102,8 @@ block
     ;
 
 expr
-    : expr '(' exprList? ')' ('catch' ':' block)?    // fn call
-    | '@' expr '(' exprList? ')' ('then' ':' block)? ('catch' ':' block)?
+    : expr '(' exprList? ')' ('catch' block)?    // fn call
+    | '*' expr '(' exprList? ')' ('then' block)? ('catch' block)?
     | '#' expr
     | 'not' expr
     | expr ('*'|'/'|'%') expr
@@ -123,14 +133,14 @@ lvalue
 // literals
 
 literal
-    : 'nil'
-    | BOOL
-    | NUMBER
-    | STRING
-    | MODREF
-    | 'service' ':' block
-    | '[' list_items? ']'
-    | '{' fieldList? '}'
+    : 'nil'                 # nil
+    | BOOL                  # bool
+    | NUMBER                # number
+    | STRING                # string
+    | MODREF                # modref
+    | 'service' block       # service
+    | '[' list_items? ']'   # list
+    | '{' fieldList? '}'    # record
     ;
 
 fieldList

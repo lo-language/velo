@@ -7,7 +7,10 @@
 
 var fs = require('fs');
 var path = require('path');
-var parser = require('../../parser/Parser');
+
+const antlr4 = require('antlr4');
+const Lexer = require('../../gen/exaLexer');
+const Parser = require('../../gen/exaParser');
 
 var EXT = '.exa';
 
@@ -26,36 +29,29 @@ files.forEach(function (filename) {
 
         var source = fs.readFileSync(__dirname + '/inputs/' + filename, 'utf8');
         var expected = fs.readFileSync(__dirname + '/outputs/' + name + '.json', 'utf8');
-        var result = parser.parse(source);
+        var result = parse(source);
 
         // we shouldn't have to stringify both of these but if we don't, we get a test fail
-        test.deepEqual(JSON.stringify(result), JSON.stringify(JSON.parse(expected)));
+        //test.deepEqual(JSON.stringify(result), JSON.stringify(JSON.parse(expected)));
         test.done();
     };
 });
 
-// commented this chunk out and threw the tests away because they were all really obsolete
-// and they would put the parser in a bad state such that when it went to parse a correct program in RunTest it would fail
-// go through the errors directory and make sure they all fail
-//var errorFiles = fs.readdirSync(__dirname + '/errors');
-//
-//errorFiles.forEach(function (filename) {
-//
-//    if (path.extname(filename) !== EXT) {
-//        return;
-//    }
-//
-//    var name = path.basename(filename, EXT);
-//
-//    module.exports['error - ' + name] = function (test) {
-//
-//        var source = fs.readFileSync(__dirname + '/errors/' + filename, 'utf8');
-//
-//        test.throws(function () {
-//            var result = parser.parse(source);
-//            console.log(JSON.stringify(result));
-//        });
-//
-//        test.done();
-//    };
-//});
+function parse (source) {
+
+    var chars = new antlr4.InputStream(source);
+    var lexer = new Lexer.exaLexer(chars);
+    var tokens  = new antlr4.CommonTokenStream(lexer);
+    var parser = new Parser.exaParser(tokens);
+    parser.buildParseTrees = true;
+
+    var tree = parser.module();
+
+    console.log(tree);
+}
+
+function printTree (tree) {
+
+
+
+}
