@@ -37,22 +37,18 @@ MODREF      : '<' ~[ \t\r\n]+ '>';
 
 // ??? allow modules to be records?
 module
-    : statement_list {return {type: "module", service: {type: "procedure", body: $statement_list.retVal}};}
+    : statement_list
     ;
 
 // we do this the old-fashioned way because that's what the compiler wants
-statement_list returns [retVal]
-    : statement {$retVal = {type: "stmt_list", head: $statement.retVal, tail: null};}
-    | statement statement_list {$retVal = {type: "stmt_list", head: $statement.retVal, tail: $statement_list.retVal};}
+statement_list
+    : statement
+    | statement statement_list
     ;
 
-statement returns [retVal]
-    @init
-    {
-    	names = [];
-    }
-    : 'receive' ID {names.push($ID.text);} (',' ID {names.push($ID.text);})* ';'        {$retVal = {type: "receive", names: names};} # receive
-    | ID 'is' literal ';'               {$retVal = {type: "constant", name: $ID.text, value: $literal.text};} # define
+statement
+    : 'receive' ID (',' ID)* ';'        # receive
+    | ID 'is' literal ';'               # define
     | 'distinguish' ID (',' ID)+ ';'    # distinguish
     | response ';'                      # responseStmt
     | assignment ';'                    # assignmentStmt
@@ -138,7 +134,7 @@ literal
     | NUMBER                # number
     | STRING                # string
     | MODREF                # modref
-    | 'service' block       # service
+    | block       # service
     | '[' list_items? ']'   # list
     | '{' fieldList? '}'    # record
     ;
