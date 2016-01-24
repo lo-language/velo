@@ -13,22 +13,17 @@ statement_list
     ;
 
 statement
-    : 'receive' ID (',' ID)* ';'        # receive
-    | ID 'is' literal ';'               # constant
-    | 'distinguish' ID (','? ID)+ ';'   # dimension
-    | response ';'                      # responseStmt
-    | lvalue assignment_op expr ';'     # assignment
-    | lvalue op=('++'|'--') ';'         # incDec
-    | expr '->' lvalue ';'              # splice
-    | conditional                       # conditionalStmt
-    | 'while' expr block                # iteration
-    | expr ';'                          # exprStmt
-    ;
-
-response
-    : 'reply' exprList
-    | 'fail' exprList
-    | 'substitute' exprList
+    : 'receive' ID (',' ID)* ';'                            # receive
+    | ID 'is' literal ';'                                   # constant
+    | 'distinguish' ID (','? ID)+ ';'                       # dimension
+    | channel=('reply'|'fail'|'substitute') exprList ';'    # response
+    | expr assignment_op expr ';'                           # assignment
+    | expr op=('++'|'--') ';'                               # incDec
+    | expr '->' expr ';'                                    # splice
+    | conditional                                           # condStmt
+    | 'while' expr block                                    # iteration
+    | 'skip' ';'                                            # skip
+    | expr ';'                                              # exprStmt
     ;
 
 // assignments are statements, not expressions!
@@ -45,10 +40,11 @@ assignment_op
     | '%='
     ;
 
+// might want to refactor this
 conditional
-    : 'if' expr block
-    | 'if' expr block 'else' block
-    | 'if' expr block 'else' conditional
+    : 'if' expr block                       # ifOnly
+    | 'if' expr block 'else' block          # ifElse
+    | 'if' expr block 'else' conditional    # nestedIf
     ;
 
 // we could alternately go the C way and make a block a kind of statement
@@ -67,9 +63,15 @@ expr
     | expr op=('and'|'or') expr                                     # logical
     | expr 'in' expr                                                # membership // not sure where this guy should go, precedence-wise
     | '(' expr ')'                                                  # wrap
-    | literal                                                       # litExpr
-    | lvalue                                                        # valExpr
+    | expr '[' expr ']'                                             # subscript
+    | expr '[' expr? ':' expr? ']'                                  # slice
+    | expr '{' expr '}'                                             # extraction
+    | expr '{' expr? ':' expr? '}'                                  # excision
+    | expr '.' ID                                                   # select
+    | '(' expr (',' expr)+ ')'                                      # destructure
     | INTER_BEGIN interpolated INTER_END                            # dynastring
+    | literal                                                       # litExpr
+    | ID                                                            # id
     ;
 
 interpolated
@@ -81,43 +83,27 @@ exprList
     : expr (',' expr)*
     ;
 
-lvalue
-    : ID                                # id
-    | lvalue '[' expr ']'               # subscript
-    | lvalue '[' expr? ':' expr? ']'    # slice
-    | lvalue '{' expr '}'               # extraction
-    | lvalue '{' expr? ':' expr? '}'    # excision
-    | lvalue '.' ID                     # select
-    | '(' lvalue (',' lvalue)+ ')'      # destructure
-    ;
-
 // literals
 
 literal
-    : 'nil'                 # nil
-    | BOOL                  # bool
-    | NUMBER                # number
-    | STRING                # string
-    | MODREF                # modref
-    | 'service' block       # service
-    | '[' list_items? ']'   # list
-    | '{' fieldList? '}'    # record
-    ;
-
-fieldList
-    : field (',' field)*
-    ;
-
-list_items
-    : ':'
-    | expr (',' expr)*
-    | dyad (',' dyad)*
-    ;
-
-dyad
-    : expr ':' expr
+    : 'nil'                                     # nil
+    | BOOL                                      # bool
+    | NUMBER                                    # number
+    | STRING                                    # string
+    | MODREF                                    # modref
+    | 'service' block                           # service
+    | '[' (':'|exprList|pairList)? ']'          # collection
+    | '{' field (',' field)* '}'                # record
     ;
 
 field
     : ID ':' expr
+    ;
+
+pairList
+    : pair (',' pair)*
+    ;
+
+pair
+    : expr ':' expr
     ;

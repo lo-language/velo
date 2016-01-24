@@ -16,9 +16,9 @@ homes = [
 ];
 
 // procedure literal
-HardyRamanujan = service:
+HardyRamanujan = service {
     reply 1729;
-;
+};
 
 // record with indentation
 pairs = {

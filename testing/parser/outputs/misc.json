@@ -281,59 +281,59 @@
                               "tail": {
                                 "type": "stmt_list",
                                 "head": {
-                                  "type": "recovery",
+                                  "type": "assign",
                                   "op": "=",
                                   "left": {
                                     "type": "id",
                                     "name": "result"
                                   },
-                                  "application": {
+                                  "right": {
                                     "type": "application",
                                     "address": {
                                       "type": "id",
                                       "name": "foo"
                                     },
-                                    "args": []
-                                  },
-                                  "contingency": {
-                                    "type": "stmt_list",
-                                    "head": {
-                                      "type": "receive",
-                                      "names": [
-                                        "err"
-                                      ]
-                                    },
-                                    "tail": {
+                                    "args": [],
+                                    "recover": {
                                       "type": "stmt_list",
                                       "head": {
-                                        "type": "application_stmt",
-                                        "application": {
-                                          "type": "application",
-                                          "address": {
-                                            "type": "id",
-                                            "name": "log"
-                                          },
-                                          "args": [
-                                            {
-                                              "type": "id",
-                                              "name": "err"
-                                            }
-                                          ]
-                                        }
+                                        "type": "receive",
+                                        "names": [
+                                          "err"
+                                        ]
                                       },
                                       "tail": {
                                         "type": "stmt_list",
                                         "head": {
-                                          "type": "response",
-                                          "channel": "reply",
-                                          "args": [
-                                            {
+                                          "type": "application_stmt",
+                                          "application": {
+                                            "type": "application",
+                                            "address": {
                                               "type": "id",
-                                              "name": "fixed"
-                                            }
-                                          ]
+                                              "name": "log"
+                                            },
+                                            "args": [
+                                              {
+                                                "type": "id",
+                                                "name": "err"
+                                              }
+                                            ]
+                                          }
                                         },
-                                        "tail": null
+                                        "tail": {
+                                          "type": "stmt_list",
+                                          "head": {
+                                            "type": "response",
+                                            "channel": "reply",
+                                            "args": [
+                                              {
+                                                "type": "id",
+                                                "name": "fixed"
+                                              }
+                                            ]
+                                          },
+                                          "tail": null
+                                        }
                                       }
                                     }
                                   }

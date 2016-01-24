@@ -23,19 +23,20 @@ block = connect("Block")();
 
 monkeys = 72;
 
-result = foo() catch:
+result = foo() catch {
     receive err;
     log(err);
     reply fixed;
+};
 
 // generator - the outer process is one entry point; it creates and returns *another* entry point
 // getIterator
 
 index = 0;
 
-iterator = service:
+iterator = service {
     reply items[index];
     index++;
-;
+};
 
 reply iterator;
