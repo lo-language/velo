@@ -7,7 +7,9 @@
 
 var fs = require('fs');
 var path = require('path');
-var parser = require('../../parser/Parser');
+//var parser = require('../../parser/Parser');
+var ASTBulder = require('../../parser/ASTBuilder');
+var parser = new ASTBulder();
 
 var EXT = '.exa';
 

@@ -12,8 +12,15 @@ grammar exa;
 WS              : [ \t\r\n]+ -> skip ;
 LINE_COMMENT    : '//' .*? '\r'? '\n' -> skip ; // BCPL
 COMMENT         : '/*' .*? '*/' -> skip ;
+BEGIN           : '{' ;
+END             : '}' ;
 
 fragment DIGIT  : '0'..'9' ;
+fragment INT    : '0' | [1-9] DIGIT* ;
+fragment EXP    : [Ee] [+\-]? INT ;
+fragment ESC    : '\\' [btnr"\\] ;
+
+fragment ID_LETTER  : 'a'..'z'|'A'..'Z'|'_' ;
 
 NIL         : 'nil';
 BOOL        : 'true'|'false';
@@ -24,15 +31,9 @@ NUMBER
     | '-'? INT
     ;
 
-fragment INT : '0' | [1-9] DIGIT* ;
-fragment EXP : [Ee] [+\-]? INT ;
-
-STRING          : '"' (ESC|.)*? '"';
-fragment ESC    : '\\' [btnr"\\] ;
-
-ID          : ID_LETTER (ID_LETTER | DIGIT)* ; // From C language fragment
-ID_LETTER   : 'a'..'z'|'A'..'Z'|'_' ;
-MODREF      : '<' ~[ \t\r\n]+ '>';
+ID      : ID_LETTER (ID_LETTER | DIGIT)* ;
+STRING  : '"' (ESC|.)*? '"' {this.text = this.text.slice(1, -1);} ;
+MODREF  : '<' ~[ \t\r\n]+ '>' {this.text = this.text.slice(1, -1);} ;
 
 
 // ??? allow modules to be records?
@@ -48,12 +49,14 @@ statement_list
 
 statement
     : 'receive' ID (',' ID)* ';'        # receive
-    | ID 'is' literal ';'               # define
-    | 'distinguish' ID (',' ID)+ ';'    # distinguish
+    | ID 'is' literal ';'               # constant
+    | 'distinguish' ID (','? ID)+ ';'   # dimension
     | response ';'                      # responseStmt
-    | assignment ';'                    # assignmentStmt
+    | lvalue assignment_op expr ';'     # assignment
+    | lvalue op=('++'|'--') ';'         # incDec
+    | expr '->' lvalue ';'              # splice
     | conditional                       # conditionalStmt
-    | iteration                         # iterationStmt
+    | 'while' expr block                # iteration
     | expr ';'                          # exprStmt
     ;
 
@@ -65,12 +68,6 @@ response
 
 // assignments are statements, not expressions!
 // todo multiple lvalues separated by commas for destructuring
-assignment
-    : lvalue assignment_op expr
-    | lvalue '++'
-    | lvalue '--'
-    | expr '->' lvalue
-    ;
 
 // assignments are NOT expressions
 // all but = should probably be considered edits instead of assignments
@@ -89,27 +86,24 @@ conditional
     | 'if' expr block 'else' conditional
     ;
 
-iteration
-    : 'while' expr block
-    ;
-
+// we could alternately go the C way and make a block a kind of statement
 block
-    : '{' statement+ '}'
+    : BEGIN statement_list END
     ;
 
 expr
-    : expr '(' exprList? ')' ('catch' block)?    // fn call
-    | '*' expr '(' exprList? ')' ('then' block)? ('catch' block)?
-    | '#' expr
-    | 'not' expr
-    | expr ('*'|'/'|'%') expr
-    | expr ('+'|'-') expr
-    | expr ('<'|'>'|'<='|'>='|'=='|'!=') expr
-    | expr ('and'|'or') expr
-    | expr 'in' expr
-    | '(' expr ')'
-    | literal
-    | lvalue
+    : expr '(' exprList? ')' ('catch' block)?                       # call
+    | '*' expr '(' exprList? ')' ('then' block)? ('catch' block)?   # dispatch
+    | '#' expr                                                      # measure
+    | 'not' expr                                                    # inverse
+    | expr op=('*'|'/'|'%') expr                                    # mulDiv
+    | expr op=('+'|'-') expr                                        # addSub
+    | expr op=('<'|'>'|'<='|'>='|'=='|'!=') expr                    # compare
+    | expr op=('and'|'or') expr                                     # logical
+    | expr 'in' expr                                                # membership // not sure where this guy should go, precedence-wise
+    | '(' expr ')'                                                  # wrap
+    | literal                                                       # litExpr
+    | lvalue                                                        # valExpr
     ;
 
 exprList
@@ -117,13 +111,13 @@ exprList
     ;
 
 lvalue
-    : ID
-    | lvalue '[' expr ']'
-    | lvalue '[' expr? ':' expr? ']'    // slice
-    | lvalue '{' expr '}'               // extraction
-    | lvalue '{' expr? ':' expr? '}'    // excision
-    | lvalue '.' ID
-    | '(' lvalue (',' lvalue)+ ')'          // destructure
+    : ID                                # id
+    | lvalue '[' expr ']'               # subscript
+    | lvalue '[' expr? ':' expr? ']'    # slice
+    | lvalue '{' expr '}'               # extraction
+    | lvalue '{' expr? ':' expr? '}'    # excision
+    | lvalue '.' ID                     # select
+    | '(' lvalue (',' lvalue)+ ')'      # destructure
     ;
 
 // literals
@@ -134,7 +128,7 @@ literal
     | NUMBER                # number
     | STRING                # string
     | MODREF                # modref
-    | block       # service
+    | 'service' block       # service
     | '[' list_items? ']'   # list
     | '{' fieldList? '}'    # record
     ;
