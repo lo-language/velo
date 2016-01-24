@@ -155,15 +155,6 @@ exaListener.prototype.exitBlock = function(ctx) {
 };
 
 
-// Enter a parse tree produced by exaParser#call.
-exaListener.prototype.enterCall = function(ctx) {
-};
-
-// Exit a parse tree produced by exaParser#call.
-exaListener.prototype.exitCall = function(ctx) {
-};
-
-
 // Enter a parse tree produced by exaParser#inverse.
 exaListener.prototype.enterInverse = function(ctx) {
 };
@@ -173,21 +164,21 @@ exaListener.prototype.exitInverse = function(ctx) {
 };
 
 
+// Enter a parse tree produced by exaParser#dynastring.
+exaListener.prototype.enterDynastring = function(ctx) {
+};
+
+// Exit a parse tree produced by exaParser#dynastring.
+exaListener.prototype.exitDynastring = function(ctx) {
+};
+
+
 // Enter a parse tree produced by exaParser#compare.
 exaListener.prototype.enterCompare = function(ctx) {
 };
 
 // Exit a parse tree produced by exaParser#compare.
 exaListener.prototype.exitCompare = function(ctx) {
-};
-
-
-// Enter a parse tree produced by exaParser#measure.
-exaListener.prototype.enterMeasure = function(ctx) {
-};
-
-// Exit a parse tree produced by exaParser#measure.
-exaListener.prototype.exitMeasure = function(ctx) {
 };
 
 
@@ -218,24 +209,6 @@ exaListener.prototype.exitMembership = function(ctx) {
 };
 
 
-// Enter a parse tree produced by exaParser#wrap.
-exaListener.prototype.enterWrap = function(ctx) {
-};
-
-// Exit a parse tree produced by exaParser#wrap.
-exaListener.prototype.exitWrap = function(ctx) {
-};
-
-
-// Enter a parse tree produced by exaParser#litExpr.
-exaListener.prototype.enterLitExpr = function(ctx) {
-};
-
-// Exit a parse tree produced by exaParser#litExpr.
-exaListener.prototype.exitLitExpr = function(ctx) {
-};
-
-
 // Enter a parse tree produced by exaParser#valExpr.
 exaListener.prototype.enterValExpr = function(ctx) {
 };
@@ -260,6 +233,51 @@ exaListener.prototype.enterLogical = function(ctx) {
 
 // Exit a parse tree produced by exaParser#logical.
 exaListener.prototype.exitLogical = function(ctx) {
+};
+
+
+// Enter a parse tree produced by exaParser#call.
+exaListener.prototype.enterCall = function(ctx) {
+};
+
+// Exit a parse tree produced by exaParser#call.
+exaListener.prototype.exitCall = function(ctx) {
+};
+
+
+// Enter a parse tree produced by exaParser#measure.
+exaListener.prototype.enterMeasure = function(ctx) {
+};
+
+// Exit a parse tree produced by exaParser#measure.
+exaListener.prototype.exitMeasure = function(ctx) {
+};
+
+
+// Enter a parse tree produced by exaParser#wrap.
+exaListener.prototype.enterWrap = function(ctx) {
+};
+
+// Exit a parse tree produced by exaParser#wrap.
+exaListener.prototype.exitWrap = function(ctx) {
+};
+
+
+// Enter a parse tree produced by exaParser#litExpr.
+exaListener.prototype.enterLitExpr = function(ctx) {
+};
+
+// Exit a parse tree produced by exaParser#litExpr.
+exaListener.prototype.exitLitExpr = function(ctx) {
+};
+
+
+// Enter a parse tree produced by exaParser#interpolated.
+exaListener.prototype.enterInterpolated = function(ctx) {
+};
+
+// Exit a parse tree produced by exaParser#interpolated.
+exaListener.prototype.exitInterpolated = function(ctx) {
 };
 
 

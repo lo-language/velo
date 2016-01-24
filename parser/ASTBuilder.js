@@ -51,6 +51,10 @@ ASTBuilder.prototype.visitStatement_list = function(ctx) {
 };
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// statements
+
+
 // Visit a parse tree produced by exaParser#receive.
 ASTBuilder.prototype.visitReceive = function(ctx) {
 
@@ -67,6 +71,20 @@ ASTBuilder.prototype.visitAssignment = function(ctx) {
         right: this.visit(ctx.expr())
     };
 };
+
+
+// Visit a parse tree produced by exaParser#expr.
+ASTBuilder.prototype.visitIncDec = function(ctx) {
+
+    return {
+        type: ctx.op.text == '++' ? 'increment' : 'decrement',
+        operand: this.visit(ctx.lvalue())
+    };
+};
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// expressions
 
 
 // Visit a parse tree produced by exaParser#expr.
@@ -106,16 +124,6 @@ ASTBuilder.prototype.visitCompare = function(ctx) {
 
 
 // Visit a parse tree produced by exaParser#expr.
-ASTBuilder.prototype.visitIncDec = function(ctx) {
-
-    return {
-        type: ctx.op.text == '++' ? 'increment' : 'decrement',
-        operand: this.visit(ctx.lvalue())
-    };
-};
-
-
-// Visit a parse tree produced by exaParser#expr.
 ASTBuilder.prototype.visitWrap = function(ctx) {
 
     return this.visit(ctx.expr());
@@ -141,22 +149,43 @@ ASTBuilder.prototype.visitExprList = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#lvalue.
 ASTBuilder.prototype.visitId = function(ctx) {
     return {type: "id", name: ctx.ID().getText()};
 };
 
 
-// Visit a parse tree produced by exaParser#nil.
 ASTBuilder.prototype.visitConstant = function(ctx) {
 
     return {type: 'constant', name: ctx.ID().getText(), value: this.visit(ctx.literal()) };
 };
 
-// Visit a parse tree produced by exaParser#nil.
+
 ASTBuilder.prototype.visitDimension = function(ctx) {
 
     return {type: 'range', variants: ctx.ID().map(function (token) {return token.getText()}) };
+};
+
+
+ASTBuilder.prototype.visitDynastring = function(ctx) {
+
+    return {type: 'interpolation', left: ctx.INTER_BEGIN().getText(), middle: this.visit(ctx.interpolated()), right: ctx.INTER_END().getText()};
+};
+
+
+ASTBuilder.prototype.visitInterpolated = function(ctx) {
+
+    var mid = ctx.INTER_MID();
+
+    if (mid) {
+        return {
+            type: 'dynastring', // todo change to interpolated
+            left: this.visit(ctx.expr()),
+            middle: mid.getText(),
+            right: this.visit(ctx.interpolated())
+        };
+    }
+
+    return this.visit(ctx.expr());
 };
 
 

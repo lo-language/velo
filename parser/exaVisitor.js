@@ -92,23 +92,18 @@ exaVisitor.prototype.visitBlock = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#call.
-exaVisitor.prototype.visitCall = function(ctx) {
-};
-
-
 // Visit a parse tree produced by exaParser#inverse.
 exaVisitor.prototype.visitInverse = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#compare.
-exaVisitor.prototype.visitCompare = function(ctx) {
+// Visit a parse tree produced by exaParser#dynastring.
+exaVisitor.prototype.visitDynastring = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#measure.
-exaVisitor.prototype.visitMeasure = function(ctx) {
+// Visit a parse tree produced by exaParser#compare.
+exaVisitor.prototype.visitCompare = function(ctx) {
 };
 
 
@@ -127,16 +122,6 @@ exaVisitor.prototype.visitMembership = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#wrap.
-exaVisitor.prototype.visitWrap = function(ctx) {
-};
-
-
-// Visit a parse tree produced by exaParser#litExpr.
-exaVisitor.prototype.visitLitExpr = function(ctx) {
-};
-
-
 // Visit a parse tree produced by exaParser#valExpr.
 exaVisitor.prototype.visitValExpr = function(ctx) {
 };
@@ -149,6 +134,31 @@ exaVisitor.prototype.visitMulDiv = function(ctx) {
 
 // Visit a parse tree produced by exaParser#logical.
 exaVisitor.prototype.visitLogical = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#call.
+exaVisitor.prototype.visitCall = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#measure.
+exaVisitor.prototype.visitMeasure = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#wrap.
+exaVisitor.prototype.visitWrap = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#litExpr.
+exaVisitor.prototype.visitLitExpr = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#interpolated.
+exaVisitor.prototype.visitInterpolated = function(ctx) {
 };
 
 
