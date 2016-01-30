@@ -124,7 +124,7 @@ __.prototype.visitNestedIf = function(ctx) {
 __.prototype.visitExprStmt = function(ctx) {
 
     return {
-        type: 'application_stmt',
+        type: 'application_stmt',   // todo should arguably be expr_stmt
         application: this.visit(ctx.expr())
     };
 };
@@ -136,6 +136,15 @@ __.prototype.visitResponse = function(ctx) {
         type: 'response',
         channel: ctx.channel.text,
         args: this.visit(ctx.exprList())
+    };
+};
+
+
+__.prototype.visitDestructure = function(ctx) {
+
+    return {
+        type: 'destructure',
+        members: ctx.ID().map(function (token) {return token.getText()})
     };
 };
 
@@ -294,6 +303,29 @@ __.prototype.visitCall = function(ctx) {
 };
 
 
+__.prototype.visitDispatch = function(ctx) {
+
+    var args = ctx.exprList();
+
+    var res = {
+        type: 'message',
+        address: this.visit(ctx.expr()),
+        args: args ? this.visit(args) : []
+    };
+
+    if (ctx.t) {
+        res.subsequent = this.visit(ctx.block(0));
+    }
+
+    if (ctx.c) {
+        // todo - we have to check the flag to know which block to use; can we change the parser to get rid of this ugliness?
+        res.contingency = this.visit(ctx.t ? ctx.block(1) : ctx.block(0));
+    }
+
+    return res;
+};
+
+
 __.prototype.visitBlock = function(ctx) {
 
     return this.visit(ctx.statement_list());
@@ -375,6 +407,15 @@ __.prototype.visitService = function(ctx) {
 };
 
 
+__.prototype.visitMeasure = function(ctx) {
+
+    return {
+        type: 'cardinality',
+        operand: this.visit(ctx.expr())
+    };
+};
+
+
 __.prototype.visitCollection = function(ctx) {
 
     if (ctx.exprList()) {
@@ -392,6 +433,12 @@ __.prototype.visitCollection = function(ctx) {
             elements: this.visit(ctx.pairList())
         };
     }
+
+    if (ctx.colon) {
+        return {type: 'map', elements: []};
+    }
+
+    return {type: 'array', elements: []};
 };
 
 

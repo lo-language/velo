@@ -45,7 +45,7 @@ module.exports['iteration'] = {
 //    }
 //};
 
-module.exports['io'] = {
+module.exports['helloWorld'] = {
 
     "setUp": function (cb) {
 

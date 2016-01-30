@@ -3,6 +3,7 @@ y = false;
 answer = 42;
 age = 63.4;
 message = "hello, world!";
+empty = [];
 
 // list
 names = ["Ford", "Arthur", "Trillian", "Zaphod"];

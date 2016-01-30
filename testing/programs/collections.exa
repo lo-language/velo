@@ -7,102 +7,97 @@
 array = [];
 words = ["foo", "mani", "padme", "hum"];
 
-if #array != 0:
+if #array != 0 {
     fail "problem";
+}
 
-if words[2] != "padme":
+if words[2] != "padme" {
     fail "oh me oh my";
+}
 
-if #words != 4:
+if #words != 4 {
     fail "what the deuce?!";
+}
 
 // Array slicing
 subset = words[1:3];
 
-if #subset != 2:
+if #subset != 2 {
     fail "darn";
+}
 
-if subset[0] != words[1]:
+if subset[0] != words[1] {
     fail "uh oh";
+}
 
-if subset[1] != words[2]:
-    fail "how could that be?"; 
+if subset[1] != words[2] {
+    fail "how could that be?";
+}
 
 // Array slicing shorthand
 subset = words[:];
 
-if #subset != #words:
+if #subset != #words {
     fail "dang";
+}
 
-if subset[1] != words[1]:
+if subset[1] != words[1] {
     fail "that's weird";
+}
 
 // Array extraction and excision
 subset = words{1};
 
-if subset != "mani":
+if subset != "mani" {
     fail "crud";
+}
 
-if #words != 3:
+if #words != 3 {
     fail "too bad";
+}
 
 words = ["foo", "mani", "padme", "hum"];
 subset = words{1:3};
 
-if #subset != 2:
+if #subset != 2 {
     fail "that's not good";
+}
 
-if #words != 2:
+if #words != 2 {
     fail "problem found";
+}
 
-if subset[0] != "mani":
+if subset[0] != "mani" {
     fail "my goodness";
+}
 
-if words[1] != "hum":
+if words[1] != "hum" {
     fail "that's a real shame";
+}
 
 // Map literal (including empty), access, and cardinality
 map = [:];
 cities = ["nyc":"New York", "phi":"Philadelphia"];
 
-if #map != 0:
+if #map != 0 {
     fail "problem";
+}
 
-if cities.nyc != "New York":
+if cities.nyc != "New York" {
     fail "something happened";
+}
 
-if cities["nyc"] != "New York":
+if cities["nyc"] != "New York" {
     fail "whoops";
+}
 
-if #cities != 2:
+if #cities != 2 {
     fail "what the deuce?!";
-
+}
 
 // String cardinality
 name = "snooks";
 
-if #name < 6:
+if #name < 6 {
     fail "WHAT?!";
-
-
-//if #dudes < 3:
-//    fail "not very froody";
-
-// todo throw an error on undefined identifiers
-//if #set != 3
-//    fail("surely you"re joking");
-
-// test membership
-// or should these be a in b?
-
-//if "om" in words:
-//    fail "oops";
-
-//if "trillian" in dudes:
-//    fail "not a dude";
-
-// shouldn"t be necessary but is for now; otherwise we never conclude
-//reply;
-
-//if #map != 3
-//    fail("a most unpleasant situation, captain");
+}

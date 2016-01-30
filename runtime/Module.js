@@ -4,9 +4,11 @@
 
 "use strict";
 
-const parser = require('./../parser/Parser');
+const ASTBuilder = require('./../parser/ASTBuilder');
 const Scope = require('./../codegen/Scope');
 const util = require('util');
+
+var parser = new ASTBuilder();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**

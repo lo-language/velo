@@ -1,31 +1,16 @@
-{"type":"module", "service": {
-  "type": "procedure",
-  "body": {
-    "type": "stmt_list",
-    "head": {
-      "type": "application_stmt",
-      "application": {
-        "type": "application",
-        "address": {
-          "type": "id",
-          "name": "foo"
-        },
-        "args": []
-      }
-    },
-    "tail": {
+{
+  "type": "module",
+  "service": {
+    "type": "procedure",
+    "body": {
       "type": "stmt_list",
       "head": {
         "type": "application_stmt",
         "application": {
           "type": "application",
           "address": {
-            "type": "select",
-            "set": {
-              "type": "id",
-              "name": "foo"
-            },
-            "member": "bar"
+            "type": "id",
+            "name": "foo"
           },
           "args": []
         }
@@ -33,17 +18,16 @@
       "tail": {
         "type": "stmt_list",
         "head": {
-          "type": "assign",
-          "op": "=",
-          "left": {
-            "type": "id",
-            "name": "x"
-          },
-          "right": {
+          "type": "application_stmt",
+          "application": {
             "type": "application",
             "address": {
-              "type": "id",
-              "name": "foo"
+              "type": "select",
+              "set": {
+                "type": "id",
+                "name": "foo"
+              },
+              "member": "bar"
             },
             "args": []
           }
@@ -54,14 +38,8 @@
             "type": "assign",
             "op": "=",
             "left": {
-              "type": "destructure",
-              "members": [
-                ",",
-                {
-                  "type": "id",
-                  "name": "x"
-                }
-              ]
+              "type": "id",
+              "name": "x"
             },
             "right": {
               "type": "application",
@@ -75,125 +53,116 @@
           "tail": {
             "type": "stmt_list",
             "head": {
-              "type": "id",
-              "name": "foo"
-            },
-            "tail": {
-              "type": "stmt_list",
-              "head": {
-                "type": "message",
+              "type": "assign",
+              "op": "=",
+              "left": {
+                "type": "destructure",
+                "members": [
+                  "x",
+                  "y"
+                ]
+              },
+              "right": {
+                "type": "application",
                 "address": {
                   "type": "id",
                   "name": "foo"
                 },
-                "args": [
-                  {
-                    "type": "number",
-                    "val": "18"
-                  }
-                ]
+                "args": []
+              }
+            },
+            "tail": {
+              "type": "stmt_list",
+              "head": {
+                "type": "application_stmt",
+                "application": {
+                  "type": "id",
+                  "name": "foo"
+                }
               },
               "tail": {
                 "type": "stmt_list",
                 "head": {
-                  "type": "message",
-                  "address": {
-                    "type": "select",
-                    "set": {
+                  "type": "application_stmt",
+                  "application": {
+                    "type": "message",
+                    "address": {
                       "type": "id",
-                      "name": "sessionStore"
+                      "name": "foo"
                     },
-                    "member": "getByID"
-                  },
-                  "args": [
-                    {
-                      "type": "id",
-                      "name": "sessionID"
-                    }
-                  ]
+                    "args": [
+                      {
+                        "type": "number",
+                        "val": "18"
+                      }
+                    ]
+                  }
                 },
                 "tail": {
                   "type": "stmt_list",
                   "head": {
-                    "type": "id",
-                    "name": "foo"
+                    "type": "application_stmt",
+                    "application": {
+                      "type": "message",
+                      "address": {
+                        "type": "select",
+                        "set": {
+                          "type": "id",
+                          "name": "sessionStore"
+                        },
+                        "member": "getByID"
+                      },
+                      "args": [
+                        {
+                          "type": "id",
+                          "name": "sessionID"
+                        }
+                      ]
+                    }
                   },
                   "tail": {
                     "type": "stmt_list",
                     "head": {
-                      "type": "message",
-                      "address": {
-                        "type": "id",
-                        "name": "foo"
+                      "type": "assign",
+                      "op": "=",
+                      "left": {
+                        "type": "destructure",
+                        "members": [
+                          "bar",
+                          "baz"
+                        ]
                       },
-                      "args": [
-                        {
-                          "type": "number",
-                          "val": "47"
-                        }
-                      ],
-                      "futures": [
-                        {
-                          "type": "id",
-                          "name": "bar"
-                        },
-                        {
-                          "type": "id",
-                          "name": "baz"
-                        }
-                      ]
-                    },
-                    "tail": {
-                      "type": "stmt_list",
-                      "head": {
+                      "right": {
                         "type": "message",
                         "address": {
                           "type": "id",
-                          "name": "bar"
+                          "name": "foo"
                         },
                         "args": [
                           {
                             "type": "number",
-                            "val": "48"
+                            "val": "47"
                           }
-                        ],
-                        "subsequent": {
-                          "type": "stmt_list",
-                          "head": {
-                            "type": "response",
-                            "channel": "reply",
-                            "args": [
-                              {
-                                "type": "string",
-                                "val": "hello"
-                              }
-                            ]
-                          },
-                          "tail": null
-                        }
-                      },
-                      "tail": {
-                        "type": "stmt_list",
-                        "head": {
+                        ]
+                      }
+                    },
+                    "tail": {
+                      "type": "stmt_list",
+                      "head": {
+                        "type": "application_stmt",
+                        "application": {
                           "type": "message",
                           "address": {
                             "type": "id",
-                            "name": "baz"
+                            "name": "bar"
                           },
                           "args": [
                             {
                               "type": "number",
-                              "val": "128"
+                              "val": "48"
                             }
                           ],
                           "subsequent": {
-                            "type": "stmt_list",
-                            "head": {
-                              "type": "skip"
-                            },
-                            "tail": null
-                          },
-                          "contingency": {
                             "type": "stmt_list",
                             "head": {
                               "type": "response",
@@ -201,38 +170,34 @@
                               "args": [
                                 {
                                   "type": "string",
-                                  "val": "bummer"
+                                  "val": "hello"
                                 }
                               ]
                             },
                             "tail": null
                           }
-                        },
-                        "tail": {
-                          "type": "stmt_list",
-                          "head": {
+                        }
+                      },
+                      "tail": {
+                        "type": "stmt_list",
+                        "head": {
+                          "type": "application_stmt",
+                          "application": {
                             "type": "message",
                             "address": {
                               "type": "id",
-                              "name": "foo"
+                              "name": "baz"
                             },
                             "args": [
                               {
                                 "type": "number",
-                                "val": "42"
+                                "val": "128"
                               }
                             ],
                             "subsequent": {
                               "type": "stmt_list",
                               "head": {
-                                "type": "response",
-                                "channel": "reply",
-                                "args": [
-                                  {
-                                    "type": "string",
-                                    "val": "yay"
-                                  }
-                                ]
+                                "type": "skip"
                               },
                               "tail": null
                             },
@@ -244,16 +209,19 @@
                                 "args": [
                                   {
                                     "type": "string",
-                                    "val": "darn"
+                                    "val": "bummer"
                                   }
                                 ]
                               },
                               "tail": null
                             }
-                          },
-                          "tail": {
-                            "type": "stmt_list",
-                            "head": {
+                          }
+                        },
+                        "tail": {
+                          "type": "stmt_list",
+                          "head": {
+                            "type": "application_stmt",
+                            "application": {
                               "type": "message",
                               "address": {
                                 "type": "id",
@@ -265,69 +233,17 @@
                                   "val": "42"
                                 }
                               ],
-                              "futures": [
-                                {
-                                  "type": "id",
-                                  "name": "result"
-                                }
-                              ],
                               "subsequent": {
                                 "type": "stmt_list",
                                 "head": {
-                                  "type": "message",
-                                  "address": {
-                                    "type": "id",
-                                    "name": "bar"
-                                  },
+                                  "type": "response",
+                                  "channel": "reply",
                                   "args": [
                                     {
-                                      "type": "id",
-                                      "name": "result"
+                                      "type": "string",
+                                      "val": "yay"
                                     }
-                                  ],
-                                  "futures": [
-                                    {
-                                      "type": "id",
-                                      "name": "result"
-                                    }
-                                  ],
-                                  "subsequent": {
-                                    "type": "stmt_list",
-                                    "head": {
-                                      "type": "message",
-                                      "address": {
-                                        "type": "id",
-                                        "name": "baz"
-                                      },
-                                      "args": [
-                                        {
-                                          "type": "id",
-                                          "name": "result"
-                                        }
-                                      ],
-                                      "futures": [
-                                        {
-                                          "type": "id",
-                                          "name": "yarp"
-                                        }
-                                      ]
-                                    },
-                                    "tail": null
-                                  },
-                                  "contingency": {
-                                    "type": "stmt_list",
-                                    "head": {
-                                      "type": "response",
-                                      "channel": "fail",
-                                      "args": [
-                                        {
-                                          "type": "string",
-                                          "val": "narp"
-                                        }
-                                      ]
-                                    },
-                                    "tail": null
-                                  }
+                                  ]
                                 },
                                 "tail": null
                               },
@@ -344,6 +260,108 @@
                                   ]
                                 },
                                 "tail": null
+                              }
+                            }
+                          },
+                          "tail": {
+                            "type": "stmt_list",
+                            "head": {
+                              "type": "assign",
+                              "op": "=",
+                              "left": {
+                                "type": "id",
+                                "name": "result"
+                              },
+                              "right": {
+                                "type": "message",
+                                "address": {
+                                  "type": "id",
+                                  "name": "foo"
+                                },
+                                "args": [
+                                  {
+                                    "type": "number",
+                                    "val": "42"
+                                  }
+                                ],
+                                "subsequent": {
+                                  "type": "stmt_list",
+                                  "head": {
+                                    "type": "assign",
+                                    "op": "=",
+                                    "left": {
+                                      "type": "id",
+                                      "name": "result"
+                                    },
+                                    "right": {
+                                      "type": "message",
+                                      "address": {
+                                        "type": "id",
+                                        "name": "bar"
+                                      },
+                                      "args": [
+                                        {
+                                          "type": "id",
+                                          "name": "result"
+                                        }
+                                      ],
+                                      "subsequent": {
+                                        "type": "stmt_list",
+                                        "head": {
+                                          "type": "assign",
+                                          "op": "=",
+                                          "left": {
+                                            "type": "id",
+                                            "name": "yarp"
+                                          },
+                                          "right": {
+                                            "type": "message",
+                                            "address": {
+                                              "type": "id",
+                                              "name": "baz"
+                                            },
+                                            "args": [
+                                              {
+                                                "type": "id",
+                                                "name": "result"
+                                              }
+                                            ]
+                                          }
+                                        },
+                                        "tail": null
+                                      },
+                                      "contingency": {
+                                        "type": "stmt_list",
+                                        "head": {
+                                          "type": "response",
+                                          "channel": "fail",
+                                          "args": [
+                                            {
+                                              "type": "string",
+                                              "val": "narp"
+                                            }
+                                          ]
+                                        },
+                                        "tail": null
+                                      }
+                                    }
+                                  },
+                                  "tail": null
+                                },
+                                "contingency": {
+                                  "type": "stmt_list",
+                                  "head": {
+                                    "type": "response",
+                                    "channel": "reply",
+                                    "args": [
+                                      {
+                                        "type": "string",
+                                        "val": "darn"
+                                      }
+                                    ]
+                                  },
+                                  "tail": null
+                                }
                               }
                             },
                             "tail": {
@@ -397,45 +415,87 @@
                                 "tail": {
                                   "type": "stmt_list",
                                   "head": {
-                                    "type": "recovery",
+                                    "type": "assign",
                                     "op": "=",
                                     "left": {
                                       "type": "id",
                                       "name": "x"
                                     },
-                                    "application": {
+                                    "right": {
                                       "type": "application",
                                       "address": {
                                         "type": "id",
                                         "name": "foo"
                                       },
-                                      "args": []
-                                    },
-                                    "contingency": {
-                                      "type": "stmt_list",
-                                      "head": {
-                                        "type": "receive",
-                                        "names": [
-                                          "error"
-                                        ]
-                                      },
-                                      "tail": {
+                                      "args": [],
+                                      "recover": {
                                         "type": "stmt_list",
                                         "head": {
-                                          "type": "response",
-                                          "channel": "replace",
-                                          "args": [
-                                            {
-                                              "type": "string",
-                                              "val": "ok"
-                                            }
+                                          "type": "receive",
+                                          "names": [
+                                            "error"
                                           ]
                                         },
-                                        "tail": null
+                                        "tail": {
+                                          "type": "stmt_list",
+                                          "head": {
+                                            "type": "response",
+                                            "channel": "substitute",
+                                            "args": [
+                                              {
+                                                "type": "string",
+                                                "val": "ok"
+                                              }
+                                            ]
+                                          },
+                                          "tail": null
+                                        }
                                       }
                                     }
                                   },
-                                  "tail": null
+                                  "tail": {
+                                    "type": "stmt_list",
+                                    "head": {
+                                      "type": "assign",
+                                      "op": "=",
+                                      "left": {
+                                        "type": "id",
+                                        "name": "y"
+                                      },
+                                      "right": {
+                                        "type": "message",
+                                        "address": {
+                                          "type": "id",
+                                          "name": "foo"
+                                        },
+                                        "args": [],
+                                        "contingency": {
+                                          "type": "stmt_list",
+                                          "head": {
+                                            "type": "receive",
+                                            "names": [
+                                              "error"
+                                            ]
+                                          },
+                                          "tail": {
+                                            "type": "stmt_list",
+                                            "head": {
+                                              "type": "response",
+                                              "channel": "substitute",
+                                              "args": [
+                                                {
+                                                  "type": "string",
+                                                  "val": "ok"
+                                                }
+                                              ]
+                                            },
+                                            "tail": null
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "tail": null
+                                  }
                                 }
                               }
                             }
@@ -452,4 +512,4 @@
       }
     }
   }
-}}
+}

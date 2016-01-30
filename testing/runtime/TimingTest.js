@@ -32,8 +32,8 @@ module.exports['basics'] = {
         test.expect(1);
 
         var mod = new Module(
-            'sayHello = >>:\n' +
-            '    reply "hullo!";\n;\n' +
+            'sayHello = service {\n' +
+            '    reply "hullo!";\n};\n' +
             'reply sayHello();\n');
 
         var service = mod.makeService();
@@ -51,8 +51,8 @@ module.exports['basics'] = {
     "sync message, default reply": function (test) {
 
         var mod = new Module(
-            'sayHello = >>:\n' +
-            '    reply "hullo!";\n;\n' +
+            'sayHello = service {\n' +
+            '    reply "hullo!";\n};\n' +
             'sayHello();\n');
 
         var service = mod.makeService();
@@ -72,8 +72,8 @@ module.exports['basics'] = {
         test.expect(1);
 
         var mod = new Module(
-            'sayHello = >>:\n' +
-            '    reply "hullo!";\n;\n' +
+            'sayHello = service {\n' +
+            '    reply "hullo!";\n};\n' +
             'sayHello(); reply "howdy!";\n');
 
         var service = mod.makeService();
@@ -99,7 +99,7 @@ module.exports['basics'] = {
 
         var mod = new Module(
             'receive write;\n' +
-            'write ~ "hi there!";\n');
+            '*write("hi there!");\n');
 
         var service = mod.makeService();
 

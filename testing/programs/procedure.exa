@@ -4,22 +4,23 @@
  */
 
 
-foo = >>:
+foo = service {
 
     receive x;
     reply factorial(x) / 2;
-;
+};
 
-factorial = >>:
+factorial = service {
 
     receive num;
 
     again = recur;
 
-    if num <= 1:
+    if num <= 1 {
         reply num;
+    }
 
     reply num * again(num - 1);
-;
+};
 
 reply foo(5);

@@ -20,12 +20,6 @@ sendRequest = service {
 
         reply #body;
     }
-    catch {
-
-        receive err;
-
-
-    };
 
     *io.stdout.write("sent request to `url`\n");
 };

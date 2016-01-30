@@ -3,17 +3,21 @@ receive log;
 num = 0;
 val = 0;
 
-while num < 3:
+while num < 3 {
 
-    if num > 1:
-        log ~ "hello hello!\n";
-    else:
-        log ~ "howdy!\n";
+    if num > 1 {
+        *log("hello hello!\n");
+    }
+    else {
+        *log("howdy!\n");
+    }
 
     num++;
+}
 
-while num < 5:
-    log ~ "ok.\n";
+while num < 5 {
+    *log("ok.\n");
     num++;
+}
 
 reply num;

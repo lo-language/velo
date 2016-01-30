@@ -1,26 +1,85 @@
-{"type":"module", "service": {
-    "type":"procedure",
+{
+  "type": "module",
+  "service": {
+    "type": "procedure",
     "body": {
-        "type": "stmt_list",
-        "head":
-            { "type":"assign","op": "=", "left": {"type":"id","name":"bar"}, "right": {"type":"id","name":"baz"} },
-        "tail": {
-            "type": "stmt_list",
-            "head":
-                { "type":"assign","op": "=", "left": {"type":"id","name":"binky"}, "right": {"type":"number","val":"64"} },
-            "tail": {
-                "type": "stmt_list",
-                "head":
-                    { "type":"assign","op": "=",
-                        "left": {"type":"id","name":"message"},
-                        "right": {"type":"string","val":"hi there"}},
-                "tail": {
-                    "type": "stmt_list",
-                    "head":
-                        { "type":"assign","op": "=", "left": {"type":"id","name":"foo"}, "right": {"type":"boolean","val":true} },
-                    "tail": null
-                }
-            }
+      "type": "stmt_list",
+      "head": {
+        "type": "assign",
+        "op": "=",
+        "left": {
+          "type": "id",
+          "name": "bar"
+        },
+        "right": {
+          "type": "id",
+          "name": "baz"
         }
+      },
+      "tail": {
+        "type": "stmt_list",
+        "head": {
+          "type": "assign",
+          "op": "=",
+          "left": {
+            "type": "id",
+            "name": "binky"
+          },
+          "right": {
+            "type": "number",
+            "val": "64"
+          }
+        },
+        "tail": {
+          "type": "stmt_list",
+          "head": {
+            "type": "assign",
+            "op": "=",
+            "left": {
+              "type": "id",
+              "name": "message"
+            },
+            "right": {
+              "type": "string",
+              "val": "hi there"
+            }
+          },
+          "tail": {
+            "type": "stmt_list",
+            "head": {
+              "type": "assign",
+              "op": "=",
+              "left": {
+                "type": "id",
+                "name": "foo"
+              },
+              "right": {
+                "type": "boolean",
+                "val": true
+              }
+            },
+            "tail": {
+              "type": "stmt_list",
+              "head": {
+                "type": "assign",
+                "op": "=",
+                "left": {
+                  "type": "id",
+                  "name": "baz"
+                },
+                "right": {
+                  "type": "cardinality",
+                  "operand": {
+                    "type": "id",
+                    "name": "someList"
+                  }
+                }
+              },
+              "tail": null
+            }
+          }
+        }
+      }
     }
-}}
+  }
+}

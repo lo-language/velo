@@ -22,61 +22,71 @@ receive args, io;
 max is 10;
 
 num = 0;
-while num < max:
+while num < max {
 //  no indent
     num++;
+}
 
 num = 0;
-while num < max:
+while num < max {
   // small indent
     num++;
+}
 
 num = 0;
-while num < max:
+while num < max {
     // right indent
     num++;
+}
 
 num = 0;
-while num < max:
+while num < max {
       // large indent
     num++;
+}
 
 num = 0;
-while num < max:
+while num < max {
 	// tab indent
     num++;
+}
 
 num = 0;
-while num < max:
+while num < max {
     num++;
     num--;
 //  no indent
     num++;
+}
 
 num = 0;
-while num < max:
+while num < max {
     num++;
     num--;
   // small indent
     num++;
+}
 
 num = 0;
-while num < max:
+while num < max {
     num++;
     num--;
     // right indent
     num++;
+}
 
 num = 0;
-while num < max:
+while num < max {
     num++;
     num--;
       // large indent
     num++;
+}
 
 num = 0;
-while num < max:
+while num < max {
     num++;
     num--;
 	// tab indent
     num++;
+}

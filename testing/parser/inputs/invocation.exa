@@ -12,31 +12,36 @@ x = foo();
 // async calls
 
 foo;
-foo ~ 18;
+*foo(18);
 
-sessionStore.getByID ~ sessionID;
+*sessionStore.getByID(sessionID);
 
-foo => bar;
-foo ~ 47 => bar, baz;  // destructuring
+//foo => bar;
+(bar, baz) = *foo(47);  // destructuring
 
 // handle success only
-after bar ~ 48:
+*bar(48) then {
     reply "hello";
+};
 
 // handle failure only
-after baz ~ 128:
+*baz(128) then {
     skip;
-catch:
+}
+catch {
     reply "bummer";
+};
 
 // todo
 // after baz(12) mute;
 
 // handle both success and failure
-after foo ~ 42:
+*foo(42) then {
     reply "yay";
-catch:
+}
+catch {
     reply "darn";
+};
 
 //nil -> foo => x ~> bar;
 
@@ -46,14 +51,19 @@ catch:
 
 // nested requests
 // should we support pipes like 42 -> foo -> bar -> baz?
-after foo ~ 42 => result:
+result = *foo(42) then {
 
-    after bar ~ result => result:
-        baz ~ result => yarp;
-    catch:
+    result = *bar(result) then {
+
+        yarp = *baz(result);
+    }
+    catch {
         fail "narp";
-catch:
+    };
+}
+catch {
     reply "darn";
+};
 
 // sync form in expressions
 
@@ -61,8 +71,16 @@ foo(bar());
 
 x = foo() + 7;
 
-// assignment with handler - implemented with an ugly hack in the grammar
 
-x = foo() catch:
+x = foo() catch {
+
     receive error;
-    replace "ok";
+    substitute "ok";
+};
+
+
+y = *foo() catch {
+
+    receive error;
+    substitute "ok";
+};
