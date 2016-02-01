@@ -103,12 +103,12 @@ JsConstruct.prototype.resolve = function () {
 
         var sm = wrappers[index];
 
-        var parts = ['task.sendMessage(',
+        var pre = ['task.sendMessage(',
             sm.address, ', [', {csv: sm.args}, '], function (P' + index + ') {'];
 
         var post = ['}, null, true);\n\n'];
 
-        var wrapper = new JsConstruct(parts, post);
+        var wrapper = new JsConstruct(pre, post);
 
         return wrapper.attach(wrap(stmt, wrappers, index + 1));
     };
@@ -202,41 +202,17 @@ JsConstruct.renderFragment = function (fragment) {
  *
  * @param address
  * @param args
- * @param subsequent
- * @param contingency
- * @param replyParams
- * @param failParams
+ * @param replyHandler
+ * @param failHandler
  * @return {*}
  */
-JsConstruct.buildMessage = function (address, args, subsequent, contingency, replyParams, failParams) {
+JsConstruct.buildMessage = function (address, args, replyHandler, failHandler) {
 
-    if (replyParams === undefined) {
-        replyParams = 'args';
-    }
-
-    if (failParams === undefined) {
-        failParams = 'args';
-    }
-
-    var parts = ['task.sendMessage(', address, ', [', {csv: args}, ']'];
-
-    if (subsequent) {
-        parts.push([', ', 'function (', replyParams, ') ', {block: subsequent}]);
-    }
-    else {
-        parts.push(', null');
-    }
-
-    if (contingency) {
-        parts.push([', ', 'function (', failParams, ') ', {block: contingency}]);
-    }
-    else {
-        parts.push(', null');
-    }
-
-    parts.push(');\n\n');
-
-    return JsConstruct.makeStatement(parts);
+    return JsConstruct.makeStatement([
+        'task.sendMessage(', address, ', [', {csv: args}, '], ',
+        replyHandler ? replyHandler : 'null', ', ',
+        failHandler ? failHandler : 'null', ')'
+    ]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
