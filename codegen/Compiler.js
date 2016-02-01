@@ -32,11 +32,8 @@ var __ = {};
  */
 __['module'] = function (node) {
 
-    // enable strict mode
-
     return new JsConstruct([
-        "'use strict';\n\n",
-        "return ", this.compile(node.service), ';']);
+        "'use strict';\n\nreturn ", this.compile(node.service), ';']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,21 +81,23 @@ __['procedure'] = function (node) {
     // compile the statement(s) in the context of the local scope
     var body = localScope.compile(node.body).attach(new JsConstruct("task.pickupReplies();\n"));
 
-    // todo only include where it's used (or just remove this feature)
-    body = ['var $recur = task.service;\n', body];
-
-    // declare our local vars
-    // todo move to block-level scoping with 'let'
-
+    // after compilation we can get our declared vars
     var localVars = localScope.getJsVars();
 
-    if (localVars.length > 0) {
-        body = ['var ' + localVars.join(', ') + ';\n\n', body];
-    }
+    var receives = localScope.receives.map(function (name) {
+        return '$' + name + ' = ' + 'task.args.shift()' + ';\n';
+    }).join('') + '\n';
+
+    // todo only include recur where it's referenced (or just remove this feature)
+    // declare our local vars
+    var fnBody = [
+        'var $recur = task.service;\n',
+        localVars.length > 0 ? 'var ' + localVars.join(', ') + ';\n\n' : '',
+        receives, body];
 
     // implements an exa service as a JS function that takes a task
     return new JsConstruct([
-        'function (task) ', {block: body}], false);
+        'function (task) ', {block: fnBody}], false);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,18 +130,10 @@ __['receive'] = function (node) {
 
     // todo do we always want the declaration? could use receive to clobber existing values...
 
-    var _this = this;
+    this.receives(node.names);
 
-    return JsConstruct.makeStatement([node.names.map(function (name) {
-
-        // declare if a new var
-        if (_this.has(name) == false) {
-            _this.declare(name);
-        }
-
-        return '$' + name + ' = ' + 'task.args.shift()';
-
-    }).join(';\n') + ';\n\n']);
+    // return an empty construct to allow attachment
+    return new JsConstruct();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -312,32 +303,35 @@ __['message'] = function (node) {
     var subsequent = node.subsequent ? this.compile(node.subsequent) : null;
     var contingency = node.contingency ? this.compile(node.contingency) : null;
 
-    // put the futures in scope, then the continuation callback will assign to them
-
-    if (node.futures) {
-
-        var captures = [];
-
-        node.futures.forEach(function (future) {
-
-            if (future.type == 'id' && _this.has(future.name) == false) {
-                _this.declare(future.name);
-            }
-
-            captures.push([_this.compile(future), ' = args.shift();\n']);
-        });
-
-        // if there's a subsequent, throw the capture assignments in there at the top, otherwise make one
-
-        if (subsequent) {
-            subsequent = [captures, subsequent];
-        }
-        else {
-            subsequent = captures;
-        }
-    }
-
     return JsConstruct.buildMessage(target, args, subsequent, contingency);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+__['handler'] = function (node) {
+
+    // todo look at the channel
+
+    // create a new scope for the handler
+    var localScope = this.bud();
+    var body = localScope.compile(node.body);
+
+    // unpack the scope
+    // after compilation we can get our declared vars
+    var localVars = localScope.getJsVars();
+
+    var receives = localScope.receives.map(function (name) {
+            return '$' + name + ' = ' + 'args.shift()' + ';\n'; // differs from procedure (which is task.args.shift)
+        }).join('') + '\n';
+
+    // todo only include recur where it's referenced (or just remove this feature)
+    // declare our local vars
+    var fnBody = [
+        localVars.length > 0 ? 'var ' + localVars.join(', ') + ';\n\n' : '',
+        receives, body];
+
+    // create a new JS function for the handler
+    return new JsConstruct('function (args) ', {block: fnBody});
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -405,6 +399,7 @@ __['constant'] = function (node) {
 
     this.define(node.name, this.compile(node.value));
 
+    // return an empty construct to allow attachment
     return new JsConstruct();
 };
 

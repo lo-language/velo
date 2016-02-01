@@ -21,7 +21,7 @@ module.exports["message"] = {
             }
         };
 
-        test.equal(new Scope().compile(node).render(), 'task.sendMessage($foo, [], null, null);\n\n');
+        test.equal(new Scope().compile(node).render(), 'task.sendMessage($foo, [], null, null)');
         test.done();
     },
 

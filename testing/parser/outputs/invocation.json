@@ -163,18 +163,22 @@
                             }
                           ],
                           "subsequent": {
-                            "type": "stmt_list",
-                            "head": {
-                              "type": "response",
-                              "channel": "reply",
-                              "args": [
-                                {
-                                  "type": "string",
-                                  "val": "hello"
-                                }
-                              ]
-                            },
-                            "tail": null
+                            "type": "handler",
+                            "channel": "reply",
+                            "body": {
+                              "type": "stmt_list",
+                              "head": {
+                                "type": "response",
+                                "channel": "reply",
+                                "args": [
+                                  {
+                                    "type": "string",
+                                    "val": "hello"
+                                  }
+                                ]
+                              },
+                              "tail": null
+                            }
                           }
                         }
                       },
@@ -195,25 +199,33 @@
                               }
                             ],
                             "subsequent": {
-                              "type": "stmt_list",
-                              "head": {
-                                "type": "skip"
-                              },
-                              "tail": null
+                              "type": "handler",
+                              "channel": "reply",
+                              "body": {
+                                "type": "stmt_list",
+                                "head": {
+                                  "type": "skip"
+                                },
+                                "tail": null
+                              }
                             },
                             "contingency": {
-                              "type": "stmt_list",
-                              "head": {
-                                "type": "response",
-                                "channel": "reply",
-                                "args": [
-                                  {
-                                    "type": "string",
-                                    "val": "bummer"
-                                  }
-                                ]
-                              },
-                              "tail": null
+                              "type": "handler",
+                              "channel": "fail",
+                              "body": {
+                                "type": "stmt_list",
+                                "head": {
+                                  "type": "response",
+                                  "channel": "reply",
+                                  "args": [
+                                    {
+                                      "type": "string",
+                                      "val": "bummer"
+                                    }
+                                  ]
+                                },
+                                "tail": null
+                              }
                             }
                           }
                         },
@@ -234,32 +246,40 @@
                                 }
                               ],
                               "subsequent": {
-                                "type": "stmt_list",
-                                "head": {
-                                  "type": "response",
-                                  "channel": "reply",
-                                  "args": [
-                                    {
-                                      "type": "string",
-                                      "val": "yay"
-                                    }
-                                  ]
-                                },
-                                "tail": null
+                                "type": "handler",
+                                "channel": "reply",
+                                "body": {
+                                  "type": "stmt_list",
+                                  "head": {
+                                    "type": "response",
+                                    "channel": "reply",
+                                    "args": [
+                                      {
+                                        "type": "string",
+                                        "val": "yay"
+                                      }
+                                    ]
+                                  },
+                                  "tail": null
+                                }
                               },
                               "contingency": {
-                                "type": "stmt_list",
-                                "head": {
-                                  "type": "response",
-                                  "channel": "reply",
-                                  "args": [
-                                    {
-                                      "type": "string",
-                                      "val": "darn"
-                                    }
-                                  ]
-                                },
-                                "tail": null
+                                "type": "handler",
+                                "channel": "fail",
+                                "body": {
+                                  "type": "stmt_list",
+                                  "head": {
+                                    "type": "response",
+                                    "channel": "reply",
+                                    "args": [
+                                      {
+                                        "type": "string",
+                                        "val": "darn"
+                                      }
+                                    ]
+                                  },
+                                  "tail": null
+                                }
                               }
                             }
                           },
@@ -285,82 +305,98 @@
                                   }
                                 ],
                                 "subsequent": {
-                                  "type": "stmt_list",
-                                  "head": {
-                                    "type": "assign",
-                                    "op": "=",
-                                    "left": {
-                                      "type": "id",
-                                      "name": "result"
-                                    },
-                                    "right": {
-                                      "type": "message",
-                                      "address": {
+                                  "type": "handler",
+                                  "channel": "reply",
+                                  "body": {
+                                    "type": "stmt_list",
+                                    "head": {
+                                      "type": "assign",
+                                      "op": "=",
+                                      "left": {
                                         "type": "id",
-                                        "name": "bar"
+                                        "name": "result"
                                       },
-                                      "args": [
-                                        {
+                                      "right": {
+                                        "type": "message",
+                                        "address": {
                                           "type": "id",
-                                          "name": "result"
-                                        }
-                                      ],
-                                      "subsequent": {
-                                        "type": "stmt_list",
-                                        "head": {
-                                          "type": "assign",
-                                          "op": "=",
-                                          "left": {
+                                          "name": "bar"
+                                        },
+                                        "args": [
+                                          {
                                             "type": "id",
-                                            "name": "yarp"
-                                          },
-                                          "right": {
-                                            "type": "message",
-                                            "address": {
-                                              "type": "id",
-                                              "name": "baz"
-                                            },
-                                            "args": [
-                                              {
+                                            "name": "result"
+                                          }
+                                        ],
+                                        "subsequent": {
+                                          "type": "handler",
+                                          "channel": "reply",
+                                          "body": {
+                                            "type": "stmt_list",
+                                            "head": {
+                                              "type": "assign",
+                                              "op": "=",
+                                              "left": {
                                                 "type": "id",
-                                                "name": "result"
+                                                "name": "yarp"
+                                              },
+                                              "right": {
+                                                "type": "message",
+                                                "address": {
+                                                  "type": "id",
+                                                  "name": "baz"
+                                                },
+                                                "args": [
+                                                  {
+                                                    "type": "id",
+                                                    "name": "result"
+                                                  }
+                                                ]
                                               }
-                                            ]
+                                            },
+                                            "tail": null
                                           }
                                         },
-                                        "tail": null
-                                      },
-                                      "contingency": {
-                                        "type": "stmt_list",
-                                        "head": {
-                                          "type": "response",
+                                        "contingency": {
+                                          "type": "handler",
                                           "channel": "fail",
-                                          "args": [
-                                            {
-                                              "type": "string",
-                                              "val": "narp"
-                                            }
-                                          ]
-                                        },
-                                        "tail": null
+                                          "body": {
+                                            "type": "stmt_list",
+                                            "head": {
+                                              "type": "response",
+                                              "channel": "fail",
+                                              "args": [
+                                                {
+                                                  "type": "string",
+                                                  "val": "narp"
+                                                }
+                                              ]
+                                            },
+                                            "tail": null
+                                          }
+                                        }
                                       }
-                                    }
-                                  },
-                                  "tail": null
+                                    },
+                                    "tail": null
+                                  }
                                 },
                                 "contingency": {
-                                  "type": "stmt_list",
-                                  "head": {
-                                    "type": "response",
-                                    "channel": "reply",
-                                    "args": [
-                                      {
-                                        "type": "string",
-                                        "val": "darn"
-                                      }
-                                    ]
-                                  },
-                                  "tail": null
+                                  "type": "handler",
+                                  "channel": "fail",
+                                  "body": {
+                                    "type": "stmt_list",
+                                    "head": {
+                                      "type": "response",
+                                      "channel": "reply",
+                                      "args": [
+                                        {
+                                          "type": "string",
+                                          "val": "darn"
+                                        }
+                                      ]
+                                    },
+                                    "tail": null
+                                  }
                                 }
                               }
                             },
@@ -429,26 +465,30 @@
                                       },
                                       "args": [],
                                       "recover": {
-                                        "type": "stmt_list",
-                                        "head": {
-                                          "type": "receive",
-                                          "names": [
-                                            "error"
-                                          ]
-                                        },
-                                        "tail": {
+                                        "type": "handler",
+                                        "channel": "fail",
+                                        "body": {
                                           "type": "stmt_list",
                                           "head": {
-                                            "type": "response",
-                                            "channel": "substitute",
-                                            "args": [
-                                              {
-                                                "type": "string",
-                                                "val": "ok"
-                                              }
+                                            "type": "receive",
+                                            "names": [
+                                              "error"
                                             ]
                                           },
-                                          "tail": null
+                                          "tail": {
+                                            "type": "stmt_list",
+                                            "head": {
+                                              "type": "response",
+                                              "channel": "substitute",
+                                              "args": [
+                                                {
+                                                  "type": "string",
+                                                  "val": "ok"
+                                                }
+                                              ]
+                                            },
+                                            "tail": null
+                                          }
                                         }
                                       }
                                     }
@@ -470,26 +510,30 @@
                                         },
                                         "args": [],
                                         "contingency": {
-                                          "type": "stmt_list",
-                                          "head": {
-                                            "type": "receive",
-                                            "names": [
-                                              "error"
-                                            ]
-                                          },
-                                          "tail": {
+                                          "type": "handler",
+                                          "channel": "fail",
+                                          "body": {
                                             "type": "stmt_list",
                                             "head": {
-                                              "type": "response",
-                                              "channel": "substitute",
-                                              "args": [
-                                                {
-                                                  "type": "string",
-                                                  "val": "ok"
-                                                }
+                                              "type": "receive",
+                                              "names": [
+                                                "error"
                                               ]
                                             },
-                                            "tail": null
+                                            "tail": {
+                                              "type": "stmt_list",
+                                              "head": {
+                                                "type": "response",
+                                                "channel": "substitute",
+                                                "args": [
+                                                  {
+                                                    "type": "string",
+                                                    "val": "ok"
+                                                  }
+                                                ]
+                                              },
+                                              "tail": null
+                                            }
                                           }
                                         }
                                       }

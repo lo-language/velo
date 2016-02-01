@@ -13,13 +13,15 @@ sendRequest = service {
 
     receive url;
 
-    (res, body) = *client.get(url) then {
+    *client.get(url) then {
+
+        receive res, body;  // this style constrains these names to this handler scope
 
         *io.stdout.write("response from `url`: status = `res.statusCode`\n");
         *io.stdout.write("body length: `#body`\n");
 
         reply #body;
-    }
+    };
 
     *io.stdout.write("sent request to `url`\n");
 };

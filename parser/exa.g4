@@ -92,25 +92,34 @@ block
     ;
 
 expr
-    : expr '(' exprList? ')' ('catch' block)?                           # call
-    | '*' expr '(' exprList? ')' (t='then' block)? (c='catch' block)?   # dispatch
-    | '#' expr                                                          # measure
-    | 'not' expr                                                        # inverse
-    | expr op=('*'|'/'|'%') expr                                        # mulDiv
-    | expr op=('+'|'-') expr                                            # addSub
-    | expr op=('<'|'>'|'<='|'>='|'=='|'!=') expr                        # compare
-    | expr op=('and'|'or') expr                                         # logical
-    | expr 'in' expr                                                    # membership // not sure where this guy should go, precedence-wise
-    | '(' expr ')'                                                      # wrap
-    | expr '[' expr ']'                                                 # subscript
-    | expr '[' expr? ':' expr? ']'                                      # slice
-    | expr '{' expr '}'                                                 # extraction
-    | expr '{' expr? ':' expr? '}'                                      # excision
-    | expr '.' ID                                                       # select
-    | '(' ID (',' ID)+ ')'                                              # destructure
-    | INTER_BEGIN interpolated INTER_END                                # dynastring
-    | literal                                                           # litExpr
-    | ID                                                                # id
+    : expr '(' exprList? ')' failHandler?                       # call
+    | '*' expr '(' exprList? ')' replyHandler? failHandler?     # dispatch
+    | '#' expr                                                  # measure
+    | 'not' expr                                                # inverse
+    | 'cut' expr                                                # cut
+    | expr op=('*'|'/'|'%') expr                                # mulDiv
+    | expr op=('+'|'-') expr                                    # addSub
+    | expr op=('<'|'>'|'<='|'>='|'=='|'!=') expr                # compare
+    | expr op=('and'|'or') expr                                 # logical
+    | expr 'in' expr                                            # membership // not sure where this guy should go, precedence-wise
+    | '(' expr ')'                                              # wrap
+    | expr '[' expr ']'                                         # subscript
+    | expr '[' expr? ':' expr? ']'                              # slice
+    | expr '{' expr '}'                                         # extraction
+    | expr '{' expr? ':' expr? '}'                              # excision
+    | expr '.' ID                                               # select
+    | '(' ID (',' ID)+ ')'                                      # destructure
+    | INTER_BEGIN interpolated INTER_END                        # dynastring
+    | literal                                                   # litExpr
+    | ID                                                        # id
+    ;
+
+replyHandler
+    : 'then' block
+    ;
+
+failHandler
+    : 'catch' block
     ;
 
 interpolated

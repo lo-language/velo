@@ -293,10 +293,8 @@ __.prototype.visitCall = function(ctx) {
         args: args ? this.visit(args) : []
     };
 
-    var recover = ctx.block();
-
-    if (recover) {
-        res.recover = this.visit(recover);
+    if (ctx.failHandler()) {
+        res.recover = this.visit(ctx.failHandler());
     }
 
     return res;
@@ -313,16 +311,35 @@ __.prototype.visitDispatch = function(ctx) {
         args: args ? this.visit(args) : []
     };
 
-    if (ctx.t) {
-        res.subsequent = this.visit(ctx.block(0));
+    if (ctx.replyHandler()) {
+        res.subsequent = this.visit(ctx.replyHandler());
     }
 
-    if (ctx.c) {
-        // todo - we have to check the flag to know which block to use; can we change the parser to get rid of this ugliness?
-        res.contingency = this.visit(ctx.t ? ctx.block(1) : ctx.block(0));
+    if (ctx.failHandler()) {
+        res.contingency = this.visit(ctx.failHandler());
     }
 
     return res;
+};
+
+
+__.prototype.visitReplyHandler = function(ctx) {
+
+    return {
+        type: 'handler',
+        channel: 'reply',
+        body: this.visit(ctx.block())
+    };
+};
+
+
+__.prototype.visitFailHandler = function(ctx) {
+
+    return {
+        type: 'handler',
+        channel: 'fail',
+        body: this.visit(ctx.block())
+    };
 };
 
 

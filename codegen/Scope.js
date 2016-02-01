@@ -50,6 +50,27 @@ __.prototype.getDeps = function (name) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ *
+ * @param names
+ * @returns {Array}
+ */
+__.prototype.receives = function (names) {
+
+    var _this = this;
+
+    names.map(function (name) {
+
+        if (_this.has(name) == false) {
+            _this.declare(name);
+        }
+
+    });
+
+    this.receives = names;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
  * Declares a variable in this scope.
  *
  * @param name

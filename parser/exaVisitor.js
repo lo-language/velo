@@ -197,6 +197,16 @@ exaVisitor.prototype.visitDestructure = function(ctx) {
 };
 
 
+// Visit a parse tree produced by exaParser#replyHandler.
+exaVisitor.prototype.visitReplyHandler = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#failHandler.
+exaVisitor.prototype.visitFailHandler = function(ctx) {
+};
+
+
 // Visit a parse tree produced by exaParser#interpolated.
 exaVisitor.prototype.visitInterpolated = function(ctx) {
 };
