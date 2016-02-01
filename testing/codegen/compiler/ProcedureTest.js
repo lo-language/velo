@@ -34,7 +34,7 @@ module.exports["procedure"] = {
         var obj = new Scope().compile(node);
 
         test.equal(obj.render(),
-            'function (task) {var $next, $result;\n\nvar $recur = task.service;\n$next = task.args.shift();\n\n' +
+            'function (task) {var $recur = task.service;\nvar $next, $result;\n\n$next = task.args.shift();\n\n' +
             'task.sendMessage($bar, [42], function (P0) {$result *= P0;\ntask.pickupReplies();\n}, null, true);\n\n}');
         test.done();
     }

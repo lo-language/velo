@@ -29,9 +29,5 @@ sendRequest = service {
 // race some requests
 
 *sendRequest(google);
-
 sendRequest(apple);
-
-//io.stdout.write * "apple length was: " + len + "\n\n";
-
 *sendRequest(exa);

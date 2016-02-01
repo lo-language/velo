@@ -210,7 +210,7 @@ module.exports["application statements"] = {
         };
 
         test.equal(new Scope().compile(node).render(),
-            "task.sendMessage($factorial, [$args[0]], function (P0) {task.sendMessage($io.stdout.write, ['' + P0 + '\\n'], null, null);\n\n}, null, true);\n\n");
+            "task.sendMessage($factorial, [$args[0]], function (P0) {task.sendMessage($io.stdout.write, ['' + P0 + '\\n'], null, null)}, null, true);\n\n");
 
         test.done();
     }

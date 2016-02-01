@@ -130,7 +130,7 @@ __['receive'] = function (node) {
 
     // todo do we always want the declaration? could use receive to clobber existing values...
 
-    this.receives(node.names);
+    this.setReceives(node.names);
 
     // return an empty construct to allow attachment
     return new JsConstruct();

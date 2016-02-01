@@ -22,6 +22,7 @@ var __ = function (parent) {
     this.deps = parent ? parent.deps : {};
     this.vars = {};
     this.constants = {};
+    this.receives = [];
     this.contNum = 0;
 };
 
@@ -50,11 +51,12 @@ __.prototype.getDeps = function (name) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * Sets the names received within the scope.
  *
  * @param names
  * @returns {Array}
  */
-__.prototype.receives = function (names) {
+__.prototype.setReceives = function (names) {
 
     var _this = this;
 

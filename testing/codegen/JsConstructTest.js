@@ -229,25 +229,25 @@ module.exports["build message"] = {
 
         var msg = JsConstruct.buildMessage('$foo', []);
 
-        test.equal(msg.render(), 'task.sendMessage($foo, [], null, null);\n\n');
+        test.equal(msg.render(), 'task.sendMessage($foo, [], null, null)');
         //test.equal(msg.isSync(), false);
         test.done();
     },
 
     "success handler": function (test) {
 
-        var msg = JsConstruct.buildMessage('$foo', [], "x = 1;", null, 'scragh', 'args');
+        var msg = JsConstruct.buildMessage('$foo', [], "function (args) {x = 1;}");
 
-        test.equal(msg.render(), 'task.sendMessage($foo, [], function (scragh) {x = 1;}, null);\n\n');
+        test.equal(msg.render(), 'task.sendMessage($foo, [], function (args) {x = 1;}, null)');
         //test.equal(msg.isSync(), false);
         test.done();
     },
 
     "sync wrapper": function (test) {
 
-        var msg = JsConstruct.buildMessage('$foo', [], "x = 1;", null, 'scragh', 'args');
+        var msg = JsConstruct.buildMessage('$foo', [], "function (args) {x = 1;}");
 
-        test.equal(msg.render(), 'task.sendMessage($foo, [], function (scragh) {x = 1;}, null);\n\n');
+        test.equal(msg.render(), 'task.sendMessage($foo, [], function (args) {x = 1;}, null)');
         //test.ok(msg.isSync());
         test.done();
     }
