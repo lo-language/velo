@@ -35,7 +35,7 @@ __.prototype.parse = function (input) {
 // Visit a parse tree produced by exaParser#module.
 __.prototype.visitModule = function(ctx) {
 
-    return {type: 'module', service: {type: 'procedure', body: this.visit(ctx.statement_list())}};
+    return {type: 'module', service: {type: 'procedure', body: ctx.statement_list().accept(this)}};
 };
 
 
@@ -44,7 +44,7 @@ __.prototype.visitStatement_list = function(ctx) {
 
     var subList = ctx.statement_list();
 
-    return {type: 'stmt_list', head: this.visit(ctx.statement()), tail: subList ? this.visit(subList) : null};
+    return {type: 'stmt_list', head: ctx.statement().accept(this), tail: subList ? subList.accept(this) : null};
 };
 
 
@@ -68,8 +68,8 @@ __.prototype.visitAssignment = function(ctx) {
     return {
         type: 'assign',
         op: ctx.assignment_op().getText(),
-        left: this.visit(ctx.expr(0)),
-        right: this.visit(ctx.expr(1))
+        left: ctx.expr(0).accept(this),
+        right: ctx.expr(1).accept(this)
     };
 };
 
@@ -78,14 +78,14 @@ __.prototype.visitIncDec = function(ctx) {
 
     return {
         type: ctx.op.text == '++' ? 'increment' : 'decrement',
-        operand: this.visit(ctx.expr())
+        operand: ctx.expr().accept(this)
     };
 };
 
 
 __.prototype.visitCondStmt = function(ctx) {
 
-    return this.visit(ctx.conditional());
+    return ctx.conditional().accept(this);
 };
 
 
@@ -93,8 +93,8 @@ __.prototype.visitIfOnly = function(ctx) {
 
     return {
         type: 'conditional',
-        predicate: this.visit(ctx.expr()),
-        consequent: this.visit(ctx.block())
+        predicate: ctx.expr().accept(this),
+        consequent: ctx.block().accept(this)
     };
 };
 
@@ -103,9 +103,9 @@ __.prototype.visitIfElse = function(ctx) {
 
     return {
         type: 'conditional',
-        predicate: this.visit(ctx.expr()),
-        consequent: this.visit(ctx.block(0)),
-        otherwise: this.visit(ctx.block(1))
+        predicate: ctx.expr().accept(this),
+        consequent: ctx.block(0).accept(this),
+        otherwise: ctx.block(1).accept(this)
     };
 };
 
@@ -114,9 +114,9 @@ __.prototype.visitNestedIf = function(ctx) {
 
     return {
         type: 'conditional',
-        predicate: this.visit(ctx.expr()),
-        consequent: this.visit(ctx.block()),
-        otherwise: this.visit(ctx.conditional())
+        predicate: ctx.expr().accept(this),
+        consequent: ctx.block().accept(this),
+        otherwise: ctx.conditional().accept(this)
     };
 };
 
@@ -125,7 +125,7 @@ __.prototype.visitExprStmt = function(ctx) {
 
     return {
         type: 'application_stmt',   // todo should arguably be expr_stmt
-        application: this.visit(ctx.expr())
+        application: ctx.expr().accept(this)
     };
 };
 
@@ -135,7 +135,7 @@ __.prototype.visitResponse = function(ctx) {
     return {
         type: 'response',
         channel: ctx.channel.text,
-        args: this.visit(ctx.exprList())
+        args: ctx.exprList().accept(this)
     };
 };
 
@@ -159,8 +159,8 @@ __.prototype.visitIteration = function(ctx) {
 
     return {
         type: 'iteration',
-        condition: this.visit(ctx.expr()),
-        statements: this.visit(ctx.block())
+        condition: ctx.expr().accept(this),
+        statements: ctx.block().accept(this)
     };
 };
 
@@ -174,8 +174,8 @@ __.prototype.visitMulDiv = function(ctx) {
     return {
         type: 'op',
         op: ctx.op.text,
-        left: this.visit(ctx.expr(0)),
-        right: this.visit(ctx.expr(1))
+        left: ctx.expr(0).accept(this),
+        right: ctx.expr(1).accept(this)
     };
 };
 
@@ -185,8 +185,8 @@ __.prototype.visitAddSub = function(ctx) {
     return {
         type: 'op',
         op: ctx.op.text,
-        left: this.visit(ctx.expr(0)),
-        right: this.visit(ctx.expr(1))
+        left: ctx.expr(0).accept(this),
+        right: ctx.expr(1).accept(this)
     };
 };
 
@@ -196,40 +196,48 @@ __.prototype.visitCompare = function(ctx) {
     return {
         type: 'op',
         op: ctx.op.text,
-        left: this.visit(ctx.expr(0)),
-        right: this.visit(ctx.expr(1))
+        left: ctx.expr(0).accept(this),
+        right: ctx.expr(1).accept(this)
     };
 };
 
 
 __.prototype.visitWrap = function(ctx) {
 
-    return this.visit(ctx.expr());
+    return ctx.expr().accept(this);
 };
 
 
 __.prototype.visitLitExpr = function(ctx) {
 
-    return this.visit(ctx.literal());
+    return ctx.literal().accept(this);
 };
 
 
 __.prototype.visitValExpr = function(ctx) {
 
-    return this.visit(ctx.lvalue());
+    return ctx.lvalue().accept(this);
 };
 
 
 // Visit a parse tree produced by exaParser#exprList.
 __.prototype.visitExprList = function(ctx) {
 
-    return this.visit(ctx.expr());
+    var _this = this;
+
+    return ctx.expr().map(function (item) {
+        return item.accept(_this);
+    });
 };
 
 
 __.prototype.visitPairList = function(ctx) {
 
-    return this.visit(ctx.pair());
+    var _this = this;
+
+    return ctx.pair().map(function (item) {
+        return item.accept(_this);
+    });
 };
 
 
@@ -237,8 +245,8 @@ __.prototype.visitPair = function(ctx) {
 
     return {
         type: 'dyad',
-        key: this.visit(ctx.expr(0)),
-        value: this.visit(ctx.expr(1))
+        key: ctx.expr(0).accept(this),
+        value: ctx.expr(1).accept(this)
     };
 };
 
@@ -250,7 +258,7 @@ __.prototype.visitId = function(ctx) {
 
 __.prototype.visitConstant = function(ctx) {
 
-    return {type: 'constant', name: ctx.ID().getText(), value: this.visit(ctx.literal()) };
+    return {type: 'constant', name: ctx.ID().getText(), value: ctx.literal().accept(this) };
 };
 
 
@@ -262,7 +270,7 @@ __.prototype.visitDimension = function(ctx) {
 
 __.prototype.visitDynastring = function(ctx) {
 
-    return {type: 'interpolation', left: ctx.INTER_BEGIN().getText(), middle: this.visit(ctx.interpolated()), right: ctx.INTER_END().getText()};
+    return {type: 'interpolation', left: ctx.INTER_BEGIN().getText(), middle: ctx.interpolated().accept(this), right: ctx.INTER_END().getText()};
 };
 
 
@@ -273,13 +281,13 @@ __.prototype.visitInterpolated = function(ctx) {
     if (mid) {
         return {
             type: 'dynastring', // todo change to interpolated
-            left: this.visit(ctx.expr()),
+            left: ctx.expr().accept(this),
             middle: mid.getText(),
-            right: this.visit(ctx.interpolated())
+            right: ctx.interpolated().accept(this)
         };
     }
 
-    return this.visit(ctx.expr());
+    return ctx.expr().accept(this);
 };
 
 
@@ -289,12 +297,12 @@ __.prototype.visitCall = function(ctx) {
 
     var res = {
         type: 'application',
-        address: this.visit(ctx.expr()),
-        args: args ? this.visit(args) : []
+        address: ctx.expr().accept(this),
+        args: args ? args.accept(this) : []
     };
 
     if (ctx.failHandler()) {
-        res.recover = this.visit(ctx.failHandler());
+        res.recover = ctx.failHandler().accept(this);
     }
 
     return res;
@@ -307,16 +315,16 @@ __.prototype.visitDispatch = function(ctx) {
 
     var res = {
         type: 'message',
-        address: this.visit(ctx.expr()),
-        args: args ? this.visit(args) : []
+        address: ctx.expr().accept(this),
+        args: args ? args.accept(this) : []
     };
 
     if (ctx.replyHandler()) {
-        res.subsequent = this.visit(ctx.replyHandler());
+        res.subsequent = ctx.replyHandler().accept(this);
     }
 
     if (ctx.failHandler()) {
-        res.contingency = this.visit(ctx.failHandler());
+        res.contingency = ctx.failHandler().accept(this);
     }
 
     return res;
@@ -328,7 +336,7 @@ __.prototype.visitReplyHandler = function(ctx) {
     return {
         type: 'handler',
         channel: 'reply',
-        body: this.visit(ctx.block())
+        body: ctx.block().accept(this)
     };
 };
 
@@ -338,14 +346,14 @@ __.prototype.visitFailHandler = function(ctx) {
     return {
         type: 'handler',
         channel: 'fail',
-        body: this.visit(ctx.block())
+        body: ctx.block().accept(this)
     };
 };
 
 
 __.prototype.visitBlock = function(ctx) {
 
-    return this.visit(ctx.statement_list());
+    return ctx.statement_list().accept(this);
 };
 
 
@@ -398,9 +406,13 @@ __.prototype.visitModref = function(ctx) {
 
 __.prototype.visitRecord = function(ctx) {
 
+    var _this = this;
+
     return {
         type: 'record',
-        fields: this.visit(ctx.field())
+        fields: ctx.field().map(function (item) {
+            return item.accept(_this);
+        })
     };
 };
 
@@ -410,7 +422,7 @@ __.prototype.visitField = function(ctx) {
     return {
         type: 'field',
         name: ctx.ID().getText(),
-        value: this.visit(ctx.expr())
+        value: ctx.expr().accept(this)
     };
 };
 
@@ -419,7 +431,7 @@ __.prototype.visitService = function(ctx) {
 
     return {
         type: 'procedure',
-        body: this.visit(ctx.block())
+        body: ctx.block().accept(this)
     };
 };
 
@@ -428,7 +440,7 @@ __.prototype.visitMeasure = function(ctx) {
 
     return {
         type: 'cardinality',
-        operand: this.visit(ctx.expr())
+        operand: ctx.expr().accept(this)
     };
 };
 
@@ -439,7 +451,7 @@ __.prototype.visitCollection = function(ctx) {
 
         return {
             type: 'array',
-            elements: this.visit(ctx.exprList())
+            elements: ctx.exprList().accept(this)
         };
     }
 
@@ -447,7 +459,7 @@ __.prototype.visitCollection = function(ctx) {
 
         return {
             type: 'map',
-            elements: this.visit(ctx.pairList())
+            elements: ctx.pairList().accept(this)
         };
     }
 
@@ -464,19 +476,23 @@ __.prototype.visitCollection = function(ctx) {
 
 __.prototype.visitSplice = function(ctx) {
 
-    return { type: 'splice', item: this.visit(ctx.expr(0)), list: this.visit(ctx.expr(1))};
+    return { type: 'splice', item: ctx.expr(0).accept(this), list: ctx.expr(1).accept(this)};
 };
 
 
 __.prototype.visitSubscript = function(ctx) {
 
-    return { type: 'subscript', list: this.visit(ctx.expr(0)), index: this.visit(ctx.expr(1))};
+    return {
+        type: 'subscript',
+        list: ctx.expr(0).accept(this),
+        index: ctx.expr(1).accept(this)
+    };
 };
 
 
 __.prototype.visitSelect = function(ctx) {
 
-    return { type: 'select', set: this.visit(ctx.expr()), member: ctx.ID().getText()};
+    return { type: 'select', set: ctx.expr().accept(this), member: ctx.ID().getText()};
 };
 
 
@@ -487,15 +503,15 @@ __.prototype.visitSlice = function(ctx) {
 
     var res = {
         type: 'slice',
-        list: this.visit(ctx.expr(0))
+        list: ctx.expr(0).accept(this)
     };
 
     if (start) {
-        res.start = this.visit(start);
+        res.start = start.accept(this);
     }
 
     if (end) {
-        res.end = this.visit(end);
+        res.end = end.accept(this);
     }
 
     return res;
@@ -504,7 +520,7 @@ __.prototype.visitSlice = function(ctx) {
 
 __.prototype.visitExtraction = function(ctx) {
 
-    return { type: 'extraction', list: this.visit(ctx.expr(0)), index: this.visit(ctx.expr(1))};
+    return { type: 'extraction', list: ctx.expr(0).accept(this), index: ctx.expr(1).accept(this)};
 };
 
 
@@ -515,15 +531,15 @@ __.prototype.visitExcision = function(ctx) {
 
     var res = {
         type: 'excision',
-        list: this.visit(ctx.expr(0))
+        list: ctx.expr(0).accept(this)
     };
 
     if (start) {
-        res.start = this.visit(start);
+        res.start = start.accept(this);
     }
 
     if (end) {
-        res.end = this.visit(end);
+        res.end = end.accept(this);
     }
 
     return res;

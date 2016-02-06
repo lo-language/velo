@@ -168,7 +168,8 @@ __['response'] = function (node) {
  */
 __['assign'] = function (node) {
 
-    // this is guaranteed to be a statement
+    // if the left node is a bare ID, then we compile it as an lvalue
+    // otherwise all IDs are compiled as rvalues
 
     var left = this.compile(node.left);
     var right = this.compile(node.right);
