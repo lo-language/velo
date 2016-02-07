@@ -11,45 +11,17 @@ var util = require('util');
 
 module.exports['responses'] = {
 
-    "new reply not processed in working state": function (test) {
-
-        var task = new Task('root');
-
-        test.equal(task.outstandingRequests, 0);
-        test.done();
-    },
-
-    //"new reply processed in waiting state": function (test) {
-    //
-    //    var task = new Task('root', null, null, function (args) {
-    //        test.equal(args, "foo");
-    //        test.done();
-    //    }, function (args) {
-    //        test.fail();
-    //    });
-    //
-    //    test.equal(task.pendingReplies.length, 0);
-    //    task.enqueueReply('snork');
-    //
-    //    test.equal(task.pendingReplies.length, 1);
-    //
-    //    test.done();
-    //}
-
     "reply kills further response": function (test) {
 
         test.expect(1);
 
-        var task = new Task('root');
-
-        task.on("reply", function (args) {
-            test.equal(args, "foo");
-            test.done();
-        });
-
-        task.on("fail", function (args) {
-            test.fail();
-        });
+        var task = new Task(null, null,
+            function (args) {
+                test.equal(args, "foo");
+                test.done();
+            }, function (args) {
+                test.fail();
+            }, true);
 
         task.respond("reply", "foo");
         task.respond("reply", "boo");
@@ -62,16 +34,13 @@ module.exports['responses'] = {
 
         test.expect(1);
 
-        var task = new Task('root');
-
-        task.on("reply", function (args) {
-            test.fail();
-        });
-
-        task.on("fail", function (args) {
-            test.equal(args, "foo");
-            test.done();
-        });
+        var task = new Task(null, null,
+            function (args) {
+                test.fail();
+            }, function (args) {
+                test.equal(args, "foo");
+                test.done();
+            }, true);
 
         task.respond("fail", "foo");
         task.respond("reply", "foo");
@@ -84,12 +53,11 @@ module.exports['responses'] = {
 
         test.expect(1);
 
-        var task = new Task('root');
-
-        task.on("reply", function (args) {
-            test.equal(args, undefined);
-            test.done();
-        });
+        var task = new Task(null, null,
+            function (args) {
+                test.equal(args, undefined);
+                test.done();
+            }, null, true);
 
         task.pickupReplies();
     },
@@ -98,16 +66,13 @@ module.exports['responses'] = {
 
         test.expect(1);
 
-        var task = new Task('root');
-
-        task.on("reply", function (args) {
-            test.equal(args, "foo");
-            test.done();
-        });
-
-        task.on("fail", function (args) {
-            test.fail();
-        });
+        var task = new Task(null, null,
+            function (args) {
+                test.equal(args, "foo");
+                test.done();
+            }, function (args) {
+                test.fail();
+            }, true);
 
         task.respond("reply", "foo");
         task.pickupReplies();
@@ -117,16 +82,13 @@ module.exports['responses'] = {
 
         test.expect(1);
 
-        var task = new Task('root');
-
-        task.on("reply", function (args) {
-            test.fail();
-        });
-
-        task.on("fail", function (args) {
-            test.equal(args, "boo");
-            test.done();
-        });
+        var task = new Task(null, null,
+            function (args) {
+                test.fail();
+            }, function (args) {
+                test.equal(args, "boo");
+                test.done();
+            }, true);
 
         task.respond("fail", "boo");
         task.pickupReplies();
@@ -142,17 +104,14 @@ module.exports['closing'] = {
         var collector = '';
 
         // create a root task
-        var task = new Task('root');
-
-        task.on("reply", function (args) {
-            test.equal(args, undefined); // implicit reply sends no args
-            test.equal(collector, 'foobar');
-            test.done();
-        });
-
-        task.on("fail", function (args) {
-            test.fail();
-        });
+        var task = new Task(null, null,
+            function (args) {
+                test.equal(args, undefined); // implicit reply sends no args
+                test.equal(collector, 'foobar');
+                test.done();
+            }, function (args) {
+                test.fail();
+            }, true);
 
         // create an ersatz service
         var service = function (task) {
@@ -205,16 +164,13 @@ module.exports['closing'] = {
 
         test.expect(7);
 
-        var task = new Task('root');
-
-        task.on("reply", function (args) {
-            test.equal(expected.length, 0);
-            test.done();
-        });
-
-        task.on("fail", function (args) {
-            test.fail();
-        });
+        var task = new Task(null, null,
+            function (args) {
+                test.equal(expected.length, 0);
+                test.done();
+            }, function (args) {
+                test.fail();
+            }, true);
 
         var expected = ['foo', 'bar', 'baz'];
         var replies = ['boo', 'zar', 'maz'];
@@ -253,55 +209,52 @@ module.exports['closing'] = {
 
         // create the root task
         //console.error("create root");
-        var task = new Task('root');
+        var task = new Task(null, null,
+            function (args) {
 
-        task.on("reply", function (args) {
+                // this test enforces a particular (expected) ordering of tasks, but
+                // there are actually *several* valid orderings of the tasks in this test because
+                // the calls are all supposed to be concurrent
+                // an also-valid, previously-expected ordering is commented out below
 
-            // this test enforces a particular (expected) ordering of tasks, but
-            // there are actually *several* valid orderings of the tasks in this test because
-            // the calls are all supposed to be concurrent
-            // an also-valid, previously-expected ordering is commented out below
+                test.deepEqual(results, [
+                    "call1",
+                    "call2:pre",
+                    "call2:subcall",
+                    "call2:post",
+                    "call2:subcall:handler",
+                    "call3:pre",
+                    "call3:subcall",
+                    "call3:post",
+                    "call3:subcall:handler",
+                    "call4",
+                    "call1:handler",
+                    "call2:handler",
+                    "call3:handler",
+                    "call4:handler"
+                ]);
 
-            test.deepEqual(results, [
-                "call1",
-                "call2:pre",
-                "call2:subcall",
-                "call2:post",
-                "call2:subcall:handler",
-                "call3:pre",
-                "call3:subcall",
-                "call3:post",
-                "call3:subcall:handler",
-                "call4",
-                "call1:handler",
-                "call2:handler",
-                "call3:handler",
-                "call4:handler"
-            ]);
+                //test.deepEqual(results, [
+                //    'call1',
+                //    'call2:pre',
+                //    'call2:post',
+                //    'call3:pre',
+                //    'call3:post',
+                //    'call4',
+                //    'call1:handler',
+                //    'call2:subcall',
+                //    'call3:subcall',
+                //    'call4:handler',
+                //    'call2:subcall:handler',
+                //    'call3:subcall:handler',
+                //    'call2:handler',
+                //    'call3:handler'
+                //]);
 
-            //test.deepEqual(results, [
-            //    'call1',
-            //    'call2:pre',
-            //    'call2:post',
-            //    'call3:pre',
-            //    'call3:post',
-            //    'call4',
-            //    'call1:handler',
-            //    'call2:subcall',
-            //    'call3:subcall',
-            //    'call4:handler',
-            //    'call2:subcall:handler',
-            //    'call3:subcall:handler',
-            //    'call2:handler',
-            //    'call3:handler'
-            //]);
-
-            test.done();
-        });
-
-        task.on("fail", function (args) {
-            test.fail();
-        });
+                test.done();
+            }, function (args) {
+                test.fail();
+            }, true);
 
         var passTheBuck = function (task) {
 

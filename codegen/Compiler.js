@@ -18,7 +18,7 @@
 'use strict';
 
 var JsConstruct = require('./JsConstruct');
-var SyncMessage = require('./SyncMessage');
+var Call = require('./Call');
 
 // this is a stateless library, not a "class"
 var __ = {};
@@ -361,7 +361,7 @@ __['application'] = function (node) {
     });
 
     // return a wrapped placeholder
-    return new SyncMessage(target, args);
+    return new Call(target, args);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -6,7 +6,7 @@
 "use strict";
 
 var JsConstruct = require('../../codegen/JsConstruct');
-var SyncMessage = require('../../codegen/SyncMessage');
+var Call = require('../../codegen/Call');
 
 module.exports["construction"] = {
 
@@ -69,7 +69,7 @@ module.exports["construction"] = {
 };
 
 
-module.exports["resolve"] = {
+module.exports["resolve sync"] = {
 
     "one part passthrough": function (test) {
 
@@ -91,7 +91,7 @@ module.exports["resolve"] = {
 
     "one blocker": function (test) {
 
-        var expr = new JsConstruct([new SyncMessage('$foo'), ' + ', '3']).resolve();
+        var expr = new JsConstruct([new Call('$foo'), ' + ', '3']).resolve();
 
         test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0 + 3}, null, true);\n\n');
         test.equal(expr.async, true);
@@ -100,7 +100,7 @@ module.exports["resolve"] = {
 
     "bare blocker": function (test) {
 
-        var expr = new JsConstruct([new SyncMessage('$foo'), ';']).resolve();
+        var expr = new JsConstruct([new Call('$foo'), ';']).resolve();
 
         test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0;}, null, true);\n\n');
         test.equal(expr.async, true);
@@ -109,7 +109,7 @@ module.exports["resolve"] = {
 
     "two blockers": function (test) {
 
-        var expr = new JsConstruct([new SyncMessage('$foo'), ' + ', new SyncMessage('$bar')]).resolve();
+        var expr = new JsConstruct([new Call('$foo'), ' + ', new Call('$bar')]).resolve();
 
         test.equal(expr.render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {P0 + P1}, null, true);\n\n}, null, true);\n\n");
         test.equal(expr.async, true);
@@ -118,7 +118,7 @@ module.exports["resolve"] = {
 
     "can resolve within annotation objects": function (test) {
 
-        var expr = new JsConstruct(['Math.min(', {csv: [new SyncMessage('$foo'), new SyncMessage('$bar')]}, ')']).resolve();
+        var expr = new JsConstruct(['Math.min(', {csv: [new Call('$foo'), new Call('$bar')]}, ')']).resolve();
 
         test.equal(expr.render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {Math.min(P0, P1)}, null, true);\n\n}, null, true);\n\n");
         test.equal(expr.async, true);
@@ -136,7 +136,7 @@ module.exports["resolve"] = {
 
     "nested blockers": function (test) {
 
-        var expr = new JsConstruct([new SyncMessage('$foo', [new SyncMessage('$bar')]), ';']).resolve();
+        var expr = new JsConstruct([new Call('$foo', [new Call('$bar')]), ';']).resolve();
 
         test.equal(expr.render(), 'task.sendMessage($bar, [], function (P0) {task.sendMessage($foo, [P0], function (P0) {P0;}, null, true);\n\n}, null, true);\n\n');
         test.equal(expr.async, true);
@@ -146,9 +146,9 @@ module.exports["resolve"] = {
     "multiple nested blockers": function (test) {
 
         var expr = new JsConstruct([
-            new SyncMessage('$foo', [
-                new SyncMessage('$bar', [new SyncMessage('$baz')]),
-                new SyncMessage('$quux', [new SyncMessage('$snux')])
+            new Call('$foo', [
+                new Call('$bar', [new Call('$baz')]),
+                new Call('$quux', [new Call('$snux')])
             ]), ';']).resolve();
 
         test.equal(expr.render(), 'task.sendMessage($baz, [], function (P0) {task.sendMessage($snux, [], function (P1) {task.sendMessage($bar, [P0], function (P0) {task.sendMessage($quux, [P1], function (P1) {task.sendMessage($foo, [P0, P1], function (P0) {P0;}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n');
@@ -156,6 +156,23 @@ module.exports["resolve"] = {
         test.done();
     }
 };
+
+//module.exports["resolve async"] = {
+//
+//    "one message": function (test) {
+//
+//        // with one future should we just generate a sync wrapper?
+//
+//        var expr = new JsConstruct([new Call('$foo', null, true), ' + ', '3']).resolve();
+//
+//        var F1 = task.sendMessage($foo, [], null, null, true);
+//        F1.onResolve(function (P0) {P0 + 3});
+//
+//        test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0 + 3}, null, true);\n\n');
+//        test.equal(expr.async, true);
+//        test.done();
+//    }
+//};
 
 module.exports["attach"] = {
 

@@ -30,7 +30,7 @@ var JsConstruct = function (parts, post) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Returns a JsConstruct with SyncMessages resolved by wrapping the construct in as many Messages as required.
+ * Returns a JsConstruct with embedded Calls resolved by wrapping the construct in as many Messages as required.
  */
 JsConstruct.prototype.resolve = function () {
 
@@ -56,7 +56,7 @@ JsConstruct.prototype.resolve = function () {
 
         if (typeof part === 'object') {
 
-            if (part instanceof SyncMessage) {
+            if (part instanceof Call) {
                 var placeholderName = 'P' + wrappers.length;
                 wrappers.push(part);
                 return placeholderName;
@@ -229,4 +229,4 @@ JsConstruct.makeStatement = function (pre, post) {
 module.exports = JsConstruct;
 
 // end the cycle of dependency
-var SyncMessage = require('./SyncMessage');
+var Call = require('./Call');

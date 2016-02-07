@@ -5,7 +5,7 @@ receive foo, bar;
 value = 0;
 
 // send an async message that returns quickly
-*foo(1) then {
+*foo() then {
 
     // value should always be whatever's returned by bar() here
     reply 42;

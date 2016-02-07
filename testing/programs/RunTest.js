@@ -86,13 +86,11 @@ module.exports['reply handling'] = {
         // todo add a test that does this experiment within a reply handler
 
         this.harness.run([
-
             function (task) {
                 task.respond("reply");
             },
-
             function (task) {
-                task.respond("reply", 42);
+                task.respond("reply", 33);
             }
         ]).then(
             function (res) {

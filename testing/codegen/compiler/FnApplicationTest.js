@@ -5,9 +5,8 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
 var JsConstruct = require('../../../codegen/JsConstruct');
-var SyncMessage = require('../../../codegen/SyncMessage');
+var Call = require('../../../codegen/Call');
 var Scope = require('../../../codegen/Scope');
 var util = require('util');
 
@@ -23,7 +22,7 @@ module.exports["application"] = {
 
         var result = new Scope().compile(node);
 
-        test.ok(result instanceof SyncMessage);
+        test.ok(result instanceof Call);
         test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [], function (P0) {P0}, null, true);\n\n');
         test.done();
     },
@@ -40,7 +39,7 @@ module.exports["application"] = {
 
         var result = new Scope().compile(node);
 
-        test.ok(result instanceof SyncMessage);
+        test.ok(result instanceof Call);
         test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [42], function (P0) {P0}, null, true);\n\n');
         test.done();
     },
@@ -58,7 +57,7 @@ module.exports["application"] = {
 
         var result = new Scope().compile(node);
 
-        test.ok(result instanceof SyncMessage);
+        test.ok(result instanceof Call);
         test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [42, 'hi there'], function (P0) {P0}, null, true);\n\n");
         test.done();
     },
@@ -81,7 +80,7 @@ module.exports["application"] = {
 
         var result = new Scope().compile(node);
 
-        test.ok(result instanceof SyncMessage);
+        test.ok(result instanceof Call);
         test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [P0, P1], function (P0) {P0}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n");
         test.done();
     }
