@@ -160,6 +160,46 @@ module.exports['closing'] = {
         });
     },
 
+    "empty async reply still gets handled": function (test) {
+
+        // there was a bug where an async reply of undefined wouldn't trigger its handler
+
+        // model the message receiver
+        var service = function (task) {
+
+            // send an async message from this task
+            task.sendMessage(task.args[0], null,
+                function (args) {
+
+                    task.respond("reply", 42);
+
+                }, null);
+
+            // send a sync message from this task
+            task.sendMessage(task.args[1], null,
+                function (args) {
+
+                }, null, true);
+
+            task.pickupReplies();
+        };
+
+        Task.sendRootRequest(service, [
+            function (task) {
+                task.respond("reply");
+            },
+            function (task) {
+                task.respond("reply", 33);
+            }
+        ],
+        function (res) {
+            test.equal(res, 42);
+            test.done();
+        }, function () {
+            test.fail();
+        });
+    },
+
     "implicit reply waits for multiple subtasks": function (test) {
 
         test.expect(7);

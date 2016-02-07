@@ -7,8 +7,8 @@
  * If the message is synchronous, you don't make a note because you just sit there waiting until you
  * get the response back, then you execute the appropriate handler and move on.
  *
- * If responses to earlier async messages came in while you were waiting on a sync message, you've
- * paper-clipped those responses to their respective notes to be processed later; when you're available,
+ * If responses to async messages come in while you're waiting on a sync message, you
+ * paper-clip those responses to their respective notes to be processed later; when you're available,
  * you go through your list of notes, and for any with a response clipped to it, you execute its handler,
  * then discard it. Note that its handler could result in more messages being sent, and more notes being created.
  *
@@ -37,11 +37,10 @@ const LOG_ENABLE = false;
 /**
  * Models an Exa task to handle the bookkeeping.
  *
- * Both request handlers and response handlers can send subTasks,
- * but all subTasks are attached to a parent request.
- * This creates a request tree which serves a similar purpose to a call stack.
+ * Both request handlers and response handlers can create subTasks, but all subTasks are
+ * attached to a parent request.
  *
- * Takes a reply handler and a fail handler.
+ * This creates a request tree which serves a similar purpose to a call stack.
  *
  * @param service   the service performing this task - we only need this to support recur()
  * @param args      the args for this task
@@ -69,7 +68,7 @@ var __ = function (service, args, onReply, onFail, isSync) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Emits a response, provided we haven't already responded.
+ * Sends a response, or queues one to be sent, provided we haven't already responded.
  *
  * @param type  "reply" or "fail"
  * @param args
@@ -85,28 +84,11 @@ __.prototype.respond = function (type, args) {
 
     // like emitting an event that will wait for a listener to be attached
 
-    if (type == 'reply') {
-
-        if (this.handlersEnabled) {
-            this.onReply(args);
-        }
-        else {
-            this.response = {success: true, message: args};
-        }
-    }
-    else if (type == 'fail') {
-
-        //this.log(["received FAIL for request " + requestId, args]);
-
-        if (this.handlersEnabled) {
-            this.onFail(args);
-        }
-        else {
-            this.response = {success: false, message: args};
-        }
+    if (this.handlersEnabled) {
+        (type == 'reply' ? this.onReply : this.onFail)(args);
     }
     else {
-        throw new Error("unknown response type: " + type);
+        this.response = {success: type == 'reply', message: args};
     }
 };
 
@@ -134,7 +116,7 @@ __.prototype.enableHandlers = function () {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Sends a message after creating a subrequest under this request, since we can't consider our task complete
+ * Sends a message after creating a subtask under this task. We can't consider our task complete
  * if there are still child tasks kicking around for which we're expecting a response.
  *
  * @param service       target Exa service (JS function that takes a task)
@@ -178,15 +160,6 @@ __.prototype.pickupReplies = function () {
     this.log(['picking up replies', this]);
 
     // see if our work is already complete
-
-    //if (this.outstandingRequests == 0 &&
-    //    this.pendingReplies.length == 0) {
-    //
-    //    // issue a default reply
-    //    this.log(['emmitting default reply']);
-    //    this.respond("reply");
-    //    return;
-    //}
 
     // pull each task off as we enable handlers - then he's on his own
     // how do we process tasks added by a handler?

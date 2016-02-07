@@ -6,7 +6,7 @@ google  is "http://www.google.com";
 
 receive args, io, system;
 
-// connect authority with expertise
+// todo connect authority with expertise
 client = createClient();
 
 sendRequest = service {
