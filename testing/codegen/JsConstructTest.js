@@ -7,6 +7,7 @@
 
 var JsConstruct = require('../../codegen/JsConstruct');
 var Call = require('../../codegen/Call');
+var Future = require('../../codegen/Future');
 
 module.exports["construction"] = {
 
@@ -157,23 +158,6 @@ module.exports["resolve sync"] = {
     }
 };
 
-//module.exports["resolve async"] = {
-//
-//    "one message": function (test) {
-//
-//        // with one future should we just generate a sync wrapper?
-//
-//        var expr = new JsConstruct([new Call('$foo', null, true), ' + ', '3']).resolve();
-//
-//        var F1 = task.sendMessage($foo, [], null, null, true);
-//        F1.onResolve(function (P0) {P0 + 3});
-//
-//        test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0 + 3}, null, true);\n\n');
-//        test.equal(expr.async, true);
-//        test.done();
-//    }
-//};
-
 module.exports["attach"] = {
 
     "sync head and tail": function (test) {
@@ -247,7 +231,7 @@ module.exports["build message"] = {
         var msg = JsConstruct.buildMessage('$foo', []);
 
         test.equal(msg.render(), 'task.sendMessage($foo, [], null, null)');
-        //test.equal(msg.isSync(), false);
+        test.equal(msg.async, false);
         test.done();
     },
 
@@ -256,7 +240,7 @@ module.exports["build message"] = {
         var msg = JsConstruct.buildMessage('$foo', [], "function (args) {x = 1;}");
 
         test.equal(msg.render(), 'task.sendMessage($foo, [], function (args) {x = 1;}, null)');
-        //test.equal(msg.isSync(), false);
+        test.equal(msg.async, false);
         test.done();
     },
 
@@ -265,7 +249,34 @@ module.exports["build message"] = {
         var msg = JsConstruct.buildMessage('$foo', [], "function (args) {x = 1;}");
 
         test.equal(msg.render(), 'task.sendMessage($foo, [], function (args) {x = 1;}, null)');
-        //test.ok(msg.isSync());
+        test.equal(msg.async, false);
+        test.done();
+    }
+};
+
+module.exports["resolve futures"] = {
+
+    "one future": function (test) {
+
+        var expr = new JsConstruct([new Future('foo')]).resolve();
+
+        test.equal(expr.render(), '$foo.wait(function (F0) {F0});\n');
+        test.equal(expr.async, true);
+        test.done();
+    },
+
+    "one s": function (test) {
+
+        var future = new Future('foo');
+        var msg1 = JsConstruct.buildMessage('$io.out.write', [future], null, null);
+        var stmt1 = JsConstruct.makeStatement([msg1, ';\n']);
+        var msg2 = JsConstruct.buildMessage('$io.out.write', ["ok"], null, null);
+        var stmt2 = JsConstruct.makeStatement([msg2, ';\n']);
+        var stmtList = stmt1.attach(stmt2);
+
+        test.equal(stmtList.render(),
+            '$foo.wait(function (F0) {task.sendMessage($io.out.write, [F0], null, null);\ntask.sendMessage($io.out.write, [ok], null, null);\n});\n');
+        //test.equal(expr.async, true);
         test.done();
     }
 };

@@ -178,8 +178,8 @@ module.exports["application statements"] = {
     "application in async message": function (test) {
 
         var node = {
-            type: 'stmt_list',
-            head: {
+            type: 'application_stmt',
+            application: {
                 type: 'message',
                 address: {
                     type: 'select',
@@ -204,12 +204,11 @@ module.exports["application statements"] = {
                     },
                     right: '\\n'
                 }]
-            },
-            tail: null
+            }
         };
 
         test.equal(new Scope().compile(node).render(),
-            "task.sendMessage($factorial, [$args[0]], function (P0) {task.sendMessage($io.stdout.write, ['' + P0 + '\\n'], null, null)}, null, true);\n\n");
+            "task.sendMessage($factorial, [$args[0]], function (P0) {task.sendMessage($io.stdout.write, ['' + P0 + '\\n'], null, null);\n}, null, true);\n\n");
 
         test.done();
     }

@@ -19,6 +19,7 @@
 
 var JsConstruct = require('./JsConstruct');
 var Call = require('./Call');
+var Future = require('./Future');
 
 // this is a stateless library, not a "class"
 var __ = {};
@@ -79,7 +80,7 @@ __['procedure'] = function (node) {
     var localScope = this.bud();
 
     // compile the statement(s) in the context of the local scope
-    var body = localScope.compile(node.body).attach(new JsConstruct("task.pickupReplies();\n"));
+    var body = localScope.compile(node.body).attach(new JsConstruct("task.processResponses();\n"));
 
     // after compilation we can get our declared vars
     var localVars = localScope.getJsVars();
@@ -177,15 +178,22 @@ __['assign'] = function (node) {
     // todo this implies block-level scoping
     if (node.left.type == 'id') {
 
+        var name = node.left.name;
+
         // validate we're not assigning to a constant
-        if (this.isConstant(node.left.name)) {
-            throw new Error("can't assign to a constant (" + node.left.name + ")");
+        if (this.isConstant(name)) {
+            throw new Error("can't assign to a constant (" + name + ")");
         }
 
         // declare if a new var
         // can this not be idempotent?
-        if (this.has(node.left.name) == false) {
-            this.declare(node.left.name);
+        if (this.has(name) == false) {
+            this.declare(name);
+        }
+
+        // see if the RHS is a dispatch
+        if (node.right.type == 'message') {
+            this.setFuture(name);
         }
     }
 
@@ -373,7 +381,7 @@ __['application'] = function (node) {
  */
 __['id'] = function (node) {
 
-    // we know we're not rendering an lvalue because we're defended from that
+    // todo know we're not rendering an lvalue because we're defended from that
     // in the assignment code generator
 
     // should we pass down in a context if we're in eval or assign mode?
@@ -384,7 +392,12 @@ __['id'] = function (node) {
         return this.resolve(node.name);
     }
 
-    // todo if we're in an eval
+    // todo just return whatever the ID resolves to in this scope?
+    // make resolve able to return a Future or a $ name?
+
+    if (this.isFuture(node.name)) {
+        return new Future(node.name);
+    }
 
     return '$' + node.name;
 };

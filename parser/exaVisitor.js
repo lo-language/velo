@@ -122,6 +122,11 @@ exaVisitor.prototype.visitCompare = function(ctx) {
 };
 
 
+// Visit a parse tree produced by exaParser#cut.
+exaVisitor.prototype.visitCut = function(ctx) {
+};
+
+
 // Visit a parse tree produced by exaParser#dispatch.
 exaVisitor.prototype.visitDispatch = function(ctx) {
 };

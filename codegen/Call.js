@@ -4,18 +4,14 @@
 
 "use strict";
 
-var JsConstruct = require('./JsConstruct');
-
 /**
  * @param address
  * @param args
- * @param async  true if this call is asynchronous
  */
-var __ = function (address, args, async) {
+var __ = function (address, args) {
 
     this.address = address;
     this.args = args || [];
-    this.async = async;
 };
 
 module.exports = __;

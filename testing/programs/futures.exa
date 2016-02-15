@@ -1,0 +1,11 @@
+receive foo, bar;
+
+fooVal = *foo();
+barVal = *bar();
+
+if (fooVal > barVal) {
+    reply "foo wins";
+}
+else {
+    reply "bar wins";
+}

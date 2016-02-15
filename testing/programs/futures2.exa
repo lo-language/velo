@@ -1,0 +1,26 @@
+receive httpGet, writeLine;
+
+sendRequest = service {
+
+    receive url;
+
+    *httpGet(url) then {
+
+        receive res, body;
+
+        *writeLine("response from `url`: status = `res.statusCode`\n");
+        *writeLine("body length: `#body`\n");
+
+        reply #body;
+    };
+
+    *writeLine("sent request to `url`\n");
+};
+
+req1Len = sendRequest("hi");
+
+*writeLine("`req1Len`");
+
+reply 18;
+//req2Len = sendRequest("howdy");
+//req3Len = *sendRequest("hello");

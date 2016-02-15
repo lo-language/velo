@@ -1,10 +1,11 @@
+receive io, system;
+
 createClient is <net:http:client>;
 
 exa     is "http://www.exalang.org";
 apple   is "http://www.apple.com";
 google  is "http://www.google.com";
 
-receive args, io, system;
 
 // todo connect authority with expertise
 client = createClient();
@@ -17,17 +18,21 @@ sendRequest = service {
 
         receive res, body;  // this style constrains these names to this handler scope
 
-        *io.stdout.write("response from `url`: status = `res.statusCode`\n");
-        *io.stdout.write("body length: `#body`\n");
+        *io.out.write("response from `url`: status = `res.statusCode`\n");
+        *io.out.write("body length: `#body`\n");
 
         reply #body;
     };
 
-    *io.stdout.write("sent request to `url`\n");
+    *io.out.write("sent request to `url`\n");
 };
 
 // race some requests
 
-*sendRequest(google);
-sendRequest(apple);
-*sendRequest(exa);
+req1Len = *sendRequest(google);
+req2Len = sendRequest(apple);
+
+*io.out.write("`req1Len`\n");
+
+req3Len = *sendRequest(exa);
+

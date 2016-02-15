@@ -13,7 +13,7 @@ myHexInt = 0x2A;
 ```
 *Note: assignments in Exa are statements, not expressions.*
 
-### Operators
+### Number Operators
 
 Exa provides the usual operators for:
 
@@ -61,7 +61,7 @@ fibs[fibs[3]];	// 1
 fibs[-1];		// syntactic sugar for terminal value (8) **
 fibs[-2];		// syntactic sugar for 2nd-to-last element **
 
-fibs[1:4];              // [1, 1, 2]
+fibs[1:4];      // [1, 1, 2]
 fibs[:3];		// [0, 1, 1]
 fibs[5:];		// [5, 8]
 copy = fibs[:];         // create a shallow copy
@@ -100,6 +100,8 @@ bennyInstrument = greats["Benny Goodman"]; // Clarinet
 
 You can create an empty map with the syntax `[:]`.
 
+### Collection Operators
+
 You can get the length of any collection in constant time with the cardinality operator `#`.
 
 ```
@@ -130,34 +132,38 @@ fullName = "`student.name.first` `student.name.last`";
 Exa provides the usual `if`/`else if`/`else` construct.
 
 ```
-if x == 42:
+if x == 42 {
 	success = true;
-else if x < 42 and x > 14:
+}
+else if x < 42 and x > 14 {
 	success = false;
-else:
+}
+else {
 	success = true;
+}
 ```
 
 And the familiar `while` construct for loops.
 
 ```
-while z > 0:
-	fibs <+ fibs[-1] + fibs[-2];
+while z > 0 {
+	fibs[-1] + fibs[-2] -> fibs;
 	z--;
+}
 ```
 
 ### Requests
 
-A [procedure](procedures.md) is invoked by sending a request to an address. A request can be sent synchronously with the familiar function application syntax:
+A [service](procedures.md) is invoked by sending a request to an address. A request can be sent synchronously with the familiar function application syntax:
 
 ```
 doSomething(arg1, arg2);
 ```
 
-or asynchronously using `dispatch` or `after` (explained below).
+or asynchronously with the addition of an asterisk:
 
 ```
-dispatch doSomething(arg1, arg2);	// we don't care about any reply
+*doSomething(arg1, arg2);	// we don't care about any reply
 ```
 
 If a request is sent synchronously, the next statement won't be executed until a reply is received. *Note: if there is no reply to a synchronous request, the next statement will never be executed.*
@@ -168,18 +174,19 @@ As you'd expect, a synchronous request is an expression that evaluates to the va
 foo = sqrt(25);	// foo will be assigned 5
 ```
 
-If a request is sent asynchronously, the next statement will be executed immediately, without waiting for a reply, but a **consequent** to be executed after a reply is received can be attached to the request using the `after` construct.
+If a request is sent asynchronously, the next statement will be executed immediately, without waiting for a reply. If you'd like to do something after a response is received, a **handler**  can be attached to the request using a `then` clause (to handle a success response) or a `catch` clause (to handle a failure).
 
 ```
-after readFile(fileName):
+*readFile(fileName) then {
 	log("done reading `fileName`");
+};
 
 log("this will be logged first");
 ```
 
-*Note: all statements following an asynchronous request are executed before any consequent is run. Replies to async requests are enqueued as they are received.*
+*Note: all statements following an asynchronous request are executed before any handler is run except in the case of futures (see below). Replies to async requests are enqueued as they are received.*
 
-Like most protocols, but unlike most languages, Exa has a clear and explicit concept of failure: *every request can succeed or fail.* This is implemented not by [somehow](https://en.wikipedia.org/wiki/Semipredicate_problem) marking or categorizing a reply as success or failure, but by providing a dedicated channel for failure replies: every request includes neither, either, or both of two distinct consequents - a success consequent, introduced by the `after` construct, and a failure consequent, introduced by the `failure` construct.
+Like most protocols, but unlike most languages, Exa has a clear and explicit concept of failure: *every request can succeed or fail.* This is implemented not by [somehow](https://en.wikipedia.org/wiki/Semipredicate_problem) marking or categorizing a reply as success or failure, but by providing a second channel for failure responses: every request includes neither, either, or both of two distinct handlers - a success handler, introduced by the `after` construct, and a failure handler, introduced by the `failure` construct.
 
 ```
 after readFile(fileName):
@@ -190,7 +197,7 @@ failure => error:
 
 An async request can be thought of as a hybrid language construct that fuses a message dispatch with a specialized conditional; if you've worked with promises this approach will feel familiar to you.
 
-A failure consequent can easily swap in its own value for one that was expected from a success reply using `substitute`.**
+A failure handler can easily swap in its own value for one that was expected from a success reply using `substitute`.**
 
 ```
 after getAnswer => answer:
@@ -210,9 +217,9 @@ timeout 5ms:
 	log("failed to read the file");
 ```
 
-### consequents
+### Handlers
 
-Think of consequents as part of the main flow of the procedure, like an if/else block, rather than as a sub-procedure. They share the same scope as their enclosing procedure.
+Think of handlers as part of the main flow of the procedure, like an if/else block, rather than as a sub-procedure. They share the same scope as their enclosing procedure.
 
 Modules only provide ability, not authority.
 

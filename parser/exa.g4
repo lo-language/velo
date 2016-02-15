@@ -40,7 +40,7 @@ INTER_END   : '`' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1);} ;
 
 MODREF  : '<' ~[ \t\r\n]+ '>' {this.text = this.text.slice(1, -1);} ;
 
-// ??? allow modules to be records?
+// ??? allow modules to be records? or just literals in general?
 module
     : statement_list
     ;
@@ -88,7 +88,7 @@ conditional
 
 // we could alternately go the C way and make a block a kind of statement
 block
-    : BEGIN statement_list END
+    : BEGIN statement_list? END
     ;
 
 expr

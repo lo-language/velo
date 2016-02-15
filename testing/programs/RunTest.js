@@ -13,6 +13,63 @@
 const Harness = require('../Harness');
 const util = require('util');
 
+module.exports['futures'] = {
+
+    // test that uncaught errors are properly escalated out of the program
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'futures');
+        cb();
+    },
+
+    "run in parallel": function (test) {
+
+        var foo = function (task) {
+            test.ok(true);
+            task.respond("reply", 21);
+        };
+
+        var bar = function (task) {
+            test.ok(true);
+            task.respond("reply", 42);
+        };
+
+        this.harness.testSuccess(test, [foo, bar], "bar wins");
+    }
+};
+
+module.exports['futures2'] = {
+
+    // test that uncaught errors are properly escalated out of the program
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'futures2');
+        cb();
+    },
+
+    "run in parallel": function (test) {
+
+        //test.expect(5);
+
+        var httpGet = function (task) {
+            test.ok(true);
+            setTimeout(function () {
+                task.respond("reply", [{statusCode: 200}, "this is a response"]);
+            }, 50);
+        };
+
+        var writeLine = function (task) {
+            test.ok(true);
+            console.log('write:', task.args);
+            task.respond("reply");
+        };
+
+        this.harness.testSuccess(test, [httpGet, writeLine], 18);
+    }
+};
+
 module.exports['iteration'] = {
 
     // test that uncaught errors are properly escalated out of the program
@@ -25,7 +82,6 @@ module.exports['iteration'] = {
 
     "stack doesn't overflow": function (test) {
 
-        //console.log(this.harness.getJs().render(true));
         this.harness.testSuccess(test, [100000], 100000);
     }
 };

@@ -22,6 +22,7 @@ var __ = function (parent) {
     this.deps = parent ? parent.deps : {};
     this.vars = {};
     this.constants = {};
+    this.futures = {};
     this.receives = [];
     this.contNum = 0;
 };
@@ -100,6 +101,30 @@ __.prototype.define = function (name, value) {
     }
 
     this.constants['@' + name] = value;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Defines a future.
+ *
+ * @param name
+ */
+__.prototype.setFuture = function (name) {
+
+    this.futures['@' + name] = name;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns true if the given name refers to a future.
+ *
+ * @param name
+ */
+__.prototype.isFuture = function (name) {
+
+    if (this.futures['@' + name] !== undefined) {
+        return true;
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

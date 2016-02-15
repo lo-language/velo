@@ -9,7 +9,9 @@
 
 "use strict";
 
-var util = require('util');
+const Call = require('./Call');
+const Future = require('./Future');
+const util = require('util');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -35,6 +37,7 @@ var JsConstruct = function (parts, post) {
 JsConstruct.prototype.resolve = function () {
 
     var wrappers = [];
+    var placeholderName;
 
     // scan the fragments swapping SyncMessages for placeholders
 
@@ -57,7 +60,13 @@ JsConstruct.prototype.resolve = function () {
         if (typeof part === 'object') {
 
             if (part instanceof Call) {
-                var placeholderName = 'P' + wrappers.length;
+                placeholderName = 'P' + wrappers.length;
+                wrappers.push(part);
+                return placeholderName;
+            }
+
+            if (part instanceof Future) {
+                placeholderName = 'F' + wrappers.length;
                 wrappers.push(part);
                 return placeholderName;
             }
@@ -102,11 +111,21 @@ JsConstruct.prototype.resolve = function () {
         }
 
         var sm = wrappers[index];
+        var pre, post;
 
-        var pre = ['task.sendMessage(',
-            sm.address, ', [', {csv: sm.args}, '], function (P' + index + ') {'];
+        if (sm instanceof Call) {
 
-        var post = ['}, null, true);\n\n'];
+            pre = ['task.sendMessage(',
+                sm.address, ', [', {csv: sm.args}, '], function (P' + index + ') {'];
+
+            post = ['}, null, true);\n\n'];
+        }
+        else {
+
+            pre = ['$' + sm.name + '.wait(function (F' + index + ') {'];
+
+            post = ['});\n'];
+        }
 
         var wrapper = new JsConstruct(pre, post);
 
@@ -208,7 +227,7 @@ JsConstruct.renderFragment = function (fragment) {
  */
 JsConstruct.buildMessage = function (address, args, replyHandler, failHandler) {
 
-    return JsConstruct.makeStatement([
+    return new JsConstruct([
         'task.sendMessage(', address, ', [', {csv: args}, '], ',
         replyHandler ? replyHandler : 'null', ', ',
         failHandler ? failHandler : 'null', ')'
@@ -227,6 +246,3 @@ JsConstruct.makeStatement = function (pre, post) {
 };
 
 module.exports = JsConstruct;
-
-// end the cycle of dependency
-var Call = require('./Call');

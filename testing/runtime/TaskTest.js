@@ -59,7 +59,7 @@ module.exports['responses'] = {
                 test.done();
             }, null, true);
 
-        task.pickupReplies();
+        task.processResponses();
     },
 
     "no implicit reply after reply": function (test) {
@@ -75,7 +75,7 @@ module.exports['responses'] = {
             }, true);
 
         task.respond("reply", "foo");
-        task.pickupReplies();
+        task.processResponses();
     },
 
     "no implicit reply after fail": function (test) {
@@ -91,7 +91,7 @@ module.exports['responses'] = {
             }, true);
 
         task.respond("fail", "boo");
-        task.pickupReplies();
+        task.processResponses();
     }
 };
 
@@ -120,8 +120,9 @@ module.exports['closing'] = {
             test.equal(collector, '');
             collector += task.args;
 
-            task.respond("reply", 'bar');
-            task.pickupReplies();
+            setImmediate(function () {
+                task.respond("reply", 'bar');
+            });
         };
 
         // send a message from our root task
@@ -133,7 +134,7 @@ module.exports['closing'] = {
         });
 
         // shouldn't fire implicit reply until the message has been processed
-        task.pickupReplies();
+        task.processResponses();
     },
 
     "close doesn't wait for message with no handlers": function (test) {
@@ -142,14 +143,14 @@ module.exports['closing'] = {
         var service = function (task) {
 
             // send a message from this task
-            task.sendMessage(function (args) {
-                // do nothing
-                //console.error(args);
+            task.sendMessage(function (task) {
 
-            }, 'foo', null, null);
+                task.respond("reply");
+
+            }, 'foo', function() {}, null);
 
             // should succeed because we didn't attach handlers to that message
-            task.pickupReplies();
+            task.processResponses();
         };
 
         // todo send a root task
@@ -179,9 +180,9 @@ module.exports['closing'] = {
             task.sendMessage(task.args[1], null,
                 function (args) {
 
-                }, null, true);
+                    task.processResponses();
 
-            task.pickupReplies();
+                }, null, true);
         };
 
         Task.sendRootRequest(service, [
@@ -222,7 +223,7 @@ module.exports['closing'] = {
             test.equal(task.args, expected.shift());
             task.respond("reply", replies.shift());
 
-            task.pickupReplies();
+            task.processResponses();
         };
 
         task.sendMessage(transmogrify, 'foo', function (result) {
@@ -238,7 +239,7 @@ module.exports['closing'] = {
         });
 
         // shouldn't fire implicit reply
-        task.pickupReplies();
+        task.processResponses();
     },
 
     "close waits for subtasks": function (test) {
@@ -318,7 +319,7 @@ module.exports['closing'] = {
             // this is a weird and tricky case! because we're scheduling a reply before we hear back
             // from the message we just sent, but which has a handler!!
 //            this.reply(args);
-            task.pickupReplies();
+            task.processResponses();
         };
 
         var buckStopsHere = function (task) {
@@ -328,7 +329,7 @@ module.exports['closing'] = {
             results.push(task.args);
 
             task.respond("reply", task.args);
-            task.pickupReplies();
+            task.processResponses();
         };
 
         // send a message from this task - root:child1
@@ -357,7 +358,7 @@ module.exports['closing'] = {
             results.push(result + ':handler');
         });
 
-        task.pickupReplies();
+        task.processResponses();
     },
 
     "implicit fail handler": function (test) {
@@ -391,7 +392,7 @@ module.exports['closing'] = {
             // another task at this level could just overwrite subtask - we're done with that value
             // or we could do something where creating a subtask takes the handlers and binds them itself...
 
-            task.pickupReplies();
+            task.processResponses();
         };
 
         // set up some stub services for our task handler to send messages to

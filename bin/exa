@@ -35,6 +35,7 @@ var Q = require('q');
 var argv = require('minimist')(process.argv.slice(2));
 var Loader = require('../runtime/Loader');
 var IO = require('../runtime/IO');
+var System = require('../runtime/System');
 
 var sourceFile = argv._.shift();
 
@@ -87,7 +88,9 @@ Task.sendRootRequest(root, [argv._, IO],\n\
 }
 else {
 
-    loader.run(moduleName, [argv._, IO]).then(
+    IO.args = argv;
+
+    loader.run(moduleName, [IO, System]).then(
         function (result) {
             //console.log(result);
         },
