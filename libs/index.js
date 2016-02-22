@@ -48,6 +48,8 @@ module.exports = {
 
             get: function (task) {
 
+                var cb = task.doAsync(function () {});
+
                 http.get(task.args[0], function (res) {
 
                     var body = '';
@@ -59,6 +61,7 @@ module.exports = {
                     });
 
                     res.on('end', function () {
+                        cb();
                         task.respond("reply", [res, body]);
                     });
                 });

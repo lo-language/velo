@@ -36,6 +36,7 @@ __.prototype.testSuccess = function (test, input, expected) {
         function (result) {
 
             if (expected !== undefined) {
+                console.log(result);
                 test.equal(result, expected);
             }
 
@@ -45,7 +46,7 @@ __.prototype.testSuccess = function (test, input, expected) {
         },
         function (err) {
             console.error("error running " + _this.program + ".exa: " + err);
-            console.error(_this.getJs());
+            console.error(err.stack);
         }
     );
 };

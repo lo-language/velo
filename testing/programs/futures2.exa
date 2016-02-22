@@ -17,10 +17,13 @@ sendRequest = service {
     *writeLine("sent request to `url`\n");
 };
 
-req1Len = sendRequest("hi");
+// race some requests
 
-*writeLine("`req1Len`");
+req1Len = *sendRequest("hi");
+req2Len = sendRequest("howdy");
+
+*writeLine("`req1Len`\n");
+
+req3Len = *sendRequest("hello");
 
 reply 18;
-//req2Len = sendRequest("howdy");
-//req3Len = *sendRequest("hello");

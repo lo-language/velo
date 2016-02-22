@@ -2,7 +2,7 @@ receive io, system;
 
 createClient is <net:http:client>;
 
-exa     is "http://www.exalang.org";
+exa     is "http://1e18.org";
 apple   is "http://www.apple.com";
 google  is "http://www.google.com";
 

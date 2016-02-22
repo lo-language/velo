@@ -55,15 +55,15 @@ module.exports['futures2'] = {
 
         var httpGet = function (task) {
             test.ok(true);
-            setTimeout(function () {
+            setTimeout(task.doAsync(function () {
                 task.respond("reply", [{statusCode: 200}, "this is a response"]);
-            }, 50);
+            }), 50);
         };
 
         var writeLine = function (task) {
             test.ok(true);
             console.log('write:', task.args);
-            task.respond("reply");
+            task.respond("reply"); // todo this is now superfluous
         };
 
         this.harness.testSuccess(test, [httpGet, writeLine], 18);
