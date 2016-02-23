@@ -94,7 +94,7 @@ module.exports["resolve sync"] = {
 
         var expr = new JsConstruct([new Call('$foo'), ' + ', '3']).resolve();
 
-        test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0 + 3}, null, true);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0 + 3}, null);\n\n');
         test.equal(expr.async, true);
         test.done();
     },
@@ -103,7 +103,7 @@ module.exports["resolve sync"] = {
 
         var expr = new JsConstruct([new Call('$foo'), ';']).resolve();
 
-        test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0;}, null, true);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0;}, null);\n\n');
         test.equal(expr.async, true);
         test.done();
     },
@@ -112,7 +112,7 @@ module.exports["resolve sync"] = {
 
         var expr = new JsConstruct([new Call('$foo'), ' + ', new Call('$bar')]).resolve();
 
-        test.equal(expr.render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {P0 + P1}, null, true);\n\n}, null, true);\n\n");
+        test.equal(expr.render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {P0 + P1}, null);\n\n}, null);\n\n");
         test.equal(expr.async, true);
         test.done();
     },
@@ -121,7 +121,7 @@ module.exports["resolve sync"] = {
 
         var expr = new JsConstruct(['Math.min(', {csv: [new Call('$foo'), new Call('$bar')]}, ')']).resolve();
 
-        test.equal(expr.render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {Math.min(P0, P1)}, null, true);\n\n}, null, true);\n\n");
+        test.equal(expr.render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {Math.min(P0, P1)}, null);\n\n}, null);\n\n");
         test.equal(expr.async, true);
         test.done();
     },
@@ -139,7 +139,7 @@ module.exports["resolve sync"] = {
 
         var expr = new JsConstruct([new Call('$foo', [new Call('$bar')]), ';']).resolve();
 
-        test.equal(expr.render(), 'task.sendMessage($bar, [], function (P0) {task.sendMessage($foo, [P0], function (P0) {P0;}, null, true);\n\n}, null, true);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($bar, [], function (P0) {task.sendMessage($foo, [P0], function (P0) {P0;}, null);\n\n}, null);\n\n');
         test.equal(expr.async, true);
         test.done();
     },
@@ -152,7 +152,7 @@ module.exports["resolve sync"] = {
                 new Call('$quux', [new Call('$snux')])
             ]), ';']).resolve();
 
-        test.equal(expr.render(), 'task.sendMessage($baz, [], function (P0) {task.sendMessage($snux, [], function (P1) {task.sendMessage($bar, [P0], function (P0) {task.sendMessage($quux, [P1], function (P1) {task.sendMessage($foo, [P0, P1], function (P0) {P0;}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n}, null, true);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($baz, [], function (P0) {task.sendMessage($snux, [], function (P1) {task.sendMessage($bar, [P0], function (P0) {task.sendMessage($quux, [P1], function (P1) {task.sendMessage($foo, [P0, P1], function (P0) {P0;}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n');
         test.equal(expr.async, true);
         test.done();
     }
@@ -260,7 +260,7 @@ module.exports["resolve futures"] = {
 
         var expr = new JsConstruct([new Future('foo')]).resolve();
 
-        test.equal(expr.render(), '$foo.wait(function (F0) {F0});\n');
+        test.equal(expr.render(), '$foo.await(function (F0) {F0});\n');
         test.equal(expr.async, true);
         test.done();
     },
@@ -275,7 +275,7 @@ module.exports["resolve futures"] = {
         var stmtList = stmt1.attach(stmt2);
 
         test.equal(stmtList.render(),
-            '$foo.wait(function (F0) {task.sendMessage($io.out.write, [F0], null, null);\ntask.sendMessage($io.out.write, [ok], null, null);\n});\n');
+            '$foo.await(function (F0) {task.sendMessage($io.out.write, [F0], null, null);\ntask.sendMessage($io.out.write, [ok], null, null);\n});\n');
         //test.equal(expr.async, true);
         test.done();
     }

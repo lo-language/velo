@@ -9,7 +9,7 @@
 "use strict";
 
 const Module = require('./Module');
-const Task = require('./Task2');
+const Task = require('./Task');
 const fs = require('fs');
 const Q = require('q');
 const standardLibs = require('../libs');

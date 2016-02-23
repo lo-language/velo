@@ -118,11 +118,11 @@ JsConstruct.prototype.resolve = function () {
             pre = ['task.sendMessage(',
                 sm.address, ', [', {csv: sm.args}, '], function (P' + index + ') {'];
 
-            post = ['}, null, true);\n\n'];
+            post = ['}, null);\n\n'];
         }
         else {
 
-            pre = ['$' + sm.name + '.wait(function (F' + index + ') {'];
+            pre = ['$' + sm.name + '.await(function (F' + index + ') {'];
 
             post = ['});\n'];
         }

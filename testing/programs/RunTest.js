@@ -62,7 +62,7 @@ module.exports['futures2'] = {
 
         var writeLine = function (task) {
             test.ok(true);
-            console.log('write:', task.args);
+            //console.log('write:', task.args);
             task.respond("reply"); // todo this is now superfluous
         };
 

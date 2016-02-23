@@ -80,7 +80,7 @@ __['procedure'] = function (node) {
     var localScope = this.bud();
 
     // compile the statement(s) in the context of the local scope
-    var body = localScope.compile(node.body).attach(new JsConstruct("task.processResponses();\n"));
+    var body = localScope.compile(node.body);
 
     // after compilation we can get our declared vars
     var localVars = localScope.getJsVars();

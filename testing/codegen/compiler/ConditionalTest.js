@@ -87,7 +87,7 @@ module.exports["async"] = {
         };
 
         test.equal(new Scope().compile(node).render(),
-            "var cont0 = function () {};if ($foo) {task.sendMessage($foo, [], function (P0) {$bar = P0;\ncont0();}, null, true);\n\n}\n\nelse {cont0();}\n\n");
+            "var cont0 = function () {};if ($foo) {task.sendMessage($foo, [], function (P0) {$bar = P0;\ncont0();}, null);\n\n}\n\nelse {cont0();}\n\n");
         test.done();
     },
 
