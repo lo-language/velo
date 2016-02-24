@@ -18,11 +18,23 @@ var parser = new ASTBuilder();
  */
 var __ = function (source) {
 
+    var ast = parser.parse(source);
+
     var moduleScope = new Scope();
+
+    try {
+        var js = moduleScope.compile(ast).render();
+    }
+    catch (err) {
+
+        console.error(util.inspect(ast, {depth: null, colors: true}));
+
+        throw err;
+    }
 
     // create a factory method to build a service bound to a registry
     // use new Function() so as not to leak the local scope (can't hide globals)
-    this.makeService = new Function('MODS', moduleScope.compile(parser.parse(source)).render());
+    this.makeService = new Function('MODS', js);
 
     // actually loading the dependencies is the concern of a loader
     this.deps = moduleScope.getDeps();

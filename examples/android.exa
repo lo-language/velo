@@ -6,7 +6,7 @@
  * 12/6/2015
  */
 
-receive args, io;
+receive io, system;
 
 // could construct faster by tracking remaining choices explicitly
 
@@ -112,4 +112,4 @@ explore = service {
     reply found;
 };
 
-io.stdout.write("`explore([])`\n");
+io.out.write("`explore([])`\n");

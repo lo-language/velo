@@ -10,9 +10,9 @@ squareSide = args[0];
 
 square = makeSquare(squareSide);
 
-io.stdout.write("side length is `square.getSide()`\n");
+io.out.write("side length is `square.getSide()`\n");
 
 area = square.getArea();
 
-io.stdout.write(square.toString());
-io.stdout.write("\n`area`\n");
+io.out.write(square.toString());
+io.out.write("\n`area`\n");

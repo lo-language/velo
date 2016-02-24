@@ -277,7 +277,7 @@ __['iteration'] = function (node) {
     }
 
     // join the body to the wrapper function via setImmediate to form the loop in a way that won't break the stack
-    body.attach(new JsConstruct("setImmediate(loop);"));
+    body.attach(new JsConstruct("setImmediate(task.doAsync(loop));"));
 
     return JsConstruct.makeStatement([
 

@@ -202,6 +202,17 @@ __.prototype.visitCompare = function(ctx) {
 };
 
 
+__.prototype.visitLogical = function(ctx) {
+
+    return {
+        type: 'op',
+        op: ctx.op.text,
+        left: ctx.expr(0).accept(this),
+        right: ctx.expr(1).accept(this)
+    };
+};
+
+
 __.prototype.visitWrap = function(ctx) {
 
     return ctx.expr().accept(this);
@@ -493,6 +504,16 @@ __.prototype.visitSubscript = function(ctx) {
 __.prototype.visitSelect = function(ctx) {
 
     return { type: 'select', set: ctx.expr().accept(this), member: ctx.ID().getText()};
+};
+
+
+__.prototype.visitMembership = function(ctx) {
+
+    return {
+        type: 'in',
+        left: ctx.expr(0).accept(this),
+        right: ctx.expr(1).accept(this)
+    };
 };
 
 
