@@ -26,7 +26,6 @@ foo;
 
 // handle failure only
 *baz(128) then {
-    skip;
 }
 catch {
     reply "bummer";

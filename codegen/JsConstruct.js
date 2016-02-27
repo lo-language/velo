@@ -18,7 +18,6 @@ const util = require('util');
  *
  * @param parts     an array of strings or JsConstructs
  * @param post      any parts of this construct that need to come *after* following statements
- * @param async
  */
 var JsConstruct = function (parts, post) {
 

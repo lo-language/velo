@@ -364,7 +364,14 @@ __.prototype.visitFailHandler = function(ctx) {
 
 __.prototype.visitBlock = function(ctx) {
 
-    return ctx.statement_list().accept(this);
+    var stmtList = ctx.statement_list();
+
+    if (stmtList) {
+        return stmtList.accept(this);
+    }
+    else {
+        return {type: 'stmt_list', head: {type: 'skip'}, tail: null};
+    }
 };
 
 

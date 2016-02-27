@@ -18,19 +18,15 @@ if foo == 42 {
     x++;
 }
 else if foo == 15 {
-    skip;
 }
 
 if foo == 42 {
     x++;
 }
 else if foo == 15 {
-    skip;
 }
 else {
-    skip;
 }
 
 while foo < 15 {
-    skip;
 }

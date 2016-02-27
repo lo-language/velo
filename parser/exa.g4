@@ -62,7 +62,6 @@ statement
     | expr '->' expr ';'                                    # splice
     | conditional                                           # condStmt
     | 'while' expr block                                    # iteration
-    | 'skip' ';'                                            # skip
     | expr ';'                                              # exprStmt
     ;
 

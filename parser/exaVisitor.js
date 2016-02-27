@@ -72,11 +72,6 @@ exaVisitor.prototype.visitIteration = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#skip.
-exaVisitor.prototype.visitSkip = function(ctx) {
-};
-
-
 // Visit a parse tree produced by exaParser#exprStmt.
 exaVisitor.prototype.visitExprStmt = function(ctx) {
 };
