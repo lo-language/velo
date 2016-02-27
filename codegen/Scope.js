@@ -20,9 +20,7 @@ var __ = function (parent) {
 
     this.parent = parent;
     this.deps = parent ? parent.deps : {};
-    this.vars = {};
-    this.constants = {};
-    this.futures = {};
+    this.symbols = {};  // variables, constants, futures
     this.receives = [];
     this.contNum = 0;
 };
@@ -84,7 +82,7 @@ __.prototype.declare = function (name) {
         throw new Error(name + " is a constant in this scope");
     }
 
-    this.vars['@' + name] = '$' + name;
+    this.symbols['@' + name] = {type: 'var', name: name};
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,7 +98,7 @@ __.prototype.define = function (name, value) {
         throw new Error(name + " is a constant or variable in this scope");
     }
 
-    this.constants['@' + name] = value;
+    this.symbols['@' + name] = {type: 'const', value: value};
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,7 +109,7 @@ __.prototype.define = function (name, value) {
  */
 __.prototype.setFuture = function (name) {
 
-    this.futures['@' + name] = name;
+    this.symbols['@' + name] = {type: 'future', name: name};
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +120,8 @@ __.prototype.setFuture = function (name) {
  */
 __.prototype.isFuture = function (name) {
 
-    if (this.futures['@' + name] !== undefined) {
+    if (this.symbols['@' + name] !== undefined
+        && this.symbols['@' + name].type == 'future') {
         return true;
     }
 };
@@ -133,11 +132,7 @@ __.prototype.isFuture = function (name) {
  */
 __.prototype.has = function (name) {
 
-    if (this.vars['@' + name] !== undefined) {
-        return true;
-    }
-
-    if (this.constants['@' + name] !== undefined) {
+    if (this.symbols['@' + name] !== undefined) {
         return true;
     }
 
@@ -154,9 +149,17 @@ __.prototype.getJsVars = function (name) {
 
     var _this = this;
 
-    return Object.keys(this.vars).map(function (key) {
-        return _this.vars[key];
-    });
+    return Object.keys(this.symbols).reduce(function (accum, key) {
+
+        var symbol = _this.symbols[key];
+
+        if (symbol.type == 'var' || symbol.type == 'future') {
+            accum.push('$' + symbol.name);
+        }
+
+        return accum;
+
+    }, []);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,7 +171,8 @@ __.prototype.getJsVars = function (name) {
  */
 __.prototype.isConstant = function (name) {
 
-    if (this.constants['@' + name] !== undefined) {
+    if (this.symbols['@' + name] !== undefined
+        && this.symbols['@' + name].type == 'const') {
         return true;
     }
 
@@ -188,8 +192,9 @@ __.prototype.isConstant = function (name) {
  */
 __.prototype.resolve = function (name) {
 
-    if (this.constants['@' + name] !== undefined) {
-        return this.constants['@' + name];
+    if (this.symbols['@' + name] !== undefined
+        && this.symbols['@' + name].type == 'const') {
+        return this.symbols['@' + name].value;
     }
 
     if (this.parent) {
@@ -197,27 +202,6 @@ __.prototype.resolve = function (name) {
     }
 
     throw new Error(name + " is not a defined constant");
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Returns the status of the named variable.
- *
- * @param name
- * @return {*}
- */
-__.prototype.getStatus = function (name) {
-
-    if (this.vars['@' + name] === undefined) {
-
-        if (this.parent) {
-            return this.parent.getStatus(name);
-        }
-
-        throw new Error("symbol (" + name + ") is not defined in this scope");
-    }
-
-    return this.vars['@' + name];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

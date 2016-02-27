@@ -199,7 +199,7 @@ __['assign'] = function (node) {
 
     return JsConstruct.makeStatement([left, ' ' + node.op + ' ', right, ';\n']);
     // this was genius
-    // above comment inserted by my slightly tipsy wife regarding code later removed - SP
+    // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP
  };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

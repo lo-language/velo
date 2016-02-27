@@ -73,6 +73,20 @@ module.exports["basics"] = {
         test.done();
     },
 
+    'set future': function (test) {
+
+        var scope = new Scope();
+
+        test.equal(scope.has('John_Zoidberg'), false);
+        test.deepEqual(scope.getJsVars(), []);
+
+        scope.setFuture('John_Zoidberg');
+        test.equal(scope.has('John_Zoidberg'), true);
+        test.deepEqual(scope.getJsVars(), ['$John_Zoidberg']);
+
+        test.done();
+    },
+
     "declare dependency": function (test) {
 
         var scope = new Scope();
