@@ -85,8 +85,8 @@ __['procedure'] = function (node) {
     // after compilation we can get our declared vars
     var localVars = localScope.getJsVars();
 
-    var receives = localScope.receives.map(function (name) {
-        return '$' + name + ' = ' + 'task.args.shift()' + ';\n';
+    var receives = localScope.receives.map(function (name, index) {
+        return '$' + name + ' = ' + 'task.args[' + index + '];\n';
     }).join('') + '\n';
 
     // todo only include recur where it's referenced (or just remove this feature)
@@ -329,8 +329,8 @@ __['handler'] = function (node) {
     // after compilation we can get our declared vars
     var localVars = localScope.getJsVars();
 
-    var receives = localScope.receives.map(function (name) {
-            return '$' + name + ' = ' + 'args.shift()' + ';\n'; // differs from procedure (which is task.args.shift)
+    var receives = localScope.receives.map(function (name, index) {
+            return '$' + name + ' = ' + 'args[' + index + '];\n'; // differs from procedure (which is task.args.shift)
         }).join('') + '\n';
 
     // todo only include recur where it's referenced (or just remove this feature)
