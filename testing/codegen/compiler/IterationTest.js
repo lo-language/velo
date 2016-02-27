@@ -5,7 +5,6 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
 var JsConstruct = require('../../../codegen/JsConstruct');
 var Scope = require('../../../codegen/Scope');
 var util = require('util');
@@ -94,7 +93,7 @@ module.exports["basics"] = {
                         tail: null
                         }
                     },
-                    otherwise: {
+                    alternate: {
                         type: 'stmt_list',
                         head: {
                             type: 'application_stmt',

@@ -32,6 +32,11 @@ exaVisitor.prototype.visitConstant = function(ctx) {
 };
 
 
+// Visit a parse tree produced by exaParser#adopt.
+exaVisitor.prototype.visitAdopt = function(ctx) {
+};
+
+
 // Visit a parse tree produced by exaParser#dimension.
 exaVisitor.prototype.visitDimension = function(ctx) {
 };
@@ -102,13 +107,13 @@ exaVisitor.prototype.visitBlock = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#inverse.
-exaVisitor.prototype.visitInverse = function(ctx) {
+// Visit a parse tree produced by exaParser#excision.
+exaVisitor.prototype.visitExcision = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#excision.
-exaVisitor.prototype.visitExcision = function(ctx) {
+// Visit a parse tree produced by exaParser#negation.
+exaVisitor.prototype.visitNegation = function(ctx) {
 };
 
 
@@ -179,6 +184,11 @@ exaVisitor.prototype.visitMeasure = function(ctx) {
 
 // Visit a parse tree produced by exaParser#slice.
 exaVisitor.prototype.visitSlice = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#bytes.
+exaVisitor.prototype.visitBytes = function(ctx) {
 };
 
 

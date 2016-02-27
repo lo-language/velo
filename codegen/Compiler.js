@@ -222,8 +222,8 @@ __['conditional'] = function (node) {
 
     var async = consequent.async;
 
-    if (node.otherwise) {
-        negBlock = this.compile(node.otherwise);
+    if (node.alternate) {
+        negBlock = this.compile(node.alternate);
         async = async || negBlock.async;
     }
 

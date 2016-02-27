@@ -37,7 +37,7 @@ module.exports["sync"] = {
             type: 'conditional',
             predicate: {type: 'id', name: 'foo'},
             consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null},
-            otherwise: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '32'}}, tail: null}
+            alternate: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '32'}}, tail: null}
         };
 
         test.equal(new Scope().compile(node).render(),
@@ -54,11 +54,11 @@ module.exports["sync"] = {
             type: 'conditional',
             predicate: {type: 'id', name: 'foo'},
             consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null},
-            otherwise: {type: 'stmt_list', head: {
+            alternate: {type: 'stmt_list', head: {
                 type: 'conditional',
                 predicate: {type: 'id', name: 'bar'},
                 consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '32'}}, tail: null},
-                otherwise: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'baz'}, right: {type: 'number', val: '82'}}, tail: null},
+                alternate: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'baz'}, right: {type: 'number', val: '82'}}, tail: null},
             }, tail: null}
         };
 

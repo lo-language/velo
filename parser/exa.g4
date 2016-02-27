@@ -54,6 +54,7 @@ statement_list
 statement
     : 'receive' ID (',' ID)* ';'                            # receive
     | ID 'is' literal ';'                                   # constant
+    | 'adopt' ID ';'                                        # adopt
     | 'distinguish' ID (','? ID)+ ';'                       # dimension
     | channel=('reply'|'fail'|'substitute') exprList ';'    # response
     | expr assignment_op expr ';'                           # assignment
@@ -95,8 +96,9 @@ expr
     : expr '(' exprList? ')' failHandler?                       # call
     | '*' expr '(' exprList? ')' replyHandler? failHandler?     # dispatch
     | '#' expr                                                  # measure
-    | 'not' expr                                                # inverse
+    | 'not' expr                                                # negation
     | 'cut' expr                                                # cut
+    | 'bytes' expr                                              # bytes
     | expr op=('*'|'/'|'%') expr                                # mulDiv
     | expr op=('+'|'-') expr                                    # addSub
     | expr op=('<'|'>'|'<='|'>='|'=='|'!=') expr                # compare

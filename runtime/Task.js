@@ -23,14 +23,7 @@ __.prototype.respond = function (channel, args) {
     this.hasResponded = true;
     this.response = {channel: channel, args: args};
 
-    if (channel == 'reply') {
-
-        // yes, we intentionally call onReply with this task as 'this'
-        this.onReply(args);
-    }
-    else {
-        this.onFail(args);
-    }
+    (channel == 'reply' ? this.onReply : this.onFail)(args);
 };
 
 __.prototype.await = function (cont) {
@@ -60,7 +53,7 @@ __.prototype.sendMessage = function (service, args, replyHandler, failHandler) {
             _this.active = true;
             _this.pendingRequests--;
             replyHandler && replyHandler(reply);
-            this.listener && this.listener(reply);
+            task.listener && task.listener(reply);
             _this.active = savedState;
             _this.checkFinished();
         }, function (reason) {

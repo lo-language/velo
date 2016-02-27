@@ -105,7 +105,7 @@ __.prototype.visitIfElse = function(ctx) {
         type: 'conditional',
         predicate: ctx.expr().accept(this),
         consequent: ctx.block(0).accept(this),
-        otherwise: ctx.block(1).accept(this)
+        alternate: ctx.block(1).accept(this)
     };
 };
 
@@ -116,7 +116,7 @@ __.prototype.visitNestedIf = function(ctx) {
         type: 'conditional',
         predicate: ctx.expr().accept(this),
         consequent: ctx.block().accept(this),
-        otherwise: ctx.conditional().accept(this)
+        alternate: ctx.conditional().accept(this)
     };
 };
 

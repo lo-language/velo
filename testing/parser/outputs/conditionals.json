@@ -54,7 +54,7 @@
                 },
                 "tail":null
             },
-            "otherwise":{
+            "alternate":{
                 "type":"stmt_list",
                 "head":{
                     "type":"increment",
@@ -93,7 +93,7 @@
                     },
                     "tail":null
                 },
-                "otherwise":{
+                "alternate":{
                     "type":"conditional",
                     "predicate":{
                         "type":"op",
@@ -143,7 +143,7 @@
                         },
                         "tail":null
                     },
-                    "otherwise":{
+                    "alternate":{
                         "type":"conditional",
                         "predicate":{
                             "type":"op",
@@ -164,7 +164,7 @@
                             },
                             "tail":null
                         },
-                        "otherwise":{
+                        "alternate":{
                             "type":"stmt_list",
                             "head":{
                                 "type":"skip"
