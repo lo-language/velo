@@ -15,7 +15,7 @@ doSomething();
 
 foo[-1] = 17;
 
-monkeys["marmosets"][15].wow({ ready: true, height: 72, answer: 42 })[17](57);
+monkeys["marmosets"][15].wow((ready: true, height: 72, answer: 42))[17](57);
 
 block = connect("Block")();
 

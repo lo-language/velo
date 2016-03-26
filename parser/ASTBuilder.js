@@ -26,23 +26,29 @@ __.prototype.parse = function (input) {
     var parser = new Parser.exaParser(tokens);
     parser.buildParseTrees = true;
 
-    var tree = parser.module();
+    var tree = parser.program();
     return this.visit(tree);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Visit a parse tree produced by exaParser#module.
+__.prototype.visitProgram = function(ctx) {
+
+    return {type: 'module', service: {type: 'procedure', body: ctx.statementList().accept(this)}};
+};
+
+// Visit a parse tree produced by exaParser#module.
 __.prototype.visitModule = function(ctx) {
 
-    return {type: 'module', service: {type: 'procedure', body: ctx.statement_list().accept(this)}};
+    return {type: 'module', service: {type: 'procedure', body: ctx.statementList().accept(this)}};
 };
 
 
-// Visit a parse tree produced by exaParser#statement_list.
-__.prototype.visitStatement_list = function(ctx) {
+// Visit a parse tree produced by exaParser#statementList.
+__.prototype.visitStatementList = function(ctx) {
 
-    var subList = ctx.statement_list();
+    var subList = ctx.statementList();
 
     return {type: 'stmt_list', head: ctx.statement().accept(this), tail: subList ? subList.accept(this) : null};
 };
@@ -51,6 +57,20 @@ __.prototype.visitStatement_list = function(ctx) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // statements
 
+
+// Visit a parse tree produced by exaParser#receive.
+__.prototype.visitDefStmt = function(ctx) {
+
+    return ctx.definition().accept(this);
+};
+
+__.prototype.visitAdopt = function(ctx) {
+
+    return {
+        type: 'adopt',
+        name: ctx.STRING().getText()
+    };
+};
 
 // Visit a parse tree produced by exaParser#receive.
 __.prototype.visitReceive = function(ctx) {
@@ -244,11 +264,42 @@ __.prototype.visitExprList = function(ctx) {
 
 __.prototype.visitPairList = function(ctx) {
 
-    var _this = this;
+    var pairs = [];
 
-    return ctx.pair().map(function (item) {
-        return item.accept(_this);
-    });
+    var offset = 0;
+
+    while (ctx.expr(offset)) {
+
+        pairs.push({
+            type: 'dyad',
+            key: ctx.expr(offset).accept(this),
+            value: ctx.expr(offset + 1).accept(this)
+        });
+
+        offset += 2;
+    }
+
+    return pairs;
+};
+
+
+__.prototype.visitFieldList = function(ctx) {
+
+    var fields = [];
+
+    var offset = 0;
+
+    while (ctx.ID(offset)) {
+
+        fields.push({
+            label: ctx.ID(offset).getText(),
+            value: ctx.expr(offset).accept(this)
+        });
+
+        offset++;
+    }
+
+    return fields;
 };
 
 
@@ -262,8 +313,22 @@ __.prototype.visitPair = function(ctx) {
 };
 
 
+__.prototype.visitExternalId = function(ctx) {
+
+    return {
+        type: "id",
+        scope: ctx.ID(0).getText(),
+        name: ctx.ID(1).getText()
+    };
+};
+
+
 __.prototype.visitId = function(ctx) {
-    return {type: "id", name: ctx.ID().getText()};
+
+    return {
+        type: "id",
+        name: ctx.ID().getText()
+    };
 };
 
 
@@ -364,7 +429,7 @@ __.prototype.visitFailHandler = function(ctx) {
 
 __.prototype.visitBlock = function(ctx) {
 
-    var stmtList = ctx.statement_list();
+    var stmtList = ctx.statementList();
 
     if (stmtList) {
         return stmtList.accept(this);
@@ -422,16 +487,27 @@ __.prototype.visitModref = function(ctx) {
 };
 
 
-__.prototype.visitRecord = function(ctx) {
+__.prototype.visitPacket = function(ctx) {
 
-    var _this = this;
+    if (ctx.exprList()) {
 
-    return {
-        type: 'record',
-        fields: ctx.field().map(function (item) {
-            return item.accept(_this);
-        })
-    };
+        return {
+            type: 'record',
+            labels: false,
+            fields: ctx.exprList().accept(this)
+        };
+    }
+
+    if (ctx.fieldList()) {
+
+        return {
+            type: 'record',
+            labels: true,
+            fields: ctx.fieldList().accept(this)
+        };
+    }
+
+    return {type: 'record', fields: []};
 };
 
 
@@ -463,12 +539,25 @@ __.prototype.visitMeasure = function(ctx) {
 };
 
 
-__.prototype.visitCollection = function(ctx) {
+__.prototype.visitArray = function(ctx) {
 
     if (ctx.exprList()) {
 
         return {
             type: 'array',
+            elements: ctx.exprList().accept(this)
+        };
+    }
+
+    return {type: 'array', elements: []};
+};
+
+__.prototype.visitSet = function (ctx) {
+
+    if (ctx.exprList()) {
+
+        return {
+            type: 'set',
             elements: ctx.exprList().accept(this)
         };
     }
@@ -485,7 +574,7 @@ __.prototype.visitCollection = function(ctx) {
         return {type: 'map', elements: []};
     }
 
-    return {type: 'array', elements: []};
+    return {type: 'set', elements: []};
 };
 
 
@@ -501,14 +590,14 @@ __.prototype.visitSplice = function(ctx) {
 __.prototype.visitSubscript = function(ctx) {
 
     return {
-        type: 'subscript',
+        type: ctx.cut ? 'extraction' : 'subscript',
         list: ctx.expr(0).accept(this),
         index: ctx.expr(1).accept(this)
     };
 };
 
 
-__.prototype.visitSelect = function(ctx) {
+__.prototype.visitField = function(ctx) {
 
     return { type: 'select', set: ctx.expr().accept(this), member: ctx.ID().getText()};
 };
@@ -524,13 +613,13 @@ __.prototype.visitMembership = function(ctx) {
 };
 
 
-__.prototype.visitSlice = function(ctx) {
+__.prototype.visitRange = function(ctx) {
 
     var start = ctx.expr(1);
     var end = ctx.expr(2);
 
     var res = {
-        type: 'slice',
+        type: ctx.cut ? 'extraction' : 'slice',
         list: ctx.expr(0).accept(this)
     };
 

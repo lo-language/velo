@@ -197,26 +197,24 @@
                                     "args": [
                                       {
                                         "type": "record",
+                                        "labels": true,
                                         "fields": [
                                           {
-                                            "type": "field",
-                                            "name": "ready",
+                                            "label": "ready",
                                             "value": {
                                               "type": "boolean",
                                               "val": true
                                             }
                                           },
                                           {
-                                            "type": "field",
-                                            "name": "height",
+                                            "label": "height",
                                             "value": {
                                               "type": "number",
                                               "val": "72"
                                             }
                                           },
                                           {
-                                            "type": "field",
-                                            "name": "answer",
+                                            "label": "answer",
                                             "value": {
                                               "type": "number",
                                               "val": "42"

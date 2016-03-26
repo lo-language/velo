@@ -12,14 +12,18 @@
           "name": "x"
         },
         "right": {
-          "type": "extraction",
+          "type": "slice",
           "list": {
             "type": "id",
             "name": "foo"
           },
-          "index": {
+          "start": {
             "type": "number",
-            "val": "37"
+            "val": "1"
+          },
+          "end": {
+            "type": "number",
+            "val": "4"
           }
         }
       },
@@ -33,18 +37,18 @@
             "name": "y"
           },
           "right": {
-            "type": "extraction",
+            "type": "slice",
             "list": {
               "type": "id",
               "name": "bar"
             },
             "start": {
               "type": "number",
-              "val": "1"
+              "val": "-4"
             },
             "end": {
               "type": "number",
-              "val": "11"
+              "val": "-1"
             }
           }
         },

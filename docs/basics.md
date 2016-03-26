@@ -1,8 +1,8 @@
 # Language Basics
 
-Exa has a concise syntax that should be familiar to most users. Statements are separated by semicolons and indentation is used to delimit blocks.
+Exa has a concise syntax that should be familiar to most users. Statements are separated by semicolons and braces are used to delimit blocks.
 
-### Numbers
+## Primitive Types
 
 Exa supports signed integers and IEEE-794 floating point numbers and provides the literal values `true` and `false` for booleans.
 
@@ -13,44 +13,47 @@ myHexInt = 0x2A;
 ```
 *Note: assignments in Exa are statements, not expressions.*
 
-### Number Operators
-
 Exa provides the usual operators for:
 
 - Algebraic expressions: `+` `-` `*` `/` `%`
 - Logical expressions: `and` `or`
 - Comparison: `==` `>` `<` `>=` `<=`
-- Increment: `++` and decrement: `--`
+- Successor (increment): `++` and predecessor (decrement): `--`
 
 *Note: since the increment and decrement operators are just syntactic sugar for assignments of the form `x = x +/- 1` and assignments are statements, not expressions, these operators cannot be used in expressions.*
 
 Exa also provides a few operators for working with collections; these will be explained below.
 
-### Strings
+A **character** value holds a Unicode code point. Character literals can be specified with single quotes. Characters may consume more than one byte.
 
-Strings are arrays of Unicode characters with literals defined using double quotes.
+```
+letterA = 'A';
+aleph = 'א';
+```
+
+A **string** is a sequence of characters with literals defined using double quotes.
 
 ```
 name = "Pirate Prentice";
 
 ```
-Expressions can be interpolated into string literals using backticks.
+Expressions can be interpolated into string literals using backticks...
 
 ```
 message = "You circle has area `PI * r * r`";
 ```
 
-And converted to strings with bare backticks.**
+and converted to strings with bare backticks.**
 
 ```
 write(`height`);
 ```
 
-### Collections
+## Collections
 
-Collections in Exa are not objects; they're local values that can be directly modified by the current procedure. For this reason, if you pass a collection to a different context in an async message, it may need to be copied.
+Collections in Exa are not objects; they're strictly local values that can be directly accessed and modified by the current procedure. For this reason, if you pass a collection to a different context in an async message, it may need to be copied.
 
-**Arrays** provide random-access, ordered collections of any number of homogeneous elements, retrievable in constant time by zero-based integer index. Arrays dynamically expand and contract as necessary in constant time and support literals delimited by square brackets. 
+An **array** is an ordered list of any number of same-type elements that can be addressed in constant time by zero-based integer subscript. Arrays dynamically expand and contract as necessary in constant time and support literals delimited by square brackets. 
 
 ```
 fibs = [0, 1, 1, 2, 3, 5, 8];
@@ -64,72 +67,80 @@ fibs[-2];		// syntactic sugar for 2nd-to-last element **
 fibs[1:4];      // [1, 1, 2]
 fibs[:3];		// [0, 1, 1]
 fibs[5:];		// [5, 8]
-copy = fibs[:];         // create a shallow copy
+copy = fibs[:]; // create a shallow copy
 
 mountains = [];                // create an empty array
-"Denali" -> mountains;         // pushes a value onto the back
-"Everest" -> mountains[0];     // pushes a value onto the front **
-"Kanchenjunga" -> mountains[1] // pushes a value between elements 0 and 1 **
+"Denali" -> mountains;         // insert a value at the back
+"Everest" -> mountains[0];     // insert a value at the front **
+"Kanchenjunga" -> mountains[1] // insert a value between elements 0 and 1 **
 
-x = fibs{0};	// extract the first element
-y = fibs{-1};	// extract the last element
-z = fibs{1:4};	// extract from index 1 up to but not including index 4
+x = cut fibs[0];	// extract the first element
+y = cut fibs[-1];	// extract the last element
+z = cut fibs[1:4];	// extract from index 1 up to but not including index 4
 ```
 
 The splice operator `->` splices elements and lists together as if they were pieces of paper. Elements and arrays can be spliced into arrays at the front, back, or in the middle.
 
-The extraction operator `{}` removes the specified element from a collection and evaluates to the value of the removed element. If an array, the length is decreased – extraction doesn't leave a "hole" in an array.
+The `cut` operator removes the specified element or range from a collection and evaluates to the value of the removed element. If an array, the length is decreased -- extraction doesn't leave a "hole" in an array.
 
 The slice operator `:` retrieves a portion of an array from the first index up to but not including the second index.  The indices can be omitted as a shorthand for the beginning and end of the array.  When used within square brackets, the array is not modified, but when used within the extraction operator `{}`, the specified slice is removed.
 
-
-**Maps** are unordered collections of any number of homogeneous elements which are retrievable by unique scalar index (string or number). Map literals are also delimited by square brackets.
+A **set** is an unordered collection of same-type values. Set literals are delimited by braces.
 
 ```
-greats = [
+crew = {"Leela", "Fry", "Bender"};
+```
+
+A **map** is a set of *keys*, each with an associated value. A map thus defines a mapping from the set of keys onto the set of values. Map literals are also delimited by braces, being an extension of the set concept.
+
+```
+greats = {
 	"Benny Goodman":		"Clarinet"
 	"Fats Waller":			"Piano"
 	"Fletcher Henderson":	"Clarinet"
 	"Jelly Roll Morton":	"Piano"
 	"Louis Armstrong":		"Trumpet"
-];
-empty = [:];
+};
+empty = {:};
 
 bennyInstrument = greats["Benny Goodman"]; // Clarinet
 ```
 
-You can create an empty map with the syntax `[:]`.
+You can create an empty map with the syntax `{:}`.
 
-### Collection Operators
+#### Collection Operators
 
-You can get the length of any collection in constant time with the cardinality operator `#`.
+You can get the cardinality (length) of any collection in constant time with the cardinality operator `#`.
 
 ```
 numFibs = #fibs; // 7
 numPlayers = #greats; // 5
 ```
 
-### Records
+You can visit every element in a collection with the `scan` operator.
 
-Records provide a way to create structures of heterogeneous data elements. Fields are accessed using dot notation. Literals are delimited by braces. Records can be nested.
+You can search a collection with the search operator `?`.
+
+
+
+## Packets
+
+A **packet** is a combination of one or more optionally-labeled values which can be addressed using either dot notation or subscript notation. Packets can contain collections or other packets. (A packet is not a collection since it is semantically one thing, not many things.) Packet literals are delimited by parentheses. 
 
 ```
-student = {
-
-	name: {
-		first: "Alyssa",
-		last: "Hacker"
-	},
-	
+student = (
+	name: (first: "Alyssa", middle: "P", last: "Hacker")
 	course: 6
-};
+	year: 2001
+);
 
 fullName = "`student.name.first` `student.name.last`";
+course = student[1];
 ```
 
 ### Conditionals and Iteration
 
-Exa provides the usual `if`/`else if`/`else` construct.
+Exa provides the usual `if`/`else if`/`else` construct. Predicates need not be enclosed in parentheses.
 
 ```
 if x == 42 {

@@ -11,3 +11,5 @@ foo = boo.bar.baz;
 _qux = foo[i].bar;
 quux = foo.bar[i];
 moi = __;
+method = HTTP::GET;
+server = HTTP::createServer();

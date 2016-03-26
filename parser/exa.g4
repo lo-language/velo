@@ -38,24 +38,24 @@ INTER_BEGIN : '"' (ESC|~[`"])* '`' {this.text = this.text.slice(1, -1);} ;
 INTER_MID   : '`' (ESC|~[`"])* '`' {this.text = this.text.slice(1, -1);} ;
 INTER_END   : '`' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1);} ;
 
-MODREF  : '<' ~[ \t\r\n]+ '>' {this.text = this.text.slice(1, -1);} ;
+// only support modules??
+program
+    : statementList
+    ;
 
-// ??? allow modules to be records? or just literals in general?
 module
-    : statement_list
+    : definition+
     ;
 
 // we do this the old-fashioned way because that's what the compiler wants
-statement_list
+statementList
     : statement
-    | statement statement_list
+    | statement statementList
     ;
 
 statement
-    : 'receive' ID (',' ID)* ';'                            # receive
-    | ID 'is' literal ';'                                   # constant
-    | 'adopt' ID ';'                                        # adopt
-    | 'distinguish' ID (','? ID)+ ';'                       # dimension
+    : definition                                            # defStmt
+    | 'receive' ID (',' ID)* ';'                            # receive
     | channel=('reply'|'fail'|'substitute') exprList ';'    # response
     | expr assignment_op expr ';'                           # assignment
     | expr op=('++'|'--') ';'                               # incDec
@@ -63,6 +63,12 @@ statement
     | conditional                                           # condStmt
     | 'while' expr block                                    # iteration
     | expr ';'                                              # exprStmt
+    ;
+
+definition
+    : ID 'is' literal ';'                                   # constant
+    | 'link' STRING ('as' ID)? ';'                          # link
+    | 'adopt' STRING ';'                                    # adopt
     ;
 
 // assignments are statements, not expressions!
@@ -88,7 +94,7 @@ conditional
 
 // we could alternately go the C way and make a block a kind of statement
 block
-    : BEGIN statement_list? END
+    : BEGIN statementList? END
     ;
 
 expr
@@ -96,7 +102,6 @@ expr
     | '*' expr '(' exprList? ')' replyHandler? failHandler?     # dispatch
     | '#' expr                                                  # measure
     | 'not' expr                                                # negation
-    | 'cut' expr                                                # cut
     | 'bytes' expr                                              # bytes
     | expr op=('*'|'/'|'%') expr                                # mulDiv
     | expr op=('+'|'-') expr                                    # addSub
@@ -104,14 +109,13 @@ expr
     | expr op=('and'|'or') expr                                 # logical
     | expr 'in' expr                                            # membership // not sure where this guy should go, precedence-wise
     | '(' expr ')'                                              # wrap
-    | expr '[' expr ']'                                         # subscript
-    | expr '[' expr? ':' expr? ']'                              # slice
-    | expr '{' expr '}'                                         # extraction
-    | expr '{' expr? ':' expr? '}'                              # excision
-    | expr '.' ID                                               # select
+    | expr '[' cut='cut'? expr ']'                              # subscript
+    | expr '[' cut='cut'? expr ':' expr ']'                     # range
+    | expr '.' ID                                               # field
     | '(' ID (',' ID)+ ')'                                      # destructure
     | INTER_BEGIN interpolated INTER_END                        # dynastring
     | literal                                                   # litExpr
+    | ID '::' ID                                                # externalId
     | ID                                                        # id
     ;
 
@@ -129,7 +133,7 @@ interpolated
     ;
 
 exprList
-    : expr (',' expr)*
+    : expr (',' expr)* ','?
     ;
 
 // literals
@@ -139,20 +143,17 @@ literal
     | BOOL                                      # bool
     | NUMBER                                    # number
     | STRING                                    # string
-    | MODREF                                    # modref
     | 'service' block                           # service
-    | '[' (colon=':'|exprList|pairList)? ']'    # collection
-    | '{' field (',' field)* '}'                # record
+    | '[' exprList? ']'                         # array // sequence?
+    | '{' (colon=':'|exprList|pairList)? '}'    # set
+    | '(' (exprList|fieldList)? ')'             # packet // tuple? record?
     ;
 
-field
-    : ID ':' expr
+fieldList
+    : (ID ':' expr ','?)+
     ;
 
+// todo test dangling commas -- maybe just make commas optional?
 pairList
-    : pair (',' pair)*
-    ;
-
-pair
-    : expr ':' expr
+    : (expr ':' expr ','?)+
     ;

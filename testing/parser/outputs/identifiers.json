@@ -1,162 +1,203 @@
-{"type":"module", "service":
-{"type":"procedure", "body":{
-    "type":"stmt_list",
-    "head":{
-        "type":"assign",
-        "op":"=",
-        "left":{
-            "type":"id",
-            "name":"foo"
+{
+  "type": "module",
+  "service": {
+    "type": "procedure",
+    "body": {
+      "type": "stmt_list",
+      "head": {
+        "type": "assign",
+        "op": "=",
+        "left": {
+          "type": "id",
+          "name": "foo"
         },
-        "right":{
-            "type":"number",
-            "val":"4"
+        "right": {
+          "type": "number",
+          "val": "4"
         }
-    },
-    "tail":{
-        "type":"stmt_list",
-        "head":{
-            "type":"assign",
-            "op":"=",
-            "left":{
-                "type":"id",
-                "name":"bar"
+      },
+      "tail": {
+        "type": "stmt_list",
+        "head": {
+          "type": "assign",
+          "op": "=",
+          "left": {
+            "type": "id",
+            "name": "bar"
+          },
+          "right": {
+            "type": "subscript",
+            "list": {
+              "type": "id",
+              "name": "foo"
             },
-            "right":{
-                "type":"subscript",
-                "list":{
-                    "type":"id",
-                    "name":"foo"
-                },
-                "index":{
-                    "type":"id",
-                    "name":"i"
-                }
+            "index": {
+              "type": "id",
+              "name": "i"
             }
+          }
         },
-        "tail":{
-            "type":"stmt_list",
-            "head":{
-                "type":"assign",
-                "op":"=",
-                "left":{
-                    "type":"subscript",
-                    "list":{
-                        "type":"subscript",
-                        "list":{
-                            "type":"id",
-                            "name":"foo"
-                        },
-                        "index":{
-                            "type":"id",
-                            "name":"i"
-                        }
-                    },
-                    "index":{
-                        "type":"id",
-                        "name":"j"
-                    }
+        "tail": {
+          "type": "stmt_list",
+          "head": {
+            "type": "assign",
+            "op": "=",
+            "left": {
+              "type": "subscript",
+              "list": {
+                "type": "subscript",
+                "list": {
+                  "type": "id",
+                  "name": "foo"
                 },
-                "right":{
-                    "type":"select",
-                    "set":{
-                        "type":"id",
-                        "name":"foo"
-                    },
-                    "member":"bar"
+                "index": {
+                  "type": "id",
+                  "name": "i"
                 }
+              },
+              "index": {
+                "type": "id",
+                "name": "j"
+              }
             },
-            "tail":{
-                "type":"stmt_list",
-                "head":{
-                    "type":"assign",
-                    "op":"=",
-                    "left":{
-                        "type":"id",
-                        "name":"foo"
-                    },
-                    "right":{
-                        "type":"select",
-                        "set":{
-                            "type":"select",
-                            "set":{
-                                "type":"id",
-                                "name":"boo"
-                            },
-                            "member":"bar"
-                        },
-                        "member":"baz"
-                    }
-                },
-                "tail":{
-                    "type":"stmt_list",
-                    "head":{
-                        "type":"assign",
-                        "op":"=",
-                        "left":{
-                            "type":"id",
-                            "name":"_qux"
-                        },
-                        "right":{
-                            "type":"select",
-                            "set":{
-                                "type":"subscript",
-                                "list":{
-                                    "type":"id",
-                                    "name":"foo"
-                                },
-                                "index":{
-                                    "type":"id",
-                                    "name":"i"
-                                }
-                            },
-                            "member":"bar"
-                        }
-                    },
-                    "tail":{
-                        "type":"stmt_list",
-                        "head":{
-                            "type":"assign",
-                            "op":"=",
-                            "left":{
-                                "type":"id",
-                                "name":"quux"
-                            },
-                            "right":{
-                                "type":"subscript",
-                                "list":{
-                                    "type":"select",
-                                    "set":{
-                                        "type":"id",
-                                        "name":"foo"
-                                    },
-                                    "member":"bar"
-                                },
-                                "index":{
-                                    "type":"id",
-                                    "name":"i"
-                                }
-                            }
-                        },
-                        "tail":{
-                            "type":"stmt_list",
-                            "head":{
-                                "type":"assign",
-                                "op":"=",
-                                "left":{
-                                    "type":"id",
-                                    "name":"moi"
-                                },
-                                "right":{
-                                    "type":"id",
-                                    "name":"__"
-                                }
-                            },
-                            "tail":null
-                        }
-                    }
-                }
+            "right": {
+              "type": "select",
+              "set": {
+                "type": "id",
+                "name": "foo"
+              },
+              "member": "bar"
             }
+          },
+          "tail": {
+            "type": "stmt_list",
+            "head": {
+              "type": "assign",
+              "op": "=",
+              "left": {
+                "type": "id",
+                "name": "foo"
+              },
+              "right": {
+                "type": "select",
+                "set": {
+                  "type": "select",
+                  "set": {
+                    "type": "id",
+                    "name": "boo"
+                  },
+                  "member": "bar"
+                },
+                "member": "baz"
+              }
+            },
+            "tail": {
+              "type": "stmt_list",
+              "head": {
+                "type": "assign",
+                "op": "=",
+                "left": {
+                  "type": "id",
+                  "name": "_qux"
+                },
+                "right": {
+                  "type": "select",
+                  "set": {
+                    "type": "subscript",
+                    "list": {
+                      "type": "id",
+                      "name": "foo"
+                    },
+                    "index": {
+                      "type": "id",
+                      "name": "i"
+                    }
+                  },
+                  "member": "bar"
+                }
+              },
+              "tail": {
+                "type": "stmt_list",
+                "head": {
+                  "type": "assign",
+                  "op": "=",
+                  "left": {
+                    "type": "id",
+                    "name": "quux"
+                  },
+                  "right": {
+                    "type": "subscript",
+                    "list": {
+                      "type": "select",
+                      "set": {
+                        "type": "id",
+                        "name": "foo"
+                      },
+                      "member": "bar"
+                    },
+                    "index": {
+                      "type": "id",
+                      "name": "i"
+                    }
+                  }
+                },
+                "tail": {
+                  "type": "stmt_list",
+                  "head": {
+                    "type": "assign",
+                    "op": "=",
+                    "left": {
+                      "type": "id",
+                      "name": "moi"
+                    },
+                    "right": {
+                      "type": "id",
+                      "name": "__"
+                    }
+                  },
+                  "tail": {
+                    "type": "stmt_list",
+                    "head": {
+                      "type": "assign",
+                      "op": "=",
+                      "left": {
+                        "type": "id",
+                        "name": "method"
+                      },
+                      "right": {
+                        "type": "id",
+                        "scope": "HTTP",
+                        "name": "GET"
+                      }
+                    },
+                    "tail": {
+                      "type": "stmt_list",
+                      "head": {
+                        "type": "assign",
+                        "op": "=",
+                        "left": {
+                          "type": "id",
+                          "name": "server"
+                        },
+                        "right": {
+                          "type": "application",
+                          "address": {
+                            "type": "id",
+                            "scope": "HTTP",
+                            "name": "createServer"
+                          },
+                          "args": []
+                        }
+                      },
+                      "tail": null
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
+      }
     }
-}}}
+  }
+}

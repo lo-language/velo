@@ -1,13 +1,3 @@
 port is 443;
 
 url is "http://www.exalang.org";
-
-distinguish black, white;
-
-distinguish
-king
-queen
-rook
-bishop
-knight
-pawn;
