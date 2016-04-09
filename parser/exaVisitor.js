@@ -22,6 +22,11 @@ exaVisitor.prototype.visitModule = function(ctx) {
 };
 
 
+// Visit a parse tree produced by exaParser#link.
+exaVisitor.prototype.visitLink = function(ctx) {
+};
+
+
 // Visit a parse tree produced by exaParser#statementList.
 exaVisitor.prototype.visitStatementList = function(ctx) {
 };
@@ -74,16 +79,6 @@ exaVisitor.prototype.visitExprStmt = function(ctx) {
 
 // Visit a parse tree produced by exaParser#constant.
 exaVisitor.prototype.visitConstant = function(ctx) {
-};
-
-
-// Visit a parse tree produced by exaParser#link.
-exaVisitor.prototype.visitLink = function(ctx) {
-};
-
-
-// Visit a parse tree produced by exaParser#adopt.
-exaVisitor.prototype.visitAdopt = function(ctx) {
 };
 
 
@@ -262,8 +257,8 @@ exaVisitor.prototype.visitSet = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#packet.
-exaVisitor.prototype.visitPacket = function(ctx) {
+// Visit a parse tree produced by exaParser#frame.
+exaVisitor.prototype.visitFrame = function(ctx) {
 };
 
 

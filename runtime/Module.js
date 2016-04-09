@@ -15,15 +15,16 @@ var parser = new ASTBuilder();
  * Processes exa source into a factory method that can be called to create an exa service.
  *
  * @param source    exa source code for a module
+ * @param loader    file loader for resolving 'adopt's
  */
-var __ = function (source) {
+var __ = function (source, loader) {
 
     var ast = parser.parse(source);
 
-    var moduleScope = new Scope();
+    this.scope = new Scope(null, loader);
 
     try {
-        var js = moduleScope.compile(ast).render();
+        var js = this.scope.compile(ast).render();
     }
     catch (err) {
 
@@ -37,7 +38,7 @@ var __ = function (source) {
     this.makeService = new Function('MODS', js);
 
     // actually loading the dependencies is the concern of a loader
-    this.deps = moduleScope.getDeps();
+    this.deps = this.scope.getDeps();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

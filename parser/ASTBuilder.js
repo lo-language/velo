@@ -487,7 +487,7 @@ __.prototype.visitModref = function(ctx) {
 };
 
 
-__.prototype.visitPacket = function(ctx) {
+__.prototype.visitFrame = function(ctx) {
 
     if (ctx.exprList()) {
 

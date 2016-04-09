@@ -66,6 +66,7 @@ __.prototype.getModule = function (ref) {
 
     // limited to local files for now
     var path = this.libs + '/' + ref + '.exa';
+    var _this = this;
 
     return Q(path).then(
         function (fullPath) {
@@ -78,7 +79,43 @@ __.prototype.getModule = function (ref) {
         }
     ).then(
         function (source) {
-            return new Module(source);
+            return new Module(source, _this);
+        },
+        function (err) {
+            throw new Error("failed to load module: " + ref + "\n" + err);
+        });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Loads a symbol definition file and compiles it, hanging onto its scope for use in modules.
+ *
+ * @param ref
+ * @return {promise}
+ */
+__.prototype.loadSymbols = function (ref) {
+
+    // limited to local files for now
+    var path = this.libs + '/' + ref + '.exa';
+
+    return Q(path).then(
+        function (fullPath) {
+
+            // read the file
+            return Q.denodeify(fs.readFile)(fullPath, 'utf8');
+        },
+        function () {
+            throw new Error("couldn't find module " + path);
+        }
+    ).then(
+        function (source) {
+
+            // check the cache here
+
+            var mod = new Module(source);
+
+            return mod.scope;
+
         },
         function (err) {
             throw new Error("failed to load module: " + ref + "\n" + err);

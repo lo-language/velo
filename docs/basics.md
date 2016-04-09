@@ -1,17 +1,22 @@
 # Language Basics
 
+Exa was designed semantics-first. Since that's how it was designed and I was poorly served learning the other way around, that's how it will be presented here.
+
+n't designed by bolting together various language features or fiddling with different ideas for syntax; it was designed semantics-first. A conceptual framework that was then embodied in a syntax. The language design is a mapping from semantics to syntax; the implementation is a further mapping to a target language.
+
+In compilation every module is
+
 Exa has a concise syntax that should be familiar to most users. Statements are separated by semicolons and braces are used to delimit blocks.
 
-## Primitive Types
+## Primitive Data Types
 
 Exa supports signed integers and IEEE-794 floating point numbers and provides the literal values `true` and `false` for booleans.
 
 ```
 myInt = 42;
 myFloat = 2.71828;
-myHexInt = 0x2A;
 ```
-*Note: assignments in Exa are statements, not expressions.*
+*Note: assignments in Exa are statements and not expressions.*
 
 Exa provides the usual operators for:
 
@@ -49,7 +54,9 @@ and converted to strings with bare backticks.**
 write(`height`);
 ```
 
-## Collections
+## Data Structures
+
+### Collections
 
 Collections in Exa are not objects; they're strictly local values that can be directly accessed and modified by the current procedure. For this reason, if you pass a collection to a different context in an async message, it may need to be copied.
 
@@ -95,37 +102,47 @@ A **map** is a set of *keys*, each with an associated value. A map thus defines 
 
 ```
 greats = {
-	"Benny Goodman":		"Clarinet"
-	"Fats Waller":			"Piano"
-	"Fletcher Henderson":	"Clarinet"
-	"Jelly Roll Morton":	"Piano"
-	"Louis Armstrong":		"Trumpet"
+	"Benny Goodman"      => "Clarinet"
+	"Fats Waller"        => "Piano"
+	"Fletcher Henderson" => "Clarinet"
+	"Jelly Roll Morton"  => "Piano"
 };
-empty = {:};
 
-bennyInstrument = greats["Benny Goodman"]; // Clarinet
+// access a value
+instrument = greats["Benny Goodman"]; // Clarinet
+
+// add a new key
+greats["Louis Armstrong"] = "Trumpet, Vocals";
+
+// remove a key, returning the value
+greats[cut "Jelly Roll Morton"];
+
+emptyMap = {=>};    // arrow to distinguish from an empty set
+
+// get the set of keys
+artists = keys(greats);
+
+// get the set of values
+values = values(greats);
 ```
-
-You can create an empty map with the syntax `{:}`.
 
 #### Collection Operators
 
-You can get the cardinality (length) of any collection in constant time with the cardinality operator `#`.
+You can get the cardinality (number of elements) of any collection in constant time with the cardinality operator `#`.
 
 ```
-numFibs = #fibs; // 7
-numPlayers = #greats; // 5
+numFibs = #fibs;
 ```
 
-You can visit every element in a collection with the `scan` operator.
+And you can search a collection with the search operator `?`.
 
-You can search a collection with the search operator `?`.
+```
+fibs @ 
+```
 
+### Frames
 
-
-## Packets
-
-A **packet** is a combination of one or more optionally-labeled values which can be addressed using either dot notation or subscript notation. Packets can contain collections or other packets. (A packet is not a collection since it is semantically one thing, not many things.) Packet literals are delimited by parentheses. 
+A **frame** is a composite of one or more optionally-labeled *components* which can be accessed using either dot notation or subscript notation. Frame components can be of any type, including collections or other frames. A frame is not a collection since it is semantically closer to one thing, not many things being considered together. Frame literals are delimited by parentheses. 
 
 ```
 student = (
@@ -134,9 +151,16 @@ student = (
 	year: 2001
 );
 
+// access components by label
 fullName = "`student.name.first` `student.name.last`";
+
+// access component by position
 course = student[1];
 ```
+
+A frame without labels is simply a list.
+
+## Control Structures
 
 ### Conditionals and Iteration
 
@@ -154,7 +178,7 @@ else {
 }
 ```
 
-And the familiar `while` construct for loops.
+The familiar `while` loop provides indefinite iteration.
 
 ```
 while z > 0 {
@@ -163,7 +187,20 @@ while z > 0 {
 }
 ```
 
-### Requests
+To iterate over the elements of a collection, use the scan operator: `>>`.
+
+```
+greats >> service {
+
+    receive key, value;
+    
+    // do stuff
+};
+```
+
+There are no other looping constructs.
+
+## Requests
 
 A [service](procedures.md) is invoked by sending a request to an address. A request can be sent synchronously with the familiar function application syntax:
 
@@ -174,7 +211,7 @@ doSomething(arg1, arg2);
 or asynchronously with the addition of an asterisk:
 
 ```
-*doSomething(arg1, arg2);	// we don't care about any reply
+doSomething<arg1, arg2>;	// we don't care about any reply
 ```
 
 If a request is sent synchronously, the next statement won't be executed until a reply is received. *Note: if there is no reply to a synchronous request, the next statement will never be executed.*
@@ -188,11 +225,11 @@ foo = sqrt(25);	// foo will be assigned 5
 If a request is sent asynchronously, the next statement will be executed immediately, without waiting for a reply. If you'd like to do something after a response is received, a **handler**  can be attached to the request using a `then` clause (to handle a success response) or a `catch` clause (to handle a failure).
 
 ```
-*readFile(fileName) then {
+readFile<fileName> then {
 	log("done reading `fileName`");
 };
 
-log("this will be logged first");
+log<"this will be logged first">;
 ```
 
 *Note: all statements following an asynchronous request are executed before any handler is run except in the case of futures (see below). Replies to async requests are enqueued as they are received.*
@@ -200,10 +237,12 @@ log("this will be logged first");
 Like most protocols, but unlike most languages, Exa has a clear and explicit concept of failure: *every request can succeed or fail.* This is implemented not by [somehow](https://en.wikipedia.org/wiki/Semipredicate_problem) marking or categorizing a reply as success or failure, but by providing a second channel for failure responses: every request includes neither, either, or both of two distinct handlers - a success handler, introduced by the `after` construct, and a failure handler, introduced by the `failure` construct.
 
 ```
-after readFile(fileName):
-	log("done reading `fileName`")
-failure => error:
-	log("error reading `fileName`: `error`");
+readFile<fileName> then {
+	log<"done reading `fileName`">;
+}
+catch => error {
+	log<"error reading `fileName`: `error`">;
+}
 ```
 
 An async request can be thought of as a hybrid language construct that fuses a message dispatch with a specialized conditional; if you've worked with promises this approach will feel familiar to you.
@@ -211,10 +250,12 @@ An async request can be thought of as a hybrid language construct that fuses a m
 A failure handler can easily swap in its own value for one that was expected from a success reply using `substitute`.**
 
 ```
-after getAnswer => answer:
+getAnswer<> => answer then {
 	write("the answer is... `answer`");
-failure:
+}
+catch {
 	substitute 42;
+}
 ```
 
 To handle the case where a reply was expected but not received within a certain amount of time, requests can also have timeouts**:

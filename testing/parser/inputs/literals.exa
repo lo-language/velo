@@ -14,10 +14,10 @@ nameSet = {"Ford", "Arthur", "Trillian", "Zaphod"};
 
 // map
 homes = {
-    "Ford":     "Betelgeuse",
-    "Arthur":   "Earth",
-    "Trillian": "Earth",
-    "Zaphod":   "Betelgeuse"
+    "Ford"      => "Betelgeuse",
+    "Arthur"    => "Earth",
+    "Trillian"  => "Earth",
+    "Zaphod"    => "Betelgeuse"
 };
 
 // service literal
@@ -34,4 +34,4 @@ student = (
 );
 
 // unlabeled packet initializer
-record = ("Cambridge", ["02138", "02139"], "MA", 1630);
+mottTheTuple = ("Cambridge", ["02138", "02139"], "MA", 1630);

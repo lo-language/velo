@@ -24,6 +24,8 @@ fragment ID_LETTER  : 'a'..'z'|'A'..'Z'|'_' ;
 
 NIL         : 'nil';
 BOOL        : 'true'|'false';
+PAIR_SEP    : '=>';
+FIELD_SEP   : ':';
 
 NUMBER
     : '-'? INT '.' DIGIT+ EXP?
@@ -38,13 +40,18 @@ INTER_BEGIN : '"' (ESC|~[`"])* '`' {this.text = this.text.slice(1, -1);} ;
 INTER_MID   : '`' (ESC|~[`"])* '`' {this.text = this.text.slice(1, -1);} ;
 INTER_END   : '`' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1);} ;
 
-// only support modules??
+MODREF  : '<' ~[ \t\r\n]+ '>' {this.text = this.text.slice(1, -1);} ;
+
 program
-    : statementList
+    : statementList EOF
     ;
 
 module
-    : definition+
+    : link* definition+ EOF
+    ;
+
+link
+    : 'link' MODREF 'as' ID
     ;
 
 // we do this the old-fashioned way because that's what the compiler wants
@@ -67,8 +74,6 @@ statement
 
 definition
     : ID 'is' literal ';'                                   # constant
-    | 'link' STRING ('as' ID)? ';'                          # link
-    | 'adopt' STRING ';'                                    # adopt
     ;
 
 // assignments are statements, not expressions!
@@ -109,7 +114,7 @@ expr
     | expr op=('and'|'or') expr                                 # logical
     | expr 'in' expr                                            # membership // not sure where this guy should go, precedence-wise
     | '(' expr ')'                                              # wrap
-    | expr '[' cut='cut'? expr ']'                              # subscript
+    | expr '[' cut='cut'? expr ']'                              # subscript // retrieval? access?
     | expr '[' cut='cut'? expr ':' expr ']'                     # range
     | expr '.' ID                                               # field
     | '(' ID (',' ID)+ ')'                                      # destructure
@@ -144,16 +149,16 @@ literal
     | NUMBER                                    # number
     | STRING                                    # string
     | 'service' block                           # service
-    | '[' exprList? ']'                         # array // sequence?
-    | '{' (colon=':'|exprList|pairList)? '}'    # set
-    | '(' (exprList|fieldList)? ')'             # packet // tuple? record?
+    | '[' exprList? ']'                         # array
+    | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
+    | '(' (exprList|fieldList)? ')'             # frame
     ;
 
 fieldList
-    : (ID ':' expr ','?)+
+    : (ID FIELD_SEP expr ','?)+
     ;
 
 // todo test dangling commas -- maybe just make commas optional?
 pairList
-    : (expr ':' expr ','?)+
+    : (expr PAIR_SEP expr ','?)+
     ;

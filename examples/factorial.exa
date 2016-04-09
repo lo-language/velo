@@ -1,6 +1,11 @@
-receive args, io;
+main is service {
 
-factorial = service {
+    receive args, io;
+
+    *io.stdout.write("`factorial(args[0])`\n");
+};
+
+factorial is service {
 
     receive num;
 
@@ -14,5 +19,3 @@ factorial = service {
 
     reply num * recur(num - 1);
 };
-
-*io.stdout.write("`factorial(args[0])`\n");

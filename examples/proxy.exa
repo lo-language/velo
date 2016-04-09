@@ -6,23 +6,28 @@
  * e.g. exa proxy.exa http://www.exalang.org
  */
 
-makeServer is <net:http:server>;
-makeClient is <net:http:client>;
+link <net:http:client> as Client
+link <net:http:server> as Server
 
-receive args, io, system;
+main is {
 
-client = makeClient();
-count = 0;
+    receive args, io, system;
 
-// connect authority with expertise
-server = makeServer(8080, service:
+    client = Client::create();
+    count = 0;
 
-    receive request;
+    // connect authority with expertise
+    server = Server::create(8080, {
 
-    // log the request
-    io.stderr.write ~ "`request.method` `request.url`\n";
+        receive request;
 
-    after client.get ~ "`args[0]``request.url`" => res, body:
-        io.stdout.write ~ "--> `res.statusCode` for `request.url`: `#body` bytes\n";
-        reply body;
-);
+        // log the request
+        *io.stderr.write("`request.method` `request.url`\n");
+
+        *client.get("`args[0]``request.url`") => res, body then {
+
+            *io.stdout.write("--> `res.statusCode` for `request.url`: `#body` bytes\n");
+            reply body;
+        };
+    });
+};

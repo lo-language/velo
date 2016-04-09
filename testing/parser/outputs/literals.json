@@ -315,7 +315,7 @@
                                 "op": "=",
                                 "left": {
                                   "type": "id",
-                                  "name": "record"
+                                  "name": "mottTheTuple"
                                 },
                                 "right": {
                                   "type": "record",
