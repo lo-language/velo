@@ -1,55 +1,62 @@
 {
   "type": "module",
-  "service": {
-    "type": "procedure",
-    "body": {
-      "type": "stmt_list",
-      "head": {
-        "type": "assign",
-        "op": "=",
-        "left": {
-          "type": "id",
-          "name": "x"
-        },
-        "right": {
-          "type": "extraction",
-          "list": {
-            "type": "id",
-            "name": "foo"
+  "definitions": [
+    {
+      "type": "constant",
+      "name": "test",
+      "value": {
+        "type": "procedure",
+        "body": {
+          "type": "stmt_list",
+          "head": {
+            "type": "assign",
+            "op": "=",
+            "left": {
+              "type": "id",
+              "name": "x"
+            },
+            "right": {
+              "type": "extraction",
+              "list": {
+                "type": "id",
+                "name": "foo"
+              },
+              "index": {
+                "type": "number",
+                "val": "37"
+              }
+            }
           },
-          "index": {
-            "type": "number",
-            "val": "37"
+          "tail": {
+            "type": "stmt_list",
+            "head": {
+              "type": "assign",
+              "op": "=",
+              "left": {
+                "type": "id",
+                "name": "y"
+              },
+              "right": {
+                "type": "extraction",
+                "list": {
+                  "type": "id",
+                  "name": "bar"
+                },
+                "start": {
+                  "type": "number",
+                  "val": "1"
+                },
+                "end": {
+                  "type": "number",
+                  "val": "11"
+                }
+              }
+            },
+            "tail": null
           }
         }
-      },
-      "tail": {
-        "type": "stmt_list",
-        "head": {
-          "type": "assign",
-          "op": "=",
-          "left": {
-            "type": "id",
-            "name": "y"
-          },
-          "right": {
-            "type": "extraction",
-            "list": {
-              "type": "id",
-              "name": "bar"
-            },
-            "start": {
-              "type": "number",
-              "val": "1"
-            },
-            "end": {
-              "type": "number",
-              "val": "11"
-            }
-          }
-        },
-        "tail": null
       }
     }
-  }
+  ],
+  "references": null
 }

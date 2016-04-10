@@ -1,37 +1,40 @@
-x = true;
-y = false;
-answer = 42;
-age = 63.4;
-message = "hello, world!";
-empty = [];
-emptySet = {};
+test is service {
 
-// sequence
-nameList = ["Ford", "Arthur", "Trillian", "Zaphod"];
+    x = true;
+    y = false;
+    answer = 42;
+    age = 63.4;
+    message = "hello, world!";
+    empty = [];
+    emptySet = {};
 
-// set
-nameSet = {"Ford", "Arthur", "Trillian", "Zaphod"};
+    // sequence
+    nameList = ["Ford", "Arthur", "Trillian", "Zaphod"];
 
-// map
-homes = {
-    "Ford"      => "Betelgeuse",
-    "Arthur"    => "Earth",
-    "Trillian"  => "Earth",
-    "Zaphod"    => "Betelgeuse"
+    // set
+    nameSet = {"Ford", "Arthur", "Trillian", "Zaphod"};
+
+    // map
+    homes = {
+        "Ford"      => "Betelgeuse",
+        "Arthur"    => "Earth",
+        "Trillian"  => "Earth",
+        "Zaphod"    => "Betelgeuse"
+    };
+
+    // service literal
+    HardyRamanujan = service {
+        reply 1729;
+    };
+
+    // labeled nested frame literal
+    // no commas between top-level fields
+    student = (
+        name: (first: "Alyssa", middle: "P", last: "Hacker")
+        course: 6
+        year: 2001
+    );
+
+    // unlabeled frame literal
+    mottTheTuple = ("Cambridge", ["02138", "02139"], "MA", 1630);
 };
-
-// service literal
-HardyRamanujan = service {
-    reply 1729;
-};
-
-// labeled packet initializer
-// no commas between top-level fields
-student = (
-    name: (first: "Alyssa", middle: "P", last: "Hacker")
-    course: 6
-    year: 2001
-);
-
-// unlabeled packet initializer
-mottTheTuple = ("Cambridge", ["02138", "02139"], "MA", 1630);

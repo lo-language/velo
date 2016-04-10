@@ -42,16 +42,12 @@ INTER_END   : '`' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1);} ;
 
 MODREF  : '<' ~[ \t\r\n]+ '>' {this.text = this.text.slice(1, -1);} ;
 
-program
-    : statementList EOF
-    ;
-
 module
-    : link* definition+ EOF
+    : references? definition+ EOF
     ;
 
-link
-    : 'link' MODREF 'as' ID
+references
+    : 'references' (ID MODREF)+ // should this not be an ID? maybe a 'label' instead?
     ;
 
 // we do this the old-fashioned way because that's what the compiler wants
@@ -115,12 +111,12 @@ expr
     | expr 'in' expr                                            # membership // not sure where this guy should go, precedence-wise
     | '(' expr ')'                                              # wrap
     | expr '[' cut='cut'? expr ']'                              # subscript // retrieval? access?
-    | expr '[' cut='cut'? expr ':' expr ']'                     # range
+    | expr '[' cut='cut'? expr '..' expr ']'                    # range
     | expr '.' ID                                               # field
     | '(' ID (',' ID)+ ')'                                      # destructure
     | INTER_BEGIN interpolated INTER_END                        # dynastring
     | literal                                                   # litExpr
-    | ID '::' ID                                                # externalId
+    | ID ':' ID                                                 # externalId
     | ID                                                        # id
     ;
 

@@ -1,5 +1,8 @@
-bar = baz;
-binky = 64;
-message = "hi there";
-foo = true;
-baz = #someList;
+test is service {
+
+    bar = baz;
+    binky = 64;
+    message = "hi there";
+    foo = true;
+    baz = #someList;
+};

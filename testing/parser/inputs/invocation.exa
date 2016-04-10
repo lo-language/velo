@@ -1,85 +1,88 @@
-// sync calls
+test is service {
 
-foo();
-foo.bar();
+    // sync calls
 
-x = foo();
-(x, y) = foo();
+    foo();
+    foo.bar();
 
-// todo
-// x, y = foo();
+    x = foo();
+    (x, y) = foo();
 
-// async calls
+    // todo
+    // x, y = foo();
 
-foo;
-*foo(18);
+    // async calls
 
-*sessionStore.getByID(sessionID);
+    foo;
+    *foo(18);
 
-//foo => bar;
-(bar, baz) = *foo(47);  // destructuring
+    *sessionStore.getByID(sessionID);
 
-// handle success only
-*bar(48) then {
-    reply "hello";
-};
+    //foo => bar;
+    (bar, baz) = *foo(47);  // destructuring
 
-// handle failure only
-*baz(128) then {
-}
-catch {
-    reply "bummer";
-};
+    // handle success only
+    *bar(48) then {
+        reply "hello";
+    };
 
-// todo
-// after baz(12) mute;
-
-// handle both success and failure
-*foo(42) then {
-    reply "yay";
-}
-catch {
-    reply "darn";
-};
-
-//nil -> foo => x ~> bar;
-
-// future with failure handler
-//bar(foo) => baz catch:
-//    fail;
-
-// nested requests
-// should we support pipes like 42 -> foo -> bar -> baz?
-result = *foo(42) then {
-
-    result = *bar(result) then {
-
-        yarp = *baz(result);
+    // handle failure only
+    *baz(128) then {
     }
     catch {
-        fail "narp";
+        reply "bummer";
     };
-}
-catch {
-    reply "darn";
-};
 
-// sync form in expressions
+    // todo
+    // after baz(12) mute;
 
-foo(bar());
+    // handle both success and failure
+    *foo(42) then {
+        reply "yay";
+    }
+    catch {
+        reply "darn";
+    };
 
-x = foo() + 7;
+    //nil -> foo => x ~> bar;
+
+    // future with failure handler
+    //bar(foo) => baz catch:
+    //    fail;
+
+    // nested requests
+    // should we support pipes like 42 -> foo -> bar -> baz?
+    result = *foo(42) then {
+
+        result = *bar(result) then {
+
+            yarp = *baz(result);
+        }
+        catch {
+            fail "narp";
+        };
+    }
+    catch {
+        reply "darn";
+    };
+
+    // sync form in expressions
+
+    foo(bar());
+
+    x = foo() + 7;
 
 
-x = foo() catch {
+    x = foo() catch {
 
-    receive error;
-    substitute "ok";
-};
+        receive error;
+        substitute "ok";
+    };
 
 
-y = *foo() catch {
+    y = *foo() catch {
 
-    receive error;
-    substitute "ok";
+        receive error;
+        substitute "ok";
+    };
 };

@@ -1,72 +1,23 @@
 {
   "type": "module",
-  "service": {
-    "type": "procedure",
-    "body": {
-      "type": "stmt_list",
-      "head": {
-        "type": "assign",
-        "op": "=",
-        "left": {
-          "type": "id",
-          "name": "foo"
-        },
-        "right": {
-          "type": "number",
-          "val": "4"
-        }
-      },
-      "tail": {
-        "type": "stmt_list",
-        "head": {
-          "type": "assign",
-          "op": "=",
-          "left": {
-            "type": "id",
-            "name": "bar"
-          },
-          "right": {
-            "type": "subscript",
-            "list": {
-              "type": "id",
-              "name": "foo"
-            },
-            "index": {
-              "type": "id",
-              "name": "i"
-            }
-          }
-        },
-        "tail": {
+  "definitions": [
+    {
+      "type": "constant",
+      "name": "test",
+      "value": {
+        "type": "procedure",
+        "body": {
           "type": "stmt_list",
           "head": {
             "type": "assign",
             "op": "=",
             "left": {
-              "type": "subscript",
-              "list": {
-                "type": "subscript",
-                "list": {
-                  "type": "id",
-                  "name": "foo"
-                },
-                "index": {
-                  "type": "id",
-                  "name": "i"
-                }
-              },
-              "index": {
-                "type": "id",
-                "name": "j"
-              }
+              "type": "id",
+              "name": "foo"
             },
             "right": {
-              "type": "select",
-              "set": {
-                "type": "id",
-                "name": "foo"
-              },
-              "member": "bar"
+              "type": "number",
+              "val": "4"
             }
           },
           "tail": {
@@ -76,19 +27,18 @@
               "op": "=",
               "left": {
                 "type": "id",
-                "name": "foo"
+                "name": "bar"
               },
               "right": {
-                "type": "select",
-                "set": {
-                  "type": "select",
-                  "set": {
-                    "type": "id",
-                    "name": "boo"
-                  },
-                  "member": "bar"
+                "type": "subscript",
+                "list": {
+                  "type": "id",
+                  "name": "foo"
                 },
-                "member": "baz"
+                "index": {
+                  "type": "id",
+                  "name": "i"
+                }
               }
             },
             "tail": {
@@ -97,12 +47,8 @@
                 "type": "assign",
                 "op": "=",
                 "left": {
-                  "type": "id",
-                  "name": "_qux"
-                },
-                "right": {
-                  "type": "select",
-                  "set": {
+                  "type": "subscript",
+                  "list": {
                     "type": "subscript",
                     "list": {
                       "type": "id",
@@ -112,6 +58,17 @@
                       "type": "id",
                       "name": "i"
                     }
+                  },
+                  "index": {
+                    "type": "id",
+                    "name": "j"
+                  }
+                },
+                "right": {
+                  "type": "select",
+                  "set": {
+                    "type": "id",
+                    "name": "foo"
                   },
                   "member": "bar"
                 }
@@ -123,22 +80,19 @@
                   "op": "=",
                   "left": {
                     "type": "id",
-                    "name": "quux"
+                    "name": "foo"
                   },
                   "right": {
-                    "type": "subscript",
-                    "list": {
+                    "type": "select",
+                    "set": {
                       "type": "select",
                       "set": {
                         "type": "id",
-                        "name": "foo"
+                        "name": "boo"
                       },
                       "member": "bar"
                     },
-                    "index": {
-                      "type": "id",
-                      "name": "i"
-                    }
+                    "member": "baz"
                   }
                 },
                 "tail": {
@@ -148,11 +102,22 @@
                     "op": "=",
                     "left": {
                       "type": "id",
-                      "name": "moi"
+                      "name": "_qux"
                     },
                     "right": {
-                      "type": "id",
-                      "name": "__"
+                      "type": "select",
+                      "set": {
+                        "type": "subscript",
+                        "list": {
+                          "type": "id",
+                          "name": "foo"
+                        },
+                        "index": {
+                          "type": "id",
+                          "name": "i"
+                        }
+                      },
+                      "member": "bar"
                     }
                   },
                   "tail": {
@@ -162,12 +127,22 @@
                       "op": "=",
                       "left": {
                         "type": "id",
-                        "name": "method"
+                        "name": "quux"
                       },
                       "right": {
-                        "type": "id",
-                        "scope": "HTTP",
-                        "name": "GET"
+                        "type": "subscript",
+                        "list": {
+                          "type": "select",
+                          "set": {
+                            "type": "id",
+                            "name": "foo"
+                          },
+                          "member": "bar"
+                        },
+                        "index": {
+                          "type": "id",
+                          "name": "i"
+                        }
                       }
                     },
                     "tail": {
@@ -177,19 +152,50 @@
                         "op": "=",
                         "left": {
                           "type": "id",
-                          "name": "server"
+                          "name": "moi"
                         },
                         "right": {
-                          "type": "application",
-                          "address": {
-                            "type": "id",
-                            "scope": "HTTP",
-                            "name": "createServer"
-                          },
-                          "args": []
+                          "type": "id",
+                          "name": "__"
                         }
                       },
-                      "tail": null
+                      "tail": {
+                        "type": "stmt_list",
+                        "head": {
+                          "type": "assign",
+                          "op": "=",
+                          "left": {
+                            "type": "id",
+                            "name": "method"
+                          },
+                          "right": {
+                            "type": "id",
+                            "scope": "HTTP",
+                            "name": "GET"
+                          }
+                        },
+                        "tail": {
+                          "type": "stmt_list",
+                          "head": {
+                            "type": "assign",
+                            "op": "=",
+                            "left": {
+                              "type": "id",
+                              "name": "server"
+                            },
+                            "right": {
+                              "type": "application",
+                              "address": {
+                                "type": "id",
+                                "scope": "HTTP",
+                                "name": "createServer"
+                              },
+                              "args": []
+                            }
+                          },
+                          "tail": null
+                        }
+                      }
                     }
                   }
                 }
@@ -199,5 +205,6 @@
         }
       }
     }
-  }
+  ],
+  "references": null
 }

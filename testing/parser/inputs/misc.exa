@@ -1,42 +1,45 @@
-// literals and assignments
+test is service {
 
-foo = "hello";
-foo = true;
-foo = false;
-foo = 10;
+    // literals and assignments
 
-foo += 5;
-foo -= 7;
-foo *= 10;
-foo /= 4;
-foo %= 360;
+    foo = "hello";
+    foo = true;
+    foo = false;
+    foo = 10;
 
-doSomething();
+    foo += 5;
+    foo -= 7;
+    foo *= 10;
+    foo /= 4;
+    foo %= 360;
 
-foo[-1] = 17;
+    doSomething();
 
-monkeys["marmosets"][15].wow((ready: true, height: 72, answer: 42))[17](57);
+    foo[-1] = 17;
 
-block = connect("Block")();
+    monkeys["marmosets"][15].wow((ready: true, height: 72, answer: 42))[17](57);
 
-/* comment */
+    block = connect("Block")();
 
-monkeys = 72;
+    /* comment */
 
-result = foo() catch {
-    receive err;
-    log(err);
-    reply fixed;
+    monkeys = 72;
+
+    result = foo() catch {
+        receive err;
+        log(err);
+        reply fixed;
+    };
+
+    // generator - the outer process is one entry point; it creates and returns *another* entry point
+    // getIterator
+
+    index = 0;
+
+    iterator = service {
+        reply items[index];
+        index++;
+    };
+
+    reply iterator;
 };
-
-// generator - the outer process is one entry point; it creates and returns *another* entry point
-// getIterator
-
-index = 0;
-
-iterator = service {
-    reply items[index];
-    index++;
-};
-
-reply iterator;

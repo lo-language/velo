@@ -1,5 +1,8 @@
-foo++;
-foo--;
+test is service {
 
-42 -> foo[0];
-"Denali" -> mountains;
+    foo++;
+    foo--;
+
+    42 -> foo[0];
+    "Denali" -> mountains;
+};

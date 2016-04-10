@@ -26,7 +26,7 @@ __.prototype.parse = function (input) {
     var parser = new Parser.exaParser(tokens);
     parser.buildParseTrees = true;
 
-    var tree = parser.program();
+    var tree = parser.module();
     return this.visit(tree);
 };
 
@@ -41,7 +41,33 @@ __.prototype.visitProgram = function(ctx) {
 // Visit a parse tree produced by exaParser#module.
 __.prototype.visitModule = function(ctx) {
 
-    return {type: 'module', service: {type: 'procedure', body: ctx.statementList().accept(this)}};
+    var visitor = this;
+
+    return {
+        type: 'module',
+        definitions: ctx.definition().map(function (def) {return def.accept(visitor)}),
+        references: ctx.references() ? ctx.references().accept(this) : null
+    };
+};
+
+
+__.prototype.visitReferences = function(ctx) {
+
+    var refs = [];
+
+    var offset = 0;
+
+    while (ctx.ID(offset)) {
+
+        refs.push({
+            id: ctx.ID(offset).getText(),
+            ref: ctx.MODREF(offset).getText()
+        });
+
+        offset++;
+    }
+
+    return refs;
 };
 
 

@@ -12,18 +12,13 @@ function exaVisitor() {
 exaVisitor.prototype = Object.create(antlr4.tree.ParseTreeVisitor.prototype);
 exaVisitor.prototype.constructor = exaVisitor;
 
-// Visit a parse tree produced by exaParser#program.
-exaVisitor.prototype.visitProgram = function(ctx) {
-};
-
-
 // Visit a parse tree produced by exaParser#module.
 exaVisitor.prototype.visitModule = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#link.
-exaVisitor.prototype.visitLink = function(ctx) {
+// Visit a parse tree produced by exaParser#references.
+exaVisitor.prototype.visitReferences = function(ctx) {
 };
 
 

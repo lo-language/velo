@@ -1,6 +1,9 @@
-result = foo == bar;
-result = foo != bar;
-result = foo < bar;
-result = foo > bar;
-result = foo <= bar;
-result = foo >= bar;
+test is service {
+
+    result = foo == bar;
+    result = foo != bar;
+    result = foo < bar;
+    result = foo > bar;
+    result = foo <= bar;
+    result = foo >= bar;
+};

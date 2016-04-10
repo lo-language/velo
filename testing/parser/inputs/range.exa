@@ -1,4 +1,8 @@
-x = foo[1:4];
-y = bar[-4:-1];
+test is service {
+
+    // could we reverse an array by specifying a "backwards" range?
+    x = foo[1..4];
+    y = bar[-4..-1];
+};
 
 
