@@ -1,3 +1,0 @@
-#!/bin/bash
-
-jison grammar.jison -o Parser.js

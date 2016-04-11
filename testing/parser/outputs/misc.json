@@ -204,6 +204,7 @@
                                             "labels": true,
                                             "fields": [
                                               {
+                                                "type": "field",
                                                 "label": "ready",
                                                 "value": {
                                                   "type": "boolean",
@@ -211,6 +212,7 @@
                                                 }
                                               },
                                               {
+                                                "type": "field",
                                                 "label": "height",
                                                 "value": {
                                                   "type": "number",
@@ -218,6 +220,7 @@
                                                 }
                                               },
                                               {
+                                                "type": "field",
                                                 "label": "answer",
                                                 "value": {
                                                   "type": "number",

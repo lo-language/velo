@@ -1,3 +1,8 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Seth Purcell. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE in the project root for license information.
+ *-------------------------------------------------------------------------------------------*/
+
 /**
  * Created by spurcell on 1/10/16.
  */
@@ -318,6 +323,7 @@ __.prototype.visitFieldList = function(ctx) {
     while (ctx.ID(offset)) {
 
         fields.push({
+            type: 'field',
             label: ctx.ID(offset).getText(),
             value: ctx.expr(offset).accept(this)
         });

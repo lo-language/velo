@@ -46,6 +46,8 @@ module
     : references? definition+ EOF
     ;
 
+// would a colon after references improve readability?
+// or should there be a colon between the ID and the modref?
 references
     : 'references' (ID MODREF)+ // should this not be an ID? maybe a 'label' instead?
     ;
