@@ -1,4 +1,4 @@
-test is service {
+test is -> {
 
     bar = baz;
     binky = 64;

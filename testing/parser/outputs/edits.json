@@ -5,7 +5,8 @@
       "type": "constant",
       "name": "test",
       "value": {
-        "type": "procedure",
+        "type": "service",
+        "params": [],
         "body": {
           "type": "stmt_list",
           "head": {

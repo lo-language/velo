@@ -6,27 +6,26 @@
  * e.g. exa proxy.exa http://www.exalang.org
  */
 
-link <net:http:client> as Client
-link <net:http:server> as Server
+references:
 
-main is {
+Client  < net:http:client >
+Server  < net:http:server >
 
-    receive args, io, system;
 
-    client = Client::create();
+main is -> (args, io, system) {
+
+    client = Client:create();
     count = 0;
 
     // connect authority with expertise
-    server = Server::create(8080, {
-
-        receive request;
+    server = Server:create(8080, -> (req) {
 
         // log the request
-        *io.stderr.write("`request.method` `request.url`\n");
+        *io.err.write("`req.method` `req.url`\n");
 
-        *client.get("`args[0]``request.url`") => res, body then {
+        *client.get("`args[0]``req.url`") => res, body -> {
 
-            *io.stdout.write("--> `res.statusCode` for `request.url`: `#body` bytes\n");
+            *io.stdout.write("--> `res.statusCode` for `req.url`: `#body` bytes\n");
             reply body;
         };
     });

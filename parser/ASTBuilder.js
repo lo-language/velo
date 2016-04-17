@@ -444,6 +444,7 @@ __.prototype.visitReplyHandler = function(ctx) {
     return {
         type: 'handler',
         channel: 'reply',
+        params: ctx.paramList() ? ctx.paramList().accept(this) : [],
         body: ctx.block().accept(this)
     };
 };
@@ -454,6 +455,7 @@ __.prototype.visitFailHandler = function(ctx) {
     return {
         type: 'handler',
         channel: 'fail',
+        params: ctx.paramList() ? ctx.paramList().accept(this) : [],
         body: ctx.block().accept(this)
     };
 };
@@ -556,9 +558,18 @@ __.prototype.visitField = function(ctx) {
 __.prototype.visitService = function(ctx) {
 
     return {
-        type: 'procedure',
+        type: 'service',
+        params: ctx.paramList() ? ctx.paramList().accept(this) : [],
         body: ctx.block().accept(this)
     };
+};
+
+
+__.prototype.visitParamList = function(ctx) {
+
+    return ctx.ID().map(function (item) {
+        return item.getText();
+    });
 };
 
 

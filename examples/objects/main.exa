@@ -2,17 +2,21 @@
  * usage: exa main.exa <side length>
  */
 
-makeSquare is <Square>;
+references:
 
-receive args, io, system;
+Square  <http://x-language.org/dev/libs/Square>
 
-squareSide = args[0];
+main is -> (args, io, system) {
 
-square = makeSquare(squareSide);
+    squareSide = args[0];
 
-io.out.write("side length is `square.getSide()`\n");
+    square = Square:create(squareSide);
 
-area = square.getArea();
+    io.out.write("side length is `square.getSide()`\n");
 
-io.out.write(square.toString());
-io.out.write("\n`area`\n");
+    area = square.getArea();
+
+    io.out.write(square.toString());
+    io.out.write("\n`area`\n");
+};
+

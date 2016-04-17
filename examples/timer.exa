@@ -1,9 +1,18 @@
-receive args, io, system;
+references:
 
-io.stdout.write("ready\n");
+Timer <exa:timer>
 
-after <:setTimer>(1000, 0):
-    io.stdout.write("set\n");
+main is service {
 
-after <:setTimer>(2000, 0):
-    io.stdout.write("go!\n");
+    receive io, system;
+
+    io.out.write("ready\n");
+
+    Timer:set<1000, 0> then {
+        io.out.write("set\n");
+    }
+
+    Timer:set<2000, 0> then {
+        io.out.write("go!\n");
+    }
+};

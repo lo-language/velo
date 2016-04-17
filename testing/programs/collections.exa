@@ -3,101 +3,104 @@
  * 12/25/14
  */
 
-// Array literal (including empty), access, and cardinality
-array = [];
-words = ["foo", "mani", "padme", "hum"];
+main is service {
 
-if #array != 0 {
-    fail "problem";
-}
+    // Array literal (including empty), access, and cardinality
+    array = [];
+    words = ["foo", "mani", "padme", "hum"];
 
-if words[2] != "padme" {
-    fail "oh me oh my";
-}
+    if #array != 0 {
+        fail "problem";
+    }
 
-if #words != 4 {
-    fail "what the deuce?!";
-}
+    if words[2] != "padme" {
+        fail "oh me oh my";
+    }
 
-// Array slicing
-subset = words[1:3];
+    if #words != 4 {
+        fail "what the deuce?!";
+    }
 
-if #subset != 2 {
-    fail "darn";
-}
+    // Array slicing
+    subset = words[1:3];
 
-if subset[0] != words[1] {
-    fail "uh oh";
-}
+    if #subset != 2 {
+        fail "darn";
+    }
 
-if subset[1] != words[2] {
-    fail "how could that be?";
-}
+    if subset[0] != words[1] {
+        fail "uh oh";
+    }
 
-// Array slicing shorthand
-subset = words[:];
+    if subset[1] != words[2] {
+        fail "how could that be?";
+    }
 
-if #subset != #words {
-    fail "dang";
-}
+    // Array slicing shorthand
+    subset = words[:];
 
-if subset[1] != words[1] {
-    fail "that's weird";
-}
+    if #subset != #words {
+        fail "dang";
+    }
 
-// Array extraction and excision
-subset = words{1};
+    if subset[1] != words[1] {
+        fail "that's weird";
+    }
 
-if subset != "mani" {
-    fail "crud";
-}
+    // Array extraction and excision
+    subset = words{1};
 
-if #words != 3 {
-    fail "too bad";
-}
+    if subset != "mani" {
+        fail "crud";
+    }
 
-words = ["foo", "mani", "padme", "hum"];
-subset = words{1:3};
+    if #words != 3 {
+        fail "too bad";
+    }
 
-if #subset != 2 {
-    fail "that's not good";
-}
+    words = ["foo", "mani", "padme", "hum"];
+    subset = words{1:3};
 
-if #words != 2 {
-    fail "problem found";
-}
+    if #subset != 2 {
+        fail "that's not good";
+    }
 
-if subset[0] != "mani" {
-    fail "my goodness";
-}
+    if #words != 2 {
+        fail "problem found";
+    }
 
-if words[1] != "hum" {
-    fail "that's a real shame";
-}
+    if subset[0] != "mani" {
+        fail "my goodness";
+    }
 
-// Map literal (including empty), access, and cardinality
-map = [:];
-cities = ["nyc":"New York", "phi":"Philadelphia"];
+    if words[1] != "hum" {
+        fail "that's a real shame";
+    }
 
-if #map != 0 {
-    fail "problem";
-}
+    // Map literal (including empty), access, and cardinality
+    map = [:];
+    cities = ["nyc":"New York", "phi":"Philadelphia"];
 
-if cities.nyc != "New York" {
-    fail "something happened";
-}
+    if #map != 0 {
+        fail "problem";
+    }
 
-if cities["nyc"] != "New York" {
-    fail "whoops";
-}
+    if cities.nyc != "New York" {
+        fail "something happened";
+    }
 
-if #cities != 2 {
-    fail "what the deuce?!";
-}
+    if cities["nyc"] != "New York" {
+        fail "whoops";
+    }
 
-// String cardinality
-name = "snooks";
+    if #cities != 2 {
+        fail "what the deuce?!";
+    }
 
-if #name < 6 {
-    fail "WHAT?!";
-}
+    // String cardinality
+    name = "snooks";
+
+    if #name < 6 {
+        fail "WHAT?!";
+    }
+};

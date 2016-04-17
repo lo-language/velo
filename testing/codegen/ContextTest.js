@@ -5,13 +5,13 @@
 
 "use strict";
 
-var Scope = require('../../codegen/Scope');
+var Context = require('../../codegen/Context');
 
 module.exports["basics"] = {
 
     'declare var': function (test) {
 
-        var scope = new Scope();
+        var scope = new Context().createInner();
 
         test.equal(scope.has('foo'), false);
         test.deepEqual(scope.getJsVars(), []);
@@ -33,7 +33,7 @@ module.exports["basics"] = {
 
     'declare var that collides with JS': function (test) {
 
-        var scope = new Scope();
+        var scope = new Context().createInner();
 
         test.equal(scope.has('constructor'), false);
         test.deepEqual(scope.getJsVars(), []);
@@ -52,7 +52,7 @@ module.exports["basics"] = {
 
     'define constant': function (test) {
 
-        var scope = new Scope();
+        var scope = new Context();
 
         test.equal(scope.has('port'), false);
         test.deepEqual(scope.getJsVars(), []);
@@ -75,7 +75,7 @@ module.exports["basics"] = {
 
     'set future': function (test) {
 
-        var scope = new Scope();
+        var scope = new Context();
 
         test.equal(scope.has('John_Zoidberg'), false);
         test.deepEqual(scope.getJsVars(), []);
@@ -87,20 +87,19 @@ module.exports["basics"] = {
         test.done();
     },
 
-    "declare dependency": function (test) {
+    "add/resolve reference": function (test) {
 
-        var scope = new Scope();
+        var scope = new Context();
 
-        test.deepEqual(scope.getDeps(), {});
+        var refScope = new Context();
 
-        scope.registerDep("Square");
-        test.deepEqual(scope.getDeps(), ["Square"]);
+        refScope.define('foo', '88')
 
-        scope.registerDep("Quadrangle");
-        test.deepEqual(scope.getDeps(), ["Square", "Quadrangle"]);
+        scope.addReference("Square", refScope);
 
-        scope.registerDep("Pentagon");
-        test.deepEqual(scope.getDeps(), ["Square", "Quadrangle", "Pentagon"]);
+        test.ok(scope.isConstant('foo', 'Square'));
+
+        test.equal(scope.resolve('foo', 'Square'), '88');
 
         test.done();
     }
@@ -110,9 +109,9 @@ module.exports["child scope"] = {
 
     'define var in parent': function (test) {
 
-        var parent = new Scope();
+        var parent = new Context().createInner();
 
-        var child = parent.bud();
+        var child = parent.createInner();
 
         parent.declare('foo');
 
@@ -138,9 +137,9 @@ module.exports["child scope"] = {
 
     'define constant in parent': function (test) {
 
-        var parent = new Scope();
+        var parent = new Context();
 
-        var child = parent.bud();
+        var child = parent.createInner();
 
         parent.define('foo', "42");
 
@@ -170,4 +169,11 @@ module.exports["child scope"] = {
 
         test.done();
     }
+};
+
+
+module.exports["link"] = {
+
+
+
 };

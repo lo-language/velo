@@ -7,13 +7,14 @@
 
 "use strict";
 
-const Loader = require('../runtime/Loader');
+const Builder = require('../codegen/Builder');
+const Task = require('../runtime/Task');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 var __ = function (sourceDir, program) {
 
-    this.loader = new Loader(sourceDir);
+    this.builder = new Builder(sourceDir);
     this.program = program;
 };
 
@@ -23,7 +24,13 @@ var __ = function (sourceDir, program) {
  */
 __.prototype.run = function (input) {
 
-    return this.loader.run(this.program, input);
+    var d = Q.defer();
+
+    var test = this.builder.build(this.program);
+
+    Task.sendRootRequest(service, args, d.resolve.bind(d), d.reject.bind(d));
+
+    return d.promise;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,7 +48,7 @@ __.prototype.testSuccess = function (test, input, expected) {
             }
 
             // this is in here to let us wait on tests that end with a dispatch
-            // todo figure out a way to remove this
+            // todo do we still need this?
             setImmediate(test.done.bind(test));
         },
         function (err) {

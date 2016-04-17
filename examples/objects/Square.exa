@@ -1,23 +1,35 @@
-makeRect is <Rectangle>;
+references:
 
-receive side;
+Rect    <Rectangle>
 
-rect = makeRect(side, side, "square");
+/**
+ * Constructor
+ */
+create is service {
 
-// look what we do here - we whitelist the base class's methods --
-// the base class is otherwise completely encapsulated within the child class
+    receive side;
 
-reply {
+    rect = Rect:create(side, side, "square");
 
-    getArea: rect.getArea,
+    // look what we do here: we whitelist the base class's methods
+    // the base class is otherwise completely encapsulated within the child class
 
-    toString: rect.toString,
+    reply (
 
-    setSide: >>:
-        receive side;
-        rect.setHeight(side);
-        rect.setWidth(side);
-    ,
-    getSide: >>:
-        reply side;
+        getArea: rect.getArea,
+
+        toString: rect.toString,
+
+        setSide: service {
+
+            receive side;
+
+            rect.setHeight(side);
+            rect.setWidth(side);
+        },
+
+        getSide: service {
+            reply side;
+        }
+    );
 };

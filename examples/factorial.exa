@@ -1,10 +1,3 @@
-main is service {
-
-    receive args, io;
-
-    *io.stdout.write("`factorial(args[0])`\n");
-};
-
 factorial is service {
 
     receive num;
@@ -18,4 +11,12 @@ factorial is service {
     }
 
     reply num * recur(num - 1);
+};
+
+// todo - enable main to come first?
+main is service {
+
+    receive args, io;
+
+    io.out.write("`factorial(args[0])`\n");
 };

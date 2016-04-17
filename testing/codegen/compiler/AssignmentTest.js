@@ -6,7 +6,7 @@
 "use strict";
 
 var Compiler = require('../../../codegen/Compiler');
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
 var util = require('util');
 
 module.exports["assignment"] = {
@@ -20,12 +20,12 @@ module.exports["assignment"] = {
             right: {type: 'number', val: '57'}
         };
 
-        var scope = new Scope();
+        var context = new Context().createInner();
 
-        test.equal(scope.has('foo'), false);
+        test.equal(context.has('foo'), false);
 
-        test.equal(scope.compile(node).render(), '$foo = 57;\n');
-        test.equal(scope.has('foo'), true);
+        test.equal(context.compile(node).render(), '$foo = 57;\n');
+        test.equal(context.has('foo'), true);
         test.done();
     },
 
@@ -38,9 +38,9 @@ module.exports["assignment"] = {
             right: {type: 'number', val: '57'}
         };
 
-        var scope = new Scope();
+        var context = new Context().createInner();
 
-        test.equal(scope.compile(node).render(), '$foo[$bar] = 57;\n');
+        test.equal(context.compile(node).render(), '$foo[$bar] = 57;\n');
         test.done();
     },
 
@@ -53,11 +53,11 @@ module.exports["assignment"] = {
             right: {type: 'id', name: 'bar'}
         };
 
-        var scope = new Scope();
+        var context = new Context().createInner();
 
-        test.equal(scope.has('foo'), false);
-        test.equal(scope.compile(node).render(), '$foo = $bar;\n');
-        test.equal(scope.has('foo'), true);
+        test.equal(context.has('foo'), false);
+        test.equal(context.compile(node).render(), '$foo = $bar;\n');
+        test.equal(context.has('foo'), true);
         test.done();
     },
 
@@ -70,16 +70,16 @@ module.exports["assignment"] = {
             right: {type: 'application', address: {type: 'id', name: 'bar'}, args: []}
         };
 
-        var scope = new Scope();
+        var context = new Context().createInner();
 
-        test.equal(scope.has('foo'), false);
-        test.equal(scope.compile(node).render(), 'task.sendMessage($bar, [], function (P0) {$foo = P0;\n}, null);\n\n');
-        test.equal(scope.has('foo'), true);
+        test.equal(context.has('foo'), false);
+        test.equal(context.compile(node).render(), 'task.sendMessage($bar, [], function (P0) {$foo = P0;\n}, null);\n\n');
+        test.equal(context.has('foo'), true);
 
         test.done();
     },
 
-    "doesn't assign if in parent scope": function (test) {
+    "doesn't assign if in parent context": function (test) {
 
         var node = {
             type: 'assign',
@@ -88,16 +88,16 @@ module.exports["assignment"] = {
             right: {type: 'number', val: '57'}
         };
 
-        var parent = new Scope();
+        var parent = new Context().createInner();
 
         parent.declare('foo');
 
-        var scope = parent.bud();
+        var context = parent.createInner();
 
-        test.equal(scope.has('foo'), true);
+        test.equal(context.has('foo'), true);
 
-        test.equal(scope.compile(node).render(), '$foo = 57;\n');
-        test.deepEqual(scope.getJsVars(), []);
+        test.equal(context.compile(node).render(), '$foo = 57;\n');
+        test.deepEqual(context.getJsVars(), []);
         test.done();
     },
 

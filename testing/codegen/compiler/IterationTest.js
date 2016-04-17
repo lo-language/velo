@@ -6,7 +6,7 @@
 "use strict";
 
 var JsConstruct = require('../../../codegen/JsConstruct');
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
 var util = require('util');
 
 module.exports["basics"] = {
@@ -19,7 +19,7 @@ module.exports["basics"] = {
             statements: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null}
         };
 
-        var a = new Scope().compile(node);
+        var a = new Context().createInner().compile(node);
 
         test.equal(a.render(), 'while ($foo){$bar = 42;\n}');
 
@@ -53,7 +53,7 @@ module.exports["basics"] = {
                 tail: null}
         };
 
-        var a = new Scope().compile(node);
+        var a = new Context().createInner().compile(node);
 
         test.equal(a.render(),
             'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
@@ -109,7 +109,7 @@ module.exports["basics"] = {
                 tail: null}
         };
 
-        var a = new Scope().compile(node);
+        var a = new Context().createInner().compile(node);
 
         test.equal(a.render(),
             'let loop = function () {if ($foo) {var cont0 = function () {setImmediate(task.doAsync(loop));};' +

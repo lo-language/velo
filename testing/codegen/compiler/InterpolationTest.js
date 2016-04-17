@@ -5,7 +5,7 @@
 
 "use strict";
 
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
 var util = require('util');
 
 module.exports["select"] = {
@@ -22,7 +22,7 @@ module.exports["select"] = {
             "right":"!"
         };
 
-        test.equal(new Scope().compile(node).render(), "'hello, ' + $name + '!'");
+        test.equal(new Context().compile(node).render(), "'hello, ' + $name + '!'");
         test.done();
     },
 
@@ -46,7 +46,7 @@ module.exports["select"] = {
             "right":"."
         };
 
-        test.equal(new Scope().compile(node).render(), "'I'm sorry, ' + $name + ', I can't do ' + $action + '.'");
+        test.equal(new Context().compile(node).render(), "'I'm sorry, ' + $name + ', I can't do ' + $action + '.'");
         test.done();
     },
 
@@ -78,7 +78,7 @@ module.exports["select"] = {
             "right":"."
         };
 
-        test.equal(new Scope().compile(node).render(), "'A = ' + $a + ', B = ' + $b + ', C = ' + $c + '.'");
+        test.equal(new Context().compile(node).render(), "'A = ' + $a + ', B = ' + $b + ', C = ' + $c + '.'");
         test.done();
     }
 };

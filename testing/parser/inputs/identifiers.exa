@@ -1,4 +1,4 @@
-test is service {
+test is -> {
 
     foo = 4;
     bar = foo[i];

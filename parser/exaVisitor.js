@@ -32,11 +32,6 @@ exaVisitor.prototype.visitDefStmt = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#receive.
-exaVisitor.prototype.visitReceive = function(ctx) {
-};
-
-
 // Visit a parse tree produced by exaParser#response.
 exaVisitor.prototype.visitResponse = function(ctx) {
 };
@@ -254,6 +249,11 @@ exaVisitor.prototype.visitSet = function(ctx) {
 
 // Visit a parse tree produced by exaParser#frame.
 exaVisitor.prototype.visitFrame = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#paramList.
+exaVisitor.prototype.visitParamList = function(ctx) {
 };
 
 

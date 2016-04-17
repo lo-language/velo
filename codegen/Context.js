@@ -1,5 +1,10 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Seth Purcell. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE in the project root for license information.
+ *-------------------------------------------------------------------------------------------*/
+
 /**
- * Tracks symbols - whether they've been defined as values, promises, or not at all.
+ * Compilation context; handles compile-time symbol tracking.
  *
  * Created by: spurcell
  * 12/25/14
@@ -13,61 +18,34 @@ var Compiler = require('./Compiler');
 /**
  *
  * @param parent    the parent scope, if any
- * @param cont      the tail of a statement list (optional)
  * @private
  */
 var __ = function (parent) {
 
     this.parent = parent;
-    this.deps = parent ? parent.deps : {};
-    this.symbols = {};  // variables, constants, futures
-    this.receives = [];
-    this.contNum = 0;
+
+    // our local symbol table, containing params, locals, constants, futures, etc.
+    this.symbols = {};
+
+    // references (other modules referenced in this module)
+    this.references = {};
+
+    this.contNum = 0;   // count of continuations, used for creating unique names
+    this.services = [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Registers a dependency in this scope.
+ * Links a reference scope to this scope.
  *
  * @param name
+ * @param scope
  */
-__.prototype.registerDep = function (name) {
+__.prototype.addReference = function (name, scope) {
 
-    this.deps[name] = true;
-};
+    // console.log("adding ref " + name);
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Returns a list of all the dependencies declared in this scope, in no particular order.
- *
- * @param name
- */
-__.prototype.getDeps = function (name) {
-
-    // we don't care about order
-    return Object.keys(this.deps);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Sets the names received within the scope.
- *
- * @param names
- * @returns {Array}
- */
-__.prototype.setReceives = function (names) {
-
-    var _this = this;
-
-    names.map(function (name) {
-
-        if (_this.has(name) == false) {
-            _this.declare(name);
-        }
-
-    });
-
-    this.receives = names;
+    this.references[name] = scope;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,7 +60,13 @@ __.prototype.declare = function (name) {
         throw new Error(name + " is a constant in this scope");
     }
 
-    this.symbols['@' + name] = {type: 'var', name: name};
+    // can only declare variables in non-root scopes
+    if (this.parent) {
+        this.symbols['@' + name] = {type: 'var', name: name};
+    }
+    else {
+        throw new Error("can't declare a variable in a root scope; constants only!");
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,11 +75,21 @@ __.prototype.declare = function (name) {
  *
  * @param name
  * @param value
+ * @param isService true if this is a service definition
  */
-__.prototype.define = function (name, value) {
+__.prototype.define = function (name, value, isService) {
 
     if (this.has(name)) {
         throw new Error(name + " is a constant or variable in this scope");
+    }
+
+    if (isService) {
+        console.log("defining service " + name);
+
+        // pull a switcheroo
+        var id = 'service' + this.id + "_" + this.services.length;
+        this.services.push("const " + id + " = " + value.render() + ";");   // todo put the const name in as the fn name for JS
+        value = id;
     }
 
     this.symbols['@' + name] = {type: 'const', value: value};
@@ -145,7 +139,7 @@ __.prototype.has = function (name) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__.prototype.getJsVars = function (name) {
+__.prototype.getJsVars = function () {
 
     var _this = this;
 
@@ -167,9 +161,20 @@ __.prototype.getJsVars = function (name) {
  * Returns true if the specified name is a defined constant.
  *
  * @param name
+ * @param ref     name of referenced scope to check
  * @return {Boolean}
  */
-__.prototype.isConstant = function (name) {
+__.prototype.isConstant = function (name, ref) {
+
+    // only constants can be referenced in other modules
+    if (ref) {
+        if (this.references[ref]) {
+            return this.references[ref].isConstant(name);
+        }
+        else if (this.parent) {
+            return this.parent.isConstant(name, ref);
+        }
+    }
 
     if (this.symbols['@' + name] !== undefined
         && this.symbols['@' + name].type == 'const') {
@@ -188,9 +193,19 @@ __.prototype.isConstant = function (name) {
  * Returns the value of the specified constant.
  *
  * @param name
+ * @param ref
  * @return {*}
  */
-__.prototype.resolve = function (name) {
+__.prototype.resolve = function (name, ref) {
+
+    if (ref) {
+        if (this.references[ref]) {
+            return this.references[ref].resolve(name);
+        }
+        else if (this.parent) {
+            return this.parent.resolve(name, ref);
+        }
+    }
 
     if (this.symbols['@' + name] !== undefined
         && this.symbols['@' + name].type == 'const') {
@@ -206,11 +221,11 @@ __.prototype.resolve = function (name) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Creates and returns a new child scope. The child knows its parent, but the parent has no record of the child.
+ * Creates and returns a new inner context.
  *
  * @return {*}
  */
-__.prototype.bud = function () { // push? nest? inner? derive? pushDown?
+__.prototype.createInner = function () { // push? nest? inner? derive? pushDown?
 
     return new __(this);
 };
@@ -229,6 +244,7 @@ __.prototype.compile = function (node) {
     // dispatch to the appropriate AST node handler
     return Compiler[node.type].call(this, node);
 };
+
 
 module.exports = __;
 

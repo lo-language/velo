@@ -5,19 +5,19 @@
 
 "use strict";
 
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
 var util = require('util');
 
-module.exports["procedure"] = {
+module.exports["service"] = {
 
     "basic": function (test) {
 
         var node = {
-            type: 'procedure',
+            type: 'service',
+            params: ['next'],
             body: {
                 type: 'stmt_list',
                 head:
-                    { type: 'receive', names: [ 'next' ] }, tail: { type: 'stmt_list', head:
                     { type: 'assign',
                         op: '*=',
                         left: { type: 'id', name: 'result' },
@@ -28,10 +28,9 @@ module.exports["procedure"] = {
                                 {type: 'number', val: '42'}
                             ]} },
                 tail: null}
-            }
         };
 
-        var obj = new Scope().compile(node);
+        var obj = new Context().compile(node);
 
         test.equal(obj.render(),
             'function (task) {var $recur = task.service;\nvar $next, $result;\n\n$next = task.args[0];\n\n' +

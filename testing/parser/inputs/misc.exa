@@ -1,4 +1,4 @@
-test is service {
+test is -> {
 
     // literals and assignments
 
@@ -25,8 +25,8 @@ test is service {
 
     monkeys = 72;
 
-    result = foo() catch {
-        receive err;
+    result = foo() ~> (err) {
+
         log(err);
         reply fixed;
     };
@@ -36,7 +36,7 @@ test is service {
 
     index = 0;
 
-    iterator = service {
+    iterator = -> {
         reply items[index];
         index++;
     };

@@ -1,4 +1,4 @@
-test is service {
+test is -> {
 
     qux = 2 + foo * bar / -2 + baz % ((age - 4));
     num++;

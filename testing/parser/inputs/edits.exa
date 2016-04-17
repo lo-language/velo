@@ -1,8 +1,9 @@
-test is service {
+test is -> {
 
     foo++;
     foo--;
 
-    42 -> foo[0];
-    "Denali" -> mountains;
+    // these aren't really edits anymore since they're non-mutating
+    42 >< foo[0];
+    "Denali" >< mountains;
 };

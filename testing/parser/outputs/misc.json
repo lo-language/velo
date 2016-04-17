@@ -5,7 +5,8 @@
       "type": "constant",
       "name": "test",
       "value": {
-        "type": "procedure",
+        "type": "service",
+        "params": [],
         "body": {
           "type": "stmt_list",
           "head": {
@@ -304,46 +305,40 @@
                                           "recover": {
                                             "type": "handler",
                                             "channel": "fail",
+                                            "params": [
+                                              "err"
+                                            ],
                                             "body": {
                                               "type": "stmt_list",
                                               "head": {
-                                                "type": "receive",
-                                                "names": [
-                                                  "err"
-                                                ]
+                                                "type": "application_stmt",
+                                                "application": {
+                                                  "type": "application",
+                                                  "address": {
+                                                    "type": "id",
+                                                    "name": "log"
+                                                  },
+                                                  "args": [
+                                                    {
+                                                      "type": "id",
+                                                      "name": "err"
+                                                    }
+                                                  ]
+                                                }
                                               },
                                               "tail": {
                                                 "type": "stmt_list",
                                                 "head": {
-                                                  "type": "application_stmt",
-                                                  "application": {
-                                                    "type": "application",
-                                                    "address": {
+                                                  "type": "response",
+                                                  "channel": "reply",
+                                                  "args": [
+                                                    {
                                                       "type": "id",
-                                                      "name": "log"
-                                                    },
-                                                    "args": [
-                                                      {
-                                                        "type": "id",
-                                                        "name": "err"
-                                                      }
-                                                    ]
-                                                  }
+                                                      "name": "fixed"
+                                                    }
+                                                  ]
                                                 },
-                                                "tail": {
-                                                  "type": "stmt_list",
-                                                  "head": {
-                                                    "type": "response",
-                                                    "channel": "reply",
-                                                    "args": [
-                                                      {
-                                                        "type": "id",
-                                                        "name": "fixed"
-                                                      }
-                                                    ]
-                                                  },
-                                                  "tail": null
-                                                }
+                                                "tail": null
                                               }
                                             }
                                           }
@@ -373,7 +368,8 @@
                                               "name": "iterator"
                                             },
                                             "right": {
-                                              "type": "procedure",
+                                              "type": "service",
+                                              "params": [],
                                               "body": {
                                                 "type": "stmt_list",
                                                 "head": {

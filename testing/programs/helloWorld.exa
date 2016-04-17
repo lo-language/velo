@@ -3,7 +3,9 @@
  * 5/3/15
  */
 
+link "common" as Common;
+
 receive args, io, system;
 
 // fire and forget - we won't wait!
-*io.stdout.write("hello, world!");
+*io.stdout.write(Common::GREETING);

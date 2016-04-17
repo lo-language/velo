@@ -1,7 +1,12 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Seth Purcell. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE in the project root for license information.
+ *-------------------------------------------------------------------------------------------*/
+
 /**
  * The Exa-to-JS compiler
  *
- * This is a collection of stateless functions expecting to be called with a Scope as 'this'.
+ * This is a collection of stateless functions expecting to be called with a Context as 'this'.
  *
  * How it works:
  *
@@ -22,19 +27,24 @@ var Call = require('./Call');
 var Future = require('./Future');
 
 // this is a stateless library, not a "class"
+// ??? should we just add these as instance methods to Context?
 var __ = {};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Compiles a module into an Exa service factory, that is a JS function that you call to *create* an Exa service.
- * This lets us bind a module registry into the module.
+ * Compiles a module, producing a symbol table.
  *
  * @param node
  */
 __['module'] = function (node) {
 
-    return new JsConstruct([
-        "'use strict';\n\nreturn ", this.compile(node.service), ';']);
+    // the scope already has any references loaded into it
+
+    // return new JsConstruct([
+    //     "'use strict';\n\nreturn ", this.compile(node.service), ';']);
+
+    // the net result of compiling a module is a loaded-up scope, not a return value
+    return node.definitions.map(this.compile.bind(this));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -52,49 +62,53 @@ __['nil'] = function (node) {
  *
  * @param node
  */
-__['modref'] = function (node) {
-
-    // think of module literals as symbols on the schematic
-    // when we compile, we just need to validate internally
-    // when we RUN, we need to have the symbols' meanings to hand
-    // compilation generates the complete and final code for a module
-    // acquire used to be injected at the root, now it's ambient via this mechanism
-    // what's the advantage of modrefs over acquire? static analysis & eager validation & compilation - anything else?
-
-    // register the dependency with the current scope
-    this.registerDep(node.val);
-
-    // every module has MODS in scope which maps modrefs to service functions
-    return new JsConstruct(['MODS["' + node.val + '"]']);
-};
+// __['modref'] = function (node) {
+//
+//     // think of module literals as symbols on the schematic
+//     // when we compile, we just need to validate internally
+//     // when we RUN, we need to have the symbols' meanings to hand
+//     // compilation generates the complete and final code for a module
+//     // acquire used to be injected at the root, now it's ambient via this mechanism
+//     // what's the advantage of modrefs over acquire? static analysis & eager validation & compilation - anything else?
+//
+//     // register the dependency with the current scope
+//     this.registerDep(node.val);
+//
+//     // every module has MODS in scope which maps modrefs to service functions
+//     return new JsConstruct(['MODS["' + node.val + '"]']);
+// };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * A procedure is an expression.
+ * A service definition is an expression.
  *
  * @param node
  */
-__['procedure'] = function (node) {
+__['service'] = function (node) {
 
     // push a new scope onto the scope stack
-    var localScope = this.bud();
+    var local = this.createInner();
+
+    // process params
+    var params = node.params.map(function (name, index) {
+
+            local.declare(name);
+            return '$' + name + ' = ' + 'task.args[' + index + '];\n';
+
+        }).join('') + '\n';
 
     // compile the statement(s) in the context of the local scope
-    var body = localScope.compile(node.body);
+    var body = local.compile(node.body);
 
     // after compilation we can get our declared vars
-    var localVars = localScope.getJsVars();
-
-    var receives = localScope.receives.map(function (name, index) {
-        return '$' + name + ' = ' + 'task.args[' + index + '];\n';
-    }).join('') + '\n';
+    var localVars = local.getJsVars();
 
     // todo only include recur where it's referenced (or just remove this feature)
     // declare our local vars
     var fnBody = [
         'var $recur = task.service;\n',
         localVars.length > 0 ? 'var ' + localVars.join(', ') + ';\n\n' : '',
-        receives, body];
+        params, body];
 
     // implements an exa service as a JS function that takes a task
     return new JsConstruct([
@@ -123,20 +137,6 @@ __['stmt_list'] = function (node) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Statements
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * @param node
- */
-__['receive'] = function (node) {
-
-    // todo do we always want the declaration? could use receive to clobber existing values...
-
-    this.setReceives(node.names);
-
-    // return an empty construct to allow attachment
-    return new JsConstruct();
-};
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
@@ -322,14 +322,14 @@ __['handler'] = function (node) {
     // todo look at the channel
 
     // create a new scope for the handler
-    var localScope = this.bud();
+    var localScope = this.createInner();
     var body = localScope.compile(node.body);
 
     // unpack the scope
     // after compilation we can get our declared vars
     var localVars = localScope.getJsVars();
 
-    var receives = localScope.receives.map(function (name, index) {
+    var params = node.params.map(function (name, index) {
             return '$' + name + ' = ' + 'args[' + index + '];\n'; // differs from procedure (which is task.args.shift)
         }).join('') + '\n';
 
@@ -337,7 +337,7 @@ __['handler'] = function (node) {
     // declare our local vars
     var fnBody = [
         localVars.length > 0 ? 'var ' + localVars.join(', ') + ';\n\n' : '',
-        receives, body];
+        params, body];
 
     // create a new JS function for the handler
     return new JsConstruct('function (args) ', {block: fnBody});
@@ -388,8 +388,8 @@ __['id'] = function (node) {
     // context could also let us know we're in string interpolation
     // as well as conditionals
 
-    if (this.isConstant(node.name)) {
-        return this.resolve(node.name);
+    if (this.isConstant(node.name, node.scope)) {
+        return this.resolve(node.name, node.scope);
     }
 
     // todo just return whatever the ID resolves to in this scope?
@@ -411,7 +411,7 @@ __['id'] = function (node) {
  */
 __['constant'] = function (node) {
 
-    this.define(node.name, this.compile(node.value));
+    this.define(node.name, this.compile(node.value), node.value.type == 'procedure');
 
     // return an empty construct to allow attachment
     return new JsConstruct();
@@ -669,6 +669,23 @@ __['string'] = function (node) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ *
+ * @param node
+ */
+// __['link'] = function (node) {
+//
+//     // we don't register a module dependency because we need the symbols now
+//     // but that will be too late - we need the symbols loaded at *compile time*
+//
+//     // copies the symbols into the current symbol table
+//     this.adopt(node.name);
+//
+//     // return an empty construct to allow attachment
+//     return new JsConstruct();
+// };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
  * Handles lists and maps.
  *
  * @param node
@@ -733,8 +750,8 @@ __['field'] = function (node) {
 
     var value = this.compile(node.value);
 
-    // we don't qualify field names
-    return [node.name, ':', value];
+    // we don't qualify field labels
+    return [node.label, ':', value];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

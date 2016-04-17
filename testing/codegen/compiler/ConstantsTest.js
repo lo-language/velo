@@ -6,7 +6,7 @@
 "use strict";
 
 var Compiler = require('../../../codegen/Compiler');
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
 var util = require('util');
 
 module.exports["constants"] = {
@@ -19,7 +19,7 @@ module.exports["constants"] = {
             "value": {type: "number", val: "443"}
         };
 
-        var scope = new Scope();
+        var scope = new Context();
 
         test.equal(scope.has('port'), false);
         test.equal(scope.isConstant('port'), false);
@@ -41,7 +41,7 @@ module.exports["constants"] = {
             "value": {type: "string", val: "Melon Collie"}
         };
 
-        var scope = new Scope();
+        var scope = new Context();
 
         test.equal(scope.has('album'), false);
         test.equal(scope.isConstant('album'), false);
@@ -63,7 +63,7 @@ module.exports["constants"] = {
             "value": {type: "string", val: "Melon Collie"}
         };
 
-        var scope = new Scope();
+        var scope = new Context();
 
         test.equal(scope.has('constructor'), false);
         test.equal(scope.isConstant('constructor'), false);

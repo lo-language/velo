@@ -1,4 +1,4 @@
-test is service {
+test is -> {
 
     x = foo[cut 37];
     y = bar[cut 1..11];

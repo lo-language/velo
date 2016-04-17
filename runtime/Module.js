@@ -1,3 +1,8 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Seth Purcell. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE in the project root for license information.
+ *-------------------------------------------------------------------------------------------*/
+
 /**
  * Module is the bridge between codegen and execution.
  */
@@ -5,7 +10,7 @@
 "use strict";
 
 const ASTBuilder = require('./../parser/ASTBuilder');
-const Scope = require('./../codegen/Scope');
+const Scope = require('./../codegen/Context');
 const util = require('util');
 
 var parser = new ASTBuilder();

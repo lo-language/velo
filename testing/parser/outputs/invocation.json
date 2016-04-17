@@ -5,7 +5,8 @@
       "type": "constant",
       "name": "test",
       "value": {
-        "type": "procedure",
+        "type": "service",
+        "params": [],
         "body": {
           "type": "stmt_list",
           "head": {
@@ -169,6 +170,7 @@
                               "subsequent": {
                                 "type": "handler",
                                 "channel": "reply",
+                                "params": [],
                                 "body": {
                                   "type": "stmt_list",
                                   "head": {
@@ -205,6 +207,9 @@
                                 "subsequent": {
                                   "type": "handler",
                                   "channel": "reply",
+                                  "params": [
+                                    "result"
+                                  ],
                                   "body": {
                                     "type": "stmt_list",
                                     "head": {
@@ -216,6 +221,9 @@
                                 "contingency": {
                                   "type": "handler",
                                   "channel": "fail",
+                                  "params": [
+                                    "err"
+                                  ],
                                   "body": {
                                     "type": "stmt_list",
                                     "head": {
@@ -252,6 +260,10 @@
                                   "subsequent": {
                                     "type": "handler",
                                     "channel": "reply",
+                                    "params": [
+                                      "a",
+                                      "b"
+                                    ],
                                     "body": {
                                       "type": "stmt_list",
                                       "head": {
@@ -270,6 +282,7 @@
                                   "contingency": {
                                     "type": "handler",
                                     "channel": "fail",
+                                    "params": [],
                                     "body": {
                                       "type": "stmt_list",
                                       "head": {
@@ -311,6 +324,7 @@
                                     "subsequent": {
                                       "type": "handler",
                                       "channel": "reply",
+                                      "params": [],
                                       "body": {
                                         "type": "stmt_list",
                                         "head": {
@@ -335,6 +349,7 @@
                                             "subsequent": {
                                               "type": "handler",
                                               "channel": "reply",
+                                              "params": [],
                                               "body": {
                                                 "type": "stmt_list",
                                                 "head": {
@@ -364,6 +379,7 @@
                                             "contingency": {
                                               "type": "handler",
                                               "channel": "fail",
+                                              "params": [],
                                               "body": {
                                                 "type": "stmt_list",
                                                 "head": {
@@ -387,6 +403,7 @@
                                     "contingency": {
                                       "type": "handler",
                                       "channel": "fail",
+                                      "params": [],
                                       "body": {
                                         "type": "stmt_list",
                                         "head": {
@@ -471,28 +488,22 @@
                                           "recover": {
                                             "type": "handler",
                                             "channel": "fail",
+                                            "params": [
+                                              "error"
+                                            ],
                                             "body": {
                                               "type": "stmt_list",
                                               "head": {
-                                                "type": "receive",
-                                                "names": [
-                                                  "error"
+                                                "type": "response",
+                                                "channel": "substitute",
+                                                "args": [
+                                                  {
+                                                    "type": "string",
+                                                    "val": "ok"
+                                                  }
                                                 ]
                                               },
-                                              "tail": {
-                                                "type": "stmt_list",
-                                                "head": {
-                                                  "type": "response",
-                                                  "channel": "substitute",
-                                                  "args": [
-                                                    {
-                                                      "type": "string",
-                                                      "val": "ok"
-                                                    }
-                                                  ]
-                                                },
-                                                "tail": null
-                                              }
+                                              "tail": null
                                             }
                                           }
                                         }
@@ -516,28 +527,22 @@
                                             "contingency": {
                                               "type": "handler",
                                               "channel": "fail",
+                                              "params": [
+                                                "error"
+                                              ],
                                               "body": {
                                                 "type": "stmt_list",
                                                 "head": {
-                                                  "type": "receive",
-                                                  "names": [
-                                                    "error"
+                                                  "type": "response",
+                                                  "channel": "substitute",
+                                                  "args": [
+                                                    {
+                                                      "type": "string",
+                                                      "val": "ok"
+                                                    }
                                                   ]
                                                 },
-                                                "tail": {
-                                                  "type": "stmt_list",
-                                                  "head": {
-                                                    "type": "response",
-                                                    "channel": "substitute",
-                                                    "args": [
-                                                      {
-                                                        "type": "string",
-                                                        "val": "ok"
-                                                      }
-                                                    ]
-                                                  },
-                                                  "tail": null
-                                                }
+                                                "tail": null
                                               }
                                             }
                                           }

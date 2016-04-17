@@ -7,7 +7,7 @@
 
 var Compiler = require('../../../codegen/Compiler');
 var JsConstruct = require('../../../codegen/JsConstruct');
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
 var util = require('util');
 
 module.exports["sync"] = {
@@ -23,7 +23,7 @@ module.exports["sync"] = {
             consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null}
         };
 
-        test.equal(new Scope().compile(node).render(),
+        test.equal(new Context().createInner().compile(node).render(),
             'if ($foo) {$bar = 42;\n}\n\n');
         test.done();
     },
@@ -40,7 +40,7 @@ module.exports["sync"] = {
             alternate: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '32'}}, tail: null}
         };
 
-        test.equal(new Scope().compile(node).render(),
+        test.equal(new Context().createInner().compile(node).render(),
             'if ($foo) {$bar = 42;\n}\n\nelse {$bar = 32;\n}\n\n');
         test.done();
     },
@@ -62,7 +62,7 @@ module.exports["sync"] = {
             }, tail: null}
         };
 
-        test.equal(new Scope().compile(node).render(),
+        test.equal(new Context().createInner().compile(node).render(),
             'if ($foo) {$bar = 42;\n}\n\nelse {if ($bar) {$bar = 32;\n}\n\nelse {$baz = 82;\n}\n\n}\n\n');
         test.done();
     }
@@ -86,7 +86,7 @@ module.exports["async"] = {
                 tail: null}
         };
 
-        test.equal(new Scope().compile(node).render(),
+        test.equal(new Context().createInner().compile(node).render(),
             "var cont0 = function () {};if ($foo) {task.sendMessage($foo, [], function (P0) {$bar = P0;\ncont0();}, null);\n\n}\n\nelse {cont0();}\n\n");
         test.done();
     },
@@ -120,7 +120,7 @@ module.exports["async"] = {
                 tail: null}
         };
 
-        test.equal(new Scope().compile(node).render(),
+        test.equal(new Context().createInner().compile(node).render(),
             'if ($foo) {task.respond("reply", 42);\nreturn;}\n\n');
         test.done();
     }

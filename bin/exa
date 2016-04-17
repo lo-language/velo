@@ -1,25 +1,11 @@
 #!/usr/bin/env node
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Seth Purcell. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE in the project root for license information.
+ *-------------------------------------------------------------------------------------------*/
+
 /*
- * Copyright (C) 2014 by Seth Purcell
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
- * to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
- * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
- * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
- * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *
- * For everyone who doesn't do it for the money.
- *
  * Author: Seth Purcell
  * Date: 12/24/14
  */
@@ -38,6 +24,8 @@ var argv = require('minimist')(process.argv.slice(2));
 var Loader = require('../runtime/Loader');
 var IO = require('../runtime/IO');
 var System = require('../runtime/System');
+var Builder = require('../codegen/Builder');
+const Task = require('../runtime/Task');
 
 var sourceFile = argv._.shift();
 
@@ -49,6 +37,8 @@ if (sourceFile == null) {
 // get the path of the module
 var modulePath = path.dirname(sourceFile);
 var moduleName = path.basename(sourceFile, '.exa');
+
+var builder = new Builder(modulePath);
 
 // todo support specifying more libs on the command line and add to the dir of the main module
 var loader = new Loader(modulePath);
@@ -92,8 +82,15 @@ else {
 
     IO.args = argv;
 
-    loader.run(moduleName, [IO, System]).then(
-        function (result) {
+    builder.build(moduleName).then(
+        function (fn) {
+
+            var d = Q.defer();
+
+            Task.sendRootRequest(fn, [argv._, IO, System], d.resolve.bind(d), d.reject.bind(d));
+
+            return d.promise;
+
             //console.log(result);
         },
         function (msg) {

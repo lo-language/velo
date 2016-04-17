@@ -1,28 +1,43 @@
 /**
+ * Another interview question solution.
+ *
  * Created by: spurcell
  * 2/8/15
  */
 
-findWords is:
+dict is {
+    "hi", "hit", "here", "the", "there", "resign", "post", "signpost"
+};
 
-    receive s; // could declare s constant here
+findWords is service {
+
+    receive s;
 
     length = #s;
     i = 0;
 
-    // scan s
+    while i < length {
 
-    while i < length:
+        word = s[0:i];
 
-        word = s[:i];
+        if dict has word {
 
-        if dict has word:
+            rest = recur(s[i:]);
 
-            rest = recur();
+            if rest != null {
+                reply word >< rest;
+            }
+        }
 
-            if rest != null:
-                reply cons(word, rest); // fuse
+        i++;
+    }
 
-    reply null; // is this the default?
+    reply null;
+};
 
-reply findWords('hitheresignpost');
+main is service {
+
+    receive io, system;
+
+    io.out.write("`findWords('hitheresignpost')`");
+};

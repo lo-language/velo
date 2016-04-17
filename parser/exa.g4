@@ -49,7 +49,7 @@ module
 // would a colon after references improve readability?
 // or should there be a colon between the ID and the modref?
 references
-    : 'references' (ID MODREF)+ // should this not be an ID? maybe a 'label' instead?
+    : 'references:' (ID MODREF)+ // should this not be an ID? maybe a 'label' instead?
     ;
 
 // we do this the old-fashioned way because that's what the compiler wants
@@ -60,11 +60,10 @@ statementList
 
 statement
     : definition                                            # defStmt
-    | 'receive' ID (',' ID)* ';'                            # receive
     | channel=('reply'|'fail'|'substitute') exprList ';'    # response
     | expr assignment_op expr ';'                           # assignment
     | expr op=('++'|'--') ';'                               # incDec
-    | expr '->' expr ';'                                    # splice
+    | expr '><' expr ';'                                    # splice
     | conditional                                           # condStmt
     | 'while' expr block                                    # iteration
     | expr ';'                                              # exprStmt
@@ -123,11 +122,12 @@ expr
     ;
 
 replyHandler
-    : 'then' block
+    : '->' paramList? block
     ;
 
+// can't decide? just do both!
 failHandler
-    : 'catch' block
+    : 'catch'|'~>' paramList? block
     ;
 
 interpolated
@@ -146,10 +146,14 @@ literal
     | BOOL                                      # bool
     | NUMBER                                    # number
     | STRING                                    # string
-    | 'service' block                           # service
+    | '->' paramList? block                     # service
     | '[' exprList? ']'                         # array
     | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
     | '(' (exprList|fieldList)? ')'             # frame
+    ;
+
+paramList
+    : '(' ID? (',' ID)* ')'
     ;
 
 fieldList

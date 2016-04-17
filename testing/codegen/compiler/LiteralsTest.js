@@ -6,7 +6,7 @@
 "use strict";
 
 var Compiler = require('../../../codegen/Compiler');
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
 var util = require('util');
 
 module.exports["literals"] = {
@@ -15,7 +15,7 @@ module.exports["literals"] = {
 
         var node = {type: 'nil'};
 
-        test.equal(new Scope().compile(node), 'null');
+        test.equal(new Context().compile(node), 'null');
         test.done();
     },
 
@@ -23,7 +23,7 @@ module.exports["literals"] = {
 
         var node = {type: 'boolean', val: true};
 
-        test.equal(new Scope().compile(node), 'true');
+        test.equal(new Context().compile(node), 'true');
         test.done();
     },
 
@@ -31,7 +31,7 @@ module.exports["literals"] = {
 
         var node = {type: 'number', val: '42'};
 
-        test.equal(new Scope().compile(node), '42');
+        test.equal(new Context().compile(node), '42');
         test.done();
     },
 
@@ -39,7 +39,7 @@ module.exports["literals"] = {
 
         var node = {type: 'string', val: "turanga leela"};
 
-        test.equal(new Scope().compile(node), "'turanga leela'");
+        test.equal(new Context().compile(node), "'turanga leela'");
         test.done();
     },
 
@@ -53,7 +53,7 @@ module.exports["literals"] = {
                     { type: 'string', val: 'padme' },
                     { type: 'string', val: 'hum' } ] };
 
-        test.equal(new Scope().compile(node).render(), "['foo', 'mani', 'padme', 'hum']");
+        test.equal(new Context().compile(node).render(), "['foo', 'mani', 'padme', 'hum']");
         test.done();
     },
 
@@ -75,7 +75,7 @@ module.exports["literals"] = {
                         key: { type: 'string', val: 'Trillian' },
                         value: { type: 'string', val: 'Earth' } } ] };
 
-        test.equal(new Scope().compile(node).render(), "{'Zaphod':'Betelgeuse', 'Ford':'Betelgeuse', 'Arthur':'Earth', 'Trillian':'Earth'}");
+        test.equal(new Context().compile(node).render(), "{'Zaphod':'Betelgeuse', 'Ford':'Betelgeuse', 'Arthur':'Earth', 'Trillian':'Earth'}");
         test.done();
     },
 
@@ -97,7 +97,7 @@ module.exports["literals"] = {
                         key: { type: 'string', val: 'Trillian' },
                         value: { type: 'string', val: 'Earth' } } ] };
 
-        test.equal(new Scope().compile(node).render(), "{'Zaphod':'Betelgeuse', 'Ford':'Betelgeuse', 'Arthur':'Earth', 'Trillian':'Earth'}");
+        test.equal(new Context().compile(node).render(), "{'Zaphod':'Betelgeuse', 'Ford':'Betelgeuse', 'Arthur':'Earth', 'Trillian':'Earth'}");
         test.done();
     }
 };

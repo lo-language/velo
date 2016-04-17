@@ -1,38 +1,41 @@
-receive io, system;
+references:
 
-createClient is <net:http:client>;
-
-exa     is "http://1e18.org";
-apple   is "http://www.apple.com";
-google  is "http://www.google.com";
+HTTPClient  <net:http:client>
 
 
-// todo connect authority with expertise
-client = createClient();
+main is -> (io, system) {
 
-sendRequest = service {
+    exa     is "http://1e18.org";
+    apple   is "http://www.apple.com";
+    google  is "http://www.google.com";
 
-    receive url;
 
-    *client.get(url) then {
+    // todo connect authority with expertise
+    client = HTTPClient:create();
 
-        receive res, body;  // this style constrains these names to this handler scope
+    sendRequest is -> {
 
-        *io.out.write("response from `url`: status = `res.statusCode`\n");
-        *io.out.write("body length: `#body`\n");
+        *client.get(url) -> {
 
-        reply #body;
+            // this style constrains param names to this handler scope
+
+            *io.out.write("response from `url`: status = `res.statusCode`\n");
+            *io.out.write("body length: `#body`\n");
+
+            reply #body;
+        }
+        ~> {
+        };
+
+        *io.out.write("sent request to `url`\n");
     };
 
-    *io.out.write("sent request to `url`\n");
+    // race some requests
+
+    req1Len = *sendRequest(google); // req1Len is a future now
+    req2Len = sendRequest(apple);
+
+    *io.out.write("`req1Len`\n");
+
+    req3Len = *sendRequest(exa);
 };
-
-// race some requests
-
-req1Len = *sendRequest(google);
-req2Len = sendRequest(apple);
-
-*io.out.write("`req1Len`\n");
-
-req3Len = *sendRequest(exa);
-

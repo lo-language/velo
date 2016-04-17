@@ -1,4 +1,4 @@
-test is service {
+test is -> {
 
     // sync calls
 
@@ -22,14 +22,14 @@ test is service {
     (bar, baz) = *foo(47);  // destructuring
 
     // handle success only
-    *bar(48) then {
+    *bar(48) -> {
         reply "hello";
     };
 
     // handle failure only
-    *baz(128) then {
+    *baz(128) -> (result) {
     }
-    catch {
+    ~> (err) {
         reply "bummer";
     };
 
@@ -37,32 +37,32 @@ test is service {
     // after baz(12) mute;
 
     // handle both success and failure
-    *foo(42) then {
+    *foo(42) -> (a, b) {
         reply "yay";
     }
-    catch {
+    ~> {
         reply "darn";
     };
 
     //nil -> foo => x ~> bar;
 
     // future with failure handler
-    //bar(foo) => baz catch:
+    //bar(foo) => baz ~>:
     //    fail;
 
     // nested requests
     // should we support pipes like 42 -> foo -> bar -> baz?
-    result = *foo(42) then {
+    result = *foo(42) -> {
 
-        result = *bar(result) then {
+        result = *bar(result) -> {
 
             yarp = *baz(result);
         }
-        catch {
+        ~> {
             fail "narp";
         };
     }
-    catch {
+    ~> {
         reply "darn";
     };
 
@@ -73,16 +73,12 @@ test is service {
     x = foo() + 7;
 
 
-    x = foo() catch {
-
-        receive error;
+    x = foo() ~> (error) {
         substitute "ok";
     };
 
 
-    y = *foo() catch {
-
-        receive error;
+    y = *foo() ~> (error) {
         substitute "ok";
     };
 };

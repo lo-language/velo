@@ -14,7 +14,7 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var mod = new Module('reply "hullo!";');
+        var mod = new Module('x is service {reply "hullo!";};');
         var service = mod.makeService();
 
         Task.sendRootRequest(service, null,
