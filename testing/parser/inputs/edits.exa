@@ -4,6 +4,6 @@ test is -> {
     foo--;
 
     // these aren't really edits anymore since they're non-mutating
-    42 >< foo[0];
-    "Denali" >< mountains;
+    answers = 42 >< foo;
+    mountains = "Denali" >< mountains;
 };

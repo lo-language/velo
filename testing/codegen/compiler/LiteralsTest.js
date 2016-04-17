@@ -43,7 +43,7 @@ module.exports["literals"] = {
         test.done();
     },
 
-    "list": function (test) {
+    "array": function (test) {
 
         var node = {
             type: 'array',
@@ -57,21 +57,35 @@ module.exports["literals"] = {
         test.done();
     },
 
+    "set": function (test) {
+
+        var node = {
+            type: 'set',
+            elements:
+                [ { type: 'string', val: 'foo' },
+                    { type: 'string', val: 'mani' },
+                    { type: 'string', val: 'padme' },
+                    { type: 'string', val: 'hum' } ] };
+
+        test.equal(new Context().compile(node).render(), "{'foo': true, 'mani': true, 'padme': true, 'hum': true}");
+        test.done();
+    },
+
     "map": function (test) {
 
         var node = {
             type: 'map',
             elements:
-                [ { type: 'dyad',
+                [ { type: 'pair',
                     key: { type: 'string', val: 'Zaphod' },
                     value: { type: 'string', val: 'Betelgeuse' } },
-                    { type: 'dyad',
+                    { type: 'pair',
                         key: { type: 'string', val: 'Ford' },
                         value: { type: 'string', val: 'Betelgeuse' } },
-                    { type: 'dyad',
+                    { type: 'pair',
                         key: { type: 'string', val: 'Arthur' },
                         value: { type: 'string', val: 'Earth' } },
-                    { type: 'dyad',
+                    { type: 'pair',
                         key: { type: 'string', val: 'Trillian' },
                         value: { type: 'string', val: 'Earth' } } ] };
 
@@ -84,16 +98,16 @@ module.exports["literals"] = {
         var node = {
             type: 'record',
             fields:
-                [ { type: 'dyad',
+                [ { type: 'pair',
                     key: { type: 'string', val: 'Zaphod' },
                     value: { type: 'string', val: 'Betelgeuse' } },
-                    { type: 'dyad',
+                    { type: 'pair',
                         key: { type: 'string', val: 'Ford' },
                         value: { type: 'string', val: 'Betelgeuse' } },
-                    { type: 'dyad',
+                    { type: 'pair',
                         key: { type: 'string', val: 'Arthur' },
                         value: { type: 'string', val: 'Earth' } },
-                    { type: 'dyad',
+                    { type: 'pair',
                         key: { type: 'string', val: 'Trillian' },
                         value: { type: 'string', val: 'Earth' } } ] };
 

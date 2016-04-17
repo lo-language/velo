@@ -30,7 +30,7 @@ module.exports["slice"] = {
             list: {type: 'id', name: 'foo'},
         };
 
-        test.equal(new Context().compile(node).render(), '$foo.slice(0,$foo.length)');
+        test.equal(new Context().compile(node).render(), '$foo.slice(0)');
         test.done();
     },
 
@@ -43,7 +43,7 @@ module.exports["slice"] = {
             end: {type: 'number', val: '-1'}
         };
 
-        test.equal(new Context().compile(node).render(), '$foo.slice($foo.length-3,$foo.length-1)');
+        test.equal(new Context().compile(node).render(), '$foo.slice(-3,-1)');
         test.done();
     },
 

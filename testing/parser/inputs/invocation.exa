@@ -8,7 +8,7 @@ test is -> {
     x = foo();
     (x, y) = foo();
 
-    // todo
+    // todo?
     // x, y = foo();
 
     // async calls
@@ -44,11 +44,6 @@ test is -> {
         reply "darn";
     };
 
-    //nil -> foo => x ~> bar;
-
-    // future with failure handler
-    //bar(foo) => baz ~>:
-    //    fail;
 
     // nested requests
     // should we support pipes like 42 -> foo -> bar -> baz?
@@ -72,11 +67,18 @@ test is -> {
 
     x = foo() + 7;
 
-
+    // error handler only
     x = foo() ~> (error) {
         substitute "ok";
     };
 
+    // both handlers
+    x = bar() -> (result) {
+        reply "ok";
+    }
+    ~> (error) {
+        substitute "ok";
+    };
 
     y = *foo() ~> (error) {
         substitute "ok";

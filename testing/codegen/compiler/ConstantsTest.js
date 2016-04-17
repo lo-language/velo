@@ -19,16 +19,16 @@ module.exports["constants"] = {
             "value": {type: "number", val: "443"}
         };
 
-        var scope = new Context();
+        var context = new Context();
 
-        test.equal(scope.has('port'), false);
-        test.equal(scope.isConstant('port'), false);
+        test.equal(context.has('port'), false);
+        test.equal(context.isConstant('port'), false);
 
-        test.equal(scope.compile(node).render(), '');
+        test.equal(context.compile(node).render(), '');
 
-        test.equal(scope.has('port'), true);
-        test.ok(scope.isConstant('port'));
-        test.equal(scope.resolve('port'), "443");
+        test.equal(context.has('port'), true);
+        test.ok(context.isConstant('port'));
+        test.equal(context.resolve('port'), "443");
 
         test.done();
     },
@@ -41,16 +41,55 @@ module.exports["constants"] = {
             "value": {type: "string", val: "Melon Collie"}
         };
 
-        var scope = new Context();
+        var context = new Context();
 
-        test.equal(scope.has('album'), false);
-        test.equal(scope.isConstant('album'), false);
+        test.equal(context.has('album'), false);
+        test.equal(context.isConstant('album'), false);
 
-        test.equal(scope.compile(node).render(), '');
+        test.equal(context.compile(node).render(), '');
 
-        test.equal(scope.has('album'), true);
-        test.ok(scope.isConstant('album'));
-        test.equal(scope.resolve('album'), "'Melon Collie'");
+        test.equal(context.has('album'), true);
+        test.ok(context.isConstant('album'));
+        test.equal(context.resolve('album'), "'Melon Collie'");
+
+        test.done();
+    },
+
+    "service": function (test) {
+
+        var node = {
+            "type":"constant",
+            "name":"main",
+            "value": {
+                type: 'procedure',
+                params: ['next'],
+                body: {
+                    type: 'stmt_list',
+                    head:
+                    { type: 'assign',
+                        op: '*=',
+                        left: { type: 'id', name: 'result' },
+                        right: {
+                            type: 'application',
+                            address: {type: 'id', name: 'bar'},
+                            args: [
+                                {type: 'number', val: '42'}
+                            ]} },
+                    tail: null
+                }}
+        };
+
+        var context = new Context();
+        context.id = 47;
+
+        test.equal(context.has('main'), false);
+        test.equal(context.isConstant('main'), false);
+
+        test.equal(context.compile(node).render(), '');
+
+        test.equal(context.has('main'), true);
+        test.ok(context.isConstant('main'));
+        test.equal(context.resolve('main'), "service47_0");
 
         test.done();
     },
@@ -63,16 +102,16 @@ module.exports["constants"] = {
             "value": {type: "string", val: "Melon Collie"}
         };
 
-        var scope = new Context();
+        var context = new Context();
 
-        test.equal(scope.has('constructor'), false);
-        test.equal(scope.isConstant('constructor'), false);
+        test.equal(context.has('constructor'), false);
+        test.equal(context.isConstant('constructor'), false);
 
-        test.equal(scope.compile(node).render(), '');
+        test.equal(context.compile(node).render(), '');
 
-        test.equal(scope.has('constructor'), true);
-        test.ok(scope.isConstant('constructor'));
-        test.equal(scope.resolve('constructor'), "'Melon Collie'");
+        test.equal(context.has('constructor'), true);
+        test.ok(context.isConstant('constructor'));
+        test.equal(context.resolve('constructor'), "'Melon Collie'");
 
         test.done();
     }

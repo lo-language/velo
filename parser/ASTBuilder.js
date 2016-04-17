@@ -37,11 +37,6 @@ __.prototype.parse = function (input) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Visit a parse tree produced by exaParser#module.
-__.prototype.visitProgram = function(ctx) {
-
-    return {type: 'module', service: {type: 'procedure', body: ctx.statementList().accept(this)}};
-};
 
 // Visit a parse tree produced by exaParser#module.
 __.prototype.visitModule = function(ctx) {
@@ -186,7 +181,7 @@ __.prototype.visitResponse = function(ctx) {
     return {
         type: 'response',
         channel: ctx.channel.text,
-        args: ctx.exprList().accept(this)
+        args: ctx.exprList() ? ctx.exprList().accept(this) : []
     };
 };
 
@@ -302,7 +297,7 @@ __.prototype.visitPairList = function(ctx) {
     while (ctx.expr(offset)) {
 
         pairs.push({
-            type: 'dyad',
+            type: 'pair',
             key: ctx.expr(offset).accept(this),
             value: ctx.expr(offset + 1).accept(this)
         });
@@ -409,8 +404,12 @@ __.prototype.visitCall = function(ctx) {
         args: args ? args.accept(this) : []
     };
 
+    if (ctx.replyHandler()) {
+        res.subsequent = ctx.replyHandler().accept(this);
+    }
+
     if (ctx.failHandler()) {
-        res.recover = ctx.failHandler().accept(this);
+        res.contingency = ctx.failHandler().accept(this);
     }
 
     return res;
@@ -436,41 +435,6 @@ __.prototype.visitDispatch = function(ctx) {
     }
 
     return res;
-};
-
-
-__.prototype.visitReplyHandler = function(ctx) {
-
-    return {
-        type: 'handler',
-        channel: 'reply',
-        params: ctx.paramList() ? ctx.paramList().accept(this) : [],
-        body: ctx.block().accept(this)
-    };
-};
-
-
-__.prototype.visitFailHandler = function(ctx) {
-
-    return {
-        type: 'handler',
-        channel: 'fail',
-        params: ctx.paramList() ? ctx.paramList().accept(this) : [],
-        body: ctx.block().accept(this)
-    };
-};
-
-
-__.prototype.visitBlock = function(ctx) {
-
-    var stmtList = ctx.statementList();
-
-    if (stmtList) {
-        return stmtList.accept(this);
-    }
-    else {
-        return {type: 'stmt_list', head: {type: 'skip'}, tail: null};
-    }
 };
 
 
@@ -554,16 +518,36 @@ __.prototype.visitField = function(ctx) {
     };
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 __.prototype.visitService = function(ctx) {
 
     return {
-        type: 'service',
+        type: 'procedure',
         params: ctx.paramList() ? ctx.paramList().accept(this) : [],
         body: ctx.block().accept(this)
     };
 };
 
+__.prototype.visitReplyHandler = function(ctx) {
+
+    return {
+        type: 'procedure',
+        channel: 'reply',
+        params: ctx.paramList() ? ctx.paramList().accept(this) : [],
+        body: ctx.block().accept(this)
+    };
+};
+
+__.prototype.visitFailHandler = function(ctx) {
+
+    return {
+        type: 'procedure',
+        channel: 'fail',
+        params: ctx.paramList() ? ctx.paramList().accept(this) : [],
+        body: ctx.block().accept(this)
+    };
+};
 
 __.prototype.visitParamList = function(ctx) {
 
@@ -572,6 +556,19 @@ __.prototype.visitParamList = function(ctx) {
     });
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+__.prototype.visitBlock = function(ctx) {
+
+    var stmtList = ctx.statementList();
+
+    if (stmtList) {
+        return stmtList.accept(this);
+    }
+    else {
+        return {type: 'stmt_list', head: {type: 'skip'}, tail: null};
+    }
+};
 
 __.prototype.visitMeasure = function(ctx) {
 
@@ -624,9 +621,14 @@ __.prototype.visitSet = function (ctx) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-__.prototype.visitSplice = function(ctx) {
+__.prototype.visitConcat = function(ctx) {
 
-    return { type: 'splice', item: ctx.expr(0).accept(this), list: ctx.expr(1).accept(this)};
+    return {
+        type: 'op',
+        op: 'concat',
+        left: ctx.expr(0).accept(this),
+        right: ctx.expr(1).accept(this)
+    };
 };
 
 

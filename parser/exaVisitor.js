@@ -47,11 +47,6 @@ exaVisitor.prototype.visitIncDec = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#splice.
-exaVisitor.prototype.visitSplice = function(ctx) {
-};
-
-
 // Visit a parse tree produced by exaParser#condStmt.
 exaVisitor.prototype.visitCondStmt = function(ctx) {
 };
@@ -139,6 +134,11 @@ exaVisitor.prototype.visitAddSub = function(ctx) {
 
 // Visit a parse tree produced by exaParser#membership.
 exaVisitor.prototype.visitMembership = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#concat.
+exaVisitor.prototype.visitConcat = function(ctx) {
 };
 
 

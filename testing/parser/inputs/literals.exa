@@ -3,6 +3,7 @@ y is false;
 answer is 42;
 age is 63.4;
 message is "hello, world!";
+escaped is "\thello, \"world\"?\n";
 empty is [];
 emptySet is {};
 

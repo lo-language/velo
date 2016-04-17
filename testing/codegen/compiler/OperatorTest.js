@@ -12,8 +12,6 @@ module.exports["op"] = {
 
     "with literals": function (test) {
 
-        // should create a context
-        // should call compile on each statement
 
         var node = {
             type: 'op',
@@ -28,8 +26,6 @@ module.exports["op"] = {
 
     "translates and/or": function (test) {
 
-        // should create a context
-        // should call compile on each statement
 
         var node = {
             type: 'op',
@@ -49,8 +45,6 @@ module.exports["op"] = {
 
 //    "addition handles lists": function (test) {
 //
-//        // should create a context
-//        // should call compile on each statement
 //
 //        var node = {
 //            type: 'op',
@@ -67,8 +61,6 @@ module.exports["op"] = {
 
     "in operator": function (test) {
 
-        // should create a context
-        // should call compile on each statement
 
         var node = {
             type: 'in',
@@ -81,8 +73,6 @@ module.exports["op"] = {
 
     "equality is strict": function (test) {
 
-        // should create a context
-        // should call compile on each statement
 
         var node = {
             type: 'op',
@@ -92,6 +82,23 @@ module.exports["op"] = {
         };
 
         test.equal(new Context().compile(node).render(), "($foo === $bar)");
+        test.done();
+    },
+
+    "concat": function (test) {
+
+        // if strings, should use + operator
+        // if ints, should create an array
+        // if arrays, should concat
+
+        var node = {
+            type: 'op',
+            op: 'concat',
+            left: {type: 'id', name: 'foo'},
+            right: {type: 'id', name: 'bar'}
+        };
+
+        test.equal(new Context().compile(node).render(), "task.concat($foo, $bar)");
         test.done();
     }
 };

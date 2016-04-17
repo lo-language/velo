@@ -10,7 +10,18 @@ var util = require('util');
 
 module.exports["response"] = {
 
-    "reply": function (test) {
+    "reply without args": function (test) {
+
+        var node = {
+            type: 'response',
+            channel: 'reply',
+            args: []};
+
+        test.equal(new Context().compile(node).render(), 'task.respond("reply", []);\nreturn;');
+        test.done();
+    },
+
+    "reply with one arg": function (test) {
 
         var node = {
             type: 'response',
@@ -19,7 +30,21 @@ module.exports["response"] = {
                 {type: 'number', val: '42'}
             ]};
 
-        test.equal(new Context().compile(node).render(), 'task.respond("reply", 42);\nreturn;');
+        test.equal(new Context().compile(node).render(), 'task.respond("reply", [42]);\nreturn;');
+        test.done();
+    },
+
+    "reply with two args": function (test) {
+
+        var node = {
+            type: 'response',
+            channel: 'reply',
+            args: [
+                {type: 'number', val: '42'},
+                {type: 'string', val: "hot dog!"}
+            ]};
+
+        test.equal(new Context().compile(node).render(), 'task.respond("reply", [42, \'hot dog!\']);\nreturn;');
         test.done();
     },
 
@@ -32,7 +57,7 @@ module.exports["response"] = {
                 {type: 'number', val: '42'}
             ]};
 
-        test.equal(new Context().compile(node).render(), 'task.respond("fail", 42);\nreturn;');
+        test.equal(new Context().compile(node).render(), 'task.respond("fail", [42]);\nreturn;');
         test.done();
     }
 };

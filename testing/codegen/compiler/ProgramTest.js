@@ -9,7 +9,7 @@ var Context = require('../../../codegen/Context');
 var util = require('util');
 
 var ast = {
-    type: 'service',
+    type: 'procedure',
     params: [],
     body:
     { type: 'stmt_list',
@@ -18,7 +18,7 @@ var ast = {
             op: '=',
             left: { type: 'id', name: 'foo' },
             right:
-            { type: 'service',
+            { type: 'procedure',
                 params: [],
                 body:
                 { type: 'stmt_list',
@@ -39,8 +39,8 @@ var ast = {
                     args: [] } },
             tail:
             { type: 'stmt_list',
-                head:
-                { type: 'response',
+                head: {
+                    type: 'response',
                     channel: 'reply',
                     args: [ { type: 'id', name: 'x' } ] },
                 tail: null } } } };

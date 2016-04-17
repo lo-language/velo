@@ -20,7 +20,7 @@ module.exports["dispatch"] = {
                 "name": "foo"
             },
             "subsequent": {
-                type: "handler",
+                type: "procedure",
                 channel: "reply",
                 params: [],
                 body: {
@@ -51,7 +51,7 @@ module.exports["dispatch"] = {
                 "name": "foo"
             },
             "contingency": {
-                type: "handler",
+                type: "procedure",
                 channel: "fail",
                 params: [],
                 body: {
@@ -82,7 +82,7 @@ module.exports["dispatch"] = {
                 "name": "foo"
             },
             "subsequent": {
-                type: "handler",
+                type: "procedure",
                 channel: "reply",
                 params: [],
                 body: {
@@ -97,7 +97,7 @@ module.exports["dispatch"] = {
                 }
             },
             "contingency": {
-                type: "handler",
+                type: "procedure",
                 channel: "fail",
                 params: [],
                 body: {

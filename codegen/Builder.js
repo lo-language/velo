@@ -100,16 +100,25 @@ __.prototype.build = function (path) {
     // we load and parse all modules first to sanity-check the graph before we bother compiling anything
     console.log("validating module graph");
     
-    // slap the runtime in there
+    // todo slap the runtime in there
 
-    return this.compile(path).then(mainScope => {
+    return this.compile(path).then(main => {
 
-        return new Function ("rootTask", this.modules.map(scope => {
-
+        var body = "'use strict';\n\n" + this.modules.map(scope => {
             return scope.services.join("\n\n");
 
-        }).join("\n\n") + "\n\n console.log('running main');\n\n" + mainScope.resolve('main') + '(rootTask);\n\n');
+        }).join("\n\n") + "\n\n console.log('running main');\n\n" + main.resolve('main') + '(rootTask);\n\n';
+
+        try {
+            console.log(body);
+            return new Function("rootTask", body);
+        }
+        catch (err) {
+            console.log(body);
+            throw err;
+        }
     });
 };
 
 module.exports = __;
+

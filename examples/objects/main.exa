@@ -4,7 +4,7 @@
 
 references:
 
-Square  <http://x-language.org/dev/libs/Square>
+Square  <Square>
 
 main is -> (args, io, system) {
 

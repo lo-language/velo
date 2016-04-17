@@ -9,35 +9,49 @@ dict is {
     "hi", "hit", "here", "the", "there", "resign", "post", "signpost"
 };
 
-findWords is service {
+main is -> (args, io, system) {
 
-    receive s;
+    findWords = -> (s) {
 
-    length = #s;
-    i = 0;
+        length = #s;
+        i = 1;
 
-    while i < length {
-
-        word = s[0:i];
-
-        if dict has word {
-
-            rest = recur(s[i:]);
-
-            if rest != null {
-                reply word >< rest;
-            }
+        // base case
+        if length == 0 {
+            reply [];
         }
 
-        i++;
+        io.out.write("`s`, `length`\n");
+
+        while i < (length + 1) {
+
+            word = s[0..i];
+
+            io.out.write("`word`, `i`\n");
+
+            if dict[word] {
+
+                io.out.write("FOUND\n");
+
+                // there are two patterns for ignoring failure on sync messages?... only catch reply, or catch failure and ignore
+                recur(s[i..]) -> (rest) {
+                    reply word >< rest;
+                };
+
+                // on failure we don't reply, so we keep on truckin'
+            }
+
+            i++;
+        }
+
+        fail;
+    };
+
+    findWords("hitheresignpost") -> (result) {
+        io.out.write("success is sweet\n");
     }
-
-    reply null;
-};
-
-main is service {
-
-    receive io, system;
-
-    io.out.write("`findWords('hitheresignpost')`");
+    ~> {
+        io.out.write("failure is shameful\n");
+        fail;
+    };
 };

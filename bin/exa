@@ -94,10 +94,7 @@ else {
             //console.log(result);
         },
         function (msg) {
-            console.error(msg);
-
-            // inform the OS
-            process.exit(1);
+            throw msg;
         }
-    );
+    ).done();
 }

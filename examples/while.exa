@@ -1,18 +1,19 @@
-receive args, io;
 
-path = [];
-num = 0;
+main is -> (args, io) {
 
-max is 10001;
+    path = [];
+    num = 0;
 
-while num < max {
+    max is 10001;
 
-    if num % 1000 == 0 {
-        num -> path;
+    while num < max {
+
+        if num % 1000 == 0 {
+            num >< path;
+        }
+
+        num++;
     }
 
-    num++;
-}
-
-io.stdout.write("`path`\n");
-
+    io.out.write("`path`\n");
+};

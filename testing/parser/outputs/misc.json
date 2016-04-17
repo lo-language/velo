@@ -5,7 +5,7 @@
       "type": "constant",
       "name": "test",
       "value": {
-        "type": "service",
+        "type": "procedure",
         "params": [],
         "body": {
           "type": "stmt_list",
@@ -302,8 +302,8 @@
                                             "name": "foo"
                                           },
                                           "args": [],
-                                          "recover": {
-                                            "type": "handler",
+                                          "contingency": {
+                                            "type": "procedure",
                                             "channel": "fail",
                                             "params": [
                                               "err"
@@ -368,7 +368,7 @@
                                               "name": "iterator"
                                             },
                                             "right": {
-                                              "type": "service",
+                                              "type": "procedure",
                                               "params": [],
                                               "body": {
                                                 "type": "stmt_list",

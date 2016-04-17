@@ -13,24 +13,22 @@
             "type": "conditional",
             "predicate": {
               "type": "op",
-              "op": ">",
+              "op": "==",
               "left": {
                 "type": "id",
                 "name": "foo"
               },
               "right": {
                 "type": "number",
-                "val": "2"
+                "val": "1"
               }
             },
             "consequent": {
               "type": "stmt_list",
               "head": {
-                "type": "increment",
-                "operand": {
-                  "type": "id",
-                  "name": "x"
-                }
+                "type": "response",
+                "channel": "reply",
+                "args": []
               },
               "tail": null
             }
@@ -48,28 +46,15 @@
                 },
                 "right": {
                   "type": "number",
-                  "val": "4"
+                  "val": "2"
                 }
               },
               "consequent": {
                 "type": "stmt_list",
                 "head": {
-                  "type": "decrement",
-                  "operand": {
-                    "type": "id",
-                    "name": "x"
-                  }
-                },
-                "tail": null
-              },
-              "alternate": {
-                "type": "stmt_list",
-                "head": {
-                  "type": "increment",
-                  "operand": {
-                    "type": "id",
-                    "name": "x"
-                  }
+                  "type": "response",
+                  "channel": "fail",
+                  "args": []
                 },
                 "tail": null
               }
@@ -87,41 +72,22 @@
                   },
                   "right": {
                     "type": "number",
-                    "val": "42"
+                    "val": "3"
                   }
                 },
                 "consequent": {
                   "type": "stmt_list",
                   "head": {
-                    "type": "increment",
-                    "operand": {
-                      "type": "id",
-                      "name": "x"
-                    }
+                    "type": "response",
+                    "channel": "reply",
+                    "args": [
+                      {
+                        "type": "string",
+                        "val": "ok"
+                      }
+                    ]
                   },
                   "tail": null
-                },
-                "alternate": {
-                  "type": "conditional",
-                  "predicate": {
-                    "type": "op",
-                    "op": "==",
-                    "left": {
-                      "type": "id",
-                      "name": "foo"
-                    },
-                    "right": {
-                      "type": "number",
-                      "val": "15"
-                    }
-                  },
-                  "consequent": {
-                    "type": "stmt_list",
-                    "head": {
-                      "type": "skip"
-                    },
-                    "tail": null
-                  }
                 }
               },
               "tail": {
@@ -137,21 +103,27 @@
                     },
                     "right": {
                       "type": "number",
-                      "val": "42"
+                      "val": "4"
                     }
                   },
                   "consequent": {
                     "type": "stmt_list",
                     "head": {
-                      "type": "increment",
-                      "operand": {
-                        "type": "id",
-                        "name": "x"
-                      }
+                      "type": "response",
+                      "channel": "fail",
+                      "args": [
+                        {
+                          "type": "string",
+                          "val": "oh no!"
+                        }
+                      ]
                     },
                     "tail": null
-                  },
-                  "alternate": {
+                  }
+                },
+                "tail": {
+                  "type": "stmt_list",
+                  "head": {
                     "type": "conditional",
                     "predicate": {
                       "type": "op",
@@ -162,50 +134,65 @@
                       },
                       "right": {
                         "type": "number",
-                        "val": "15"
+                        "val": "5"
                       }
                     },
                     "consequent": {
                       "type": "stmt_list",
                       "head": {
-                        "type": "skip"
-                      },
-                      "tail": null
-                    },
-                    "alternate": {
-                      "type": "stmt_list",
-                      "head": {
-                        "type": "skip"
-                      },
-                      "tail": null
-                    }
-                  }
-                },
-                "tail": {
-                  "type": "stmt_list",
-                  "head": {
-                    "type": "iteration",
-                    "condition": {
-                      "type": "op",
-                      "op": "<",
-                      "left": {
-                        "type": "id",
-                        "name": "foo"
-                      },
-                      "right": {
-                        "type": "number",
-                        "val": "15"
-                      }
-                    },
-                    "statements": {
-                      "type": "stmt_list",
-                      "head": {
-                        "type": "skip"
+                        "type": "response",
+                        "channel": "reply",
+                        "args": [
+                          {
+                            "type": "string",
+                            "val": "ok"
+                          },
+                          {
+                            "type": "string",
+                            "val": "fine"
+                          }
+                        ]
                       },
                       "tail": null
                     }
                   },
-                  "tail": null
+                  "tail": {
+                    "type": "stmt_list",
+                    "head": {
+                      "type": "conditional",
+                      "predicate": {
+                        "type": "op",
+                        "op": "==",
+                        "left": {
+                          "type": "id",
+                          "name": "foo"
+                        },
+                        "right": {
+                          "type": "number",
+                          "val": "6"
+                        }
+                      },
+                      "consequent": {
+                        "type": "stmt_list",
+                        "head": {
+                          "type": "response",
+                          "channel": "fail",
+                          "args": [
+                            {
+                              "type": "string",
+                              "val": "oh no!"
+                            },
+                            {
+                              "type": "string",
+                              "val": "too bad"
+                            }
+                          ]
+                        },
+                        "tail": null
+                      }
+                    },
+                    "tail": null
+                  }
                 }
               }
             }

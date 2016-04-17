@@ -121,7 +121,7 @@ module.exports["async"] = {
         };
 
         test.equal(new Context().createInner().compile(node).render(),
-            'if ($foo) {task.respond("reply", 42);\nreturn;}\n\n');
+            'if ($foo) {task.respond("reply", [42]);\nreturn;}\n\n');
         test.done();
     }
 };

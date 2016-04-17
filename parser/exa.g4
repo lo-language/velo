@@ -49,7 +49,7 @@ module
 // would a colon after references improve readability?
 // or should there be a colon between the ID and the modref?
 references
-    : 'references:' (ID MODREF)+ // should this not be an ID? maybe a 'label' instead?
+    : ('references'|'refs') ':' (ID MODREF)+ // should this not be an ID? maybe a 'label' instead?
     ;
 
 // we do this the old-fashioned way because that's what the compiler wants
@@ -60,10 +60,9 @@ statementList
 
 statement
     : definition                                            # defStmt
-    | channel=('reply'|'fail'|'substitute') exprList ';'    # response
+    | channel=('reply'|'fail'|'substitute') exprList? ';'   # response
     | expr assignment_op expr ';'                           # assignment
     | expr op=('++'|'--') ';'                               # incDec
-    | expr '><' expr ';'                                    # splice
     | conditional                                           # condStmt
     | 'while' expr block                                    # iteration
     | expr ';'                                              # exprStmt
@@ -100,7 +99,7 @@ block
     ;
 
 expr
-    : expr '(' exprList? ')' failHandler?                       # call
+    : expr '(' exprList? ')' replyHandler?  failHandler?        # call
     | '*' expr '(' exprList? ')' replyHandler? failHandler?     # dispatch
     | '#' expr                                                  # measure
     | 'not' expr                                                # negation
@@ -110,9 +109,10 @@ expr
     | expr op=('<'|'>'|'<='|'>='|'=='|'!=') expr                # compare
     | expr op=('and'|'or') expr                                 # logical
     | expr 'in' expr                                            # membership // not sure where this guy should go, precedence-wise
+    | expr '><' expr                                            # concat
     | '(' expr ')'                                              # wrap
     | expr '[' cut='cut'? expr ']'                              # subscript // retrieval? access?
-    | expr '[' cut='cut'? expr '..' expr ']'                    # range
+    | expr '[' cut='cut'? expr? '..' expr? ']'                  # range
     | expr '.' ID                                               # field
     | '(' ID (',' ID)+ ')'                                      # destructure
     | INTER_BEGIN interpolated INTER_END                        # dynastring
@@ -149,7 +149,7 @@ literal
     | '->' paramList? block                     # service
     | '[' exprList? ']'                         # array
     | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
-    | '(' (exprList|fieldList)? ')'             # frame
+    | '(' (exprList|fieldList)? ')'             # frame // compound? tuple? record?
     ;
 
 paramList

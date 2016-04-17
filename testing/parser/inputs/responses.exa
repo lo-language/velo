@@ -1,0 +1,26 @@
+test is -> {
+
+    if foo == 1 {
+        reply;
+    }
+
+    if foo == 2 {
+        fail;
+    }
+
+    if foo == 3 {
+        reply "ok";
+    }
+
+    if foo == 4 {
+        fail "oh no!";
+    }
+
+    if foo == 5 {
+        reply "ok", "fine";
+    }
+
+    if foo == 6 {
+        fail "oh no!", "too bad";
+    }
+};

@@ -1,33 +1,31 @@
 /**
  * Constructor
  */
-create is service {
-
-    receive width, height, name;
+create is -> (width, height, name) {
 
     reply (
 
-        getHeight: service {
+        getHeight: -> {
             reply height;
         },
 
-        getWidth: service {
+        getWidth: -> {
             reply width;
         },
 
-        getArea: service {
+        getArea: -> {
             reply height * width;
         },
 
-        setHeight: service {
-            receive height;
+        setHeight: -> (newHeight) {
+            height = newHeight;
         },
 
-        setWidth: service {
-            receive width;
+        setWidth: -> (newWidth) {
+            width = newWidth;
         },
 
-        toString: service {
+        toString: -> {
             reply "`name`: `width` x `height`";
         }
     );

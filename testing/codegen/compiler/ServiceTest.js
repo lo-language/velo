@@ -13,7 +13,7 @@ module.exports["service"] = {
     "basic": function (test) {
 
         var node = {
-            type: 'service',
+            type: 'procedure',
             params: ['next'],
             body: {
                 type: 'stmt_list',

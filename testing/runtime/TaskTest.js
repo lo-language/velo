@@ -564,3 +564,29 @@ module.exports['await'] = {
         });
     }
 };
+
+
+module.exports['concat'] = {
+
+    "success": function (test) {
+
+        var task = new Task();
+
+        // two arrays
+        test.deepEqual(task.concat([0, 1], [2, 3]), [0, 1, 2, 3]);
+
+        // left atom, right array
+        test.deepEqual(task.concat(8, [2, 3]), [8, 2, 3]);
+
+        // right atom, left array
+        test.deepEqual(task.concat([2, 3], 18), [2, 3, 18]);
+
+        // two atoms
+        test.deepEqual(task.concat(42, 57), [42, 57]);
+
+        // two strings - we treat strings like arrays!
+        test.equal(task.concat("vic", "thrill"), "victhrill");
+
+        test.done();
+    }
+};

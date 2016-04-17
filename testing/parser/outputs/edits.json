@@ -5,7 +5,7 @@
       "type": "constant",
       "name": "test",
       "value": {
-        "type": "service",
+        "type": "procedure",
         "params": [],
         "body": {
           "type": "stmt_list",
@@ -28,34 +28,45 @@
             "tail": {
               "type": "stmt_list",
               "head": {
-                "type": "splice",
-                "item": {
-                  "type": "number",
-                  "val": "42"
+                "type": "assign",
+                "op": "=",
+                "left": {
+                  "type": "id",
+                  "name": "answers"
                 },
-                "list": {
-                  "type": "subscript",
-                  "list": {
+                "right": {
+                  "type": "op",
+                  "op": "concat",
+                  "left": {
+                    "type": "number",
+                    "val": "42"
+                  },
+                  "right": {
                     "type": "id",
                     "name": "foo"
-                  },
-                  "index": {
-                    "type": "number",
-                    "val": "0"
                   }
                 }
               },
               "tail": {
                 "type": "stmt_list",
                 "head": {
-                  "type": "splice",
-                  "item": {
-                    "type": "string",
-                    "val": "Denali"
-                  },
-                  "list": {
+                  "type": "assign",
+                  "op": "=",
+                  "left": {
                     "type": "id",
                     "name": "mountains"
+                  },
+                  "right": {
+                    "type": "op",
+                    "op": "concat",
+                    "left": {
+                      "type": "string",
+                      "val": "Denali"
+                    },
+                    "right": {
+                      "type": "id",
+                      "name": "mountains"
+                    }
                   }
                 },
                 "tail": null

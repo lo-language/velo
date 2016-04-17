@@ -77,7 +77,7 @@ module.exports["message"] = {
             },
             args: [{type: 'id', name: 'url'}],
             subsequent: {
-                type: 'handler',
+                type: 'procedure',
                 channel: 'reply',
                 params: [],
                 body: {

@@ -5,7 +5,7 @@
       "type": "constant",
       "name": "test",
       "value": {
-        "type": "service",
+        "type": "procedure",
         "params": [],
         "body": {
           "type": "stmt_list",
@@ -168,7 +168,7 @@
                                 }
                               ],
                               "subsequent": {
-                                "type": "handler",
+                                "type": "procedure",
                                 "channel": "reply",
                                 "params": [],
                                 "body": {
@@ -205,7 +205,7 @@
                                   }
                                 ],
                                 "subsequent": {
-                                  "type": "handler",
+                                  "type": "procedure",
                                   "channel": "reply",
                                   "params": [
                                     "result"
@@ -219,7 +219,7 @@
                                   }
                                 },
                                 "contingency": {
-                                  "type": "handler",
+                                  "type": "procedure",
                                   "channel": "fail",
                                   "params": [
                                     "err"
@@ -258,7 +258,7 @@
                                     }
                                   ],
                                   "subsequent": {
-                                    "type": "handler",
+                                    "type": "procedure",
                                     "channel": "reply",
                                     "params": [
                                       "a",
@@ -280,7 +280,7 @@
                                     }
                                   },
                                   "contingency": {
-                                    "type": "handler",
+                                    "type": "procedure",
                                     "channel": "fail",
                                     "params": [],
                                     "body": {
@@ -322,7 +322,7 @@
                                       }
                                     ],
                                     "subsequent": {
-                                      "type": "handler",
+                                      "type": "procedure",
                                       "channel": "reply",
                                       "params": [],
                                       "body": {
@@ -347,7 +347,7 @@
                                               }
                                             ],
                                             "subsequent": {
-                                              "type": "handler",
+                                              "type": "procedure",
                                               "channel": "reply",
                                               "params": [],
                                               "body": {
@@ -377,7 +377,7 @@
                                               }
                                             },
                                             "contingency": {
-                                              "type": "handler",
+                                              "type": "procedure",
                                               "channel": "fail",
                                               "params": [],
                                               "body": {
@@ -401,7 +401,7 @@
                                       }
                                     },
                                     "contingency": {
-                                      "type": "handler",
+                                      "type": "procedure",
                                       "channel": "fail",
                                       "params": [],
                                       "body": {
@@ -485,8 +485,8 @@
                                             "name": "foo"
                                           },
                                           "args": [],
-                                          "recover": {
-                                            "type": "handler",
+                                          "contingency": {
+                                            "type": "procedure",
                                             "channel": "fail",
                                             "params": [
                                               "error"
@@ -515,17 +515,38 @@
                                           "op": "=",
                                           "left": {
                                             "type": "id",
-                                            "name": "y"
+                                            "name": "x"
                                           },
                                           "right": {
-                                            "type": "message",
+                                            "type": "application",
                                             "address": {
                                               "type": "id",
-                                              "name": "foo"
+                                              "name": "bar"
                                             },
                                             "args": [],
+                                            "subsequent": {
+                                              "type": "procedure",
+                                              "channel": "reply",
+                                              "params": [
+                                                "result"
+                                              ],
+                                              "body": {
+                                                "type": "stmt_list",
+                                                "head": {
+                                                  "type": "response",
+                                                  "channel": "reply",
+                                                  "args": [
+                                                    {
+                                                      "type": "string",
+                                                      "val": "ok"
+                                                    }
+                                                  ]
+                                                },
+                                                "tail": null
+                                              }
+                                            },
                                             "contingency": {
-                                              "type": "handler",
+                                              "type": "procedure",
                                               "channel": "fail",
                                               "params": [
                                                 "error"
@@ -547,7 +568,47 @@
                                             }
                                           }
                                         },
-                                        "tail": null
+                                        "tail": {
+                                          "type": "stmt_list",
+                                          "head": {
+                                            "type": "assign",
+                                            "op": "=",
+                                            "left": {
+                                              "type": "id",
+                                              "name": "y"
+                                            },
+                                            "right": {
+                                              "type": "message",
+                                              "address": {
+                                                "type": "id",
+                                                "name": "foo"
+                                              },
+                                              "args": [],
+                                              "contingency": {
+                                                "type": "procedure",
+                                                "channel": "fail",
+                                                "params": [
+                                                  "error"
+                                                ],
+                                                "body": {
+                                                  "type": "stmt_list",
+                                                  "head": {
+                                                    "type": "response",
+                                                    "channel": "substitute",
+                                                    "args": [
+                                                      {
+                                                        "type": "string",
+                                                        "val": "ok"
+                                                      }
+                                                    ]
+                                                  },
+                                                  "tail": null
+                                                }
+                                              }
+                                            }
+                                          },
+                                          "tail": null
+                                        }
                                       }
                                     }
                                   }

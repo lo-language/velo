@@ -5,9 +5,7 @@ Rect    <Rectangle>
 /**
  * Constructor
  */
-create is service {
-
-    receive side;
+create is -> (side) {
 
     rect = Rect:create(side, side, "square");
 
@@ -20,15 +18,13 @@ create is service {
 
         toString: rect.toString,
 
-        setSide: service {
-
-            receive side;
+        setSide: -> (side) {
 
             rect.setHeight(side);
             rect.setWidth(side);
         },
 
-        getSide: service {
+        getSide: -> {
             reply side;
         }
     );

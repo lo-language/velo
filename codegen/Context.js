@@ -12,7 +12,8 @@
 
 "use strict";
 
-var Compiler = require('./Compiler');
+const Compiler = require('./Compiler');
+const util = require('util');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -238,7 +239,7 @@ __.prototype.createInner = function () { // push? nest? inner? derive? pushDown?
 __.prototype.compile = function (node) {
 
     if (Compiler[node.type] === undefined) {
-        throw new Error("don't know how to compile node type '" + node.type + "'");
+        throw new Error("don't know how to compile node type '" + node.type + "': " + util.inspect(node));
     }
 
     // dispatch to the appropriate AST node handler

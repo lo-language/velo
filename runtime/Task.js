@@ -103,6 +103,22 @@ __.prototype.doAsync = function (cb) {
     };
 };
 
+// utility method, probably shouldn't be in here but rather somewhere else in runtime
+__.prototype.concat = function (left, right) {
+
+    if (typeof left == 'string' && typeof right == 'string') {
+        return left + right;
+    }
+    if (Array.isArray(left)) {
+        return left.concat(right);
+    }
+    if (Array.isArray(right)) {
+        return [left].concat(right);
+    }
+
+    return [left, right];
+};
+
 __.sendRootRequest = function (service, args, onReply, onFail) {
 
     var root = new __(service, args, onReply, onFail);

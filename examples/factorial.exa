@@ -1,6 +1,4 @@
-factorial is service {
-
-    receive num;
+factorial is -> (num) {
 
     if num < 0 {
         fail "I pity the fool!";
@@ -14,9 +12,7 @@ factorial is service {
 };
 
 // todo - enable main to come first?
-main is service {
-
-    receive args, io;
+main is -> (args, io) {
 
     io.out.write("`factorial(args[0])`\n");
 };

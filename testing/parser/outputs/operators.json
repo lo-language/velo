@@ -5,7 +5,7 @@
       "type": "constant",
       "name": "test",
       "value": {
-        "type": "service",
+        "type": "procedure",
         "params": [],
         "body": {
           "type": "stmt_list",
@@ -138,7 +138,30 @@
                       }
                     }
                   },
-                  "tail": null
+                  "tail": {
+                    "type": "stmt_list",
+                    "head": {
+                      "type": "assign",
+                      "op": "=",
+                      "left": {
+                        "type": "id",
+                        "name": "doghouse"
+                      },
+                      "right": {
+                        "type": "op",
+                        "op": "concat",
+                        "left": {
+                          "type": "string",
+                          "val": "dog"
+                        },
+                        "right": {
+                          "type": "string",
+                          "val": "house"
+                        }
+                      }
+                    },
+                    "tail": null
+                  }
                 }
               }
             }
