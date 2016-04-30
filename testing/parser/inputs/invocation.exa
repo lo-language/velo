@@ -14,22 +14,22 @@ test is -> {
     // async calls
 
     foo;
-    *foo(18);
+    @foo(18);
 
-    *sessionStore.getByID(sessionID);
+    @sessionStore.getByID(sessionID);
 
     //foo => bar;
-    (bar, baz) = *foo(47);  // destructuring
+    (bar, baz) = @foo(47);  // destructuring
 
     // handle success only
-    *bar(48) -> {
+    @bar(48) -> {
         reply "hello";
     };
 
     // handle failure only
-    *baz(128) -> (result) {
+    @baz(128) -> (result) {
     }
-    ~> (err) {
+    catch -> (err) {
         reply "bummer";
     };
 
@@ -37,27 +37,27 @@ test is -> {
     // after baz(12) mute;
 
     // handle both success and failure
-    *foo(42) -> (a, b) {
+    @foo(42) -> (a, b) {
         reply "yay";
     }
-    ~> {
+    catch -> {
         reply "darn";
     };
 
 
     // nested requests
     // should we support pipes like 42 -> foo -> bar -> baz?
-    result = *foo(42) -> {
+    result = @foo(42) -> {
 
-        result = *bar(result) -> {
+        result = @bar(result) -> {
 
-            yarp = *baz(result);
+            yarp = @baz(result);
         }
-        ~> {
+        catch -> {
             fail "narp";
         };
     }
-    ~> {
+    catch -> {
         reply "darn";
     };
 
@@ -68,7 +68,7 @@ test is -> {
     x = foo() + 7;
 
     // error handler only
-    x = foo() ~> (error) {
+    x = foo() catch -> (error) {
         substitute "ok";
     };
 
@@ -76,11 +76,11 @@ test is -> {
     x = bar() -> (result) {
         reply "ok";
     }
-    ~> (error) {
+    catch -> (error) {
         substitute "ok";
     };
 
-    y = *foo() ~> (error) {
+    y = @foo() catch -> (error) {
         substitute "ok";
     };
 };

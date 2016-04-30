@@ -84,27 +84,9 @@ __.prototype.visitStatementList = function(ctx) {
 // statements
 
 
-// Visit a parse tree produced by exaParser#receive.
 __.prototype.visitDefStmt = function(ctx) {
 
     return ctx.definition().accept(this);
-};
-
-__.prototype.visitAdopt = function(ctx) {
-
-    return {
-        type: 'adopt',
-        name: ctx.STRING().getText()
-    };
-};
-
-// Visit a parse tree produced by exaParser#receive.
-__.prototype.visitReceive = function(ctx) {
-
-    return {
-        type: 'receive',
-        names: ctx.ID().map(function (token) {return token.getText()})
-    };
 };
 
 
@@ -225,7 +207,6 @@ __.prototype.visitMulDiv = function(ctx) {
     };
 };
 
-
 __.prototype.visitAddSub = function(ctx) {
 
     return {
@@ -235,7 +216,6 @@ __.prototype.visitAddSub = function(ctx) {
         right: ctx.expr(1).accept(this)
     };
 };
-
 
 __.prototype.visitCompare = function(ctx) {
 
@@ -247,7 +227,6 @@ __.prototype.visitCompare = function(ctx) {
     };
 };
 
-
 __.prototype.visitLogical = function(ctx) {
 
     return {
@@ -258,18 +237,15 @@ __.prototype.visitLogical = function(ctx) {
     };
 };
 
-
 __.prototype.visitWrap = function(ctx) {
 
     return ctx.expr().accept(this);
 };
 
-
 __.prototype.visitLitExpr = function(ctx) {
 
     return ctx.literal().accept(this);
 };
-
 
 __.prototype.visitValExpr = function(ctx) {
 
@@ -277,7 +253,6 @@ __.prototype.visitValExpr = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#exprList.
 __.prototype.visitExprList = function(ctx) {
 
     var _this = this;
@@ -286,59 +261,6 @@ __.prototype.visitExprList = function(ctx) {
         return item.accept(_this);
     });
 };
-
-
-__.prototype.visitPairList = function(ctx) {
-
-    var pairs = [];
-
-    var offset = 0;
-
-    while (ctx.expr(offset)) {
-
-        pairs.push({
-            type: 'pair',
-            key: ctx.expr(offset).accept(this),
-            value: ctx.expr(offset + 1).accept(this)
-        });
-
-        offset += 2;
-    }
-
-    return pairs;
-};
-
-
-__.prototype.visitFieldList = function(ctx) {
-
-    var fields = [];
-
-    var offset = 0;
-
-    while (ctx.ID(offset)) {
-
-        fields.push({
-            type: 'field',
-            label: ctx.ID(offset).getText(),
-            value: ctx.expr(offset).accept(this)
-        });
-
-        offset++;
-    }
-
-    return fields;
-};
-
-
-__.prototype.visitPair = function(ctx) {
-
-    return {
-        type: 'dyad',
-        key: ctx.expr(0).accept(this),
-        value: ctx.expr(1).accept(this)
-    };
-};
-
 
 __.prototype.visitExternalId = function(ctx) {
 
@@ -349,7 +271,6 @@ __.prototype.visitExternalId = function(ctx) {
     };
 };
 
-
 __.prototype.visitId = function(ctx) {
 
     return {
@@ -358,10 +279,13 @@ __.prototype.visitId = function(ctx) {
     };
 };
 
-
 __.prototype.visitConstant = function(ctx) {
 
-    return {type: 'constant', name: ctx.ID().getText(), value: ctx.literal().accept(this) };
+    return {
+        type: 'constant',
+        name: ctx.ID().getText(),
+        value: ctx.literal().accept(this)
+    };
 };
 
 
@@ -394,7 +318,10 @@ __.prototype.visitInterpolated = function(ctx) {
 };
 
 
-__.prototype.visitCall = function(ctx) {
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// messages
+
+__.prototype.visitDispatch = function(ctx) {
 
     var args = ctx.exprList();
 
@@ -416,7 +343,7 @@ __.prototype.visitCall = function(ctx) {
 };
 
 
-__.prototype.visitDispatch = function(ctx) {
+__.prototype.visitAsync = function(ctx) {
 
     var args = ctx.exprList();
 
@@ -438,16 +365,42 @@ __.prototype.visitDispatch = function(ctx) {
 };
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// literals
+__.prototype.visitReplyHandler = function(ctx) {
 
+    var procedure = ctx.procedure().accept(this);
 
-// Visit a parse tree produced by exaParser#nil.
-__.prototype.visitNil = function(ctx) {
+    // save a little compiler hint here
+    procedure.channel = "reply";
+
+    return procedure;
 };
 
 
-// Visit a parse tree produced by exaParser#bool.
+__.prototype.visitFailHandler = function(ctx) {
+
+    var procedure = ctx.procedure().accept(this);
+
+    // save a little compiler hint here
+    procedure.channel = "fail";
+
+    return procedure;
+};
+
+
+__.prototype.visitParamList = function(ctx) {
+
+    return ctx.ID().map(function (item) {
+        return item.getText();
+    });
+};
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// literals
+
+__.prototype.visitNil = function(ctx) {
+};
+
 __.prototype.visitBool = function(ctx) {
 
     // ??? might not want to return an actual bool here - number literals are kept as strings
@@ -456,8 +409,6 @@ __.prototype.visitBool = function(ctx) {
         val: ctx.BOOL().getText() == 'true'};
 };
 
-
-// Visit a parse tree produced by exaParser#number.
 __.prototype.visitNumber = function(ctx) {
 
     return {
@@ -465,8 +416,6 @@ __.prototype.visitNumber = function(ctx) {
         val: ctx.NUMBER().getText()};
 };
 
-
-// Visit a parse tree produced by exaParser#string.
 __.prototype.visitString = function(ctx) {
 
     return {
@@ -475,35 +424,18 @@ __.prototype.visitString = function(ctx) {
     };
 };
 
+__.prototype.visitService = function(ctx) {
 
-__.prototype.visitModref = function(ctx) {
-
-    return {
-        type: 'modref',
-        val: ctx.MODREF().getText()
-    };
+    return ctx.procedure().accept(this);
 };
-
 
 __.prototype.visitFrame = function(ctx) {
 
-    if (ctx.exprList()) {
-
-        return {
-            type: 'record',
-            labels: false,
-            fields: ctx.exprList().accept(this)
-        };
-    }
-
-    if (ctx.fieldList()) {
-
-        return {
-            type: 'record',
-            labels: true,
-            fields: ctx.fieldList().accept(this)
-        };
-    }
+    return {
+        type: 'record',
+        labels: true,
+        fields: ctx.fieldList().accept(this)
+    };
 
     return {type: 'record', fields: []};
 };
@@ -518,9 +450,8 @@ __.prototype.visitField = function(ctx) {
     };
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__.prototype.visitService = function(ctx) {
+__.prototype.visitProcedure = function(ctx) {
 
     return {
         type: 'procedure',
@@ -529,54 +460,6 @@ __.prototype.visitService = function(ctx) {
     };
 };
 
-__.prototype.visitReplyHandler = function(ctx) {
-
-    return {
-        type: 'procedure',
-        channel: 'reply',
-        params: ctx.paramList() ? ctx.paramList().accept(this) : [],
-        body: ctx.block().accept(this)
-    };
-};
-
-__.prototype.visitFailHandler = function(ctx) {
-
-    return {
-        type: 'procedure',
-        channel: 'fail',
-        params: ctx.paramList() ? ctx.paramList().accept(this) : [],
-        body: ctx.block().accept(this)
-    };
-};
-
-__.prototype.visitParamList = function(ctx) {
-
-    return ctx.ID().map(function (item) {
-        return item.getText();
-    });
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-__.prototype.visitBlock = function(ctx) {
-
-    var stmtList = ctx.statementList();
-
-    if (stmtList) {
-        return stmtList.accept(this);
-    }
-    else {
-        return {type: 'stmt_list', head: {type: 'skip'}, tail: null};
-    }
-};
-
-__.prototype.visitMeasure = function(ctx) {
-
-    return {
-        type: 'cardinality',
-        operand: ctx.expr().accept(this)
-    };
-};
 
 
 __.prototype.visitArray = function(ctx) {
@@ -591,6 +474,7 @@ __.prototype.visitArray = function(ctx) {
 
     return {type: 'array', elements: []};
 };
+
 
 __.prototype.visitSet = function (ctx) {
 
@@ -617,6 +501,77 @@ __.prototype.visitSet = function (ctx) {
     return {type: 'set', elements: []};
 };
 
+
+__.prototype.visitPairList = function(ctx) {
+
+    var pairs = [];
+
+    var offset = 0;
+
+    while (ctx.expr(offset)) {
+
+        pairs.push({
+            type: 'pair',
+            key: ctx.expr(offset).accept(this),
+            value: ctx.expr(offset + 1).accept(this)
+        });
+
+        offset += 2;
+    }
+
+    return pairs;
+};
+
+__.prototype.visitFieldList = function(ctx) {
+
+    var fields = [];
+
+    var offset = 0;
+
+    while (ctx.ID(offset)) {
+
+        fields.push({
+            type: 'field',
+            label: ctx.ID(offset).getText(),
+            value: ctx.expr(offset).accept(this)
+        });
+
+        offset++;
+    }
+
+    return fields;
+};
+
+__.prototype.visitPair = function(ctx) {
+
+    return {
+        type: 'dyad',
+        key: ctx.expr(0).accept(this),
+        value: ctx.expr(1).accept(this)
+    };
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+__.prototype.visitBlock = function(ctx) {
+
+    var stmtList = ctx.statementList();
+
+    if (stmtList) {
+        return stmtList.accept(this);
+    }
+    else {
+        return {type: 'stmt_list', head: {type: 'skip'}, tail: null};
+    }
+};
+
+__.prototype.visitCardinality = function(ctx) {
+
+    return {
+        type: 'cardinality',
+        operand: ctx.expr().accept(this)
+    };
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

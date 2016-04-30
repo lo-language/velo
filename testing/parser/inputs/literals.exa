@@ -28,11 +28,11 @@ HardyRamanujan is -> {
 
 // labeled nested frame literal
 // no commas between top-level fields
-student is (
-    name: (first: "Alyssa", middle: "P", last: "Hacker")
+student is [
+    name: [first: "Alyssa", middle: "P", last: "Hacker"]
     course: 6
     year: 2001
-);
+];
 
 // unlabeled frame literal
-mottTheTuple is ("Cambridge", ["02138", "02139"], "MA", 1630);
+mottTheTuple is ["Cambridge", ["02138", "02139"], "MA", 1630];

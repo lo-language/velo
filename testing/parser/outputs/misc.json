@@ -304,7 +304,6 @@
                                           "args": [],
                                           "contingency": {
                                             "type": "procedure",
-                                            "channel": "fail",
                                             "params": [
                                               "err"
                                             ],
@@ -340,7 +339,8 @@
                                                 },
                                                 "tail": null
                                               }
-                                            }
+                                            },
+                                            "channel": "fail"
                                           }
                                         }
                                       },

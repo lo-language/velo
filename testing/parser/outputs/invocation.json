@@ -169,7 +169,6 @@
                               ],
                               "subsequent": {
                                 "type": "procedure",
-                                "channel": "reply",
                                 "params": [],
                                 "body": {
                                   "type": "stmt_list",
@@ -184,7 +183,8 @@
                                     ]
                                   },
                                   "tail": null
-                                }
+                                },
+                                "channel": "reply"
                               }
                             }
                           },
@@ -206,7 +206,6 @@
                                 ],
                                 "subsequent": {
                                   "type": "procedure",
-                                  "channel": "reply",
                                   "params": [
                                     "result"
                                   ],
@@ -216,11 +215,11 @@
                                       "type": "skip"
                                     },
                                     "tail": null
-                                  }
+                                  },
+                                  "channel": "reply"
                                 },
                                 "contingency": {
                                   "type": "procedure",
-                                  "channel": "fail",
                                   "params": [
                                     "err"
                                   ],
@@ -237,7 +236,8 @@
                                       ]
                                     },
                                     "tail": null
-                                  }
+                                  },
+                                  "channel": "fail"
                                 }
                               }
                             },
@@ -259,7 +259,6 @@
                                   ],
                                   "subsequent": {
                                     "type": "procedure",
-                                    "channel": "reply",
                                     "params": [
                                       "a",
                                       "b"
@@ -277,11 +276,11 @@
                                         ]
                                       },
                                       "tail": null
-                                    }
+                                    },
+                                    "channel": "reply"
                                   },
                                   "contingency": {
                                     "type": "procedure",
-                                    "channel": "fail",
                                     "params": [],
                                     "body": {
                                       "type": "stmt_list",
@@ -296,7 +295,8 @@
                                         ]
                                       },
                                       "tail": null
-                                    }
+                                    },
+                                    "channel": "fail"
                                   }
                                 }
                               },
@@ -323,7 +323,6 @@
                                     ],
                                     "subsequent": {
                                       "type": "procedure",
-                                      "channel": "reply",
                                       "params": [],
                                       "body": {
                                         "type": "stmt_list",
@@ -348,7 +347,6 @@
                                             ],
                                             "subsequent": {
                                               "type": "procedure",
-                                              "channel": "reply",
                                               "params": [],
                                               "body": {
                                                 "type": "stmt_list",
@@ -374,11 +372,11 @@
                                                   }
                                                 },
                                                 "tail": null
-                                              }
+                                              },
+                                              "channel": "reply"
                                             },
                                             "contingency": {
                                               "type": "procedure",
-                                              "channel": "fail",
                                               "params": [],
                                               "body": {
                                                 "type": "stmt_list",
@@ -393,16 +391,17 @@
                                                   ]
                                                 },
                                                 "tail": null
-                                              }
+                                              },
+                                              "channel": "fail"
                                             }
                                           }
                                         },
                                         "tail": null
-                                      }
+                                      },
+                                      "channel": "reply"
                                     },
                                     "contingency": {
                                       "type": "procedure",
-                                      "channel": "fail",
                                       "params": [],
                                       "body": {
                                         "type": "stmt_list",
@@ -417,7 +416,8 @@
                                           ]
                                         },
                                         "tail": null
-                                      }
+                                      },
+                                      "channel": "fail"
                                     }
                                   }
                                 },
@@ -487,7 +487,6 @@
                                           "args": [],
                                           "contingency": {
                                             "type": "procedure",
-                                            "channel": "fail",
                                             "params": [
                                               "error"
                                             ],
@@ -504,7 +503,8 @@
                                                 ]
                                               },
                                               "tail": null
-                                            }
+                                            },
+                                            "channel": "fail"
                                           }
                                         }
                                       },
@@ -526,7 +526,6 @@
                                             "args": [],
                                             "subsequent": {
                                               "type": "procedure",
-                                              "channel": "reply",
                                               "params": [
                                                 "result"
                                               ],
@@ -543,11 +542,11 @@
                                                   ]
                                                 },
                                                 "tail": null
-                                              }
+                                              },
+                                              "channel": "reply"
                                             },
                                             "contingency": {
                                               "type": "procedure",
-                                              "channel": "fail",
                                               "params": [
                                                 "error"
                                               ],
@@ -564,7 +563,8 @@
                                                   ]
                                                 },
                                                 "tail": null
-                                              }
+                                              },
+                                              "channel": "fail"
                                             }
                                           }
                                         },
@@ -586,7 +586,6 @@
                                               "args": [],
                                               "contingency": {
                                                 "type": "procedure",
-                                                "channel": "fail",
                                                 "params": [
                                                   "error"
                                                 ],
@@ -603,7 +602,8 @@
                                                     ]
                                                   },
                                                   "tail": null
-                                                }
+                                                },
+                                                "channel": "fail"
                                               }
                                             }
                                           },

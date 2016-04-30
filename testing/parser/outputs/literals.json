@@ -254,9 +254,8 @@
       "type": "constant",
       "name": "mottTheTuple",
       "value": {
-        "type": "record",
-        "labels": false,
-        "fields": [
+        "type": "array",
+        "elements": [
           {
             "type": "string",
             "val": "Cambridge"

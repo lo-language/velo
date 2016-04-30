@@ -99,9 +99,9 @@ block
     ;
 
 expr
-    : expr '(' exprList? ')' replyHandler?  failHandler?        # call
-    | '*' expr '(' exprList? ')' replyHandler? failHandler?     # dispatch
-    | '#' expr                                                  # measure
+    : expr '(' exprList? ')' replyHandler? failHandler?         # dispatch
+    | '@' expr '(' exprList? ')' replyHandler? failHandler?     # async
+    | '#' expr                                                  # cardinality
     | 'not' expr                                                # negation
     | 'bytes' expr                                              # bytes
     | expr op=('*'|'/'|'%') expr                                # mulDiv
@@ -122,12 +122,11 @@ expr
     ;
 
 replyHandler
-    : '->' paramList? block
+    : procedure
     ;
 
-// can't decide? just do both!
 failHandler
-    : 'catch'|'~>' paramList? block
+    : 'catch' procedure
     ;
 
 interpolated
@@ -141,15 +140,20 @@ exprList
 
 // literals
 
+// are arrays and frames immutable?
 literal
     : 'nil'                                     # nil
     | BOOL                                      # bool
     | NUMBER                                    # number
     | STRING                                    # string
-    | '->' paramList? block                     # service
     | '[' exprList? ']'                         # array
+    | '[' fieldList ']'                         # frame // record? tuple? compound? composite?
     | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
-    | '(' (exprList|fieldList)? ')'             # frame // compound? tuple? record?
+    | procedure                                 # service
+    ;
+
+procedure
+    : '->' paramList? block
     ;
 
 paramList
