@@ -252,6 +252,11 @@ exaVisitor.prototype.visitService = function(ctx) {
 };
 
 
+// Visit a parse tree produced by exaParser#subscription.
+exaVisitor.prototype.visitSubscription = function(ctx) {
+};
+
+
 // Visit a parse tree produced by exaParser#procedure.
 exaVisitor.prototype.visitProcedure = function(ctx) {
 };

@@ -150,6 +150,7 @@ literal
     | '[' fieldList ']'                         # frame // record? compound? composite?
     | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
     | procedure                                 # service
+    | 'on' expr procedure                       # subscription  // maybe not a literal
     ;
 
 procedure
