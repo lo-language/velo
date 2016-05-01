@@ -64,6 +64,7 @@ statement
     | expr assignment_op expr ';'                           # assignment
     | expr op=('++'|'--') ';'                               # incDec
     | conditional                                           # condStmt
+    | expr '>>' expr ';'                                    # send  // fire-and-forget to be clear and prevent us from using @syntax; is NOT a request, note that it is a statement, not an expression; precludes reply. could reuse -> here instead
     | 'while' expr block                                    # iteration
     | expr ';'                                              # exprStmt
     ;
@@ -99,8 +100,8 @@ block
     ;
 
 expr
-    : expr '(' exprList? ')' replyHandler? failHandler?         # dispatch
-    | '@' expr '(' exprList? ')' replyHandler? failHandler?     # async
+    : expr '(' exprList? ')' replyHandler? failHandler?         # dispatch  // request?
+    | '@' expr '(' exprList? ')' replyHandler? failHandler?     # async // dispatch?
     | '#' expr                                                  # cardinality
     | 'not' expr                                                # negation
     | 'bytes' expr                                              # bytes
@@ -126,7 +127,8 @@ replyHandler
     ;
 
 failHandler
-    : 'catch' procedure
+    : 'on' 'failure' procedure
+    | '**' procedure
     ;
 
 interpolated

@@ -29,7 +29,7 @@ test is -> {
     // handle failure only
     @baz(128) -> (result) {
     }
-    catch -> (err) {
+    ** -> (err) {
         reply "bummer";
     };
 
@@ -40,7 +40,7 @@ test is -> {
     @foo(42) -> (a, b) {
         reply "yay";
     }
-    catch -> {
+    on failure -> {
         reply "darn";
     };
 
@@ -53,11 +53,11 @@ test is -> {
 
             yarp = @baz(result);
         }
-        catch -> {
+        on failure -> {
             fail "narp";
         };
     }
-    catch -> {
+    on failure -> {
         reply "darn";
     };
 
@@ -68,7 +68,7 @@ test is -> {
     x = foo() + 7;
 
     // error handler only
-    x = foo() catch -> (error) {
+    x = foo() on failure -> (error) {
         substitute "ok";
     };
 
@@ -76,11 +76,11 @@ test is -> {
     x = bar() -> (result) {
         reply "ok";
     }
-    catch -> (error) {
+    on failure -> (error) {
         substitute "ok";
     };
 
-    y = @foo() catch -> (error) {
+    y = @foo() on failure -> (error) {
         substitute "ok";
     };
 };

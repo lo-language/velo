@@ -52,6 +52,11 @@ exaVisitor.prototype.visitCondStmt = function(ctx) {
 };
 
 
+// Visit a parse tree produced by exaParser#send.
+exaVisitor.prototype.visitSend = function(ctx) {
+};
+
+
 // Visit a parse tree produced by exaParser#iteration.
 exaVisitor.prototype.visitIteration = function(ctx) {
 };
