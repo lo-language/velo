@@ -192,6 +192,17 @@
     },
     {
       "type": "constant",
+      "name": "setX",
+      "value": {
+        "type": "procedure",
+        "params": [
+          "x"
+        ],
+        "body": "setter"
+      }
+    },
+    {
+      "type": "constant",
       "name": "student",
       "value": {
         "type": "record",

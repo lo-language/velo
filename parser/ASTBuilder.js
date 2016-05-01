@@ -453,6 +453,19 @@ __.prototype.visitField = function(ctx) {
 
 __.prototype.visitProcedure = function(ctx) {
 
+    // detect sugar
+
+    if (ctx.block() == null) {
+
+        return {
+            type: 'procedure',
+            params: ctx.ID().map(function (item) {
+                return item.getText();
+            }),
+            body: 'setter'
+        };
+    }
+
     return {
         type: 'procedure',
         params: ctx.paramList() ? ctx.paramList().accept(this) : [],

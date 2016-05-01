@@ -1,9 +1,0 @@
-test is -> {
-
-    foo++;
-    foo--;
-
-    // these aren't really edits anymore since they're non-mutating
-    answers = 42 >< foo;
-    mountains = "Denali" >< mountains;
-};

@@ -29,47 +29,61 @@
               "type": "stmt_list",
               "head": {
                 "type": "assign",
-                "op": "=",
+                "op": "+=",
                 "left": {
                   "type": "id",
-                  "name": "answers"
+                  "name": "foo"
                 },
                 "right": {
-                  "type": "op",
-                  "op": "concat",
-                  "left": {
-                    "type": "number",
-                    "val": "42"
-                  },
-                  "right": {
-                    "type": "id",
-                    "name": "foo"
-                  }
+                  "type": "number",
+                  "val": "12"
                 }
               },
               "tail": {
                 "type": "stmt_list",
                 "head": {
                   "type": "assign",
-                  "op": "=",
+                  "op": "-=",
                   "left": {
                     "type": "id",
-                    "name": "mountains"
+                    "name": "foo"
                   },
                   "right": {
-                    "type": "op",
-                    "op": "concat",
-                    "left": {
-                      "type": "string",
-                      "val": "Denali"
-                    },
-                    "right": {
-                      "type": "id",
-                      "name": "mountains"
-                    }
+                    "type": "number",
+                    "val": "7"
                   }
                 },
-                "tail": null
+                "tail": {
+                  "type": "stmt_list",
+                  "head": {
+                    "type": "assign",
+                    "op": "*=",
+                    "left": {
+                      "type": "id",
+                      "name": "foo"
+                    },
+                    "right": {
+                      "type": "number",
+                      "val": "10"
+                    }
+                  },
+                  "tail": {
+                    "type": "stmt_list",
+                    "head": {
+                      "type": "assign",
+                      "op": "/=",
+                      "left": {
+                        "type": "id",
+                        "name": "foo"
+                      },
+                      "right": {
+                        "type": "number",
+                        "val": "4"
+                      }
+                    },
+                    "tail": null
+                  }
+                }
               }
             }
           }

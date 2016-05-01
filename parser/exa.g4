@@ -147,17 +147,18 @@ literal
     | NUMBER                                    # number
     | STRING                                    # string
     | '[' exprList? ']'                         # array
-    | '[' fieldList ']'                         # frame // record? tuple? compound? composite?
+    | '[' fieldList ']'                         # frame // record? compound? composite?
     | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
     | procedure                                 # service
     ;
 
 procedure
     : '->' paramList? block
+    | '->' ID (',' ID)*
     ;
 
 paramList
-    : '(' ID? (',' ID)* ')'
+    : '(' ID (',' ID)* ')'
     ;
 
 fieldList

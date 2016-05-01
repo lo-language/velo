@@ -26,6 +26,9 @@ HardyRamanujan is -> {
     reply 1729;
 };
 
+// a little sugar
+setX is -> x;
+
 // labeled nested frame literal
 // no commas between top-level fields
 student is [
