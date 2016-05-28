@@ -28,7 +28,7 @@ __.prototype.respond = function (channel, args) {
     this.hasResponded = true;
     this.response = {channel: channel, args: args};
 
-    (channel == 'reply' ? this.onReply : this.onFail)(args);
+    (channel == 'reply' ? this.onReply : this.onFail).apply(null, args);
 };
 
 __.prototype.await = function (cont) {

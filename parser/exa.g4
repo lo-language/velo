@@ -128,7 +128,8 @@ replyHandler
 
 failHandler
     : 'on' 'failure' procedure
-    | '**' procedure
+    | ('##'|'~~'|'**') procedure    // just a shorthand. ideas: ~~, ##, --, **, __, ?!, ??, !!
+    | 'ignore'
     ;
 
 interpolated

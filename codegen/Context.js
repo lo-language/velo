@@ -12,13 +12,13 @@
 
 "use strict";
 
-const Compiler = require('./Compiler');
+const JsWriter = require('./JsWriter');
 const util = require('util');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
- * @param parent    the parent scope, if any
+ * @param parent    the parent context, if any
  * @private
  */
 var __ = function (parent) {
@@ -37,42 +37,42 @@ var __ = function (parent) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Links a reference scope to this scope.
+ * Links a reference context to this context.
  *
  * @param name
- * @param scope
+ * @param context
  */
-__.prototype.addReference = function (name, scope) {
+__.prototype.addReference = function (name, context) {
 
     // console.log("adding ref " + name);
 
-    this.references[name] = scope;
+    this.references[name] = context;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Declares a variable in this scope.
+ * Declares a variable in this context.
  *
  * @param name
  */
 __.prototype.declare = function (name) {
 
     if (this.isConstant(name)) {
-        throw new Error(name + " is a constant in this scope");
+        throw new Error(name + " is a constant in this context");
     }
 
-    // can only declare variables in non-root scopes
+    // can only declare variables in non-root contexts
     if (this.parent) {
         this.symbols['@' + name] = {type: 'var', name: name};
     }
     else {
-        throw new Error("can't declare a variable in a root scope; constants only!");
+        throw new Error("can't declare a variable in a root context; constants only!");
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Defines a constant in this scope.
+ * Defines a constant in this context.
  *
  * @param name
  * @param value
@@ -81,11 +81,11 @@ __.prototype.declare = function (name) {
 __.prototype.define = function (name, value, isService) {
 
     if (this.has(name)) {
-        throw new Error(name + " is a constant or variable in this scope");
+        throw new Error(name + " is a constant or variable in this context");
     }
 
     if (isService) {
-        console.log("defining service " + name);
+        // console.log("defining service " + name);
 
         // pull a switcheroo
         var id = 'service' + this.id + "_" + this.services.length;
@@ -123,7 +123,7 @@ __.prototype.isFuture = function (name) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Returns true if the given name is defined in this scope.
+ * Returns true if the given name is defined in this context.
  */
 __.prototype.has = function (name) {
 
@@ -162,13 +162,15 @@ __.prototype.getJsVars = function () {
  * Returns true if the specified name is a defined constant.
  *
  * @param name
- * @param ref     name of referenced scope to check
+ * @param ref     name of referenced context to check
  * @return {Boolean}
  */
 __.prototype.isConstant = function (name, ref) {
 
     // only constants can be referenced in other modules
+    
     if (ref) {
+
         if (this.references[ref]) {
             return this.references[ref].isConstant(name);
         }

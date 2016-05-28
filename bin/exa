@@ -16,15 +16,14 @@
 
 process.title = 'exa';
 
-var util = require('util');
-var path = require('path');
-var fs = require('fs');
-var Q = require('q');
-var argv = require('minimist')(process.argv.slice(2));
-var Loader = require('../runtime/Loader');
-var IO = require('../runtime/IO');
-var System = require('../runtime/System');
-var Builder = require('../codegen/Builder');
+const util = require('util');
+const path = require('path');
+const argv = require('minimist')(process.argv.slice(2));
+const IO = require('../runtime/IO');
+const System = require('../runtime/System');
+const Compiler = require('../codegen/Compiler');
+const FileResolver = require('../resolvers/FileResolver');
+const Loader = require('../builders/Loader');
 const Task = require('../runtime/Task');
 
 var sourceFile = argv._.shift();
@@ -38,63 +37,25 @@ if (sourceFile == null) {
 var modulePath = path.dirname(sourceFile);
 var moduleName = path.basename(sourceFile, '.exa');
 
-var builder = new Builder(modulePath);
+var resolver = new FileResolver(modulePath);
+var compiler = new Compiler(resolver);
+var loader = new Loader();
 
-// todo support specifying more libs on the command line and add to the dir of the main module
-var loader = new Loader(modulePath);
+IO.args = argv;
 
-if (argv.build != null) {
+resolver.resolve(moduleName).then(source => {
 
-    var targetPath = argv.build;
+    return compiler.compile(source).then(context => {
+        
+        var main = loader.loadMain(context);
 
-    loader.getModule(moduleName).then(
-        function (main) {
+        var d = Q.defer();
 
-            return main.getJs();
+        Task.sendRootRequest(main, [argv._, IO, System], d.resolve.bind(d), d.reject.bind(d));
 
-        }).then(function (js) {
-
-            // write the runtime into the file?
-
-            // write the object file
-
-            var output = '"use strict";\n\
-\n\
-var Task = require("./runtime/Task");\n\
-var IO = require("./runtime/IO");\n\
-var argv = require("minimist")(process.argv.slice(2));\n\
-\n\
-var root = ' + js + ';\n\
-\n\
-Task.sendRootRequest(root, [argv._, IO],\n\
-    function () {\n\
-        process.exit(0);\n\
-    },\n\
-    function () {\n\
-        process.exit(1);\n\
-    });';
-
-            return Q.denodeify(fs.writeFile)(targetPath, output, {encoding: 'utf8'});
-
-        }).done();
-}
-else {
-
-    IO.args = argv;
-
-    builder.build(moduleName).then(
-        function (fn) {
-
-            var d = Q.defer();
-
-            Task.sendRootRequest(fn, [argv._, IO, System], d.resolve.bind(d), d.reject.bind(d));
-
-            return d.promise;
-
-            //console.log(result);
-        },
-        function (msg) {
-            throw msg;
-        }
-    ).done();
-}
+        return d.promise;
+    });
+},
+function (msg) {
+    throw msg;
+}).done();

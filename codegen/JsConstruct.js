@@ -102,7 +102,7 @@ JsConstruct.prototype.resolve = function () {
         return this;
     }
 
-    // might be a nicer way to do this using reduce
+    // todo clean this up, probably as a reduce
 
     var wrap = function (stmt, wrappers, index) {
 
@@ -110,6 +110,7 @@ JsConstruct.prototype.resolve = function () {
             index = 0;
         }
 
+        // base case
         if (index == wrappers.length) {
             return stmt;
         }
@@ -125,6 +126,8 @@ JsConstruct.prototype.resolve = function () {
             post = ['}, null);\n\n'];
         }
         else {
+
+            // so it's a future
 
             pre = ['$' + sm.name + '.await(function (F' + index + ') {'];
 

@@ -25,11 +25,11 @@ module.exports['responses'] = {
                 test.fail();
             });
 
-        task.respond("reply", "foo");
-        task.respond("reply", "boo");
-        task.respond("fail", "boo");
-        task.respond("fail", "foo");
-        task.respond("reply", "foo");
+        task.respond("reply", ["foo"]);
+        task.respond("reply", ["boo"]);
+        task.respond("fail", ["boo"]);
+        task.respond("fail", ["foo"]);
+        task.respond("reply", ["foo"]);
     },
 
     "fail kills further response": function (test) {
@@ -44,11 +44,11 @@ module.exports['responses'] = {
                 test.done();
             });
 
-        task.respond("fail", "foo");
-        task.respond("reply", "foo");
-        task.respond("reply", "boo");
-        task.respond("fail", "foo");
-        task.respond("reply", "foo");
+        task.respond("fail", ["foo"]);
+        task.respond("reply", ["foo"]);
+        task.respond("reply", ["boo"]);
+        task.respond("fail", ["foo"]);
+        task.respond("reply", ["foo"]);
     },
 
     "implicit reply on finish": function (test) {
@@ -76,7 +76,7 @@ module.exports['responses'] = {
                 test.fail();
             });
 
-        task.respond("reply", "foo");
+        task.respond("reply", ["foo"]);
         task.deactivate();
     },
 
@@ -92,7 +92,7 @@ module.exports['responses'] = {
                 test.done();
             });
 
-        task.respond("fail", "boo");
+        task.respond("fail", ["boo"]);
         task.deactivate();
     }
 };
@@ -113,7 +113,7 @@ module.exports['finishing'] = {
             collector += task.args;
 
             setImmediate(task.doAsync(function () {
-                task.respond("reply", 'bar');
+                task.respond("reply", ['bar']);
             }));
         };
 
@@ -143,7 +143,7 @@ module.exports['finishing'] = {
             // send a message from this task
             task.sendMessage(function (task) {
 
-                task.respond("reply");
+                task.respond("reply", []);
 
             }, 'foo', null, null);
         };
@@ -169,7 +169,7 @@ module.exports['finishing'] = {
             task.sendMessage(task.args[0], null,
                 function (args) {
 
-                    task.respond("reply", 42);
+                    task.respond("reply", [42]);
 
                 }, null);
 
@@ -182,10 +182,10 @@ module.exports['finishing'] = {
 
         Task.sendRootRequest(service, [
             function (task) {
-                task.respond("reply");
+                task.respond("reply", []);
             },
             function (task) {
-                task.respond("reply", 33);
+                task.respond("reply", [33]);
             }
         ],
         function (res) {
@@ -206,7 +206,7 @@ module.exports['finishing'] = {
         var transmogrify = function (task) {
 
             test.equal(task.args, expected.shift());
-            task.respond("reply", replies.shift());
+            task.respond("reply", [replies.shift()]);
         };
 
         var main = function (task) {
@@ -246,10 +246,10 @@ module.exports['finishing'] = {
 
             // send a submessage
 
-            results.push(task.args + ':pre');
+            results.push(task.args[0] + ':pre');
 
             // send a message from this task - root:child2:child1
-            task.sendMessage(buckStopsHere, task.args + ':subcall', function (response) {
+            task.sendMessage(buckStopsHere, [task.args + ':subcall'], function (response) {
 
                 //console.error('response handler Z for ' + task.name);
                 results.push(response + ':handler');
@@ -257,7 +257,7 @@ module.exports['finishing'] = {
                 task.respond("reply", task.args);
             });
 
-            results.push(task.args + ':post');
+            results.push(task.args[0] + ':post');
 
             // this is a weird and tricky case! because we're scheduling a reply before we hear back
             // from the message we just sent, but which has a handler!!
@@ -268,7 +268,7 @@ module.exports['finishing'] = {
 
             //console.error('task handler A for ' + task.name);
 
-            results.push(task.args);
+            results.push(task.args[0]);
 
             task.respond("reply", task.args);
         };
@@ -276,33 +276,33 @@ module.exports['finishing'] = {
         var main = function (task) {
 
             // send a message from this task - root:child1
-            task.sendMessage(buckStopsHere, 'call1', function (result) {
+            task.sendMessage(buckStopsHere, ['call1'], function (result) {
 
                 //console.error('response handler X for ' + task.name);
                 results.push(result + ':handler');
             });
 
             // send a message from this task - root:child2
-            task.sendMessage(passTheBuck, 'call2', function (result) {
+            task.sendMessage(passTheBuck, ['call2'], function (result) {
 
                 //console.error('response handler Y for ' + task.name);
                 results.push(result + ':handler');
             });
 
             // send a message from this task
-            task.sendMessage(passTheBuck, 'call3', function (result) {
+            task.sendMessage(passTheBuck, ['call3'], function (result) {
 
                 results.push(result + ':handler');
             });
 
             // send a message from this task
-            task.sendMessage(buckStopsHere, 'call4', function (result) {
+            task.sendMessage(buckStopsHere, ['call4'], function (result) {
 
                 results.push(result + ':handler');
             });
         };
 
-        Task.sendRootRequest(main, null,
+        Task.sendRootRequest(main, [],
             function (args) {
 
                 // this test enforces a particular (expected) ordering of tasks, but
@@ -368,17 +368,17 @@ module.exports['finishing'] = {
 
         var foo = function (task) {
             //console.log("i am foo");
-            task.respond("reply");
+            task.respond("reply", []);
         };
 
         var bar = function (task) {
             //console.log("i am bar!");
-            task.respond("fail");
+            task.respond("fail", []);
         };
 
         var baz = function (task) {
             //console.log("I am a BANANA!");
-            task.respond("reply");
+            task.respond("reply", []);
         };
 
         Task.sendRootRequest(service, [], function () {
@@ -405,7 +405,7 @@ module.exports['finishing'] = {
 
                 task.sendMessage(syncService);
 
-                task.respond("reply", "leeloo");
+                task.respond("reply", ["leeloo"]);
             });
         };
 
@@ -423,7 +423,7 @@ module.exports['finishing'] = {
         var asyncService = function (task) {
 
             setImmediate(task.doAsync(function () {
-                task.respond("reply");
+                task.respond("reply", []);
             }));
         };
 
@@ -440,7 +440,7 @@ module.exports['finishing'] = {
 
                 task.sendMessage(syncService);
 
-                task.respond("reply", "leeloo");
+                task.respond("reply", ["leeloo"]);
             });
         };
 
@@ -466,7 +466,7 @@ module.exports['await'] = {
             var future = task.sendMessage(function (task) {
 
                 setImmediate(task.doAsync(function () {
-                    task.respond("reply", "snooks");
+                    task.respond("reply", ["snooks"]);
                 }));
             });
 
@@ -489,7 +489,7 @@ module.exports['await'] = {
         var main = function (task) {
 
             var future = task.sendMessage(function (task) {
-                task.respond("reply", "snooks");
+                task.respond("reply", ["snooks"]);
             });
 
             future.await(function (result) {
@@ -515,7 +515,7 @@ module.exports['await'] = {
             var future = task.sendMessage(function (task) {
 
                 setImmediate(task.doAsync(function () {
-                    task.respond("reply", "snooks");
+                    task.respond("reply", ["snooks"]);
                 }));
             }, [], function (reply) {
                 gotR = true;
@@ -546,7 +546,7 @@ module.exports['await'] = {
         var main = function (task) {
 
             var future = task.sendMessage(function (task) {
-                task.respond("reply", "snooks");
+                task.respond("reply", ["snooks"]);
             }, [], function (reply) {
                 gotR = true;
             });
