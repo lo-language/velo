@@ -4,9 +4,9 @@
  * Created by spurcell on 12/5/15.
  */
 
-const Task = require('../../runtime/Task');
+const Module = require('../../codegen/Module');
+const Loader = require('.././Loader');
 const util = require('util');
-const Builder = require('../../codegen/Builder');
 
 module.exports['basics'] = {
 
@@ -14,9 +14,10 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var ctx = new Builder().compile('x is -> {reply "hullo!";};');
+        var module = new Module('x is -> {reply "hullo!";};').compile();
+        var loader = new Loader(module);
 
-        Task.sendRootRequest(service, null,
+        loader.run().then(
             function (res) {
                 test.equal(res, "hullo!");
                 test.done();

@@ -9,6 +9,7 @@
 
 const fs = require('fs');
 const Q = require('q');
+const Module = require('../codegen/Module');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -19,28 +20,23 @@ var __ = function (basePath) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Resolves the given module reference into Exa source.
+ * Acquires the specified module.
  *
- * @param ref
+ * @param modRef
  * @return {String}
  */
-__.prototype.resolve = function (ref) {
+__.prototype.acquire = function (modRef) {
 
-    var path = this.basePath + '/' + ref + '.exa';
+    var path = this.basePath + '/' + modRef + '.exa';
 
-    // load the source
-    return Q(path).then(
-        function (fullPath) {
+    // read the file
+    return Q.denodeify(fs.readFile)(path, 'utf8').then(source => {
+        return new Module(source);
+    },
 
-            console.log("reading " + path);
-
-            // read the file
-            return Q.denodeify(fs.readFile)(fullPath, 'utf8');
-        },
-        function () {
-            throw new Error("couldn't find module " + path);
-        }
-    );
+    function () {
+        throw new Error("couldn't find module " + path);
+    });
 };
 
 module.exports = __;

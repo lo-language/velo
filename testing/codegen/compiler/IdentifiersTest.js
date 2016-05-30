@@ -33,11 +33,11 @@ module.exports["identifiers"] = {
 
         var node = {type: 'id', name: 'foo'};
 
-        var scope = new Context();
+        var context = new Context();
 
-        scope.define('foo', "42");
+        context.define('foo', "42");
 
-        test.equal(scope.compile(node), '42');
+        test.equal(context.compile(node), '42');
         test.done();
     },
 
@@ -45,16 +45,16 @@ module.exports["identifiers"] = {
 
         // the compiler should fetch the value and use it
 
-        var node = {type: 'id', scope: 'HTTP', name: 'foo'};
+        var node = {type: 'id', context: 'HTTP', name: 'foo'};
 
         var refContext = new Context();
         refContext.define('foo', "53");
 
-        var scope = new Context();
+        var context = new Context();
 
-        scope.addReference('HTTP', refContext);
+        context.addReference('HTTP', refContext);
 
-        test.equal(scope.compile(node), '53');
+        test.equal(context.compile(node), '53');
         test.done();
     },
 

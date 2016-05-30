@@ -11,103 +11,130 @@ module.exports["basics"] = {
 
     'declare var': function (test) {
 
-        var scope = new Context().createInner();
+        var ctx = new Context().createInner();
 
-        test.equal(scope.has('foo'), false);
-        test.deepEqual(scope.getJsVars(), []);
+        test.equal(ctx.has('foo'), false);
+        test.deepEqual(ctx.getJsVars(), []);
 
-        scope.declare('foo');
-        test.equal(scope.has('foo'), true);
-        test.deepEqual(scope.getJsVars(), ['$foo']);
+        ctx.declare('foo');
+        test.equal(ctx.has('foo'), true);
+        test.deepEqual(ctx.getJsVars(), ['$foo']);
 
         // test idempotency
-        scope.declare('foo');
-        test.equal(scope.has('foo'), true);
-        test.deepEqual(scope.getJsVars(), ['$foo']);
+        ctx.declare('foo');
+        test.equal(ctx.has('foo'), true);
+        test.deepEqual(ctx.getJsVars(), ['$foo']);
 
         // define a constant with the same name fails
-        test.throws(function () {scope.define('foo', 42);});
+        test.throws(function () {ctx.define('foo', 42);});
 
         test.done();
     },
 
+    'declare var in root ctx should fail': function (test) {
+
+        var ctx = new Context();
+
+        test.equal(ctx.has('foo'), false);
+        test.deepEqual(ctx.getJsVars(), []);
+
+        try {
+            ctx.declare('foo');
+            test.fail();
+        }
+        catch (err) {
+            test.done();
+        }
+    },
+
     'declare var that collides with JS': function (test) {
 
-        var scope = new Context().createInner();
+        var ctx = new Context().createInner();
 
-        test.equal(scope.has('constructor'), false);
-        test.deepEqual(scope.getJsVars(), []);
+        test.equal(ctx.has('function'), false);
+        test.deepEqual(ctx.getJsVars(), []);
 
-        scope.declare('constructor');
-        test.equal(scope.has('constructor'), true);
-        test.deepEqual(scope.getJsVars(), ['$constructor']);
+        ctx.declare('function');
+        test.equal(ctx.has('function'), true);
+        test.deepEqual(ctx.getJsVars(), ['$function']);
 
         // test idempotency
-        scope.declare('constructor');
-        test.equal(scope.has('constructor'), true);
-        test.deepEqual(scope.getJsVars(), ['$constructor']);
+        ctx.declare('function');
+        test.equal(ctx.has('function'), true);
+        test.deepEqual(ctx.getJsVars(), ['$function']);
 
         test.done();
     },
 
     'define constant': function (test) {
 
-        var scope = new Context();
+        var ctx = new Context();
 
-        test.equal(scope.has('port'), false);
-        test.deepEqual(scope.getJsVars(), []);
+        test.equal(ctx.has('port'), false);
+        test.deepEqual(ctx.getJsVars(), []);
 
-        scope.define('port', 8080);
+        ctx.define('port', 8080);
 
-        test.deepEqual(scope.getJsVars(), []);
-        test.equal(scope.has('port'), true);
-        test.equal(scope.isConstant('port'), true);
-        test.equal(scope.resolve('port'), 8080);
+        test.deepEqual(ctx.getJsVars(), []);
+        test.equal(ctx.has('port'), true);
+        test.equal(ctx.isConstant('port'), true);
+        test.equal(ctx.resolve('port'), 8080);
 
         // declare as var now fails
-        test.throws(function () {scope.declare('port');});
+        test.throws(function () {ctx.declare('port');});
 
         // define another constant with the same name fails
-        test.throws(function() {scope.define('port', 8000);});
+        test.throws(function() {ctx.define('port', 8000);});
+
+        test.done();
+    },
+
+    'define constant that collides with JS': function (test) {
+
+        var ctx = new Context().createInner();
+
+        test.equal(ctx.has('function'), false);
+        test.deepEqual(ctx.getJsVars(), []);
+
+        ctx.define('function', 77);
+        test.equal(ctx.has('function'), true);
+        test.deepEqual(ctx.getJsVars(), []);
+
+        test.done();
+    },
+
+    'define service constant': function (test) {
+
+        var ctx = new Context().createInner();
+
+        test.equal(ctx.has('function'), false);
+        test.deepEqual(ctx.getJsVars(), []);
+
+        ctx.define('foo', 'function () {};', true);
+        test.equal(ctx.has('foo'), true);
+        test.deepEqual(ctx.getJsVars(), []);
 
         test.done();
     },
 
     'set future': function (test) {
 
-        var scope = new Context();
+        var ctx = new Context();
 
-        test.equal(scope.has('John_Zoidberg'), false);
-        test.deepEqual(scope.getJsVars(), []);
+        test.equal(ctx.has('John_Zoidberg'), false);
+        test.deepEqual(ctx.getJsVars(), []);
 
-        scope.setFuture('John_Zoidberg');
-        test.equal(scope.has('John_Zoidberg'), true);
-        test.deepEqual(scope.getJsVars(), ['$John_Zoidberg']);
-
-        test.done();
-    },
-
-    "add/resolve reference": function (test) {
-
-        var scope = new Context();
-
-        var refScope = new Context();
-
-        refScope.define('foo', '88')
-
-        scope.addReference("Square", refScope);
-
-        test.ok(scope.isConstant('foo', 'Square'));
-
-        test.equal(scope.resolve('foo', 'Square'), '88');
+        ctx.setFuture('John_Zoidberg');
+        test.equal(ctx.has('John_Zoidberg'), true);
+        test.deepEqual(ctx.getJsVars(), ['$John_Zoidberg']);
 
         test.done();
     }
 };
 
-module.exports["child scope"] = {
+module.exports["child ctx"] = {
 
-    'define var in parent': function (test) {
+    'lookup var in parent': function (test) {
 
         var parent = new Context().createInner();
 
@@ -135,7 +162,7 @@ module.exports["child scope"] = {
         test.done();
     },
 
-    'define constant in parent': function (test) {
+    'lookup constant in parent': function (test) {
 
         var parent = new Context();
 
@@ -171,9 +198,71 @@ module.exports["child scope"] = {
     }
 };
 
+module.exports["external constants"] = {
 
-module.exports["link"] = {
+    'lookup success from root': function (test) {
 
+        test.expect(3);
 
+        var resolver = {
+            resolveExternal: function (name, qualifier) {
 
+                test.equal(name, "PI");
+                test.equal(qualifier, "Math");
+                return "snooks";
+            }
+        };
+
+        var parent = new Context(resolver);
+
+        test.equal(parent.resolveExternal("PI", "Math"), "snooks");
+
+        test.done();
+    },
+
+    'lookup success from child': function (test) {
+
+        test.expect(3);
+
+        var resolver = {
+            resolveExternal: function (name, qualifier) {
+
+                test.equal(name, "cos");
+                test.equal(qualifier, "Trig");
+                return "snooks";
+            }
+        };
+
+        var parent = new Context(resolver);
+        var child = parent.createInner();
+
+        test.equal(child.resolveExternal("cos", "Trig"), "snooks");
+
+        test.done();
+    },
+
+    'lookup failure': function (test) {
+
+        test.expect(2);
+
+        var resolver = {
+            resolveExternal: function (name, qualifier) {
+
+                test.equal(name, "cos");
+                test.equal(qualifier, "Trig");
+
+                throw new Error("not found");
+            }
+        };
+
+        var parent = new Context(resolver);
+
+        try {
+            parent.resolveExternal("cos", "Trig");
+            test.fail();
+        }
+        catch (err) {
+            test.done();
+        }
+    }
 };

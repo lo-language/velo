@@ -7,14 +7,13 @@
 
 "use strict";
 
-const Builder = require('../codegen/Builder');
-const Task = require('../runtime/Task');
+const Runner = require('./Runner');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 var __ = function (sourceDir, program) {
 
-    this.builder = new Builder(sourceDir);
+    this.builder = new Runner(sourceDir);
     this.program = program;
 };
 

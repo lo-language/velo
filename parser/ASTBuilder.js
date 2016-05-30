@@ -46,7 +46,7 @@ __.prototype.visitModule = function(ctx) {
     return {
         type: 'module',
         definitions: ctx.definition().map(function (def) {return def.accept(visitor)}),
-        references: ctx.references() ? ctx.references().accept(this) : null
+        references: ctx.references() ? ctx.references().accept(this) : null // todo make this [] not null
     };
 };
 
