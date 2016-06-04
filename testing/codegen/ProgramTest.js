@@ -9,7 +9,7 @@ var Program = require('../../codegen/Program');
 var Module = require('../../codegen/Module');
 var Q = require('q');
 
-module.exports["compilation"] = {
+module.exports["include"] = {
 
     "module with no services": function (test) {
 
@@ -59,6 +59,36 @@ module.exports["compilation"] = {
                 'return {"foo": $foo};\n}();');
             test.done();
 
+        }).done();
+    }
+};
+
+module.exports["run"] = {
+
+    "program with chained modules": function (test) {
+
+        var modules = {
+            main: new Module("references:\nfoo <foo>\nmain is -> {x = 42;};"),
+            foo: new Module("references:\nbar <bar>\nfoo is -> {x = 42;};"),
+            bar: new Module("bar is -> {x = 42;};")
+        };
+
+        var sourcer = {
+
+            acquire: function (ref) {
+                return Q(modules[ref]);
+            }
+        };
+
+        var p = new Program(sourcer);
+
+        p.include("main").then(function () {
+
+            // just to make sure loading of main works
+            return p.run();
+
+        }).then(function () {
+            test.done();
         }).done();
     }
 };

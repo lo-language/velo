@@ -352,14 +352,14 @@ module.exports['id'] = function (node) {
     // context could also let us know we're in string interpolation
     // as well as conditionals
 
-    if (this.isConstant(node.name, node.scope)) {
-        return this.resolve(node.name, node.scope);
-    }
-
     if (node.scope) {
 
         // having a qualifier implies a constant
         return this.resolveExternal(node.name, node.scope);
+    }
+
+    if (this.isConstant(node.name)) {
+        return this.resolve(node.name);
     }
 
     // see if the name is a local constant

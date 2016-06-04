@@ -24,7 +24,8 @@ const Q = require('q');
 var __ = function (sourcer) {
 
     this.sourcer = sourcer;
-    this.modules = [];
+    this.nextModule = 0;
+    this.modules = {};
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,11 +42,12 @@ __.prototype.include = function (modRef) {
     return this.sourcer.acquire(modRef).then(module => {
 
         // module ID is its index in our list
-        module.id = 'M' + this.modules.length;
+        module.id = 'M' + this.nextModule++;
 
         return module.compileSelf(this).then(result => {
 
-            this.modules.push(result);
+            // stash the module in our cache
+            this.modules[module.id] = result;
 
             return module;
         });
@@ -62,10 +64,10 @@ __.prototype.render = function () {
 
     // render each module in the program
 
-    return this.modules.map((def, index) => {
+    return Object.keys(this.modules).map(moduleId => {
 
         // todo put the const name in as the fn name for JS
-        return "const " + "M" + index + " = " + def.render() + "();";
+        return "const " + moduleId + " = " + this.modules[moduleId].render() + "();";
     }
     ).join("\n\n");
 };
