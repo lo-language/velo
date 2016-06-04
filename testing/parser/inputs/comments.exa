@@ -11,82 +11,18 @@
      // Leading whitespace before a comment should be ignored
      /* Leading whitespace before a comment should be ignored */
 
+test is -> {
 
-/*
- * Variations on comments inside a block to test block indent handling
- * and comment handling play nicely
- */
+    // Line comment should be ignored
 
-receive args, io;
+    /* Block comment on one line should be ignored */
 
-max is 10;
+    /*
+     * Block comment
+     * on multiple lines
+     * should be ignored
+     */
 
-num = 0;
-while num < max {
-//  no indent
-    num++;
-}
-
-num = 0;
-while num < max {
-  // small indent
-    num++;
-}
-
-num = 0;
-while num < max {
-    // right indent
-    num++;
-}
-
-num = 0;
-while num < max {
-      // large indent
-    num++;
-}
-
-num = 0;
-while num < max {
-	// tab indent
-    num++;
-}
-
-num = 0;
-while num < max {
-    num++;
-    num--;
-//  no indent
-    num++;
-}
-
-num = 0;
-while num < max {
-    num++;
-    num--;
-  // small indent
-    num++;
-}
-
-num = 0;
-while num < max {
-    num++;
-    num--;
-    // right indent
-    num++;
-}
-
-num = 0;
-while num < max {
-    num++;
-    num--;
-      // large indent
-    num++;
-}
-
-num = 0;
-while num < max {
-    num++;
-    num--;
-	// tab indent
-    num++;
-}
+         // Leading whitespace before a comment should be ignored
+         /* Leading whitespace before a comment should be ignored */
+};

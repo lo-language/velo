@@ -1,25 +1,11 @@
 #!/usr/bin/env node
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Seth Purcell. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE in the project root for license information.
+ *-------------------------------------------------------------------------------------------*/
+
 /*
- * Copyright (C) 2014 by Seth Purcell
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
- * to whom the Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
- * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
- * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
- * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *
- * For everyone who doesn't do it for the money.
- *
  * Author: Seth Purcell
  * Date: 12/24/14
  */
@@ -30,14 +16,15 @@
 
 process.title = 'exa';
 
-var util = require('util');
-var path = require('path');
-var fs = require('fs');
-var Q = require('q');
-var argv = require('minimist')(process.argv.slice(2));
-var Loader = require('../runtime/Loader');
-var IO = require('../runtime/IO');
-var System = require('../runtime/System');
+const util = require('util');
+const path = require('path');
+const argv = require('minimist')(process.argv.slice(2));
+
+const IO = require('../runtime/IO');
+const System = require('../runtime/System');
+
+const Sourcer = require('../pipeline/Sourcer');
+const Program = require('../codegen/Program');
 
 var sourceFile = argv._.shift();
 
@@ -49,58 +36,13 @@ if (sourceFile == null) {
 // get the path of the module
 var modulePath = path.dirname(sourceFile);
 var moduleName = path.basename(sourceFile, '.exa');
+var sourcer = new Sourcer(modulePath);
 
-// todo support specifying more libs on the command line and add to the dir of the main module
-var loader = new Loader(modulePath);
+var program = new Program(sourcer);
 
-if (argv.build != null) {
-
-    var targetPath = argv.build;
-
-    loader.getModule(moduleName).then(
-        function (main) {
-
-            return main.getJs();
-
-        }).then(function (js) {
-
-            // write the runtime into the file?
-
-            // write the object file
-
-            var output = '"use strict";\n\
-\n\
-var Task = require("./runtime/Task");\n\
-var IO = require("./runtime/IO");\n\
-var argv = require("minimist")(process.argv.slice(2));\n\
-\n\
-var root = ' + js + ';\n\
-\n\
-Task.sendRootRequest(root, [argv._, IO],\n\
-    function () {\n\
-        process.exit(0);\n\
-    },\n\
-    function () {\n\
-        process.exit(1);\n\
-    });';
-
-            return Q.denodeify(fs.writeFile)(targetPath, output, {encoding: 'utf8'});
-
-        }).done();
-}
-else {
+program.include(moduleName).then(function () {
 
     IO.args = argv;
+    return program.run([argv._, IO, System]);
 
-    loader.run(moduleName, [IO, System]).then(
-        function (result) {
-            //console.log(result);
-        },
-        function (msg) {
-            console.error(msg);
-
-            // inform the OS
-            process.exit(1);
-        }
-    );
-}
+}).done();

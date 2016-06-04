@@ -1,3 +1,8 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Seth Purcell. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE in the project root for license information.
+ *-------------------------------------------------------------------------------------------*/
+
 /**
  * Created by spurcell on 1/10/16.
  */
@@ -32,17 +37,44 @@ __.prototype.parse = function (input) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 // Visit a parse tree produced by exaParser#module.
 __.prototype.visitModule = function(ctx) {
 
-    return {type: 'module', service: {type: 'procedure', body: ctx.statement_list().accept(this)}};
+    var visitor = this;
+
+    return {
+        type: 'module',
+        definitions: ctx.definition().map(function (def) {return def.accept(visitor)}),
+        references: ctx.references() ? ctx.references().accept(this) : null // todo make this [] not null
+    };
 };
 
 
-// Visit a parse tree produced by exaParser#statement_list.
-__.prototype.visitStatement_list = function(ctx) {
+__.prototype.visitReferences = function(ctx) {
 
-    var subList = ctx.statement_list();
+    var refs = [];
+
+    var offset = 0;
+
+    while (ctx.ID(offset)) {
+
+        refs.push({
+            id: ctx.ID(offset).getText(),
+            ref: ctx.MODREF(offset).getText()
+        });
+
+        offset++;
+    }
+
+    return refs;
+};
+
+
+// Visit a parse tree produced by exaParser#statementList.
+__.prototype.visitStatementList = function(ctx) {
+
+    var subList = ctx.statementList();
 
     return {type: 'stmt_list', head: ctx.statement().accept(this), tail: subList ? subList.accept(this) : null};
 };
@@ -52,13 +84,9 @@ __.prototype.visitStatement_list = function(ctx) {
 // statements
 
 
-// Visit a parse tree produced by exaParser#receive.
-__.prototype.visitReceive = function(ctx) {
+__.prototype.visitDefStmt = function(ctx) {
 
-    return {
-        type: 'receive',
-        names: ctx.ID().map(function (token) {return token.getText()})
-    };
+    return ctx.definition().accept(this);
 };
 
 
@@ -135,7 +163,7 @@ __.prototype.visitResponse = function(ctx) {
     return {
         type: 'response',
         channel: ctx.channel.text,
-        args: ctx.exprList().accept(this)
+        args: ctx.exprList() ? ctx.exprList().accept(this) : []
     };
 };
 
@@ -179,7 +207,6 @@ __.prototype.visitMulDiv = function(ctx) {
     };
 };
 
-
 __.prototype.visitAddSub = function(ctx) {
 
     return {
@@ -189,7 +216,6 @@ __.prototype.visitAddSub = function(ctx) {
         right: ctx.expr(1).accept(this)
     };
 };
-
 
 __.prototype.visitCompare = function(ctx) {
 
@@ -201,7 +227,6 @@ __.prototype.visitCompare = function(ctx) {
     };
 };
 
-
 __.prototype.visitLogical = function(ctx) {
 
     return {
@@ -212,18 +237,15 @@ __.prototype.visitLogical = function(ctx) {
     };
 };
 
-
 __.prototype.visitWrap = function(ctx) {
 
     return ctx.expr().accept(this);
 };
 
-
 __.prototype.visitLitExpr = function(ctx) {
 
     return ctx.literal().accept(this);
 };
-
 
 __.prototype.visitValExpr = function(ctx) {
 
@@ -231,7 +253,6 @@ __.prototype.visitValExpr = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#exprList.
 __.prototype.visitExprList = function(ctx) {
 
     var _this = this;
@@ -241,35 +262,30 @@ __.prototype.visitExprList = function(ctx) {
     });
 };
 
-
-__.prototype.visitPairList = function(ctx) {
-
-    var _this = this;
-
-    return ctx.pair().map(function (item) {
-        return item.accept(_this);
-    });
-};
-
-
-__.prototype.visitPair = function(ctx) {
+__.prototype.visitExternalId = function(ctx) {
 
     return {
-        type: 'dyad',
-        key: ctx.expr(0).accept(this),
-        value: ctx.expr(1).accept(this)
+        type: "id",
+        scope: ctx.ID(0).getText(),
+        name: ctx.ID(1).getText()
     };
 };
 
-
 __.prototype.visitId = function(ctx) {
-    return {type: "id", name: ctx.ID().getText()};
-};
 
+    return {
+        type: "id",
+        name: ctx.ID().getText()
+    };
+};
 
 __.prototype.visitConstant = function(ctx) {
 
-    return {type: 'constant', name: ctx.ID().getText(), value: ctx.literal().accept(this) };
+    return {
+        type: 'constant',
+        name: ctx.ID().getText(),
+        value: ctx.literal().accept(this)
+    };
 };
 
 
@@ -302,7 +318,10 @@ __.prototype.visitInterpolated = function(ctx) {
 };
 
 
-__.prototype.visitCall = function(ctx) {
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// messages
+
+__.prototype.visitDispatch = function(ctx) {
 
     var args = ctx.exprList();
 
@@ -312,15 +331,19 @@ __.prototype.visitCall = function(ctx) {
         args: args ? args.accept(this) : []
     };
 
+    if (ctx.replyHandler()) {
+        res.subsequent = ctx.replyHandler().accept(this);
+    }
+
     if (ctx.failHandler()) {
-        res.recover = ctx.failHandler().accept(this);
+        res.contingency = ctx.failHandler().accept(this);
     }
 
     return res;
 };
 
 
-__.prototype.visitDispatch = function(ctx) {
+__.prototype.visitAsync = function(ctx) {
 
     var args = ctx.exprList();
 
@@ -344,40 +367,40 @@ __.prototype.visitDispatch = function(ctx) {
 
 __.prototype.visitReplyHandler = function(ctx) {
 
-    return {
-        type: 'handler',
-        channel: 'reply',
-        body: ctx.block().accept(this)
-    };
+    var procedure = ctx.procedure().accept(this);
+
+    // save a little compiler hint here
+    procedure.channel = "reply";
+
+    return procedure;
 };
 
 
 __.prototype.visitFailHandler = function(ctx) {
 
-    return {
-        type: 'handler',
-        channel: 'fail',
-        body: ctx.block().accept(this)
-    };
+    var procedure = ctx.procedure().accept(this);
+
+    // save a little compiler hint here
+    procedure.channel = "fail";
+
+    return procedure;
 };
 
 
-__.prototype.visitBlock = function(ctx) {
+__.prototype.visitParamList = function(ctx) {
 
-    return ctx.statement_list().accept(this);
+    return ctx.ID().map(function (item) {
+        return item.getText();
+    });
 };
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // literals
 
-
-// Visit a parse tree produced by exaParser#nil.
 __.prototype.visitNil = function(ctx) {
 };
 
-
-// Visit a parse tree produced by exaParser#bool.
 __.prototype.visitBool = function(ctx) {
 
     // ??? might not want to return an actual bool here - number literals are kept as strings
@@ -386,8 +409,6 @@ __.prototype.visitBool = function(ctx) {
         val: ctx.BOOL().getText() == 'true'};
 };
 
-
-// Visit a parse tree produced by exaParser#number.
 __.prototype.visitNumber = function(ctx) {
 
     return {
@@ -395,8 +416,6 @@ __.prototype.visitNumber = function(ctx) {
         val: ctx.NUMBER().getText()};
 };
 
-
-// Visit a parse tree produced by exaParser#string.
 __.prototype.visitString = function(ctx) {
 
     return {
@@ -405,26 +424,20 @@ __.prototype.visitString = function(ctx) {
     };
 };
 
+__.prototype.visitService = function(ctx) {
 
-__.prototype.visitModref = function(ctx) {
-
-    return {
-        type: 'modref',
-        val: ctx.MODREF().getText()
-    };
+    return ctx.procedure().accept(this);
 };
 
-
-__.prototype.visitRecord = function(ctx) {
-
-    var _this = this;
+__.prototype.visitFrame = function(ctx) {
 
     return {
         type: 'record',
-        fields: ctx.field().map(function (item) {
-            return item.accept(_this);
-        })
+        labels: true,
+        fields: ctx.fieldList().accept(this)
     };
+
+    return {type: 'record', fields: []};
 };
 
 
@@ -438,30 +451,50 @@ __.prototype.visitField = function(ctx) {
 };
 
 
-__.prototype.visitService = function(ctx) {
+__.prototype.visitProcedure = function(ctx) {
+
+    // detect sugar
+
+    if (ctx.block() == null) {
+
+        return {
+            type: 'procedure',
+            params: ctx.ID().map(function (item) {
+                return item.getText();
+            }),
+            body: 'setter'
+        };
+    }
 
     return {
         type: 'procedure',
+        params: ctx.paramList() ? ctx.paramList().accept(this) : [],
         body: ctx.block().accept(this)
     };
 };
 
 
-__.prototype.visitMeasure = function(ctx) {
 
-    return {
-        type: 'cardinality',
-        operand: ctx.expr().accept(this)
-    };
-};
-
-
-__.prototype.visitCollection = function(ctx) {
+__.prototype.visitArray = function(ctx) {
 
     if (ctx.exprList()) {
 
         return {
             type: 'array',
+            elements: ctx.exprList().accept(this)
+        };
+    }
+
+    return {type: 'array', elements: []};
+};
+
+
+__.prototype.visitSet = function (ctx) {
+
+    if (ctx.exprList()) {
+
+        return {
+            type: 'set',
             elements: ctx.exprList().accept(this)
         };
     }
@@ -478,30 +511,106 @@ __.prototype.visitCollection = function(ctx) {
         return {type: 'map', elements: []};
     }
 
-    return {type: 'array', elements: []};
+    return {type: 'set', elements: []};
 };
 
+
+__.prototype.visitPairList = function(ctx) {
+
+    var pairs = [];
+
+    var offset = 0;
+
+    while (ctx.expr(offset)) {
+
+        pairs.push({
+            type: 'pair',
+            key: ctx.expr(offset).accept(this),
+            value: ctx.expr(offset + 1).accept(this)
+        });
+
+        offset += 2;
+    }
+
+    return pairs;
+};
+
+__.prototype.visitFieldList = function(ctx) {
+
+    var fields = [];
+
+    var offset = 0;
+
+    while (ctx.ID(offset)) {
+
+        fields.push({
+            type: 'field',
+            label: ctx.ID(offset).getText(),
+            value: ctx.expr(offset).accept(this)
+        });
+
+        offset++;
+    }
+
+    return fields;
+};
+
+__.prototype.visitPair = function(ctx) {
+
+    return {
+        type: 'dyad',
+        key: ctx.expr(0).accept(this),
+        value: ctx.expr(1).accept(this)
+    };
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+__.prototype.visitBlock = function(ctx) {
+
+    var stmtList = ctx.statementList();
+
+    if (stmtList) {
+        return stmtList.accept(this);
+    }
+    else {
+        return {type: 'stmt_list', head: {type: 'skip'}, tail: null};
+    }
+};
+
+__.prototype.visitCardinality = function(ctx) {
+
+    return {
+        type: 'cardinality',
+        operand: ctx.expr().accept(this)
+    };
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-__.prototype.visitSplice = function(ctx) {
+__.prototype.visitConcat = function(ctx) {
 
-    return { type: 'splice', item: ctx.expr(0).accept(this), list: ctx.expr(1).accept(this)};
+    return {
+        type: 'op',
+        op: 'concat',
+        left: ctx.expr(0).accept(this),
+        right: ctx.expr(1).accept(this)
+    };
 };
 
 
 __.prototype.visitSubscript = function(ctx) {
 
     return {
-        type: 'subscript',
+        type: ctx.cut ? 'extraction' : 'subscript',
         list: ctx.expr(0).accept(this),
         index: ctx.expr(1).accept(this)
     };
 };
 
 
-__.prototype.visitSelect = function(ctx) {
+__.prototype.visitField = function(ctx) {
 
     return { type: 'select', set: ctx.expr().accept(this), member: ctx.ID().getText()};
 };
@@ -517,13 +626,13 @@ __.prototype.visitMembership = function(ctx) {
 };
 
 
-__.prototype.visitSlice = function(ctx) {
+__.prototype.visitRange = function(ctx) {
 
     var start = ctx.expr(1);
     var end = ctx.expr(2);
 
     var res = {
-        type: 'slice',
+        type: ctx.cut ? 'extraction' : 'slice',
         list: ctx.expr(0).accept(this)
     };
 

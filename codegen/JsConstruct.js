@@ -1,3 +1,8 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Seth Purcell. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE in the project root for license information.
+ *-------------------------------------------------------------------------------------------*/
+
 /**
  * Here's how this works:
  *
@@ -18,7 +23,6 @@ const util = require('util');
  *
  * @param parts     an array of strings or JsConstructs
  * @param post      any parts of this construct that need to come *after* following statements
- * @param async
  */
 var JsConstruct = function (parts, post) {
 
@@ -98,7 +102,7 @@ JsConstruct.prototype.resolve = function () {
         return this;
     }
 
-    // might be a nicer way to do this using reduce
+    // todo clean this up, probably as a reduce
 
     var wrap = function (stmt, wrappers, index) {
 
@@ -106,6 +110,7 @@ JsConstruct.prototype.resolve = function () {
             index = 0;
         }
 
+        // base case
         if (index == wrappers.length) {
             return stmt;
         }
@@ -121,6 +126,8 @@ JsConstruct.prototype.resolve = function () {
             post = ['}, null);\n\n'];
         }
         else {
+
+            // so it's a future
 
             pre = ['$' + sm.name + '.await(function (F' + index + ') {'];
 

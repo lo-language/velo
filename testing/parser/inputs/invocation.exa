@@ -1,86 +1,86 @@
-// sync calls
+test is -> {
 
-foo();
-foo.bar();
+    // sync calls
 
-x = foo();
-(x, y) = foo();
+    foo();
+    foo.bar();
 
-// todo
-// x, y = foo();
+    x = foo();
+    (x, y) = foo();
 
-// async calls
+    // todo?
+    // x, y = foo();
 
-foo;
-*foo(18);
+    // async calls
 
-*sessionStore.getByID(sessionID);
+    foo;
+    @foo(18);
 
-//foo => bar;
-(bar, baz) = *foo(47);  // destructuring
+    @sessionStore.getByID(sessionID);
 
-// handle success only
-*bar(48) then {
-    reply "hello";
-};
+    //foo => bar;
+    (bar, baz) = @foo(47);  // destructuring
 
-// handle failure only
-*baz(128) then {
-    skip;
-}
-catch {
-    reply "bummer";
-};
-
-// todo
-// after baz(12) mute;
-
-// handle both success and failure
-*foo(42) then {
-    reply "yay";
-}
-catch {
-    reply "darn";
-};
-
-//nil -> foo => x ~> bar;
-
-// future with failure handler
-//bar(foo) => baz catch:
-//    fail;
-
-// nested requests
-// should we support pipes like 42 -> foo -> bar -> baz?
-result = *foo(42) then {
-
-    result = *bar(result) then {
-
-        yarp = *baz(result);
-    }
-    catch {
-        fail "narp";
+    // handle success only
+    @bar(48) -> {
+        reply "hello";
     };
-}
-catch {
-    reply "darn";
-};
 
-// sync form in expressions
+    // handle failure only
+    @baz(128) -> (result) {
+    }
+    ## -> (err) {
+        reply "bummer";
+    };
 
-foo(bar());
+    // todo
+    // after baz(12) mute;
 
-x = foo() + 7;
+    // handle both success and failure
+    @foo(42) -> (a, b) {
+        reply "yay";
+    }
+    on failure -> {
+        reply "darn";
+    };
 
 
-x = foo() catch {
+    // nested requests
+    // should we support pipes like 42 -> foo -> bar -> baz?
+    result = @foo(42) -> {
 
-    receive error;
-    substitute "ok";
-};
+        result = @bar(result) -> {
 
+            yarp = @baz(result);
+        }
+        ~~ -> {
+            fail "narp";
+        };
+    }
+    ~~ -> {
+        reply "darn";
+    };
 
-y = *foo() catch {
+    // sync form in expressions
 
-    receive error;
-    substitute "ok";
+    foo(bar());
+
+    x = foo() + 7;
+
+    // error handler only
+    x = foo() on failure -> (error) {
+        substitute "ok";
+    };
+
+    // both handlers
+    x = bar() -> (result) {
+        reply "ok";
+    }
+    ~~ -> (error) {
+        substitute "ok";
+    };
+
+    y = @foo() ~~ -> (error) {
+        substitute "ok";
+    };
 };

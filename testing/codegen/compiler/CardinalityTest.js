@@ -6,7 +6,7 @@
 "use strict";
 
 var Compiler = require('../../../codegen/Compiler');
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
 var util = require('util');
 
 module.exports["cardinality"] = {
@@ -21,7 +21,7 @@ module.exports["cardinality"] = {
         // todo throw runtime error if none match?
         // todo can get rid of function call here with conditional operator
 
-        test.equal(new Scope().compile(node).render(),
+        test.equal(new Context().compile(node).render(),
             "function (val) {" +
                 "if (typeof val === 'string') return val.length;" +
                 "else if (Array.isArray(val)) return val.length;" +

@@ -1,0 +1,23 @@
+{
+  "type": "module",
+  "definitions": [
+    {
+      "type": "constant",
+      "name": "PORT",
+      "value": {
+        "type": "number",
+        "val": "8080"
+      }
+    }
+  ],
+  "references": [
+    {
+      "id": "http",
+      "ref": "http"
+    },
+    {
+      "id": "primes",
+      "ref": "https://research.setec-astronomy.xyz/libs/primes"
+    }
+  ]
+}

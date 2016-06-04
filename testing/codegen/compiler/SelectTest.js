@@ -5,7 +5,7 @@
 
 "use strict";
 
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
 var util = require('util');
 
 module.exports["select"] = {
@@ -21,7 +21,7 @@ module.exports["select"] = {
             "member":"bar"
         };
 
-        test.equal(new Scope().compile(node).render(), '$foo.bar');
+        test.equal(new Context().compile(node).render(), '$foo.bar');
         test.done();
     }
 };

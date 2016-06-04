@@ -1,3 +1,8 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Seth Purcell. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE in the project root for license information.
+ *-------------------------------------------------------------------------------------------*/
+
 /**
  * Created by spurcell on 2/21/16.
  */
@@ -23,7 +28,7 @@ __.prototype.respond = function (channel, args) {
     this.hasResponded = true;
     this.response = {channel: channel, args: args};
 
-    (channel == 'reply' ? this.onReply : this.onFail)(args);
+    (channel == 'reply' ? this.onReply : this.onFail).apply(null, args);
 };
 
 __.prototype.await = function (cont) {
@@ -96,6 +101,22 @@ __.prototype.doAsync = function (cb) {
         _this.pendingRequests--;
         cb();
     };
+};
+
+// utility method, probably shouldn't be in here but rather somewhere else in runtime
+__.prototype.concat = function (left, right) {
+
+    if (typeof left == 'string' && typeof right == 'string') {
+        return left + right;
+    }
+    if (Array.isArray(left)) {
+        return left.concat(right);
+    }
+    if (Array.isArray(right)) {
+        return [left].concat(right);
+    }
+
+    return [left, right];
 };
 
 __.sendRootRequest = function (service, args, onReply, onFail) {

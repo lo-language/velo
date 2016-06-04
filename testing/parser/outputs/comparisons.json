@@ -1,0 +1,153 @@
+{
+  "type": "module",
+  "definitions": [
+    {
+      "type": "constant",
+      "name": "test",
+      "value": {
+        "type": "procedure",
+        "params": [],
+        "body": {
+          "type": "stmt_list",
+          "head": {
+            "type": "assign",
+            "op": "=",
+            "left": {
+              "type": "id",
+              "name": "result"
+            },
+            "right": {
+              "type": "op",
+              "op": "==",
+              "left": {
+                "type": "id",
+                "name": "foo"
+              },
+              "right": {
+                "type": "id",
+                "name": "bar"
+              }
+            }
+          },
+          "tail": {
+            "type": "stmt_list",
+            "head": {
+              "type": "assign",
+              "op": "=",
+              "left": {
+                "type": "id",
+                "name": "result"
+              },
+              "right": {
+                "type": "op",
+                "op": "!=",
+                "left": {
+                  "type": "id",
+                  "name": "foo"
+                },
+                "right": {
+                  "type": "id",
+                  "name": "bar"
+                }
+              }
+            },
+            "tail": {
+              "type": "stmt_list",
+              "head": {
+                "type": "assign",
+                "op": "=",
+                "left": {
+                  "type": "id",
+                  "name": "result"
+                },
+                "right": {
+                  "type": "op",
+                  "op": "<",
+                  "left": {
+                    "type": "id",
+                    "name": "foo"
+                  },
+                  "right": {
+                    "type": "id",
+                    "name": "bar"
+                  }
+                }
+              },
+              "tail": {
+                "type": "stmt_list",
+                "head": {
+                  "type": "assign",
+                  "op": "=",
+                  "left": {
+                    "type": "id",
+                    "name": "result"
+                  },
+                  "right": {
+                    "type": "op",
+                    "op": ">",
+                    "left": {
+                      "type": "id",
+                      "name": "foo"
+                    },
+                    "right": {
+                      "type": "id",
+                      "name": "bar"
+                    }
+                  }
+                },
+                "tail": {
+                  "type": "stmt_list",
+                  "head": {
+                    "type": "assign",
+                    "op": "=",
+                    "left": {
+                      "type": "id",
+                      "name": "result"
+                    },
+                    "right": {
+                      "type": "op",
+                      "op": "<=",
+                      "left": {
+                        "type": "id",
+                        "name": "foo"
+                      },
+                      "right": {
+                        "type": "id",
+                        "name": "bar"
+                      }
+                    }
+                  },
+                  "tail": {
+                    "type": "stmt_list",
+                    "head": {
+                      "type": "assign",
+                      "op": "=",
+                      "left": {
+                        "type": "id",
+                        "name": "result"
+                      },
+                      "right": {
+                        "type": "op",
+                        "op": ">=",
+                        "left": {
+                          "type": "id",
+                          "name": "foo"
+                        },
+                        "right": {
+                          "type": "id",
+                          "name": "bar"
+                        }
+                      }
+                    },
+                    "tail": null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "references": null
+}

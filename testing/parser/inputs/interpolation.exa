@@ -1,5 +1,8 @@
-message = "hello, `name`!";
-message2 = "I'm sorry, `name`, I can't do `action`.";
-message3 = "A = `a`, B = `b`, C = `c`.";
+test is -> {
 
-//foo = `bar + baz`;
+    message = "hello, `name`!";
+    message2 = "I'm sorry, `name`, I can't do `action`.";
+    message3 = "A = `a`, B = `b`, C = `c`.";
+
+    //foo = `bar + baz`;
+};

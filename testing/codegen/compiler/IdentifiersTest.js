@@ -6,12 +6,13 @@
 "use strict";
 
 var Compiler = require('../../../codegen/Compiler');
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
+var Module = require('../../../codegen/Module');
 var util = require('util');
 
 module.exports["identifiers"] = {
 
-//    "undefined": function (test) {
+//    "undefined usage": function (test) {
 //
 //        var node = {type: 'id', name: 'foo'};
 //
@@ -25,7 +26,7 @@ module.exports["identifiers"] = {
 
         var node = {type: 'id', name: 'foo'};
 
-        test.equal(new Scope().compile(node), '$foo');
+        test.equal(new Context().compile(node), '$foo');
         test.done();
     },
 
@@ -33,11 +34,51 @@ module.exports["identifiers"] = {
 
         var node = {type: 'id', name: 'foo'};
 
-        var scope = new Scope();
+        var context = new Context();
 
-        scope.define('foo', "42");
+        context.define('foo', "42");
 
-        test.equal(scope.compile(node), '42');
+        test.equal(context.compile(node), '42');
+        test.done();
+    },
+
+    "external ID": function (test) {
+
+        var node = {type: 'id', scope: 'HTTP', name: 'foo'};
+
+        var context = new Context({
+
+            resolveExternal: function (name, ref) {
+                test.equal(ref, 'HTTP');
+                return "M0.foo";
+            }
+        });
+
+        test.equal(context.compile(node), 'M0.foo');
+        test.done();
+    },
+
+    "external ID with local counterpart": function (test) {
+
+        // should resolve to external, not local def
+
+        var node = {type: 'id', scope: 'HTTP', name: 'foo'};
+
+        var context = new Context({
+
+            has: function () {
+                return false;
+            },
+            
+            resolveExternal: function (name, ref) {
+                test.equal(ref, 'HTTP');
+                return "M0.foo";
+            }
+        });
+
+        context.define("foo", 42);
+
+        test.equal(context.compile(node), 'M0.foo');
         test.done();
     }
 };

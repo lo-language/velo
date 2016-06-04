@@ -1,86 +1,99 @@
-{"type":"module", "service":
-{"type":"procedure", "body":{
-    "type":"stmt_list",
-    "head":{
-        "type":"assign",
-        "op":"=",
-        "left":{
-            "type":"id",
-            "name":"message"
-        },
-        "right":{
-            "type":"interpolation",
-            "left":"hello, ",
-            "middle":{
-                "type":"id",
-                "name":"name"
+{
+  "type": "module",
+  "definitions": [
+    {
+      "type": "constant",
+      "name": "test",
+      "value": {
+        "type": "procedure",
+        "params": [],
+        "body": {
+          "type": "stmt_list",
+          "head": {
+            "type": "assign",
+            "op": "=",
+            "left": {
+              "type": "id",
+              "name": "message"
             },
-            "right":"!"
-        }
-    },
-    "tail":{
-        "type":"stmt_list",
-        "head":{
-            "type":"assign",
-            "op":"=",
-            "left":{
-                "type":"id",
-                "name":"message2"
-            },
-            "right":{
-                "type":"interpolation",
-                "left":"I'm sorry, ",
-                "middle":{
-                    "type":"dynastring",
-                    "left":{
-                        "type":"id",
-                        "name":"name"
-                    },
-                    "middle":", I can't do ",
-                    "right":{
-                        "type":"id",
-                        "name":"action"
-                    }
-                },
-                "right":"."
+            "right": {
+              "type": "interpolation",
+              "left": "hello, ",
+              "middle": {
+                "type": "id",
+                "name": "name"
+              },
+              "right": "!"
             }
-        },
-        "tail":{
-            "type":"stmt_list",
-            "head":{
-                "type":"assign",
-                "op":"=",
-                "left":{
-                    "type":"id",
-                    "name":"message3"
+          },
+          "tail": {
+            "type": "stmt_list",
+            "head": {
+              "type": "assign",
+              "op": "=",
+              "left": {
+                "type": "id",
+                "name": "message2"
+              },
+              "right": {
+                "type": "interpolation",
+                "left": "I'm sorry, ",
+                "middle": {
+                  "type": "dynastring",
+                  "left": {
+                    "type": "id",
+                    "name": "name"
+                  },
+                  "middle": ", I can't do ",
+                  "right": {
+                    "type": "id",
+                    "name": "action"
+                  }
                 },
-                "right":{
-                    "type":"interpolation",
-                    "left":"A = ",
-                    "middle":{
-                        "type":"dynastring",
-                        "left":{
-                            "type":"id",
-                            "name":"a"
-                        },
-                        "middle":", B = ",
-                        "right":{
-                            "type":"dynastring",
-                            "left": {
-                                "type":"id",
-                                "name":"b"
-                            },
-                            "middle":", C = ",
-                            "right": {
-                                "type":"id",
-                                "name":"c"
-                            }
-                        }
-                    },
-                    "right":"."
-                }
+                "right": "."
+              }
             },
-            "tail":null
+            "tail": {
+              "type": "stmt_list",
+              "head": {
+                "type": "assign",
+                "op": "=",
+                "left": {
+                  "type": "id",
+                  "name": "message3"
+                },
+                "right": {
+                  "type": "interpolation",
+                  "left": "A = ",
+                  "middle": {
+                    "type": "dynastring",
+                    "left": {
+                      "type": "id",
+                      "name": "a"
+                    },
+                    "middle": ", B = ",
+                    "right": {
+                      "type": "dynastring",
+                      "left": {
+                        "type": "id",
+                        "name": "b"
+                      },
+                      "middle": ", C = ",
+                      "right": {
+                        "type": "id",
+                        "name": "c"
+                      }
+                    }
+                  },
+                  "right": "."
+                }
+              },
+              "tail": null
+            }
+          }
         }
+      }
     }
-}}}
+  ],
+  "references": null
+}

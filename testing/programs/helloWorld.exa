@@ -3,7 +3,12 @@
  * 5/3/15
  */
 
-receive args, io, system;
+references:
 
-// fire and forget - we won't wait!
-*io.stdout.write("hello, world!");
+Common  <common>
+
+main is -> (args, io) {
+
+    // fire and forget - we won't wait!
+    @io.out.write(Common:GREETING);
+};

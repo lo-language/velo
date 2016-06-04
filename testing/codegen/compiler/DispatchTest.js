@@ -5,7 +5,7 @@
 
 "use strict";
 
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
 var util = require('util');
 
 module.exports["dispatch"] = {
@@ -20,8 +20,9 @@ module.exports["dispatch"] = {
                 "name": "foo"
             },
             "subsequent": {
-                type: "handler",
+                type: "procedure",
                 channel: "reply",
+                params: [],
                 body: {
                     type: "stmt_list",
                     head: {
@@ -35,7 +36,7 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.equal(new Scope().compile(node).render(),
+        test.equal(new Context().compile(node).render(),
             'task.sendMessage($foo, [], function (args) {var $foo;\n\n\n$foo = 42;\n}, null)');
         test.done();
     },
@@ -50,8 +51,9 @@ module.exports["dispatch"] = {
                 "name": "foo"
             },
             "contingency": {
-                type: "handler",
+                type: "procedure",
                 channel: "fail",
+                params: [],
                 body: {
                     type: "stmt_list",
                     head: {
@@ -65,7 +67,7 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.equal(new Scope().compile(node).render(),
+        test.equal(new Context().compile(node).render(),
             'task.sendMessage($foo, [], null, function (args) {var $foo;\n\n\n$foo = 42;\n})');
         test.done();
     },
@@ -80,8 +82,9 @@ module.exports["dispatch"] = {
                 "name": "foo"
             },
             "subsequent": {
-                type: "handler",
+                type: "procedure",
                 channel: "reply",
+                params: [],
                 body: {
                     type: "stmt_list",
                     head: {
@@ -94,8 +97,9 @@ module.exports["dispatch"] = {
                 }
             },
             "contingency": {
-                type: "handler",
+                type: "procedure",
                 channel: "fail",
+                params: [],
                 body: {
                     type: "stmt_list",
                     head: {
@@ -109,7 +113,7 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.equal(new Scope().compile(node).render(),
+        test.equal(new Context().compile(node).render(),
             'task.sendMessage($foo, [], function (args) {var $foo;\n\n\n$foo = 42;\n}, function (args) {var $bar;\n\n\n$bar = 57;\n})');
         test.done();
     }

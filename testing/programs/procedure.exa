@@ -3,16 +3,18 @@
  * 2/7/15
  */
 
+main is -> {
+    reply foo(5);
+};
 
-foo = service {
 
-    receive x;
+foo is -> (x) {
+
     reply factorial(x) / 2;
 };
 
-factorial = service {
 
-    receive num;
+factorial is -> (num) {
 
     again = recur;
 
@@ -22,5 +24,3 @@ factorial = service {
 
     reply num * again(num - 1);
 };
-
-reply foo(5);

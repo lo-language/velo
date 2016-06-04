@@ -5,7 +5,7 @@
 
 "use strict";
 
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
 var util = require('util');
 
 module.exports["message"] = {
@@ -21,7 +21,7 @@ module.exports["message"] = {
             }
         };
 
-        test.equal(new Scope().compile(node).render(), 'task.sendMessage($foo, [], null, null)');
+        test.equal(new Context().compile(node).render(), 'task.sendMessage($foo, [], null, null)');
         test.done();
     },
 
@@ -46,7 +46,7 @@ module.exports["message"] = {
     //        }
     //    };
     //
-    //    test.equal(new Scope().compile(node).render(),
+    //    test.equal(new Context().compile(node).render(),
     //        'task.sendMessage($foo, [$url], function (args) {$res = args.shift();\n$body = args.shift();\n$bar = $body;\n}, null);\n\n');
     //    test.done();
     //},
@@ -63,7 +63,7 @@ module.exports["message"] = {
     //        futures: [{type: 'id', name: 'res'}, {type: 'id', name: 'body'}]
     //    };
     //
-    //    test.equal(new Scope().compile(node).render(), 'task.sendMessage($foo, [$url], function (args) {$res = args.shift();\n\$body = args.shift();\n}, null);\n\n');
+    //    test.equal(new Context().compile(node).render(), 'task.sendMessage($foo, [$url], function (args) {$res = args.shift();\n\$body = args.shift();\n}, null);\n\n');
     //    test.done();
     //},
 
@@ -77,8 +77,9 @@ module.exports["message"] = {
             },
             args: [{type: 'id', name: 'url'}],
             subsequent: {
-                type: 'handler',
+                type: 'procedure',
                 channel: 'reply',
+                params: [],
                 body: {
                     type: 'stmt_list',
                     head: { type: 'assign',
@@ -91,10 +92,10 @@ module.exports["message"] = {
             }
         };
 
-        var scope = new Scope();
+        var scope = new Context();
         scope.define('answer', '42');
 
-        test.equal(scope.bud().compile(node).render(),
+        test.equal(scope.createInner().compile(node).render(),
             'task.sendMessage($foo, [$url], function (args) {var $bar;\n\n\n$bar = 42;\n}, null)');
         test.done();
     }

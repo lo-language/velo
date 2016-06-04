@@ -1,0 +1,95 @@
+{
+  "type": "module",
+  "definitions": [
+    {
+      "type": "constant",
+      "name": "test",
+      "value": {
+        "type": "procedure",
+        "params": [],
+        "body": {
+          "type": "stmt_list",
+          "head": {
+            "type": "increment",
+            "operand": {
+              "type": "id",
+              "name": "foo"
+            }
+          },
+          "tail": {
+            "type": "stmt_list",
+            "head": {
+              "type": "decrement",
+              "operand": {
+                "type": "id",
+                "name": "foo"
+              }
+            },
+            "tail": {
+              "type": "stmt_list",
+              "head": {
+                "type": "assign",
+                "op": "+=",
+                "left": {
+                  "type": "id",
+                  "name": "foo"
+                },
+                "right": {
+                  "type": "number",
+                  "val": "12"
+                }
+              },
+              "tail": {
+                "type": "stmt_list",
+                "head": {
+                  "type": "assign",
+                  "op": "-=",
+                  "left": {
+                    "type": "id",
+                    "name": "foo"
+                  },
+                  "right": {
+                    "type": "number",
+                    "val": "7"
+                  }
+                },
+                "tail": {
+                  "type": "stmt_list",
+                  "head": {
+                    "type": "assign",
+                    "op": "*=",
+                    "left": {
+                      "type": "id",
+                      "name": "foo"
+                    },
+                    "right": {
+                      "type": "number",
+                      "val": "10"
+                    }
+                  },
+                  "tail": {
+                    "type": "stmt_list",
+                    "head": {
+                      "type": "assign",
+                      "op": "/=",
+                      "left": {
+                        "type": "id",
+                        "name": "foo"
+                      },
+                      "right": {
+                        "type": "number",
+                        "val": "4"
+                      }
+                    },
+                    "tail": null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "references": null
+}

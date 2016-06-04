@@ -1,6 +1,0 @@
-result = foo == bar;
-result = foo != bar;
-result = foo < bar;
-result = foo > bar;
-result = foo <= bar;
-result = foo >= bar;

@@ -1,0 +1,205 @@
+{
+  "type": "module",
+  "definitions": [
+    {
+      "type": "constant",
+      "name": "test",
+      "value": {
+        "type": "procedure",
+        "params": [],
+        "body": {
+          "type": "stmt_list",
+          "head": {
+            "type": "conditional",
+            "predicate": {
+              "type": "op",
+              "op": "==",
+              "left": {
+                "type": "id",
+                "name": "foo"
+              },
+              "right": {
+                "type": "number",
+                "val": "1"
+              }
+            },
+            "consequent": {
+              "type": "stmt_list",
+              "head": {
+                "type": "response",
+                "channel": "reply",
+                "args": []
+              },
+              "tail": null
+            }
+          },
+          "tail": {
+            "type": "stmt_list",
+            "head": {
+              "type": "conditional",
+              "predicate": {
+                "type": "op",
+                "op": "==",
+                "left": {
+                  "type": "id",
+                  "name": "foo"
+                },
+                "right": {
+                  "type": "number",
+                  "val": "2"
+                }
+              },
+              "consequent": {
+                "type": "stmt_list",
+                "head": {
+                  "type": "response",
+                  "channel": "fail",
+                  "args": []
+                },
+                "tail": null
+              }
+            },
+            "tail": {
+              "type": "stmt_list",
+              "head": {
+                "type": "conditional",
+                "predicate": {
+                  "type": "op",
+                  "op": "==",
+                  "left": {
+                    "type": "id",
+                    "name": "foo"
+                  },
+                  "right": {
+                    "type": "number",
+                    "val": "3"
+                  }
+                },
+                "consequent": {
+                  "type": "stmt_list",
+                  "head": {
+                    "type": "response",
+                    "channel": "reply",
+                    "args": [
+                      {
+                        "type": "string",
+                        "val": "ok"
+                      }
+                    ]
+                  },
+                  "tail": null
+                }
+              },
+              "tail": {
+                "type": "stmt_list",
+                "head": {
+                  "type": "conditional",
+                  "predicate": {
+                    "type": "op",
+                    "op": "==",
+                    "left": {
+                      "type": "id",
+                      "name": "foo"
+                    },
+                    "right": {
+                      "type": "number",
+                      "val": "4"
+                    }
+                  },
+                  "consequent": {
+                    "type": "stmt_list",
+                    "head": {
+                      "type": "response",
+                      "channel": "fail",
+                      "args": [
+                        {
+                          "type": "string",
+                          "val": "oh no!"
+                        }
+                      ]
+                    },
+                    "tail": null
+                  }
+                },
+                "tail": {
+                  "type": "stmt_list",
+                  "head": {
+                    "type": "conditional",
+                    "predicate": {
+                      "type": "op",
+                      "op": "==",
+                      "left": {
+                        "type": "id",
+                        "name": "foo"
+                      },
+                      "right": {
+                        "type": "number",
+                        "val": "5"
+                      }
+                    },
+                    "consequent": {
+                      "type": "stmt_list",
+                      "head": {
+                        "type": "response",
+                        "channel": "reply",
+                        "args": [
+                          {
+                            "type": "string",
+                            "val": "ok"
+                          },
+                          {
+                            "type": "string",
+                            "val": "fine"
+                          }
+                        ]
+                      },
+                      "tail": null
+                    }
+                  },
+                  "tail": {
+                    "type": "stmt_list",
+                    "head": {
+                      "type": "conditional",
+                      "predicate": {
+                        "type": "op",
+                        "op": "==",
+                        "left": {
+                          "type": "id",
+                          "name": "foo"
+                        },
+                        "right": {
+                          "type": "number",
+                          "val": "6"
+                        }
+                      },
+                      "consequent": {
+                        "type": "stmt_list",
+                        "head": {
+                          "type": "response",
+                          "channel": "fail",
+                          "args": [
+                            {
+                              "type": "string",
+                              "val": "oh no!"
+                            },
+                            {
+                              "type": "string",
+                              "val": "too bad"
+                            }
+                          ]
+                        },
+                        "tail": null
+                      }
+                    },
+                    "tail": null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "references": null
+}

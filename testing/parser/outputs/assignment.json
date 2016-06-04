@@ -1,47 +1,24 @@
 {
   "type": "module",
-  "service": {
-    "type": "procedure",
-    "body": {
-      "type": "stmt_list",
-      "head": {
-        "type": "assign",
-        "op": "=",
-        "left": {
-          "type": "id",
-          "name": "bar"
-        },
-        "right": {
-          "type": "id",
-          "name": "baz"
-        }
-      },
-      "tail": {
-        "type": "stmt_list",
-        "head": {
-          "type": "assign",
-          "op": "=",
-          "left": {
-            "type": "id",
-            "name": "binky"
-          },
-          "right": {
-            "type": "number",
-            "val": "64"
-          }
-        },
-        "tail": {
+  "definitions": [
+    {
+      "type": "constant",
+      "name": "test",
+      "value": {
+        "type": "procedure",
+        "params": [],
+        "body": {
           "type": "stmt_list",
           "head": {
             "type": "assign",
             "op": "=",
             "left": {
               "type": "id",
-              "name": "message"
+              "name": "bar"
             },
             "right": {
-              "type": "string",
-              "val": "hi there"
+              "type": "id",
+              "name": "baz"
             }
           },
           "tail": {
@@ -51,11 +28,11 @@
               "op": "=",
               "left": {
                 "type": "id",
-                "name": "foo"
+                "name": "binky"
               },
               "right": {
-                "type": "boolean",
-                "val": true
+                "type": "number",
+                "val": "64"
               }
             },
             "tail": {
@@ -65,21 +42,52 @@
                 "op": "=",
                 "left": {
                   "type": "id",
-                  "name": "baz"
+                  "name": "message"
                 },
                 "right": {
-                  "type": "cardinality",
-                  "operand": {
-                    "type": "id",
-                    "name": "someList"
-                  }
+                  "type": "string",
+                  "val": "hi there"
                 }
               },
-              "tail": null
+              "tail": {
+                "type": "stmt_list",
+                "head": {
+                  "type": "assign",
+                  "op": "=",
+                  "left": {
+                    "type": "id",
+                    "name": "foo"
+                  },
+                  "right": {
+                    "type": "boolean",
+                    "val": true
+                  }
+                },
+                "tail": {
+                  "type": "stmt_list",
+                  "head": {
+                    "type": "assign",
+                    "op": "=",
+                    "left": {
+                      "type": "id",
+                      "name": "baz"
+                    },
+                    "right": {
+                      "type": "cardinality",
+                      "operand": {
+                        "type": "id",
+                        "name": "someList"
+                      }
+                    }
+                  },
+                  "tail": null
+                }
+              }
             }
           }
         }
       }
     }
-  }
+  ],
+  "references": null
 }

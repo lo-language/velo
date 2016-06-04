@@ -7,7 +7,7 @@
 
 var JsConstruct = require('../../../codegen/JsConstruct');
 var Call = require('../../../codegen/Call');
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
 var util = require('util');
 
 module.exports["application"] = {
@@ -20,7 +20,7 @@ module.exports["application"] = {
             args: []
         };
 
-        var result = new Scope().compile(node);
+        var result = new Context().compile(node);
 
         test.ok(result instanceof Call);
         test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [], function (P0) {P0}, null);\n\n');
@@ -37,7 +37,7 @@ module.exports["application"] = {
             ]
         };
 
-        var result = new Scope().compile(node);
+        var result = new Context().compile(node);
 
         test.ok(result instanceof Call);
         test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [42], function (P0) {P0}, null);\n\n');
@@ -55,7 +55,7 @@ module.exports["application"] = {
             ]
         };
 
-        var result = new Scope().compile(node);
+        var result = new Context().compile(node);
 
         test.ok(result instanceof Call);
         test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [42, 'hi there'], function (P0) {P0}, null);\n\n");
@@ -78,7 +78,7 @@ module.exports["application"] = {
             }]
         };
 
-        var result = new Scope().compile(node);
+        var result = new Context().compile(node);
 
         test.ok(result instanceof Call);
         test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [P0, P1], function (P0) {P0}, null);\n\n}, null);\n\n}, null);\n\n");
@@ -100,7 +100,7 @@ module.exports["application statements"] = {
                 ]}
         };
 
-        var a = new Scope().compile(node);
+        var a = new Context().compile(node);
         test.equal(a.render(), 'task.sendMessage($foo, [42], function (P0) {P0;\n}, null);\n\n');
         test.ok(a.async);
 
@@ -139,7 +139,7 @@ module.exports["application statements"] = {
                 }]}
         };
 
-        test.equal(new Scope().compile(node).render(),
+        test.equal(new Context().compile(node).render(),
             "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [(P0 - P1)], function (P0) {P0;\n}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     },
@@ -170,7 +170,7 @@ module.exports["application statements"] = {
                     }]}]}
         };
 
-        test.equal(new Scope().compile(node).render(),
+        test.equal(new Context().compile(node).render(),
             "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [(P0 - P1)], function (P0) {task.sendMessage($quux, [P0], function (P0) {P0;\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     },
@@ -207,7 +207,7 @@ module.exports["application statements"] = {
             }
         };
 
-        test.equal(new Scope().compile(node).render(),
+        test.equal(new Context().compile(node).render(),
             "task.sendMessage($factorial, [$args[0]], function (P0) {task.sendMessage($io.stdout.write, ['' + P0 + '\\n'], null, null);\n}, null);\n\n");
 
         test.done();

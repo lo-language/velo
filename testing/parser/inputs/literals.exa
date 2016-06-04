@@ -1,28 +1,41 @@
-x = true;
-y = false;
-answer = 42;
-age = 63.4;
-message = "hello, world!";
-empty = [];
+x is true;
+y is false;
+answer is 42;
+age is 63.4;
+message is "hello, world!";
+escaped is "\thello, \"world\"?\n";
+empty is [];
+emptySet is {};
 
-// list
-names = ["Ford", "Arthur", "Trillian", "Zaphod"];
+// sequence
+nameList is ["Ford", "Arthur", "Trillian", "Zaphod"];
+
+// set
+nameSet is {"Ford", "Arthur", "Trillian", "Zaphod"};
 
 // map
-homes = [
-    "Ford":     "Betelgeuse",
-    "Arthur":   "Earth",
-    "Trillian": "Earth",
-    "Zaphod":   "Betelgeuse"
-];
+homes is {
+    "Ford"      => "Betelgeuse",
+    "Arthur"    => "Earth",
+    "Trillian"  => "Earth",
+    "Zaphod"    => "Betelgeuse"
+};
 
-// procedure literal
-HardyRamanujan = service {
+// service literal
+HardyRamanujan is -> {
     reply 1729;
 };
 
-// record with indentation
-pairs = {
-    key1: "alpha",
-    key2: "bravo"
-};
+// a little sugar
+setX is -> x;
+
+// labeled nested frame literal
+// no commas between top-level fields
+student is [
+    name: [first: "Alyssa", middle: "P", last: "Hacker"]
+    course: 6
+    year: 2001
+];
+
+// unlabeled frame literal
+mottTheTuple is ["Cambridge", ["02138", "02139"], "MA", 1630];

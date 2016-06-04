@@ -1,11 +1,12 @@
-receive foo, bar;
+main is -> (foo, bar) {
 
-fooVal = *foo();
-barVal = *bar();
+    fooVal = @foo();
+    barVal = @bar();
 
-if (fooVal > barVal) {
-    reply "foo wins";
-}
-else {
-    reply "bar wins";
-}
+    if fooVal > barVal {
+        reply "foo wins";
+    }
+    else {
+        reply "bar wins";
+    }
+};

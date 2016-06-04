@@ -1,123 +1,103 @@
 {
   "type": "module",
-  "service": {
-    "type": "procedure",
-    "body": {
-      "type": "stmt_list",
-      "head": {
-        "type": "assign",
-        "op": "=",
-        "left": {
-          "type": "id",
-          "name": "qux"
-        },
-        "right": {
-          "type": "op",
-          "op": "+",
-          "left": {
-            "type": "op",
-            "op": "+",
+  "definitions": [
+    {
+      "type": "constant",
+      "name": "test",
+      "value": {
+        "type": "procedure",
+        "params": [],
+        "body": {
+          "type": "stmt_list",
+          "head": {
+            "type": "assign",
+            "op": "=",
             "left": {
-              "type": "number",
-              "val": "2"
+              "type": "id",
+              "name": "qux"
             },
             "right": {
               "type": "op",
-              "op": "/",
+              "op": "+",
               "left": {
                 "type": "op",
-                "op": "*",
+                "op": "+",
                 "left": {
-                  "type": "id",
-                  "name": "foo"
+                  "type": "number",
+                  "val": "2"
                 },
                 "right": {
-                  "type": "id",
-                  "name": "bar"
+                  "type": "op",
+                  "op": "/",
+                  "left": {
+                    "type": "op",
+                    "op": "*",
+                    "left": {
+                      "type": "id",
+                      "name": "foo"
+                    },
+                    "right": {
+                      "type": "id",
+                      "name": "bar"
+                    }
+                  },
+                  "right": {
+                    "type": "number",
+                    "val": "-2"
+                  }
                 }
               },
               "right": {
-                "type": "number",
-                "val": "-2"
-              }
-            }
-          },
-          "right": {
-            "type": "op",
-            "op": "%",
-            "left": {
-              "type": "id",
-              "name": "baz"
-            },
-            "right": {
-              "type": "op",
-              "op": "-",
-              "left": {
-                "type": "id",
-                "name": "age"
-              },
-              "right": {
-                "type": "number",
-                "val": "4"
-              }
-            }
-          }
-        }
-      },
-      "tail": {
-        "type": "stmt_list",
-        "head": {
-          "type": "increment",
-          "operand": {
-            "type": "id",
-            "name": "num"
-          }
-        },
-        "tail": {
-          "type": "stmt_list",
-          "head": {
-            "type": "decrement",
-            "operand": {
-              "type": "id",
-              "name": "num"
-            }
-          },
-          "tail": {
-            "type": "stmt_list",
-            "head": {
-              "type": "assign",
-              "op": "=",
-              "left": {
-                "type": "id",
-                "name": "foo"
-              },
-              "right": {
-                "type": "in",
+                "type": "op",
+                "op": "%",
                 "left": {
                   "type": "id",
                   "name": "baz"
                 },
                 "right": {
-                  "type": "id",
-                  "name": "bar"
+                  "type": "op",
+                  "op": "-",
+                  "left": {
+                    "type": "id",
+                    "name": "age"
+                  },
+                  "right": {
+                    "type": "number",
+                    "val": "4"
+                  }
                 }
+              }
+            }
+          },
+          "tail": {
+            "type": "stmt_list",
+            "head": {
+              "type": "increment",
+              "operand": {
+                "type": "id",
+                "name": "num"
               }
             },
             "tail": {
               "type": "stmt_list",
               "head": {
-                "type": "assign",
-                "op": "=",
-                "left": {
+                "type": "decrement",
+                "operand": {
                   "type": "id",
-                  "name": "foo"
-                },
-                "right": {
-                  "type": "op",
-                  "op": "or",
+                  "name": "num"
+                }
+              },
+              "tail": {
+                "type": "stmt_list",
+                "head": {
+                  "type": "assign",
+                  "op": "=",
                   "left": {
-                    "type": "op",
-                    "op": "and",
+                    "type": "id",
+                    "name": "foo"
+                  },
+                  "right": {
+                    "type": "in",
                     "left": {
                       "type": "id",
                       "name": "baz"
@@ -126,18 +106,69 @@
                       "type": "id",
                       "name": "bar"
                     }
+                  }
+                },
+                "tail": {
+                  "type": "stmt_list",
+                  "head": {
+                    "type": "assign",
+                    "op": "=",
+                    "left": {
+                      "type": "id",
+                      "name": "foo"
+                    },
+                    "right": {
+                      "type": "op",
+                      "op": "or",
+                      "left": {
+                        "type": "op",
+                        "op": "and",
+                        "left": {
+                          "type": "id",
+                          "name": "baz"
+                        },
+                        "right": {
+                          "type": "id",
+                          "name": "bar"
+                        }
+                      },
+                      "right": {
+                        "type": "id",
+                        "name": "buzzy"
+                      }
+                    }
                   },
-                  "right": {
-                    "type": "id",
-                    "name": "buzzy"
+                  "tail": {
+                    "type": "stmt_list",
+                    "head": {
+                      "type": "assign",
+                      "op": "=",
+                      "left": {
+                        "type": "id",
+                        "name": "doghouse"
+                      },
+                      "right": {
+                        "type": "op",
+                        "op": "concat",
+                        "left": {
+                          "type": "string",
+                          "val": "dog"
+                        },
+                        "right": {
+                          "type": "string",
+                          "val": "house"
+                        }
+                      }
+                    },
+                    "tail": null
                   }
                 }
-              },
-              "tail": null
+              }
             }
           }
         }
       }
     }
-  }
+  ],
+  "references": null
 }

@@ -7,14 +7,15 @@
 
 "use strict";
 
-const Loader = require('../runtime/Loader');
+const Sourcer = require('../pipeline/Sourcer');
+const Program = require('../codegen/Program');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var __ = function (sourceDir, program) {
+var __ = function (sourceDir, mainMod) {
 
-    this.loader = new Loader(sourceDir);
-    this.program = program;
+    this.program = new Program(new Sourcer(sourceDir));
+    this.mainMod = mainMod;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -23,39 +24,45 @@ var __ = function (sourceDir, program) {
  */
 __.prototype.run = function (input) {
 
-    return this.loader.run(this.program, input);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-__.prototype.testSuccess = function (test, input, expected) {
-
-    var _this = this;
-
-    return this.run(input).then(
-        function (result) {
-
-            if (expected !== undefined) {
-                console.log(result);
-                test.equal(result, expected);
-            }
-
-            // this is in here to let us wait on tests that end with a dispatch
-            // todo figure out a way to remove this
-            setImmediate(test.done.bind(test));
-        },
-        function (err) {
-            console.error("error running " + _this.program + ".exa: " + err);
-            console.error(err.stack);
+    return this.program.include(this.mainMod).then(
+        () => {
+            this.program.run(input);
         }
     );
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+__.prototype.testSuccess = function (test, input, expected) {
+    
+    return this.program.include(this.mainMod).then(() => {
+        return this.program.run(input);
+    }).then(
+            function (result) {
+
+                if (expected !== undefined) {
+                    console.log(result);
+                    test.equal(result, expected);
+                }
+
+                // this is in here to let us wait on tests that end with a dispatch
+                // todo do we still need this?
+                setImmediate(test.done.bind(test));
+            },
+            function (err) {
+                console.error("error running " + _this.program + ".exa: " + err);
+                console.error(err.stack);
+            }
+        );
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 __.prototype.testFailure = function (test, input, expected) {
 
-    this.run(input).then(
+    return this.program.include(this.mainMod).then(() => {
+        return this.program.run(input);
+    }).then(
         function () {
             test.fail();
         },

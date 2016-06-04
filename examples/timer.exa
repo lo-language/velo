@@ -1,9 +1,0 @@
-receive args, io, system;
-
-io.stdout.write("ready\n");
-
-after <:setTimer>(1000, 0):
-    io.stdout.write("set\n");
-
-after <:setTimer>(2000, 0):
-    io.stdout.write("go!\n");

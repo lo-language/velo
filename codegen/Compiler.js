@@ -1,7 +1,12 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Seth Purcell. All rights reserved.
+ *  Licensed under the MIT License. See LICENSE in the project root for license information.
+ *-------------------------------------------------------------------------------------------*/
+
 /**
- * The Exa-to-JS compiler
+ * JavaScript code generator
  *
- * This is a collection of stateless functions expecting to be called with a Scope as 'this'.
+ * This is a collection of stateless functions expecting to be called with a Context as 'this'.
  *
  * How it works:
  *
@@ -17,24 +22,38 @@
 
 'use strict';
 
-var JsConstruct = require('./JsConstruct');
-var Call = require('./Call');
-var Future = require('./Future');
-
-// this is a stateless library, not a "class"
-var __ = {};
+const JsConstruct = require('./JsConstruct');
+const Call = require('./Call');
+const Future = require('./Future');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Compiles a module into an Exa service factory, that is a JS function that you call to *create* an Exa service.
- * This lets us bind a module registry into the module.
+ * Compiles a module, producing a symbol table.
  *
  * @param node
  */
-__['module'] = function (node) {
+module.exports['module'] = function (node) {
+
+    var defs = node.definitions.map(def => {
+        return this.compile(def).render();
+    }).join("\n\n");
+
+    var exports = this.getExports();
+
+    var returnVal = '{' + Object.keys(exports).map(function (name) {
+
+            return '"' + name + '": ' + exports[name];
+
+        }).join(", ") + '}';
+
+    // wrap our service constant definitions in a scope to prevent collisions with other modules
+    // export our constants via a return statement
 
     return new JsConstruct([
-        "'use strict';\n\nreturn ", this.compile(node.service), ';']);
+        "function () {\n\n'use strict';\n\n",
+        defs,
+        "\n\nreturn ", returnVal, ";\n",
+        "}"]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -42,63 +61,53 @@ __['module'] = function (node) {
  *
  * @param node
  */
-__['nil'] = function (node) {
+module.exports['nil'] = function (node) {
 
     return "null";
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * A service definition is an expression.
  *
  * @param node
  */
-__['modref'] = function (node) {
-
-    // think of module literals as symbols on the schematic
-    // when we compile, we just need to validate internally
-    // when we RUN, we need to have the symbols' meanings to hand
-    // compilation generates the complete and final code for a module
-    // acquire used to be injected at the root, now it's ambient via this mechanism
-    // what's the advantage of modrefs over acquire? static analysis & eager validation & compilation - anything else?
-
-    // register the dependency with the current scope
-    this.registerDep(node.val);
-
-    // every module has MODS in scope which maps modrefs to service functions
-    return new JsConstruct(['MODS["' + node.val + '"]']);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * A procedure is an expression.
- *
- * @param node
- */
-__['procedure'] = function (node) {
+module.exports['procedure'] = function (node) {
 
     // push a new scope onto the scope stack
-    var localScope = this.bud();
+    var local = this.createInner();
+
+    // if we have a channel we're a handler with args instead of a task
+    // todo could drop this if services took an 'args' arg rather than putting them in the task
+    var argList = node.channel ? 'args' : 'task.args';
+
+    // process params
+    var params = node.params.map(function (name, index) {
+
+            local.declare(name);
+            return '$' + name + ' = ' + 'task.args[' + index + '];\n';
+
+        }).join('') + '\n';
 
     // compile the statement(s) in the context of the local scope
-    var body = localScope.compile(node.body);
+    var body = local.compile(node.body);
 
     // after compilation we can get our declared vars
-    var localVars = localScope.getJsVars();
+    var localVars = local.getJsVars();
 
-    var receives = localScope.receives.map(function (name) {
-        return '$' + name + ' = ' + 'task.args.shift()' + ';\n';
-    }).join('') + '\n';
-
-    // todo only include recur where it's referenced (or just remove this feature)
     // declare our local vars
     var fnBody = [
-        'var $recur = task.service;\n',
         localVars.length > 0 ? 'var ' + localVars.join(', ') + ';\n\n' : '',
-        receives, body];
+        params, body];
+
+    // todo only include recur where it's referenced (or just remove this feature)
+    if (node.channel == null) {
+        fnBody.unshift('var $recur = task.service;\n');
+    }
 
     // implements an exa service as a JS function that takes a task
     return new JsConstruct([
-        'function (task) ', {block: fnBody}], false);
+        'function (' + (node.channel ? 'args' : 'task') + ') ', {block: fnBody}], false);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,7 +115,7 @@ __['procedure'] = function (node) {
  *
  * @param node
  */
-__['stmt_list'] = function (node) {
+module.exports['stmt_list'] = function (node) {
 
     // hooray for Lisp!
 
@@ -125,24 +134,10 @@ __['stmt_list'] = function (node) {
 // Statements
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * @param node
- */
-__['receive'] = function (node) {
-
-    // todo do we always want the declaration? could use receive to clobber existing values...
-
-    this.setReceives(node.names);
-
-    // return an empty construct to allow attachment
-    return new JsConstruct();
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
  *
  * @param node
  */
-__['response'] = function (node) {
+module.exports['response'] = function (node) {
 
     var _this = this;
 
@@ -150,14 +145,9 @@ __['response'] = function (node) {
         return _this.compile(arg);
     });
 
-    if (args.length > 1) {
-        throw new Error("results with >1 value not yet supported, sorry");
-    }
-
     // we assume the existence of a Task object named 'task'
-
     // todo throw a compiler warning if anything is attach()'d to this statement
-    return JsConstruct.makeStatement(['task.respond("', node.channel, '", ', {csv: args}, ');\nreturn;']);
+    return JsConstruct.makeStatement(['task.respond("', node.channel, '", [', {csv: args}, ']);\nreturn;']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,7 +157,7 @@ __['response'] = function (node) {
  *
  * @param node
  */
-__['assign'] = function (node) {
+module.exports['assign'] = function (node) {
 
     // if the left node is a bare ID, then we compile it as an lvalue
     // otherwise all IDs are compiled as rvalues
@@ -199,7 +189,7 @@ __['assign'] = function (node) {
 
     return JsConstruct.makeStatement([left, ' ' + node.op + ' ', right, ';\n']);
     // this was genius
-    // above comment inserted by my slightly tipsy wife regarding code later removed - SP
+    // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP
  };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,7 +197,7 @@ __['assign'] = function (node) {
  *
  * @param node
  */
-__['conditional'] = function (node) {
+module.exports['conditional'] = function (node) {
 
     // if the predicate is sync that's easy because we always want to resolve it
     // the trick is sync logic in the branches because we only want to resolve if
@@ -235,12 +225,16 @@ __['conditional'] = function (node) {
         }
 
         // and need to call the continuation as the last statement in both branches
+        // var cont = new Continuation(this.contNum++);
 
         // generate unique continuation names
         contName = "cont" + this.contNum++;
 
         consequent.attach(new JsConstruct(contName + "();"));
         negBlock.attach(new JsConstruct(contName + "();"));
+
+        // consequent.attach(cont.call());
+        // negBlock.attach(cont.call());
     }
 
     var parts = ['if (', predicate, ') ', {block: consequent}, '\n\n'];
@@ -262,14 +256,13 @@ __['conditional'] = function (node) {
  *
  * @param node
  */
-__['iteration'] = function (node) {
+module.exports['iteration'] = function (node) {
 
     var condition = this.compile(node.condition);
     var body = this.compile(node.statements);
-    var async = body.async;
 
     // can render as a while loop if body isn't async
-    if (!async) {
+    if (!(body.async)) {
 
         return JsConstruct.makeStatement([
             'while (', condition, ')',
@@ -297,16 +290,14 @@ __['iteration'] = function (node) {
  *
  * @param node
  */
-__['message'] = function (node) {
+module.exports['message'] = function (node) {
 
     // compile the parts
 
     var target = this.compile(node.address);
 
-    var _this = this;
-
-    var args = node.args.map(function (arg) {
-        return _this.compile(arg);
+    var args = node.args.map(arg => {
+        return this.compile(arg);
     });
 
     var subsequent = node.subsequent ? this.compile(node.subsequent) : null;
@@ -317,35 +308,7 @@ __['message'] = function (node) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__['handler'] = function (node) {
-
-    // todo look at the channel
-
-    // create a new scope for the handler
-    var localScope = this.bud();
-    var body = localScope.compile(node.body);
-
-    // unpack the scope
-    // after compilation we can get our declared vars
-    var localVars = localScope.getJsVars();
-
-    var receives = localScope.receives.map(function (name) {
-            return '$' + name + ' = ' + 'args.shift()' + ';\n'; // differs from procedure (which is task.args.shift)
-        }).join('') + '\n';
-
-    // todo only include recur where it's referenced (or just remove this feature)
-    // declare our local vars
-    var fnBody = [
-        localVars.length > 0 ? 'var ' + localVars.join(', ') + ';\n\n' : '',
-        receives, body];
-
-    // create a new JS function for the handler
-    return new JsConstruct('function (args) ', {block: fnBody});
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-__['application_stmt'] = function (node) {
+module.exports['application_stmt'] = function (node) {
 
     // slap a semicolon on that bad boy
     return JsConstruct.makeStatement([this.compile(node.application), ';\n']);
@@ -355,21 +318,22 @@ __['application_stmt'] = function (node) {
 // Application
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- *
+ * todo this is exactly the same as dispatch now except for the return expr
  * @param node
  */
-__['application'] = function (node) {
+module.exports['application'] = function (node) {
 
     var target = this.compile(node.address);
 
-    var _this = this;
-
-    var args = node.args.map(function (arg) {
-        return _this.compile(arg);
+    var args = node.args.map(arg => {
+        return this.compile(arg);
     });
 
+    var subsequent = node.subsequent ? this.compile(node.subsequent) : null;
+    var contingency = node.contingency ? this.compile(node.contingency) : null;
+
     // return a wrapped placeholder
-    return new Call(target, args);
+    return new Call(target, args, subsequent, contingency);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -379,7 +343,7 @@ __['application'] = function (node) {
  *
  * @param node
  */
-__['id'] = function (node) {
+module.exports['id'] = function (node) {
 
     // todo know we're not rendering an lvalue because we're defended from that
     // in the assignment code generator
@@ -388,8 +352,22 @@ __['id'] = function (node) {
     // context could also let us know we're in string interpolation
     // as well as conditionals
 
+    if (node.scope) {
+
+        // having a qualifier implies a constant
+        return this.resolveExternal(node.name, node.scope);
+    }
+
     if (this.isConstant(node.name)) {
         return this.resolve(node.name);
+    }
+
+    // see if the name is a local constant
+    try {
+        return this.resolve(node.name);
+    }
+    catch (err) {
+        // ignore
     }
 
     // todo just return whatever the ID resolves to in this scope?
@@ -404,12 +382,20 @@ __['id'] = function (node) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * This just puts a mapping in the scope; it doesn't compile "to" anything.
  *
  * @param node
  * @return {String}
  */
-__['constant'] = function (node) {
+module.exports['constant'] = function (node) {
+
+    // services are *run-time* constants -- we just can't know them at compile-time
+
+    if (node.value.type == 'procedure') {
+
+        var id = '$' + node.name;
+        this.define(node.name, id, true);
+        return new JsConstruct.makeStatement(["const ", id, " = ", this.compile(node.value), ';']);
+    }
 
     this.define(node.name, this.compile(node.value));
 
@@ -422,7 +408,7 @@ __['constant'] = function (node) {
  *
  * @param node
  */
-__['cardinality'] = function (node) {
+module.exports['cardinality'] = function (node) {
 
     var right = this.compile(node.operand);
 
@@ -441,7 +427,7 @@ __['cardinality'] = function (node) {
  *
  * @param node
  */
-__['complement'] = function (node) {
+module.exports['complement'] = function (node) {
 
     return new JsConstruct(['!', this.compile(node.operand)]);
 };
@@ -451,7 +437,7 @@ __['complement'] = function (node) {
  *
  * @param node
  */
-__['subscript'] = function (node) {
+module.exports['subscript'] = function (node) {
 
     // this is guaranteed to be a statement
 
@@ -470,12 +456,19 @@ __['subscript'] = function (node) {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Handles both non-mutating slice of a list and mutating excision of a list.
- *
- * @param node
- */
-var compileSlice = function (node) {
+
+module.exports['slice'] = function (node) {
+
+    // lean on JS slice since it has the same semantics
+
+    var list = this.compile(node.list);
+    var start = node.start ? this.compile(node.start) : '0';
+    var end = node.end ? this.compile(node.end) : null;
+
+    return new JsConstruct([list, '.slice(', start, end ? [',', end] : '', ')']);
+};
+
+module.exports['excision'] = function (node) {
 
     var list = this.compile(node.list);
     var start; // optional, so compile only if present
@@ -490,7 +483,8 @@ var compileSlice = function (node) {
 
     if (node.start === undefined) {
         start = '0';
-    } else {
+    }
+    else {
         start = this.compile(node.start);
 
         if (node.start.type == 'number' && parseInt(node.start.val) < 0) {
@@ -500,7 +494,8 @@ var compileSlice = function (node) {
 
     if (node.end === undefined) {
         end = list + '.length';
-    } else {
+    }
+    else {
         end = this.compile(node.end);
 
         if (node.end.type == 'number' && parseInt(node.end.val) < 0) {
@@ -515,11 +510,8 @@ var compileSlice = function (node) {
     }
 
     // slice
-    return new JsConstruct([list, '.slice(', start, ',', end, ')']);
+    return new JsConstruct([list, '.slice(', start, ',', end, '+1)']);
 };
-
-__['slice'] = compileSlice;
-__['excision'] = compileSlice;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -527,7 +519,7 @@ __['excision'] = compileSlice;
  *
  * @param node
  */
-__['extraction'] = function (node) {
+module.exports['extraction'] = function (node) {
 
     var list = this.compile(node.list);
     var index = this.compile(node.index);
@@ -543,7 +535,7 @@ __['extraction'] = function (node) {
  *
  * @param node
  */
-__['select'] = function (node) {
+module.exports['select'] = function (node) {
 
     var set = this.compile(node.set);
 
@@ -555,7 +547,7 @@ __['select'] = function (node) {
  *
  * @param node
  */
-__['in'] = function (node) {
+module.exports['in'] = function (node) {
 
     // should holds apply to strings? maybe as 'contains'? or some non-word operator?
 
@@ -573,7 +565,7 @@ __['in'] = function (node) {
  *
  * @param node
  */
-__['sequence'] = function (node) {
+module.exports['sequence'] = function (node) {
 
     var first = this.compile(node.first);
     var last = this.compile(node.last);
@@ -591,12 +583,16 @@ __['sequence'] = function (node) {
  *
  * @param node
  */
-__['op'] = function (node) {
+module.exports['op'] = function (node) {
 
     var left = this.compile(node.left);
     var right = this.compile(node.right);
 
     var op = node.op;
+
+    if (op == 'concat') {
+        return new JsConstruct(['task.concat(', left, ', ', right, ')']);
+    }
 
     if (op === 'and') {
         op = '&&';
@@ -604,13 +600,6 @@ __['op'] = function (node) {
     else if (op === 'or') {
         op = '||';
     }
-//    else if (op == '+') {
-//
-//        // todo drop this in favor of combination operator ><
-//        return new JsConstruct(['function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {' +
-//                'return left.concat(right);} else return left + right;}(',
-//                left, ',', right, ')']);
-//    }
 
     if (op == '==') {
         op = '===';
@@ -635,70 +624,56 @@ __['op'] = function (node) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Literals
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param node
- */
-__['boolean'] = function (node) {
 
-    // a literal has no effects or preconditions - just a value
+module.exports['boolean'] = function (node) {
+
     return node.val ? 'true' : 'false';
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param node
- */
-__['number'] = function (node) {
+module.exports['number'] = function (node) {
 
-    // a literal has no effects or preconditions - just a value
     return node.val;
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param node
- */
-__['string'] = function (node) {
 
-    // a literal has no effects or preconditions - just a value
+module.exports['string'] = function (node) {
+
     return "'" + node.val.replace(/'/g, "\\'") + "'";
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Handles lists and maps.
- *
- * @param node
- */
-var compileList = function (node) {
+module.exports['array'] = function (node) {
 
-    // list literals might have members that need to be realized
-
-    var self = this;
-
-    var items = node.elements.map(function (item) {
-        return self.compile(item);
+    const items = node.elements.map((item) => {
+        return this.compile(item);
     });
-
-    if (node.type == 'map') {
-        return new JsConstruct(['{', {csv: items}, '}']);
-    }
 
     return new JsConstruct(['[', {csv: items}, ']']);
 };
 
-__['array'] = compileList;
-__['map'] = compileList;
+module.exports['set'] = function (node) {
+
+    const items = node.elements.map((item) => {
+        return [this.compile(item), ': true'];
+    });
+
+    return new JsConstruct(['{', {csv: items}, '}']);
+};
+
+module.exports['map'] = function (node) {
+
+    const items = node.elements.map((item) => {
+        return this.compile(item);
+    });
+
+    return new JsConstruct(['{', {csv: items}, '}']);
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
  * @param node
  */
-__['dyad'] = function (node) {
+module.exports['pair'] = function (node) {
 
     var key = this.compile(node.key);
     var value = this.compile(node.value);
@@ -712,7 +687,7 @@ __['dyad'] = function (node) {
  *
  * @param node
  */
-__['record'] = function (node) {
+module.exports['record'] = function (node) {
 
     var self = this;
 
@@ -729,23 +704,23 @@ __['record'] = function (node) {
  *
  * @param node
  */
-__['field'] = function (node) {
+module.exports['field'] = function (node) {
 
     var value = this.compile(node.value);
 
-    // we don't qualify field names
-    return [node.name, ':', value];
+    // we don't qualify field labels
+    return [node.label, ':', value];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__['interpolation'] = function (node) {
+module.exports['interpolation'] = function (node) {
 
     return new JsConstruct(["'", node.left, "' + ",
         this.compile(node.middle), " + '", node.right, "'"]);
 };
 
-__['dynastring'] = function (node) {
+module.exports['dynastring'] = function (node) {
 
     return new JsConstruct([this.compile(node.left), " + '", node.middle, "' + ",
         this.compile(node.right)]);
@@ -753,16 +728,14 @@ __['dynastring'] = function (node) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__['increment'] = function (node) {
+module.exports['increment'] = function (node) {
     return JsConstruct.makeStatement([ this.compile(node.operand), "++;\n"]);
 };
 
-__['decrement'] = function (node) {
+module.exports['decrement'] = function (node) {
     return JsConstruct.makeStatement([ this.compile(node.operand), "--;\n"]);
 };
 
-__['splice'] = function (node) {
+module.exports['splice'] = function (node) {
     return JsConstruct.makeStatement([ this.compile(node.list), ".push(", this.compile(node.item), ");\n"]);
 };
-
-module.exports = __;

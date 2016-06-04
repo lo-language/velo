@@ -5,10 +5,12 @@
 
 "use strict";
 
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
 var util = require('util');
 
-var ast = { type: 'procedure',
+var ast = {
+    type: 'procedure',
+    params: [],
     body:
     { type: 'stmt_list',
         head:
@@ -17,6 +19,7 @@ var ast = { type: 'procedure',
             left: { type: 'id', name: 'foo' },
             right:
             { type: 'procedure',
+                params: [],
                 body:
                 { type: 'stmt_list',
                     head:
@@ -36,8 +39,8 @@ var ast = { type: 'procedure',
                     args: [] } },
             tail:
             { type: 'stmt_list',
-                head:
-                { type: 'response',
+                head: {
+                    type: 'response',
                     channel: 'reply',
                     args: [ { type: 'id', name: 'x' } ] },
                 tail: null } } } };
@@ -46,7 +49,7 @@ module.exports["basics"] = {
 
     "full": function (test) {
 
-        var js = new Scope().compile(ast);
+        var js = new Context().compile(ast);
 
 //        console.log(require('util').inspect(js, {depth: null, colors: true}), '\n\n');
 //        console.log(js.render());

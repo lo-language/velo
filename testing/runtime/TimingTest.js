@@ -4,8 +4,9 @@
  * Created by spurcell on 12/5/15.
  */
 
-const Module = require('../../runtime/Module');
-const Task = require('../../runtime/Task');
+const Program = require('../../codegen/Program');
+const Module = require('../../codegen/Module');
+const Q = require('q');
 const util = require('util');
 
 module.exports['basics'] = {
@@ -14,10 +15,19 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var mod = new Module('reply "hullo!";');
-        var service = mod.makeService();
+        var sourcer = {
 
-        Task.sendRootRequest(service, null,
+            acquire: function (modRef) {
+                return Q(new Module('main is -> {reply "hullo!";};'));
+            }
+        };
+
+        var program = new Program(sourcer);
+
+        program.include('foo').then(function () {
+            return program.run();
+        }
+        ).then(
             function (res) {
                 test.equal(res, "hullo!");
                 test.done();
@@ -31,33 +41,48 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var mod = new Module(
-            'sayHello = service {\n' +
-            '    reply "hullo!";\n};\n' +
-            'reply sayHello();\n');
+        var sourcer = {
 
-        var service = mod.makeService();
+            acquire: function (modRef) {
+                return Q(new Module(
+                    'sayHello is -> {\n' +
+                    '    reply "hullo!";\n};\n' +
+                    'main is -> {\n' +
+                    '    reply sayHello();\n};\n'));
+            }
+        };
 
-        Task.sendRootRequest(service, null,
+        var p = new Program(sourcer);
+
+        p.include("foo").then(function () {
+            return p.run();
+        }).then(
             function (res) {
                 test.equal(res, "hullo!");
                 test.done();
-            },
-            function () {
-                test.fail();
-            });
+            }).done();
     },
 
     "sync message, default reply": function (test) {
 
-        var mod = new Module(
-            'sayHello = service {\n' +
-            '    reply "hullo!";\n};\n' +
-            'sayHello();\n');
+        test.expect(1);
 
-        var service = mod.makeService();
+        var sourcer = {
 
-        Task.sendRootRequest(service, null,
+            acquire: function (modRef) {
+                return Q(new Module(
+                    'sayHello is -> {\n' +
+                    '    reply "hullo!";\n};\n' +
+                    'main is -> {\n' +
+                    '    sayHello();\n};\n'));
+            }
+        };
+
+        var p = new Program(sourcer);
+
+        p.include("foo").then(function () {
+            return p.run();
+        }).then(
             function (res) {
                 test.equal(res, undefined);
                 test.done();
@@ -71,14 +96,23 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var mod = new Module(
-            'sayHello = service {\n' +
-            '    reply "hullo!";\n};\n' +
-            'sayHello(); reply "howdy!";\n');
+        var sourcer = {
 
-        var service = mod.makeService();
+            acquire: function (modRef) {
+                return Q(new Module(
+                    'sayHello is -> {\n' +
+                    '    reply "hullo!";\n};\n' +
+                    'main is -> {\n' +
+                    '    sayHello();\n' +
+                    '    reply "howdy!";\n};\n'));
+            }
+        };
 
-        Task.sendRootRequest(service, null,
+        var p = new Program(sourcer);
+
+        p.include("foo").then(function () {
+            return p.run();
+        }).then(
             function (res) {
                 test.equal(res, "howdy!");
                 test.done();
@@ -97,18 +131,22 @@ module.exports['basics'] = {
             task.respond("reply");
         };
 
-        var mod = new Module(
-            'receive write;\n' +
-            '*write("hi there!");\n');
+        var sourcer = {
 
-        var service = mod.makeService();
+            acquire: function (modRef) {
+                return Q(new Module(
+                    'main is -> (write) {\n' +
+                    '@write("hi there!");\n};\n'));
+            }
+        };
 
-        Task.sendRootRequest(service, [write],
+        var p = new Program(sourcer);
+
+        p.include("foo").then(function () {
+            return p.run([write]);
+        }).then(
             function (res) {
                 setImmediate(test.done.bind(test));
-            },
-            function () {
-                test.fail();
-            });
+            }).done();
     }
 };

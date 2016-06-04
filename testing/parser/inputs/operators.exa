@@ -1,5 +1,10 @@
-qux = 2 + foo * bar / -2 + baz % ((age - 4));
-num++;
-num--;
-foo = baz in bar;
-foo = baz and bar or buzzy;
+test is -> {
+
+    qux = 2 + foo * bar / -2 + baz % ((age - 4));
+    num++;
+    num--;
+    foo = baz in bar;
+    foo = baz and bar or buzzy;
+
+    doghouse = "dog" >< "house";    // either arg can be an atom or an array; an array is the result
+};

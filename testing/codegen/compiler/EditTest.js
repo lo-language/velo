@@ -6,7 +6,7 @@
 "use strict";
 
 var Compiler = require('../../../codegen/Compiler');
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
 var util = require('util');
 
 module.exports["basics"] = {
@@ -18,7 +18,7 @@ module.exports["basics"] = {
             "operand":{type: "id", name: "bar"}
         };
 
-        test.equal(new Scope().compile(node).render(), '$bar++;\n');
+        test.equal(new Context().compile(node).render(), '$bar++;\n');
         test.done();
     },
 
@@ -29,7 +29,7 @@ module.exports["basics"] = {
             "operand":{type: "id", name: "bar"}
         };
 
-        test.equal(new Scope().compile(node).render(), '$bar--;\n');
+        test.equal(new Context().compile(node).render(), '$bar--;\n');
         test.done();
     },
 
@@ -53,7 +53,7 @@ module.exports["basics"] = {
             }
         };
 
-        test.equal(new Scope().compile(node).render(), '$list.push($item);\n');
+        test.equal(new Context().compile(node).render(), '$list.push($item);\n');
         test.done();
     }
 };

@@ -24,6 +24,8 @@ fragment ID_LETTER  : 'a'..'z'|'A'..'Z'|'_' ;
 
 NIL         : 'nil';
 BOOL        : 'true'|'false';
+PAIR_SEP    : '=>';
+FIELD_SEP   : ':';
 
 NUMBER
     : '-'? INT '.' DIGIT+ EXP?
@@ -40,30 +42,35 @@ INTER_END   : '`' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1);} ;
 
 MODREF  : '<' ~[ \t\r\n]+ '>' {this.text = this.text.slice(1, -1);} ;
 
-// ??? allow modules to be records? or just literals in general?
 module
-    : statement_list
+    : references? definition+ EOF
+    ;
+
+// would a colon after references improve readability?
+// or should there be a colon between the ID and the modref?
+references
+    : ('references'|'refs') ':' (ID MODREF)+ // should this not be an ID? maybe a 'label' instead?
     ;
 
 // we do this the old-fashioned way because that's what the compiler wants
-statement_list
+statementList
     : statement
-    | statement statement_list
+    | statement statementList
     ;
 
 statement
-    : 'receive' ID (',' ID)* ';'                            # receive
-    | ID 'is' literal ';'                                   # constant
-    | 'adopt' ID ';'                                        # adopt
-    | 'distinguish' ID (','? ID)+ ';'                       # dimension
-    | channel=('reply'|'fail'|'substitute') exprList ';'    # response
+    : definition                                            # defStmt
+    | channel=('reply'|'fail'|'substitute') exprList? ';'   # response
     | expr assignment_op expr ';'                           # assignment
     | expr op=('++'|'--') ';'                               # incDec
-    | expr '->' expr ';'                                    # splice
     | conditional                                           # condStmt
+    | expr '>>' expr ';'                                    # send  // fire-and-forget to be clear and prevent us from using @syntax; is NOT a request, note that it is a statement, not an expression; precludes reply. could reuse -> here instead
     | 'while' expr block                                    # iteration
-    | 'skip' ';'                                            # skip
     | expr ';'                                              # exprStmt
+    ;
+
+definition
+    : ID 'is' literal ';'                                   # constant
     ;
 
 // assignments are statements, not expressions!
@@ -89,39 +96,40 @@ conditional
 
 // we could alternately go the C way and make a block a kind of statement
 block
-    : BEGIN statement_list? END
+    : BEGIN statementList? END
     ;
 
 expr
-    : expr '(' exprList? ')' failHandler?                       # call
-    | '*' expr '(' exprList? ')' replyHandler? failHandler?     # dispatch
-    | '#' expr                                                  # measure
+    : expr '(' exprList? ')' replyHandler? failHandler?         # dispatch  // request?
+    | '@' expr '(' exprList? ')' replyHandler? failHandler?     # async // dispatch?
+    | '#' expr                                                  # cardinality
     | 'not' expr                                                # negation
-    | 'cut' expr                                                # cut
     | 'bytes' expr                                              # bytes
     | expr op=('*'|'/'|'%') expr                                # mulDiv
     | expr op=('+'|'-') expr                                    # addSub
     | expr op=('<'|'>'|'<='|'>='|'=='|'!=') expr                # compare
     | expr op=('and'|'or') expr                                 # logical
     | expr 'in' expr                                            # membership // not sure where this guy should go, precedence-wise
+    | expr '><' expr                                            # concat
     | '(' expr ')'                                              # wrap
-    | expr '[' expr ']'                                         # subscript
-    | expr '[' expr? ':' expr? ']'                              # slice
-    | expr '{' expr '}'                                         # extraction
-    | expr '{' expr? ':' expr? '}'                              # excision
-    | expr '.' ID                                               # select
+    | expr '[' cut='cut'? expr ']'                              # subscript // retrieval? access?
+    | expr '[' cut='cut'? expr? '..' expr? ']'                  # range
+    | expr '.' ID                                               # field
     | '(' ID (',' ID)+ ')'                                      # destructure
     | INTER_BEGIN interpolated INTER_END                        # dynastring
     | literal                                                   # litExpr
+    | ID ':' ID                                                 # externalId
     | ID                                                        # id
     ;
 
 replyHandler
-    : 'then' block
+    : procedure
     ;
 
 failHandler
-    : 'catch' block
+    : 'on' 'failure' procedure
+    | ('##'|'~~'|'**') procedure    // just a shorthand. ideas: ~~, ##, --, **, __, ?!, ??, !!
+    | 'ignore'
     ;
 
 interpolated
@@ -130,30 +138,38 @@ interpolated
     ;
 
 exprList
-    : expr (',' expr)*
+    : expr (',' expr)* ','?
     ;
 
 // literals
 
+// are arrays and frames immutable?
 literal
     : 'nil'                                     # nil
     | BOOL                                      # bool
     | NUMBER                                    # number
     | STRING                                    # string
-    | MODREF                                    # modref
-    | 'service' block                           # service
-    | '[' (colon=':'|exprList|pairList)? ']'    # collection
-    | '{' field (',' field)* '}'                # record
+    | '[' exprList? ']'                         # array
+    | '[' fieldList ']'                         # frame // record? compound? composite?
+    | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
+    | procedure                                 # service
+    | 'on' expr procedure                       # subscription  // maybe not a literal
     ;
 
-field
-    : ID ':' expr
+procedure
+    : '->' paramList? block
+    | '->' ID (',' ID)*
     ;
 
+paramList
+    : '(' ID (',' ID)* ')'
+    ;
+
+fieldList
+    : (ID FIELD_SEP expr ','?)+
+    ;
+
+// todo test dangling commas -- maybe just make commas optional?
 pairList
-    : pair (',' pair)*
-    ;
-
-pair
-    : expr ':' expr
+    : (expr PAIR_SEP expr ','?)+
     ;

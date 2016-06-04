@@ -1,29 +1,26 @@
-receive httpGet, writeLine;
+main is -> (httpGet, writeLine) {
 
-sendRequest = service {
+    sendRequest = -> (url) {
 
-    receive url;
+        @httpGet(url) -> (res, body) {
 
-    *httpGet(url) then {
+            @writeLine("response from `url`: status = `res.statusCode`\n");
+            @writeLine("body length: `#body`\n");
 
-        receive res, body;
+            reply #body;
+        };
 
-        *writeLine("response from `url`: status = `res.statusCode`\n");
-        *writeLine("body length: `#body`\n");
-
-        reply #body;
+        @writeLine("sent request to `url`\n");
     };
 
-    *writeLine("sent request to `url`\n");
+    // race some requests
+
+    req1Len = @sendRequest("hi");
+    req2Len = sendRequest("howdy");
+
+    @writeLine("`req1Len`\n");
+
+    req3Len = @sendRequest("hello");
+
+    reply 18;
 };
-
-// race some requests
-
-req1Len = *sendRequest("hi");
-req2Len = sendRequest("howdy");
-
-*writeLine("`req1Len`\n");
-
-req3Len = *sendRequest("hello");
-
-reply 18;

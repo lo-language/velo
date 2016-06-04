@@ -6,7 +6,7 @@
 "use strict";
 
 var Compiler = require('../../../codegen/Compiler');
-var Scope = require('../../../codegen/Scope');
+var Context = require('../../../codegen/Context');
 var util = require('util');
 
 module.exports["complement"] = {
@@ -18,7 +18,7 @@ module.exports["complement"] = {
             operand: {type: 'id', name: 'foo'}
         };
 
-        test.equal(new Scope().compile(node).render(), "!$foo");
+        test.equal(new Context().compile(node).render(), "!$foo");
         test.done();
     }
 };
