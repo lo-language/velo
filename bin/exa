@@ -25,7 +25,6 @@ const System = require('../runtime/System');
 
 const Sourcer = require('../pipeline/Sourcer');
 const Program = require('../codegen/Program');
-const Loader = require('../pipeline/Loader');
 
 var sourceFile = argv._.shift();
 
@@ -41,43 +40,9 @@ var sourcer = new Sourcer(modulePath);
 
 var program = new Program(sourcer);
 
-program.compile(moduleName).then(module => {
+program.include(moduleName).then(function () {
 
     IO.args = argv;
-    return new Loader(program).run([argv._, IO, System]);
+    return program.run([argv._, IO, System]);
 
 }).done();
-
-// when we want to fetch a constant from another module, we have the local name for the module and the name of the constant
-// so we first want to check that module's exports, right? see if the local name is in there
-
-// or what if we contribute a bunch of exports when the module is loaded??
-
-// we need to resolve our local name to a *global* name and then an ID specifier
-
-// so we need some concept of a module ID?
-// and of course this only applies to fucking services!!
-
-// if i'm a module and i'm being asked to resolve a *service* constant, i'll return
-// S[0];
-
-// a module has its ID *before* it's compiled, so it can use that to create global IDs
-
-// how about whenever we define a module-level service, we create an export with an ID of modID+servID
-// then at the end of the module func we just list all the exports?
-
-S.push(function loadMod0 () {
-
-    const $foo = function () {};
-    const $bar = function () {};
-
-    return {$foo, $bar};
-}());
-
-
-const mod1 = function () {
-
-    mod0[0];
-
-    return [$bar];
-};

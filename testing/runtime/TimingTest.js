@@ -4,8 +4,9 @@
  * Created by spurcell on 12/5/15.
  */
 
+const Program = require('../../codegen/Program');
 const Module = require('../../codegen/Module');
-const Loader = require('.././Loader');
+const Q = require('q');
 const util = require('util');
 
 module.exports['basics'] = {
@@ -14,10 +15,19 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var module = new Module('x is -> {reply "hullo!";};').compile();
-        var loader = new Loader(module);
+        var sourcer = {
 
-        loader.run().then(
+            acquire: function (modRef) {
+                return Q(new Module('main is -> {reply "hullo!";};'));
+            }
+        };
+
+        var program = new Program(sourcer);
+
+        program.include('foo').then(function () {
+            return program.run();
+        }
+        ).then(
             function (res) {
                 test.equal(res, "hullo!");
                 test.done();
@@ -27,88 +37,116 @@ module.exports['basics'] = {
             });
     },
 
-    // "simple sync": function (test) {
-    //
-    //     test.expect(1);
-    //
-    //     var mod = new Module(
-    //         'sayHello = -> {\n' +
-    //         '    reply "hullo!";\n};\n' +
-    //         'reply sayHello();\n');
-    //
-    //     var service = mod.makeService();
-    //
-    //     Task.sendRootRequest(service, null,
-    //         function (res) {
-    //             test.equal(res, "hullo!");
-    //             test.done();
-    //         },
-    //         function () {
-    //             test.fail();
-    //         });
-    // },
-    //
-    // "sync message, default reply": function (test) {
-    //
-    //     var mod = new Module(
-    //         'sayHello = -> {\n' +
-    //         '    reply "hullo!";\n};\n' +
-    //         'sayHello();\n');
-    //
-    //     var service = mod.makeService();
-    //
-    //     Task.sendRootRequest(service, null,
-    //         function (res) {
-    //             test.equal(res, undefined);
-    //             test.done();
-    //         },
-    //         function () {
-    //             test.fail();
-    //         });
-    // },
-    //
-    // "sync message, explicit reply": function (test) {
-    //
-    //     test.expect(1);
-    //
-    //     var mod = new Module(
-    //         'sayHello = -> {\n' +
-    //         '    reply "hullo!";\n};\n' +
-    //         'sayHello(); reply "howdy!";\n');
-    //
-    //     var service = mod.makeService();
-    //
-    //     Task.sendRootRequest(service, null,
-    //         function (res) {
-    //             test.equal(res, "howdy!");
-    //             test.done();
-    //         },
-    //         function () {
-    //             test.fail();
-    //         });
-    // },
-    //
-    // "simple dispatch": function (test) {
-    //
-    //     test.expect(1);
-    //
-    //     var write = function (task) {
-    //         test.equal(task.args[0], "hi there!");
-    //         task.respond("reply");
-    //     };
-    //
-    //     var mod = new Module(
-    //         'receive write;\n' +
-    //         '@write("hi there!");\n');
-    //
-    //     var service = mod.makeService();
-    //
-    //     Task.sendRootRequest(service, [write],
-    //         function (res) {
-    //             setImmediate(test.done.bind(test));
-    //         },
-    //         function () {
-    //             test.fail();
-    //         });
-    // }
+    "simple sync": function (test) {
+
+        test.expect(1);
+
+        var sourcer = {
+
+            acquire: function (modRef) {
+                return Q(new Module(
+                    'sayHello is -> {\n' +
+                    '    reply "hullo!";\n};\n' +
+                    'main is -> {\n' +
+                    '    reply sayHello();\n};\n'));
+            }
+        };
+
+        var p = new Program(sourcer);
+
+        p.include("foo").then(function () {
+            return p.run();
+        }).then(
+            function (res) {
+                test.equal(res, "hullo!");
+                test.done();
+            }).done();
+    },
+
+    "sync message, default reply": function (test) {
+
+        test.expect(1);
+
+        var sourcer = {
+
+            acquire: function (modRef) {
+                return Q(new Module(
+                    'sayHello is -> {\n' +
+                    '    reply "hullo!";\n};\n' +
+                    'main is -> {\n' +
+                    '    sayHello();\n};\n'));
+            }
+        };
+
+        var p = new Program(sourcer);
+
+        p.include("foo").then(function () {
+            return p.run();
+        }).then(
+            function (res) {
+                test.equal(res, undefined);
+                test.done();
+            },
+            function () {
+                test.fail();
+            });
+    },
+
+    "sync message, explicit reply": function (test) {
+
+        test.expect(1);
+
+        var sourcer = {
+
+            acquire: function (modRef) {
+                return Q(new Module(
+                    'sayHello is -> {\n' +
+                    '    reply "hullo!";\n};\n' +
+                    'main is -> {\n' +
+                    '    sayHello();\n' +
+                    '    reply "howdy!";\n};\n'));
+            }
+        };
+
+        var p = new Program(sourcer);
+
+        p.include("foo").then(function () {
+            return p.run();
+        }).then(
+            function (res) {
+                test.equal(res, "howdy!");
+                test.done();
+            },
+            function () {
+                test.fail();
+            });
+    },
+
+    "simple dispatch": function (test) {
+
+        test.expect(1);
+
+        var write = function (task) {
+            test.equal(task.args[0], "hi there!");
+            task.respond("reply");
+        };
+
+        var sourcer = {
+
+            acquire: function (modRef) {
+                return Q(new Module(
+                    'main is -> (write) {\n' +
+                    '@write("hi there!");\n};\n'));
+            }
+        };
+
+        var p = new Program(sourcer);
+
+        p.include("foo").then(function () {
+            return p.run([write]);
+        }).then(
+            function (res) {
+                setImmediate(test.done.bind(test));
+            }).done();
+    }
 };

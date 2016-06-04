@@ -11,7 +11,7 @@ var Q = require('q');
 
 module.exports["compilation"] = {
 
-    "compile module": function (test) {
+    "module with no services": function (test) {
 
         var module = new Module("foo is 42;");
 
@@ -25,19 +25,40 @@ module.exports["compilation"] = {
 
         var p = new Program(sourcer);
 
-        p.compile("Shape").then(result => {
+        p.include("Shape").then(result => {
 
             test.equal(result, module);
+
+            test.equal(p.render(), "const M0 = function () {\n\n'use strict';\n\n\n\nreturn {};\n}();");
             test.done();
+
         }).done();
-    }
-};
+    },
 
+    "module with one service": function (test) {
 
-module.exports["rendering"] = {
+        var module = new Module("foo is -> {x = 42;};");
 
-    "render modules": function (test) {
+        var sourcer = {
 
-        test.done();
+            acquire: function (ref) {
+                test.equal(ref, "Shape");
+                return Q(module);
+            }
+        };
+
+        var p = new Program(sourcer);
+
+        p.include("Shape").then(result => {
+
+            test.equal(result, module);
+
+            test.equal(p.render(),
+                "const M0 = function () {\n\n'use strict';\n\n" +
+                "const $foo = function (task) {var $recur = task.service;\nvar $x;\n\n\n$x = 42;\n};\n\n" +
+                'return {"foo": $foo};\n}();');
+            test.done();
+
+        }).done();
     }
 };

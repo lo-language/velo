@@ -4,12 +4,18 @@
  *-------------------------------------------------------------------------------------------*/
 
 /**
- * Models an Exa program, which is mostly a service space.
+ * Models an Exa program, which is mostly a collection of modules and an address space for services.
+ * Also supplies our load-and-go behavior by loading compiled code into the current JS environment.
+ *
+ * Author: Seth Purcell
+ * Date: 5/28/16
  */
 
 'use strict';
 
-const Module = require('./../codegen/Module');
+const Module = require('../codegen/Module');
+const Task = require('../runtime/Task');
+const Q = require('q');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -34,13 +40,14 @@ __.prototype.include = function (modRef) {
 
     return this.sourcer.acquire(modRef).then(module => {
 
-        var id = this.modules.length;
+        // module ID is its index in our list
+        module.id = 'M' + this.modules.length;
 
         return module.compileSelf(this).then(result => {
 
             this.modules.push(result);
 
-            return id;
+            return module;
         });
     });
 };
@@ -53,19 +60,41 @@ __.prototype.include = function (modRef) {
  */
 __.prototype.render = function () {
 
-    // render each module in the graph
-
-    // services are constants defined in a shared namespace for all modules
-
+    // render each module in the program
 
     return this.modules.map((def, index) => {
 
-            var id = "S" + index;
+        // todo put the const name in as the fn name for JS
+        return "const " + "M" + index + " = " + def.render() + "();";
+    }
+    ).join("\n\n");
+};
 
-            // todo put the const name in as the fn name for JS
-            return "const " + id + " = " + def.render() + ";";
-        }
-        ).join("\n\n");
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Loads and runs this program.
+ */
+__.prototype.run = function (args) {
+
+    var body =
+        "'use strict';\n\n" +
+        this.render() +
+        '\n\nM0["main"](rootTask);\n\n';
+
+    try {
+        // console.log(body);
+        var main = new Function("rootTask", body);
+
+        var d = Q.defer();
+
+        Task.sendRootRequest(main, args, d.resolve.bind(d), d.reject.bind(d));
+
+        return d.promise;
+    }
+    catch (err) {
+        console.log(body);
+        throw err;
+    }
 };
 
 module.exports = __;

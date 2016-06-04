@@ -19,12 +19,10 @@ const util = require('util');
 /**
  *
  * @param parent    the parent context, if any
- * @param resolver  for resolving long-distance (external) IDs
  */
-var __ = function (parent, resolver) {
+var __ = function (parent) {
 
     this.parent = parent;
-    this.externalResolver = parent ? parent.externalResolver : resolver;
 
     // our local symbol table, containing params, locals, constants, futures, etc.
     this.symbols = {};

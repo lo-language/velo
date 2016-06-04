@@ -34,15 +34,25 @@ const Future = require('./Future');
  */
 module.exports['module'] = function (node) {
 
+    var defs = node.definitions.map(def => {
+        return this.compile(def).render();
+    }).join("\n\n");
+
+    var exports = this.getExports();
+
+    var returnVal = '{' + Object.keys(exports).map(function (name) {
+
+            return '"' + name + '": ' + exports[name];
+
+        }).join(", ") + '}';
+
     // wrap our service constant definitions in a scope to prevent collisions with other modules
     // export our constants via a return statement
 
     return new JsConstruct([
         "function () {\n\n'use strict';\n\n",
-        node.definitions.map(def => {
-            return this.compile(def).render();
-        }).join("\n\n"),
-        "\n\nreturn [", this.getExports().join(', '), "];\n",
+        defs,
+        "\n\nreturn ", returnVal, ";\n",
         "}"]);
 };
 

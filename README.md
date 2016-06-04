@@ -1,10 +1,10 @@
 # Exa
 
-Exa is a secure, concurrent programming language designed for building robust, scalable, networked applications in the real world, where security is critical and failures happen.
+Exa is a concurrent, message-oriented programming language designed for building robust, scalable, networked applications in the real world, where security is critical and failures happen.
 
 To learn about the language, see the [docs](docs).
 
-This is an implementation of Exa as a transpiler to JavaScript. The exa "binary" is a load-and-go compiler that can also be used to generate Node.js executables. Modules are parsed and compiled when loaded.
+This is an implementation of Exa as a compiler targeting JavaScript. The exa "binary" is a load-and-go compiler that can also be used to generate Node.js executables. Modules are parsed and compiled when loaded.
 
 #### Installation
 

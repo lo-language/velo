@@ -39,27 +39,5 @@ module.exports["identifiers"] = {
 
         test.equal(context.compile(node), '42');
         test.done();
-    },
-
-    "external constant": function (test) {
-
-        // the compiler should fetch the value and use it
-
-        var node = {type: 'id', context: 'HTTP', name: 'foo'};
-
-        var refContext = new Context();
-        refContext.define('foo', "53");
-
-        var context = new Context();
-
-        context.addReference('HTTP', refContext);
-
-        test.equal(context.compile(node), '53');
-        test.done();
-    },
-
-    "external service": function (test) {
-
-        test.done();
     }
 };

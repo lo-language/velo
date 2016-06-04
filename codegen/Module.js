@@ -6,6 +6,9 @@
 /**
  * Models an Exa module.
  * Specializes Context to only allow constants
+ * 
+ * Author: Seth Purcell
+ * Date: 5/28/16
  */
 
 'use strict';
@@ -26,7 +29,7 @@ var __ = function (source) {
 
     this.source = source;
     this.deps = {};
-    this.exports = [];
+    this.exports = {};
 };
 
 __.prototype = Object.create(Context.prototype);
@@ -64,6 +67,17 @@ __.prototype.compileSelf = function (program) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * Returns exported service definitions.
+ *
+ * @returns {*}
+ */
+__.prototype.getExports = function () {
+
+    return this.exports;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
  * Resolves the requested constant to its globally-visible name.
  *
  * @param name
@@ -71,8 +85,10 @@ __.prototype.compileSelf = function (program) {
 __.prototype.resolveToGlobal = function (name) {
 
     if (this.exports[name]) {
-        return this.id + "_" + name;
+        return this.id + "." + name;
     }
+
+    return this.resolve(name);
 };
 
 // Override methods inherited from Context
@@ -104,14 +120,14 @@ __.prototype.define = function (name, value, isService) {
 
     if (isService) {
         // need to tag to keep away from JS reserved words?
-        this.exports[name] = name;
+        this.exports[name] = value;
     }
 
+    // would rather call the base class here
     this.symbols['@' + name] = {
         type: 'const',
         name: name,
         value: value};
-
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,17 +139,6 @@ __.prototype.define = function (name, value, isService) {
 __.prototype.createInner = function () {
 
     return new Context(this);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Returns exported service definitions.
- *
- * @returns {*}
- */
-__.prototype.getExports = function () {
-
-    return this.exports;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
