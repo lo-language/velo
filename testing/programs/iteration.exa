@@ -1,9 +1,10 @@
-receive max;
+main is -> (max) {
 
-num = 0;
+    num = 0;
 
-while num < max {
-    num++;
-}
+    while num < max {
+        num++;
+    }
 
-reply num;
+    reply num;
+};

@@ -14,9 +14,9 @@ module.exports['basics'] = {
 
         var sourcer = new Sourcer(__dirname + '/../programs');
 
-        sourcer.acquire("collections").then(module => {
+        sourcer.acquire("factorial").then(module => {
 
-            test.equal(module.source.length, 1751);
+            test.equal(module.source.length, 196);
             test.done();
         });
     },

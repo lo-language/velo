@@ -1,9 +1,9 @@
-test is (foo, bar) {
+main is -> (foo, bar) {
 
-    fooVal = *foo();
-    barVal = *bar();
+    fooVal = @foo();
+    barVal = @bar();
 
-    if (fooVal > barVal) {
+    if fooVal > barVal {
         reply "foo wins";
     }
     else {

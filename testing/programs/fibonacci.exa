@@ -2,14 +2,15 @@
  * Calculates the nth fibonacci number using näive binary recursion
  */
 
-receive n;
+main is -> (n) {
 
-if n < 0 {
-    fail "Whatsamatta, you?";
-}
+    if n < 0 {
+        fail "Whatsamatta, you?";
+    }
 
-if n <= 1 {
-    reply n;
-}
+    if n <= 1 {
+        reply n;
+    }
 
-reply recur(n - 1) + recur(n - 2);
+    reply recur(n - 1) + recur(n - 2);
+};

@@ -3,9 +3,12 @@
  * 5/3/15
  */
 
-link "common" as Common;
+references:
 
-receive args, io, system;
+Common  <common>
 
-// fire and forget - we won't wait!
-*io.stdout.write(Common::GREETING);
+main is -> (args, io) {
+
+    // fire and forget - we won't wait!
+    @io.out.write(Common:GREETING);
+};

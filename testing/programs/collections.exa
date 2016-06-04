@@ -3,7 +3,7 @@
  * 12/25/14
  */
 
-main is service {
+main is -> {
 
     // Array literal (including empty), access, and cardinality
     array = [];
@@ -22,7 +22,7 @@ main is service {
     }
 
     // Array slicing
-    subset = words[1:3];
+    subset = words[1..3];
 
     if #subset != 2 {
         fail "darn";
@@ -37,7 +37,7 @@ main is service {
     }
 
     // Array slicing shorthand
-    subset = words[:];
+    subset = words[0..];
 
     if #subset != #words {
         fail "dang";
@@ -47,39 +47,39 @@ main is service {
         fail "that's weird";
     }
 
-    // Array extraction and excision
-    subset = words{1};
-
-    if subset != "mani" {
-        fail "crud";
-    }
-
-    if #words != 3 {
-        fail "too bad";
-    }
-
-    words = ["foo", "mani", "padme", "hum"];
-    subset = words{1:3};
-
-    if #subset != 2 {
-        fail "that's not good";
-    }
-
-    if #words != 2 {
-        fail "problem found";
-    }
-
-    if subset[0] != "mani" {
-        fail "my goodness";
-    }
-
-    if words[1] != "hum" {
-        fail "that's a real shame";
-    }
+//    // Array extraction and excision
+//    subset = words{1};
+//
+//    if subset != "mani" {
+//        fail "crud";
+//    }
+//
+//    if #words != 3 {
+//        fail "too bad";
+//    }
+//
+//    words = ["foo", "mani", "padme", "hum"];
+//    subset = words{1:3};
+//
+//    if #subset != 2 {
+//        fail "that's not good";
+//    }
+//
+//    if #words != 2 {
+//        fail "problem found";
+//    }
+//
+//    if subset[0] != "mani" {
+//        fail "my goodness";
+//    }
+//
+//    if words[1] != "hum" {
+//        fail "that's a real shame";
+//    }
 
     // Map literal (including empty), access, and cardinality
-    map = [:];
-    cities = ["nyc":"New York", "phi":"Philadelphia"];
+//    map = {:};
+    cities = {"nyc": "New York", "phi": "Philadelphia"};
 
     if #map != 0 {
         fail "problem";

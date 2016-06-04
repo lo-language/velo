@@ -3,14 +3,15 @@
  * 12/25/14
  */
 
-receive x;
+main is -> (x) {
 
-if x < 0 {
-    reply "negative";
-}
-else if x == 0 {
-    reply "zero!";
-}
-else {
-    reply "positive";
-}
+    if x < 0 {
+        reply "negative";
+    }
+    else if x == 0 {
+        reply "zero!";
+    }
+    else {
+        reply "positive";
+    }
+};

@@ -13,7 +13,6 @@
 
 'use strict';
 
-const Module = require('../codegen/Module');
 const Task = require('../runtime/Task');
 const Q = require('q');
 
