@@ -25,7 +25,7 @@ const System = require('../runtime/System');
 
 const Sourcer = require('../pipeline/Sourcer');
 const Program = require('../codegen/Program');
-const NodeEnv = require('../pipeline/NodeEnv');
+const NodeBuilder = require('../pipeline/NodeBuilder');
 
 var sourceFile = argv._.shift();
 
@@ -40,14 +40,12 @@ var moduleName = path.basename(sourceFile, '.exa');
 
 var program = new Program(new Sourcer(modulePath), moduleName);
 
-// do we need program and env to be separate? the env could track which modules have been included so far
-
 program.compile().then(function () {
 
     // see if we should build
 
     if (argv.build != null) {
-        return env.build(program);
+        return new NodeBuilder().build(program, argv.build);
     }
 
     IO.args = argv;

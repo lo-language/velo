@@ -68,7 +68,7 @@ module.exports['nil'] = function (node) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * A service definition is an expression.
+ * Compiles a procedure, which may be a service or a handler.
  *
  * @param node
  */
@@ -106,8 +106,9 @@ module.exports['procedure'] = function (node) {
     }
 
     // implements an exa service as a JS function that takes a task
+    // if a service, squash the construct?
     return new JsConstruct([
-        'function (' + (node.channel ? 'args' : 'task') + ') ', {block: fnBody}], false);
+        'function (' + (node.channel ? 'args' : 'task') + ') {', fnBody], ['}']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -485,18 +486,13 @@ module.exports['excision'] = function (node) {
     }
 
     if (node.end) {
-        
+
         end = this.compile(node.end);
 
         if (node.end.type == 'number' && parseInt(node.end.val) < 0) {
             end = list + '.length' + node.end.val;
         }
     }
-
-    // explicit end: 3..5
-    // we want splice (3, (end-start+1));
-    // missing end, say array is 5 elements 0-4, slice is 1.., which means 1..4, so length 4
-    // we want splice (1, (end-start+1)); where end is 4?
 
     // todo - what if the list expression is a request or somesuch? can't resolve it twice
     // wrap it in a helper function?

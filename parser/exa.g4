@@ -66,7 +66,6 @@ statement
     | conditional                                           # condStmt
     | expr '>>' expr ';'                                    # send  // fire-and-forget to be clear and prevent us from using @syntax; is NOT a request, note that it is a statement, not an expression; precludes reply. could reuse -> here instead
     | 'while' expr block                                    # iteration
-//    | expr '..' expr sink                                   # range
     | expr ';'                                              # exprStmt
     ;
 
@@ -130,7 +129,8 @@ replyHandler
     ;
 
 failHandler
-    : 'on' 'fail' procedure
+    : 'on' 'fail' procedure // unless fail?
+    | 'ignore' 'fail'
     ;
 
 interpolated
@@ -174,3 +174,15 @@ fieldList
 pairList
     : (expr PAIR_SEP expr ','?)+
     ;
+
+
+//dataflow
+//    : 'scan' expr sink
+//    | 'scan' expr '..' expr sink
+//    | expr '>>' sink
+//    ;
+//
+//sink
+//    : procedure
+//    | 'into' expr
+//    ;

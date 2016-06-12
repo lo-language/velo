@@ -13,19 +13,9 @@ const Sourcer = require('./Sourcer');
 const fs = require('fs');
 const Q = require('q');
 
-/**
- * Constructor
- */
-var __ = function (basePath) {
+var __ = function () {
 
-    this.sourcer = new Sourcer(basePath);
 };
-
-__.prototype.acquire = function (modRef) {
-
-    return this.sourcer.acquire(modRef);
-};
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**

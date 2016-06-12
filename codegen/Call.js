@@ -1,5 +1,5 @@
 /**
- * Models a function call so we can recognize and handle them in compilation.
+ * Models a sync function call so we can recognize and handle them in compilation.
  */
 
 "use strict";
@@ -7,6 +7,8 @@
 /**
  * @param address
  * @param args
+ * @param subsequent
+ * @param contingency
  */
 var __ = function (address, args, subsequent, contingency) {
 

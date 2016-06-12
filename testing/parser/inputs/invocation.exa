@@ -80,6 +80,11 @@ test is -> {
         substitute "ok";
     };
 
+    x = bar() -> (result) {
+        reply "ok";
+    }
+    ignore fail;
+
     y = @foo() on fail -> (error) {
         substitute "ok";
     };

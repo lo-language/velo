@@ -378,12 +378,18 @@ __.prototype.visitReplyHandler = function(ctx) {
 
 __.prototype.visitFailHandler = function(ctx) {
 
-    var procedure = ctx.procedure().accept(this);
+    if (ctx.procedure()) {
 
-    // save a little compiler hint here
-    procedure.channel = "fail";
+        var procedure = ctx.procedure().accept(this);
 
-    return procedure;
+        // save a little compiler hint here
+        procedure.channel = "fail";
+
+        return procedure;
+    }
+
+    // ignore
+    return {type: 'ignore'};
 };
 
 
@@ -425,6 +431,12 @@ __.prototype.visitString = function(ctx) {
 };
 
 __.prototype.visitService = function(ctx) {
+
+    // var proc = ctx.procedure().accept(this);
+    //
+    // proc.isService = true;
+    //
+    // return proc;
 
     return ctx.procedure().accept(this);
 };

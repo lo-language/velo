@@ -10,6 +10,9 @@
  *
  * A construct can be attach()ed to another one, assuming they're both statements. In the
  * simple case this just concatenates them, but it could also infix the following statement.
+ *
+ * Thus a statement always has an "attachment point" for following statements: either inside it,
+ * so following statements will be inserted, or at the end.
  */
 
 "use strict";
@@ -116,25 +119,22 @@ JsConstruct.prototype.resolve = function () {
         }
 
         var sm = wrappers[index];
-        var pre, post;
+        var wrapper;
 
         if (sm instanceof Call) {
 
-            pre = ['task.sendMessage(',
-                sm.address, ', [', {csv: sm.args}, '], function (P' + index + ') {'];
-
-            post = ['}, null);\n\n'];
+            wrapper = JsConstruct.buildSyncMessage(sm.address, sm.args,
+                sm.subsequent ? sm.subsequent : new JsConstruct(['function (P' + index + ') {'], ['}']),
+                sm.contingency);
         }
         else {
 
             // so it's a future
 
-            pre = ['$' + sm.name + '.await(function (F' + index + ') {'];
-
-            post = ['});\n'];
+            wrapper = new JsConstruct(
+                ['$' + sm.name + '.await(function (F' + index + ') {'],
+                ['});\n']);
         }
-
-        var wrapper = new JsConstruct(pre, post);
 
         return wrapper.attach(wrap(stmt, wrappers, index + 1));
     };
@@ -224,7 +224,18 @@ JsConstruct.renderFragment = function (fragment) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Builds a message.
+ * Closes this construct to infix statements so it can only grow on the end.
+ * Do we need this method? What if an open construct isn't a statement??
+ */
+// JsConstruct.prototype.fuse = function () {
+//
+//     this.parts = this.parts.concat(this.post);
+//     this.async = false;
+// };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Builds an async message.
  *
  * @param address
  * @param args
@@ -239,6 +250,29 @@ JsConstruct.buildMessage = function (address, args, replyHandler, failHandler) {
         replyHandler ? replyHandler : 'null', ', ',
         failHandler ? failHandler : 'null', ')'
     ]);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Builds a sync message.
+ *
+ * @param address
+ * @param args
+ * @param replyHandler
+ * @param failHandler
+ * @return {*}
+ */
+JsConstruct.buildSyncMessage = function (address, args, replyHandler, failHandler) {
+
+    // the attachment point is always in the reply handler
+
+    var message = new JsConstruct([
+        'task.sendMessage(', address, ', [', {csv: args}, '], '],
+        [', ', failHandler ? failHandler : 'null', ');\n\n']);
+
+    message.attach(replyHandler);
+
+    return message;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

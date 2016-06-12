@@ -575,25 +575,25 @@
                                             "op": "=",
                                             "left": {
                                               "type": "id",
-                                              "name": "y"
+                                              "name": "x"
                                             },
                                             "right": {
-                                              "type": "message",
+                                              "type": "application",
                                               "address": {
                                                 "type": "id",
-                                                "name": "foo"
+                                                "name": "bar"
                                               },
                                               "args": [],
-                                              "contingency": {
+                                              "subsequent": {
                                                 "type": "procedure",
                                                 "params": [
-                                                  "error"
+                                                  "result"
                                                 ],
                                                 "body": {
                                                   "type": "stmt_list",
                                                   "head": {
                                                     "type": "response",
-                                                    "channel": "substitute",
+                                                    "channel": "reply",
                                                     "args": [
                                                       {
                                                         "type": "string",
@@ -603,11 +603,54 @@
                                                   },
                                                   "tail": null
                                                 },
-                                                "channel": "fail"
+                                                "channel": "reply"
+                                              },
+                                              "contingency": {
+                                                "type": "ignore"
                                               }
                                             }
                                           },
-                                          "tail": null
+                                          "tail": {
+                                            "type": "stmt_list",
+                                            "head": {
+                                              "type": "assign",
+                                              "op": "=",
+                                              "left": {
+                                                "type": "id",
+                                                "name": "y"
+                                              },
+                                              "right": {
+                                                "type": "message",
+                                                "address": {
+                                                  "type": "id",
+                                                  "name": "foo"
+                                                },
+                                                "args": [],
+                                                "contingency": {
+                                                  "type": "procedure",
+                                                  "params": [
+                                                    "error"
+                                                  ],
+                                                  "body": {
+                                                    "type": "stmt_list",
+                                                    "head": {
+                                                      "type": "response",
+                                                      "channel": "substitute",
+                                                      "args": [
+                                                        {
+                                                          "type": "string",
+                                                          "val": "ok"
+                                                        }
+                                                      ]
+                                                    },
+                                                    "tail": null
+                                                  },
+                                                  "channel": "fail"
+                                                }
+                                              }
+                                            },
+                                            "tail": null
+                                          }
                                         }
                                       }
                                     }
