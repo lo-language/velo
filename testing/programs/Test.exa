@@ -1,0 +1,37 @@
+
+create is -> (name) {
+
+    passes = 0;
+    failures = 0;
+
+    getName is -> {
+        reply name;
+    };
+
+    getStatus is -> {
+
+        if failures > 0 {
+            reply "FAIL";
+        }
+
+        reply "PASS";
+    };
+
+    reply [
+
+        toString: -> {
+
+            reply "`name`: `getStatus()` (`passes` passes, `failures` failures)";
+        },
+
+        assert: -> (pred) {
+
+            if pred {
+                passes++;
+            }
+            else {
+                failures++;
+            }
+        }
+    ];
+};

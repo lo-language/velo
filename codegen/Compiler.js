@@ -465,7 +465,7 @@ module.exports['slice'] = function (node) {
     var start = node.start ? this.compile(node.start) : '0';
     var end = node.end ? this.compile(node.end) : null;
 
-    return new JsConstruct([list, '.slice(', start, end ? [',', end] : '', ')']);
+    return new JsConstruct([list, '.slice(', start, end ? [',', end, '+1'] : '', ')']);
 };
 
 module.exports['excision'] = function (node) {

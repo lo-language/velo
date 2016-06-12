@@ -19,7 +19,7 @@ module.exports["slice"] = {
             end: {type: 'number', val: '3'},
         };
 
-        test.equal(new Context().compile(node).render(), '$foo.slice(1,3)');
+        test.equal(new Context().compile(node).render(), '$foo.slice(1,3+1)');
         test.done();
     },
 
@@ -43,7 +43,7 @@ module.exports["slice"] = {
             end: {type: 'number', val: '-1'}
         };
 
-        test.equal(new Context().compile(node).render(), '$foo.slice(-3,-1)');
+        test.equal(new Context().compile(node).render(), '$foo.slice(-3,-1+1)');
         test.done();
     },
 
@@ -53,7 +53,7 @@ module.exports["slice"] = {
             type: 'excision',
             list: {type: 'id', name: 'foo'},
             start: {type: 'number', val: '1'},
-            end: {type: 'number', val: '3'},
+            end: {type: 'number', val: '3'}
         };
 
         test.equal(new Context().compile(node).render(), '$foo.splice(1,(3)-(1))');

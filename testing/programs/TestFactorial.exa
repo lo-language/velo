@@ -1,0 +1,56 @@
+references:
+
+Fact    <Factorial>
+Fib     <Fibonacci>
+Test    <Test>
+
+main is -> (args, io) {
+
+    suite = createSuite();
+
+    test = suite.addTest("factorial");
+
+    test.assert(Fact:main(10) == 3628800);
+    test.assert(Fact:main(0) == 1);
+    test.assert(Fact:main(1) == 1);
+
+    io.out.write("`test.toString()`\n");
+
+
+
+
+    test = suite.addTest("fibonacci");
+
+    test.assert(Fib:main(10) == 55);
+    test.assert(Fib:main(0) == 0);
+    test.assert(Fib:main(1) == 1);
+
+    io.out.write("`test.toString()`\n");
+
+    suite.printReport(io.out);
+};
+
+createSuite is -> (name) {
+
+    tests = [];
+
+    reply [
+
+        addTest: -> (name) {
+
+            test = Test:create(name);
+
+            tests = tests >< test;
+
+            reply test;
+        },
+
+        printReport: -> (out) {
+
+            // check status of all tests
+            // out.write("ALL TESTS PASSED");
+
+            out.write("`#tests` tests\n");
+        }
+    ];
+};

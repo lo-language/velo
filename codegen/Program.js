@@ -5,7 +5,7 @@
 
 /**
  * Models an Exa program, which is mostly a collection of modules and an address space for services.
- * Also supplies our load-and-go behavior by loading compiled code into the current JS environment.
+ * Also supplies our load-and-go behavior by loading compiled code into the current JS sourcerironment.
  *
  * Author: Seth Purcell
  * Date: 5/28/16
@@ -20,9 +20,10 @@ const Q = require('q');
 /**
  * Constructor
  */
-var __ = function (sourcer) {
+var __ = function (sourcer, baseModule) {
 
     this.sourcer = sourcer;
+    this.baseModule = baseModule;
     this.nextModule = 0;
     this.modules = {};
 };
@@ -51,6 +52,23 @@ __.prototype.include = function (modRef) {
             return module;
         });
     });
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Builds this program to its environment.
+ */
+__.prototype.compile = function () {
+
+    return this.include(this.baseModule);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Builds this program to its environment.
+ */
+__.prototype.build = function () {
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

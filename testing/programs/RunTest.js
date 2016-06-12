@@ -173,6 +173,19 @@ module.exports['conditional in loop'] = {
     }
 };
 
+module.exports['collections'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'collections');
+        cb();
+    },
+
+    'all': function (test) {
+
+        this.harness.testSuccess(test);
+    }
+};
 
 // module.exports['futures'] = {
 //
@@ -258,20 +271,6 @@ module.exports['futures2'] = {
 //                 test.equal(res, 42);
 //                 test.done();
 //             });
-//     }
-// };
-
-// module.exports['collections'] = {
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'collections');
-//         cb();
-//     },
-//
-//     'all': function (test) {
-//
-//         this.harness.testSuccess(test);
 //     }
 // };
 
