@@ -600,16 +600,6 @@ __.prototype.visitConcat = function(ctx) {
 };
 
 
-__.prototype.visitSubscript = function(ctx) {
-
-    return {
-        type: ctx.cut ? 'extraction' : 'subscript',
-        list: ctx.expr(0).accept(this),
-        index: ctx.expr(1).accept(this)
-    };
-};
-
-
 __.prototype.visitField = function(ctx) {
 
     return { type: 'select', set: ctx.expr().accept(this), member: ctx.ID().getText()};
@@ -626,13 +616,23 @@ __.prototype.visitMembership = function(ctx) {
 };
 
 
-__.prototype.visitRange = function(ctx) {
+
+__.prototype.visitSubscript = function(ctx) {
+
+    return {
+        type: 'subscript',
+        list: ctx.expr(0).accept(this),
+        index: ctx.expr(1).accept(this)
+    };
+};
+
+__.prototype.visitSlice = function(ctx) {
 
     var start = ctx.expr(1);
     var end = ctx.expr(2);
 
     var res = {
-        type: ctx.cut ? 'extraction' : 'slice',
+        type: 'slice',
         list: ctx.expr(0).accept(this)
     };
 
@@ -647,32 +647,26 @@ __.prototype.visitRange = function(ctx) {
     return res;
 };
 
-
 __.prototype.visitExtraction = function(ctx) {
 
-    return { type: 'extraction', list: ctx.expr(0).accept(this), index: ctx.expr(1).accept(this)};
+    return {
+        type: 'extraction',
+        list: ctx.expr(0).accept(this),
+        index: ctx.expr(1).accept(this)
+    };
 };
-
 
 __.prototype.visitExcision = function(ctx) {
 
     var start = ctx.expr(1);
     var end = ctx.expr(2);
 
-    var res = {
+    return {
         type: 'excision',
-        list: ctx.expr(0).accept(this)
+        list: ctx.expr(0).accept(this),
+        start: start.accept(this),
+        end: end? end.accept(this) : null
     };
-
-    if (start) {
-        res.start = start.accept(this);
-    }
-
-    if (end) {
-        res.end = end.accept(this);
-    }
-
-    return res;
 };
 
 module.exports = __;

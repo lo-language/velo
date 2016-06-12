@@ -38,7 +38,7 @@
                 "name": "y"
               },
               "right": {
-                "type": "extraction",
+                "type": "excision",
                 "list": {
                   "type": "id",
                   "name": "bar"

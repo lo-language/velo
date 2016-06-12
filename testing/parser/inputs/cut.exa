@@ -1,0 +1,5 @@
+test is -> {
+
+    x = cut foo[37];
+    y = cut bar[1..11];
+};

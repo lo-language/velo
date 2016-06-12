@@ -468,34 +468,24 @@ module.exports['slice'] = function (node) {
     return new JsConstruct([list, '.slice(', start, end ? [',', end, '+1'] : '', ')']);
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 module.exports['excision'] = function (node) {
 
     var list = this.compile(node.list);
-    var start; // optional, so compile only if present
+    var start = this.compile(node.start);
     var end;   // optional, so compile only if present
 
-    // Handles shorthand where start or end
-    // is omitted as shorthand for the start or end
-    // of the array
-    // Also allows experimental syntax with negative indices referring to
+    // Allows syntax with negative indices referring to
     // positions from the end, but only for number literals.
     // To do this properly we'd have to catch it at runtime
 
-    if (node.start === undefined) {
-        start = '0';
-    }
-    else {
-        start = this.compile(node.start);
-
-        if (node.start.type == 'number' && parseInt(node.start.val) < 0) {
-            start = list + '.length' + node.start.val;
-        }
+    if (node.start.type == 'number' && parseInt(node.start.val) < 0) {
+        start = list + '.length' + node.start.val;
     }
 
-    if (node.end === undefined) {
-        end = list + '.length';
-    }
-    else {
+    if (node.end) {
+        
         end = this.compile(node.end);
 
         if (node.end.type == 'number' && parseInt(node.end.val) < 0) {
@@ -503,10 +493,16 @@ module.exports['excision'] = function (node) {
         }
     }
 
+    // explicit end: 3..5
+    // we want splice (3, (end-start+1));
+    // missing end, say array is 5 elements 0-4, slice is 1.., which means 1..4, so length 4
+    // we want splice (1, (end-start+1)); where end is 4?
+
     // todo - what if the list expression is a request or somesuch? can't resolve it twice
     // wrap it in a helper function?
+
     if (node.type == 'excision') {
-      return new JsConstruct([list, '.splice(', start, ',(', end, ')-(' , start, '))']);
+        return new JsConstruct([list, '.splice(', start, end ? [',(', end, ')-(' , start, ')+1'] : '', ')']);
     }
 
     // slice

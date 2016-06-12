@@ -66,6 +66,7 @@ statement
     | conditional                                           # condStmt
     | expr '>>' expr ';'                                    # send  // fire-and-forget to be clear and prevent us from using @syntax; is NOT a request, note that it is a statement, not an expression; precludes reply. could reuse -> here instead
     | 'while' expr block                                    # iteration
+//    | expr '..' expr sink                                   # range
     | expr ';'                                              # exprStmt
     ;
 
@@ -112,8 +113,10 @@ expr
     | expr 'in' expr                                            # membership // not sure where this guy should go, precedence-wise
     | expr '><' expr                                            # concat
     | '(' expr ')'                                              # wrap
-    | expr '[' cut='cut'? expr ']'                              # subscript // retrieval? access?
-    | expr '[' cut='cut'? expr? '..' expr? ']'                  # range
+    | expr '[' expr ']'                                         # subscript
+    | expr '[' expr '..' expr? ']'                              # slice
+    | 'cut' expr '[' expr ']'                                   # extraction
+    | 'cut' expr '[' expr '..' expr? ']'                        # excision
     | expr '.' ID                                               # field
     | '(' ID (',' ID)+ ')'                                      # destructure
     | INTER_BEGIN interpolated INTER_END                        # dynastring

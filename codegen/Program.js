@@ -56,7 +56,9 @@ __.prototype.include = function (modRef) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Builds this program to its environment.
+ * Compiles the program, starting with the base module.
+ *
+ * Should this return a built program, instead of just modifying this object's state?
  */
 __.prototype.compile = function () {
 

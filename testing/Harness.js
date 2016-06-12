@@ -14,7 +14,7 @@ const Program = require('../codegen/Program');
 
 var __ = function (sourceDir, mainMod) {
 
-    this.program = new Program(new Sourcer(sourceDir));
+    this.program = new Program(new Sourcer(sourceDir), mainMod);
     this.mainMod = mainMod;
 };
 
@@ -24,9 +24,10 @@ var __ = function (sourceDir, mainMod) {
  */
 __.prototype.run = function (input) {
 
-    return this.program.include(this.mainMod).then(
+    return this.program.compile().then(
         () => {
-            this.program.run(input);
+            // console.log(this.program.render());
+            return this.program.run(input);
         }
     );
 };
@@ -35,9 +36,7 @@ __.prototype.run = function (input) {
 
 __.prototype.testSuccess = function (test, input, expected) {
     
-    return this.program.include(this.mainMod).then(() => {
-        return this.program.run(input);
-    }).then(
+    return this.run(input).then(
             function (result) {
 
                 if (expected !== undefined) {

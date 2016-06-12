@@ -1,4 +1,4 @@
-// Generated from /Users/spurcell/dev/exa/parser/exa.g4 by ANTLR 4.5.1
+// Generated from /Users/spurcell/dev/exa/parser/exa.g4 by ANTLR 4.5.3
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 
@@ -97,6 +97,11 @@ exaVisitor.prototype.visitBlock = function(ctx) {
 };
 
 
+// Visit a parse tree produced by exaParser#excision.
+exaVisitor.prototype.visitExcision = function(ctx) {
+};
+
+
 // Visit a parse tree produced by exaParser#negation.
 exaVisitor.prototype.visitNegation = function(ctx) {
 };
@@ -127,11 +132,6 @@ exaVisitor.prototype.visitExternalId = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#range.
-exaVisitor.prototype.visitRange = function(ctx) {
-};
-
-
 // Visit a parse tree produced by exaParser#addSub.
 exaVisitor.prototype.visitAddSub = function(ctx) {
 };
@@ -144,6 +144,11 @@ exaVisitor.prototype.visitMembership = function(ctx) {
 
 // Visit a parse tree produced by exaParser#concat.
 exaVisitor.prototype.visitConcat = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#extraction.
+exaVisitor.prototype.visitExtraction = function(ctx) {
 };
 
 
@@ -169,6 +174,11 @@ exaVisitor.prototype.visitAsync = function(ctx) {
 
 // Visit a parse tree produced by exaParser#field.
 exaVisitor.prototype.visitField = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#slice.
+exaVisitor.prototype.visitSlice = function(ctx) {
 };
 
 

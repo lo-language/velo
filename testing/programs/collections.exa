@@ -6,10 +6,10 @@
 main is -> {
 
     // Array literal (including empty), access, and cardinality
-    array = [];
+    empty = [];
     words = ["foo", "mani", "padme", "hum"];
 
-    if #array != 0 {
+    if #empty != 0 {
         fail "problem";
     }
 
@@ -24,7 +24,7 @@ main is -> {
     // Array slicing
     subset = words[1..3];
 
-    if #subset != 2 {
+    if #subset != 3 {
         fail "darn";
     }
 
@@ -47,10 +47,10 @@ main is -> {
         fail "that's weird";
     }
 
-    // Array extraction and excision
-    subset = words[cut 1];
+    // Array excision
+    snip = cut words[1];
 
-    if subset != "mani" {
+    if snip != "mani" {
         fail "crud";
     }
 
@@ -59,7 +59,7 @@ main is -> {
     }
 
     words = ["foo", "mani", "padme", "hum"];
-    subset = words[cut 1..2];
+    subset = cut words[1..2];
 
     if #subset != 2 {
         fail "that's not good";
@@ -77,17 +77,20 @@ main is -> {
         fail "that's a real shame";
     }
 
-    // Map literal (including empty), access, and cardinality
-    map = {=>};
+    // Map literals (including empty), access, and cardinality
+
+    emptyMap = {=>};
+
+    if #emptyMap != 0 {
+        fail "problem";
+    }
+
     cities = {
         "nyc" => "New York",
         "phi" => "Philadelphia"
     };
 
-    if #map != 0 {
-        fail "problem";
-    }
-
+    // todo this shouldn't work, it does incidentally
     if cities.nyc != "New York" {
         fail "something happened";
     }

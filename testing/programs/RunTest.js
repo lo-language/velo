@@ -14,6 +14,20 @@ const Harness = require('../Harness');
 const util = require('util');
 
 
+module.exports['collections'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'collections');
+        cb();
+    },
+
+    'all': function (test) {
+
+        this.harness.testSuccess(test);
+    }
+};
+
 module.exports['factorial'] = {
 
     "setUp": function (cb) {
@@ -173,46 +187,6 @@ module.exports['conditional in loop'] = {
     }
 };
 
-module.exports['collections'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(__dirname, 'collections');
-        cb();
-    },
-
-    'all': function (test) {
-
-        this.harness.testSuccess(test);
-    }
-};
-
-// module.exports['futures'] = {
-//
-//     // test that uncaught errors are properly escalated out of the program
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'futures');
-//         cb();
-//     },
-//
-//     "run in parallel": function (test) {
-//
-//         var foo = function (task) {
-//             test.ok(true);
-//             task.respond("reply", 21);
-//         };
-//
-//         var bar = function (task) {
-//             test.ok(true);
-//             task.respond("reply", 42);
-//         };
-//
-//         this.harness.testSuccess(test, [foo, bar], "bar wins");
-//     }
-// };
-
 module.exports['futures2'] = {
 
     // test that uncaught errors are properly escalated out of the program
@@ -243,6 +217,33 @@ module.exports['futures2'] = {
         this.harness.testSuccess(test, [httpGet, writeLine], 18);
     }
 };
+
+// module.exports['futures'] = {
+//
+//     // test that uncaught errors are properly escalated out of the program
+//
+//     "setUp": function (cb) {
+//
+//         this.harness = new Harness(__dirname, 'futures');
+//         cb();
+//     },
+//
+//     "run in parallel": function (test) {
+//
+//         var foo = function (task) {
+//             test.ok(true);
+//             task.respond("reply", 21);
+//         };
+//
+//         var bar = function (task) {
+//             test.ok(true);
+//             task.respond("reply", 42);
+//         };
+//
+//         this.harness.testSuccess(test, [foo, bar], "bar wins");
+//     }
+// };
+
 
 // module.exports['reply handling'] = {
 //
