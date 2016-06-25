@@ -31,29 +31,5 @@ module.exports["basics"] = {
 
         test.equal(new Context().compile(node).render(), '$bar--;\n');
         test.done();
-    },
-
-    "splice": function (test) {
-
-        // weld is very runtime-dependent
-        // item -> list appends item
-        // item -> list[0] prepends item, etc.
-        // item -> item creates list of two items
-        // list -> list appends lists
-
-        var node = {
-            "type": "splice",
-            "list": {
-                "type": "id",
-                "name": "list"
-            },
-            "item": {
-                "type": "id",
-                "name": "item"
-            }
-        };
-
-        test.equal(new Context().compile(node).render(), '$list.push($item);\n');
-        test.done();
     }
 };

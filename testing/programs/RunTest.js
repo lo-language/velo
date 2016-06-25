@@ -218,62 +218,62 @@ module.exports['futures2'] = {
     }
 };
 
-// module.exports['futures'] = {
-//
-//     // test that uncaught errors are properly escalated out of the program
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'futures');
-//         cb();
-//     },
-//
-//     "run in parallel": function (test) {
-//
-//         var foo = function (task) {
-//             test.ok(true);
-//             task.respond("reply", 21);
-//         };
-//
-//         var bar = function (task) {
-//             test.ok(true);
-//             task.respond("reply", 42);
-//         };
-//
-//         this.harness.testSuccess(test, [foo, bar], "bar wins");
-//     }
-// };
+module.exports['futures'] = {
+
+    // test that uncaught errors are properly escalated out of the program
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'futures');
+        cb();
+    },
+
+    "run in parallel": function (test) {
+
+        var foo = function (task) {
+            test.ok(true);
+            task.respond("reply", 21);
+        };
+
+        var bar = function (task) {
+            test.ok(true);
+            task.respond("reply", 42);
+        };
+
+        this.harness.testSuccess(test, [foo, bar], "bar wins");
+    }
+};
 
 
-// module.exports['reply handling'] = {
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'replyHandling');
-//         cb();
-//     },
-//
-//     'success': function (test) {
-//
-//         test.expect(1);
-//
-//         // both functions just reply immediately
-//         // todo add a test that does this experiment within a reply handler
-//
-//         this.harness.run([
-//             function (task) {
-//                 task.respond("reply");
-//             },
-//             function (task) {
-//                 task.respond("reply", 33);
-//             }
-//         ]).then(
-//             function (res) {
-//                 test.equal(res, 42);
-//                 test.done();
-//             });
-//     }
-// };
+module.exports['reply handling'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'replyHandling');
+        cb();
+    },
+
+    'success': function (test) {
+
+        test.expect(1);
+
+        // both functions just reply immediately
+        // todo add a test that does this experiment within a reply handler
+
+        this.harness.run([
+            function (task) {
+                task.respond("reply");
+            },
+            function (task) {
+                task.respond("reply", 33);
+            }
+        ]).then(
+            function (res) {
+                test.equal(res, 42);
+                test.done();
+            });
+    }
+};
 
 
 // //module.exports['recovery'] = {

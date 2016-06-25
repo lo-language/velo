@@ -26,13 +26,15 @@ const util = require('util');
  *
  * @param parts     an array of strings or JsConstructs
  * @param post      any parts of this construct that need to come *after* following statements
+ * @param final     indicates a terminal statement; should properly be in a stmt subclass
  */
-var JsConstruct = function (parts, post) {
+var JsConstruct = function (parts, post, final) {
 
     // enable a single fragment to be passed in directly
 
     this.parts = Array.isArray(parts) ? parts : (parts ? [parts] : []);
     this.post = Array.isArray(post) ? post : (post ? [post] : []);
+    this.final = final;
 
     this.async = post ? (post.length > 0) : false;
 };
@@ -46,7 +48,7 @@ JsConstruct.prototype.resolve = function () {
     var wrappers = [];
     var placeholderName;
 
-    // scan the fragments swapping SyncMessages for placeholders
+    // scan the fragments swapping Calls for placeholders
 
     var analyze = function (part) {
 
@@ -67,7 +69,14 @@ JsConstruct.prototype.resolve = function () {
         if (typeof part === 'object') {
 
             if (part instanceof Call) {
-                placeholderName = 'P' + wrappers.length;
+                
+                if (part.notUsed) {
+                    placeholderName = 'not_used';
+                }
+                else {
+                    placeholderName = 'P' + wrappers.length;
+                }
+
                 wrappers.push(part);
                 return placeholderName;
             }
@@ -124,7 +133,7 @@ JsConstruct.prototype.resolve = function () {
         if (sm instanceof Call) {
 
             wrapper = JsConstruct.buildSyncMessage(sm.address, sm.args,
-                sm.subsequent ? sm.subsequent : new JsConstruct(['function (P' + index + ') {'], ['}']),
+                sm.subsequent ? sm.subsequent : new JsConstruct(['function (res) {\nvar P' + index + ' = res ? res[0] : null;\n'], ['}']),
                 sm.contingency);
         }
         else {
@@ -134,6 +143,12 @@ JsConstruct.prototype.resolve = function () {
             wrapper = new JsConstruct(
                 ['$' + sm.name + '.await(function (F' + index + ') {'],
                 ['});\n']);
+        }
+
+        // see if stmt is an expression that's not used
+        // welcome to super hack time!
+        if (stmt.parts[0] == 'not_used') {
+            return wrapper;
         }
 
         return wrapper.attach(wrap(stmt, wrappers, index + 1));
@@ -149,6 +164,10 @@ JsConstruct.prototype.resolve = function () {
  * @param stmt
  */
 JsConstruct.prototype.attach = function (stmt) {
+
+    if (this.final) {
+        return;
+    }
 
     this.parts = this.parts.concat(stmt.parts);
     this.post = stmt.post.concat(this.post);
@@ -224,17 +243,6 @@ JsConstruct.renderFragment = function (fragment) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Closes this construct to infix statements so it can only grow on the end.
- * Do we need this method? What if an open construct isn't a statement??
- */
-// JsConstruct.prototype.fuse = function () {
-//
-//     this.parts = this.parts.concat(this.post);
-//     this.async = false;
-// };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
  * Builds an async message.
  *
  * @param address
@@ -280,10 +288,11 @@ JsConstruct.buildSyncMessage = function (address, args, replyHandler, failHandle
  *
  * @param pre
  * @param post
+ * @param final     flag to say whether any statement can follow this one along its branch
  */
-JsConstruct.makeStatement = function (pre, post) {
+JsConstruct.makeStatement = function (pre, post, final) {
 
-    return new JsConstruct(pre, post).resolve();
+    return new JsConstruct(pre, post, final).resolve();
 };
 
 module.exports = JsConstruct;

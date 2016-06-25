@@ -57,21 +57,21 @@ module.exports["basics"] = {
 
         test.equal(a.render(),
             'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
-            'function (P0) {P0;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {}};\n\nloop();\n');
+            'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {}};\n\nloop();\n');
 
         // try attaching a statement
         a.attach(new JsConstruct("var z = 57;"));
 
         test.equal(a.render(),
             'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
-            'function (P0) {P0;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;}};\n\nloop();\n');
+            'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;}};\n\nloop();\n');
 
         // try attaching another statement
         a.attach(new JsConstruct("var bee = 27;"));
 
         test.equal(a.render(),
             'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
-            'function (P0) {P0;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
+            'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
 
         test.done();
     },
@@ -113,24 +113,24 @@ module.exports["basics"] = {
 
         test.equal(a.render(),
             'let loop = function () {if ($foo) {var cont0 = function () {setImmediate(task.doAsync(loop));};' +
-            'if ($bar) {$baz = 4;\ncont0();}\n\nelse {task.sendMessage($foo, [57], function (P0) ' +
-            '{P0;\ncont0();}, null);\n\n}\n\n}else {}};\n\nloop();\n');
+            'if ($bar) {$baz = 4;\ncont0();}\n\nelse {task.sendMessage($foo, [57], function (res) ' +
+            '{\nvar P0 = res ? res[0] : null;\ncont0();}, null);\n\n}\n\n}else {}};\n\nloop();\n');
 
         // try attaching a statement
         a.attach(new JsConstruct("var z = 57;"));
 
         test.equal(a.render(),
             'let loop = function () {if ($foo) {var cont0 = function () {setImmediate(task.doAsync(loop));};' +
-            'if ($bar) {$baz = 4;\ncont0();}\n\nelse {task.sendMessage($foo, [57], function (P0) ' +
-            '{P0;\ncont0();}, null);\n\n}\n\n}else {var z = 57;}};\n\nloop();\n');
+            'if ($bar) {$baz = 4;\ncont0();}\n\nelse {task.sendMessage($foo, [57], function (res) ' +
+            '{\nvar P0 = res ? res[0] : null;\ncont0();}, null);\n\n}\n\n}else {var z = 57;}};\n\nloop();\n');
 
         // try attaching another statement
         a.attach(new JsConstruct("var bee = 27;"));
 
         test.equal(a.render(),
             'let loop = function () {if ($foo) {var cont0 = function () {setImmediate(task.doAsync(loop));};' +
-            'if ($bar) {$baz = 4;\ncont0();}\n\nelse {task.sendMessage($foo, [57], function (P0) ' +
-            '{P0;\ncont0();}, null);\n\n}\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
+            'if ($bar) {$baz = 4;\ncont0();}\n\nelse {task.sendMessage($foo, [57], function (res) ' +
+            '{\nvar P0 = res ? res[0] : null;\ncont0();}, null);\n\n}\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
         test.done();
     }
 };

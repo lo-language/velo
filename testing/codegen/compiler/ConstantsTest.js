@@ -88,7 +88,7 @@ module.exports["constants"] = {
         test.equal(context.compile(node).render(),
             'const $main = function (task) {var $recur = task.service;\n' +
             'var $next, $result;\n\n$next = task.args[0];\n\n' +
-            'task.sendMessage($bar, [42], function (P0) {$result *= P0;\n}, null);\n\n};');
+            'task.sendMessage($bar, [42], function (res) {\nvar P0 = res ? res[0] : null;\n$result *= P0;\n}, null);\n\n};');
 
         test.equal(context.has('main'), true);
         test.ok(context.isConstant('main'));

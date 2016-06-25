@@ -432,12 +432,6 @@ __.prototype.visitString = function(ctx) {
 
 __.prototype.visitService = function(ctx) {
 
-    // var proc = ctx.procedure().accept(this);
-    //
-    // proc.isService = true;
-    //
-    // return proc;
-
     return ctx.procedure().accept(this);
 };
 

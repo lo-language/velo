@@ -23,7 +23,7 @@ module.exports["application"] = {
         var result = new Context().compile(node);
 
         test.ok(result instanceof Call);
-        test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [], function (P0) {P0}, null);\n\n');
+        test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\nP0}, null);\n\n');
         test.done();
     },
 
@@ -40,7 +40,7 @@ module.exports["application"] = {
         var result = new Context().compile(node);
 
         test.ok(result instanceof Call);
-        test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [42], function (P0) {P0}, null);\n\n');
+        test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [42], function (res) {\nvar P0 = res ? res[0] : null;\nP0}, null);\n\n');
         test.done();
     },
 
@@ -58,7 +58,7 @@ module.exports["application"] = {
         var result = new Context().compile(node);
 
         test.ok(result instanceof Call);
-        test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [42, 'hi there'], function (P0) {P0}, null);\n\n");
+        test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [42, 'hi there'], function (res) {\nvar P0 = res ? res[0] : null;\nP0}, null);\n\n");
         test.done();
     },
 
@@ -81,7 +81,7 @@ module.exports["application"] = {
         var result = new Context().compile(node);
 
         test.ok(result instanceof Call);
-        test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [P0, P1], function (P0) {P0}, null);\n\n}, null);\n\n}, null);\n\n");
+        test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($bar, [], function (res) {\nvar P1 = res ? res[0] : null;\ntask.sendMessage($baz, [P0, P1], function (res) {\nvar P0 = res ? res[0] : null;\nP0}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     }
 };
@@ -101,7 +101,7 @@ module.exports["application statements"] = {
         };
 
         var a = new Context().compile(node);
-        test.equal(a.render(), 'task.sendMessage($foo, [42], function (P0) {P0;\n}, null);\n\n');
+        test.equal(a.render(), 'task.sendMessage($foo, [42], function (res) {\nvar P0 = res ? res[0] : null;\n}, null);\n\n');
         test.ok(a.async);
 
         // we don't have a good interaction between resolve & attach because of nesting
@@ -111,7 +111,7 @@ module.exports["application statements"] = {
 
         // add a statement after resolving
         a.attach(new JsConstruct("foo = bar;"));
-        test.equal(a.render(), 'task.sendMessage($foo, [42], function (P0) {P0;\nfoo = bar;}, null);\n\n');
+        test.equal(a.render(), 'task.sendMessage($foo, [42], function (res) {\nvar P0 = res ? res[0] : null;\nfoo = bar;}, null);\n\n');
 
         test.done();
     },
@@ -140,7 +140,7 @@ module.exports["application statements"] = {
         };
 
         test.equal(new Context().compile(node).render(),
-            "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [(P0 - P1)], function (P0) {P0;\n}, null);\n\n}, null);\n\n}, null);\n\n");
+            "task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($bar, [], function (res) {\nvar P1 = res ? res[0] : null;\ntask.sendMessage($baz, [(P0 - P1)], function (res) {\nvar P0 = res ? res[0] : null;\n}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     },
 
@@ -171,7 +171,7 @@ module.exports["application statements"] = {
         };
 
         test.equal(new Context().compile(node).render(),
-            "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {task.sendMessage($baz, [(P0 - P1)], function (P0) {task.sendMessage($quux, [P0], function (P0) {P0;\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n");
+            "task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($bar, [], function (res) {\nvar P1 = res ? res[0] : null;\ntask.sendMessage($baz, [(P0 - P1)], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($quux, [P0], function (res) {\nvar P0 = res ? res[0] : null;\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     },
 
@@ -208,7 +208,7 @@ module.exports["application statements"] = {
         };
 
         test.equal(new Context().compile(node).render(),
-            "task.sendMessage($factorial, [$args[0]], function (P0) {task.sendMessage($io.stdout.write, ['' + P0 + '\\n'], null, null);\n}, null);\n\n");
+            "task.sendMessage($factorial, [$args[0]], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($io.stdout.write, ['' + P0 + '\\n'], null, null);\n}, null);\n\n");
 
         test.done();
     }

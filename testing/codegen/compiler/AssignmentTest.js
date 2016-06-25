@@ -73,7 +73,7 @@ module.exports["assignment"] = {
         var context = new Context().createInner();
 
         test.equal(context.has('foo'), false);
-        test.equal(context.compile(node).render(), 'task.sendMessage($bar, [], function (P0) {$foo = P0;\n}, null);\n\n');
+        test.equal(context.compile(node).render(), 'task.sendMessage($bar, [], function (res) {\nvar P0 = res ? res[0] : null;\n$foo = P0;\n}, null);\n\n');
         test.equal(context.has('foo'), true);
 
         test.done();

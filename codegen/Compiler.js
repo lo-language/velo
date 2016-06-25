@@ -77,6 +77,8 @@ module.exports['procedure'] = function (node) {
     // push a new scope onto the scope stack
     var local = this.createInner();
 
+    // -- we're already discriminating between handler and service below!
+    // maybe split these up?
     // if we have a channel we're a handler with args instead of a task
     // todo could drop this if services took an 'args' arg rather than putting them in the task
     var argList = node.channel ? 'args' : 'task.args';
@@ -85,7 +87,7 @@ module.exports['procedure'] = function (node) {
     var params = node.params.map(function (name, index) {
 
             local.declare(name);
-            return '$' + name + ' = ' + 'task.args[' + index + '];\n';
+            return '$' + name + ' = ' + argList + '[' + index + '];\n';
 
         }).join('') + '\n';
 
@@ -147,8 +149,7 @@ module.exports['response'] = function (node) {
     });
 
     // we assume the existence of a Task object named 'task'
-    // todo throw a compiler warning if anything is attach()'d to this statement
-    return JsConstruct.makeStatement(['task.respond("', node.channel, '", [', {csv: args}, ']);\nreturn;']);
+    return JsConstruct.makeStatement(['task.respond("', node.channel, '", [', {csv: args}, ']);\nreturn;'], null, true);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -312,7 +313,9 @@ module.exports['message'] = function (node) {
 module.exports['application_stmt'] = function (node) {
 
     // slap a semicolon on that bad boy
-    return JsConstruct.makeStatement([this.compile(node.application), ';\n']);
+    var call = this.compile(node.application);
+    call.notUsed = true; // secret!
+    return JsConstruct.makeStatement([call, ';\n']);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -548,7 +551,7 @@ module.exports['in'] = function (node) {
 
     return new JsConstruct(['function (item, collection) {' +
             "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
-            "else if (typeof val === 'object') return collection.hasOwnProperty(item);" +
+            "else if (typeof collection === 'object') return collection.hasOwnProperty(item);" +
             "}(", left, ',', right, ")"]);
 };
 
@@ -726,8 +729,4 @@ module.exports['increment'] = function (node) {
 
 module.exports['decrement'] = function (node) {
     return JsConstruct.makeStatement([ this.compile(node.operand), "--;\n"]);
-};
-
-module.exports['splice'] = function (node) {
-    return JsConstruct.makeStatement([ this.compile(node.list), ".push(", this.compile(node.item), ");\n"]);
 };

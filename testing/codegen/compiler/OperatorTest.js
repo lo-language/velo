@@ -67,7 +67,7 @@ module.exports["op"] = {
             left: { type: 'string', val: 'trillian' },
             right: { type: 'id', name: 'dudes' } };
 
-        test.equal(new Context().compile(node).render(), "function (item, collection) {if (Array.isArray(collection)) return collection.indexOf(item) >= 0;else if (typeof val === 'object') return collection.hasOwnProperty(item);}('trillian',$dudes)");
+        test.equal(new Context().compile(node).render(), "function (item, collection) {if (Array.isArray(collection)) return collection.indexOf(item) >= 0;else if (typeof collection === 'object') return collection.hasOwnProperty(item);}('trillian',$dudes)");
         test.done();
     },
 

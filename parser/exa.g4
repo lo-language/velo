@@ -100,8 +100,8 @@ block
     ;
 
 expr
-    : expr '(' exprList? ')' replyHandler? failHandler?         # dispatch  // request?
-    | '@' expr '(' exprList? ')' replyHandler? failHandler?     # async // dispatch?
+    : expr '(' exprList? ')' replyHandler? failHandler?         # dispatch  // request? the value of the expr is the *return value*
+    | '@' expr '(' exprList? ')' replyHandler? failHandler?     # async // dispatch? the value of the expr is a *future*
     | '#' expr                                                  # cardinality
     | 'not' expr                                                # negation
     | 'bytes' expr                                              # bytes

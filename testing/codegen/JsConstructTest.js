@@ -94,7 +94,7 @@ module.exports["resolve sync"] = {
 
         var expr = new JsConstruct([new Call('$foo'), ' + ', '3']).resolve();
 
-        test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0 + 3}, null);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\nP0 + 3}, null);\n\n');
         test.equal(expr.async, true);
         test.done();
     },
@@ -103,7 +103,9 @@ module.exports["resolve sync"] = {
 
         var expr = new JsConstruct([new Call('$foo'), ';']).resolve();
 
-        test.equal(expr.render(), 'task.sendMessage($foo, [], function (P0) {P0;}, null);\n\n');
+        // todo I don't like this behavior
+
+        test.equal(expr.render(), 'task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\nP0;}, null);\n\n');
         test.equal(expr.async, true);
         test.done();
     },
@@ -112,7 +114,7 @@ module.exports["resolve sync"] = {
 
         var expr = new JsConstruct([new Call('$foo'), ' + ', new Call('$bar')]).resolve();
 
-        test.equal(expr.render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {P0 + P1}, null);\n\n}, null);\n\n");
+        test.equal(expr.render(), "task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($bar, [], function (res) {\nvar P1 = res ? res[0] : null;\nP0 + P1}, null);\n\n}, null);\n\n");
         test.equal(expr.async, true);
         test.done();
     },
@@ -121,7 +123,7 @@ module.exports["resolve sync"] = {
 
         var expr = new JsConstruct(['Math.min(', {csv: [new Call('$foo'), new Call('$bar')]}, ')']).resolve();
 
-        test.equal(expr.render(), "task.sendMessage($foo, [], function (P0) {task.sendMessage($bar, [], function (P1) {Math.min(P0, P1)}, null);\n\n}, null);\n\n");
+        test.equal(expr.render(), "task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($bar, [], function (res) {\nvar P1 = res ? res[0] : null;\nMath.min(P0, P1)}, null);\n\n}, null);\n\n");
         test.equal(expr.async, true);
         test.done();
     },
@@ -139,7 +141,7 @@ module.exports["resolve sync"] = {
 
         var expr = new JsConstruct([new Call('$foo', [new Call('$bar')]), ';']).resolve();
 
-        test.equal(expr.render(), 'task.sendMessage($bar, [], function (P0) {task.sendMessage($foo, [P0], function (P0) {P0;}, null);\n\n}, null);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($bar, [], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($foo, [P0], function (res) {\nvar P0 = res ? res[0] : null;\nP0;}, null);\n\n}, null);\n\n');
         test.equal(expr.async, true);
         test.done();
     },
@@ -152,7 +154,17 @@ module.exports["resolve sync"] = {
                 new Call('$quux', [new Call('$snux')])
             ]), ';']).resolve();
 
-        test.equal(expr.render(), 'task.sendMessage($baz, [], function (P0) {task.sendMessage($snux, [], function (P1) {task.sendMessage($bar, [P0], function (P0) {task.sendMessage($quux, [P1], function (P1) {task.sendMessage($foo, [P0, P1], function (P0) {P0;}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n');
+        test.equal(expr.render(), 'task.sendMessage($baz, [], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($snux, [], function (res) {\nvar P1 = res ? res[0] : null;\ntask.sendMessage($bar, [P0], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($quux, [P1], function (res) {\nvar P1 = res ? res[0] : null;\ntask.sendMessage($foo, [P0, P1], function (res) {\nvar P0 = res ? res[0] : null;\nP0;}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n');
+        test.equal(expr.async, true);
+        test.done();
+    },
+
+    "blocker with reply handler": function (test) {
+
+        var expr = new JsConstruct([
+            new Call('$foo', null, new JsConstruct(['function (args) {var $a;\n\n'], ['}'])), ';']).resolve();
+
+        test.equal(expr.render(), 'task.sendMessage($foo, [], function (args) {var $a;\n\nP0;}, null);\n\n');
         test.equal(expr.async, true);
         test.done();
     }
@@ -220,6 +232,19 @@ module.exports["attach"] = {
 
         test.equal(a.render(), 'task.sendMessage([], function (p0) {p0;task.sendMessage([], function (p1) {p1;task.sendMessage([], function (p2) {p2;});});});');
         test.equal(a.async, true);
+        test.done();
+    },
+    
+    "attach to final statement": function (test) {
+
+        var final = JsConstruct.makeStatement(['task.respond();return;\n\n'], null, true);
+
+        test.equal(final.render(), 'task.respond();return;\n\n');
+
+        final.attach(JsConstruct.makeStatement(['cont1();\n']));
+
+        test.equal(final.render(), 'task.respond();return;\n\n');
+
         test.done();
     }
 };

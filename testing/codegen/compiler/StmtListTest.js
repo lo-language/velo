@@ -65,7 +65,7 @@ module.exports["statement lists"] = {
         };
 
         test.equal(new Context().createInner().compile(node).render(),
-            'task.sendMessage($bar, [42], function (P0) {$foo = P0;\n$baz = 57;\n}, null);\n\n');
+            'task.sendMessage($bar, [42], function (res) {\nvar P0 = res ? res[0] : null;\n$foo = P0;\n$baz = 57;\n}, null);\n\n');
         test.done();
     }
 };

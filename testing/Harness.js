@@ -16,27 +16,39 @@ var __ = function (sourceDir, mainMod) {
 
     this.program = new Program(new Sourcer(sourceDir), mainMod);
     this.mainMod = mainMod;
+    this.dump = false;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+__.prototype.enableDump = function () {
+
+    this.dump = true;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
  */
-__.prototype.run = function (input) {
+__.prototype.run = function (args) {
 
     return this.program.compile().then(
         () => {
-            // console.log(this.program.render());
-            return this.program.run(input);
+
+            if (this.dump) {
+                console.log(this.program.render());
+            }
+
+            return this.program.run(args);
         }
     );
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__.prototype.testSuccess = function (test, input, expected) {
+__.prototype.testSuccess = function (test, args, expected) {
     
-    return this.run(input).then(
+    return this.run(args).then(
             function (result) {
 
                 if (expected !== undefined) {
@@ -44,9 +56,10 @@ __.prototype.testSuccess = function (test, input, expected) {
                     test.equal(result, expected);
                 }
 
-                // this is in here to let us wait on tests that end with a dispatch
-                // todo do we still need this?
-                setImmediate(test.done.bind(test));
+                test.done();
+
+                // this was in here to let us wait on tests that end with a dispatch
+                // setImmediate(test.done.bind(test));
             },
             function (err) {
                 console.error("error running " + _this.program + ".exa: " + err);

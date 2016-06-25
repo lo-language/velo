@@ -113,7 +113,7 @@ __.prototype.run = function (args) {
         return d.promise;
     }
     catch (err) {
-        console.log(body);
+        console.log(err);
         throw err;
     }
 };

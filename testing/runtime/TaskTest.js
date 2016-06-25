@@ -19,7 +19,7 @@ module.exports['responses'] = {
 
         var task = new Task(null, null,
             function (args) {
-                test.equal(args, "foo");
+                test.deepEqual(args, ["foo"]);
                 test.done();
             }, function (args) {
                 test.fail();
@@ -40,7 +40,7 @@ module.exports['responses'] = {
             function (args) {
                 test.fail();
             }, function (args) {
-                test.equal(args, "foo");
+                test.deepEqual(args, ["foo"]);
                 test.done();
             });
 
@@ -57,7 +57,7 @@ module.exports['responses'] = {
 
         var task = new Task(null, null,
             function (args) {
-                test.equal(args, undefined);
+                test.ok(args === undefined);
                 test.done();
             }, null);
 
@@ -70,7 +70,7 @@ module.exports['responses'] = {
 
         var task = new Task(null, null,
             function (args) {
-                test.equal(args, "foo");
+                test.deepEqual(args, ["foo"]);
                 test.done();
             }, function (args) {
                 test.fail();
@@ -88,7 +88,7 @@ module.exports['responses'] = {
             function (args) {
                 test.fail();
             }, function (args) {
-                test.equal(args, "boo");
+                test.deepEqual(args, ["boo"]);
                 test.done();
             });
 
@@ -121,7 +121,7 @@ module.exports['finishing'] = {
 
             task.sendMessage(service, 'foo', function (result) {
 
-                test.equal(result, 'bar');
+                test.deepEqual(result, ["bar"]);
                 test.equal(collector, 'foo');
                 collector += result;
             });
@@ -145,7 +145,7 @@ module.exports['finishing'] = {
 
                 task.respond("reply", []);
 
-            }, 'foo', null, null);
+            }, ['foo'], null, null);
         };
 
         // todo send a root task
@@ -189,7 +189,7 @@ module.exports['finishing'] = {
             }
         ],
         function (res) {
-            test.equal(res, 42);
+            test.deepEqual(res, [42]);
             test.done();
         }, function () {
             test.fail();
@@ -211,16 +211,16 @@ module.exports['finishing'] = {
 
         var main = function (task) {
 
-            task.sendMessage(transmogrify, 'foo', function (result) {
-                test.equal(result, 'boo');
+            task.sendMessage(transmogrify, 'foo', function (args) {
+                test.deepEqual(args, ["boo"]);
             });
 
-            task.sendMessage(transmogrify, 'bar', function (result) {
-                test.equal(result, 'zar');
+            task.sendMessage(transmogrify, 'bar', function (args) {
+                test.deepEqual(args, ["zar"]);
             });
 
-            task.sendMessage(transmogrify, 'baz', function (result) {
-                test.equal(result, 'maz');
+            task.sendMessage(transmogrify, 'baz', function (args) {
+                test.deepEqual(args, ["maz"]);
             });
         };
 

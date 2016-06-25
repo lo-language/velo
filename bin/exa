@@ -51,4 +51,6 @@ program.compile().then(function () {
     IO.args = argv;
     return program.run([argv._, IO, System]);
 
-}).done();
+}).catch(function (err) {
+    process.exit(1);
+});
