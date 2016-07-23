@@ -22,9 +22,10 @@
 
 'use strict';
 
-const JsConstruct = require('./JsConstruct');
 const Call = require('./Call');
 const Future = require('./Future');
+const JsKit = require('./JsKit');
+const JS = JsKit.parts;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -40,20 +41,21 @@ module.exports['module'] = function (node) {
 
     var exports = this.getExports();
 
-    var returnVal = '{' + Object.keys(exports).map(function (name) {
+    var returnVal = JS.objLiteral(Object.keys(exports).map(function (name) {
 
-            return '"' + name + '": ' + exports[name];
-
-        }).join(", ") + '}';
+            return [JS.string(name), exports[name]];
+        }));
 
     // wrap our service constant definitions in a scope to prevent collisions with other modules
     // export our constants via a return statement
 
-    return new JsConstruct([
-        "function () {\n\n'use strict';\n\n",
-        defs,
-        "\n\nreturn ", returnVal, ";\n",
-        "}"]);
+    return JS.fnDef([], JS.strictMode().attach(JS.return(returnVal)));
+
+    // return new JsConstruct([
+    //     "function () {\n\n'use strict';\n\n",
+    //     defs,
+    //     "\n\nreturn ", returnVal, ";\n",
+    //     "}"]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +65,7 @@ module.exports['module'] = function (node) {
  */
 module.exports['nil'] = function (node) {
 
-    return "null";
+    return JS.NULL;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,19 +100,18 @@ module.exports['procedure'] = function (node) {
     var localVars = local.getJsVars();
 
     // declare our local vars
-    var fnBody = [
+    var statements = [
         localVars.length > 0 ? 'var ' + localVars.join(', ') + ';\n\n' : '',
         params, body];
 
     // todo only include recur where it's referenced (or just remove this feature)
     if (node.channel == null) {
-        fnBody.unshift('var $recur = task.service;\n');
+        statements.unshift('var $recur = task.service;\n');
     }
 
     // implements an exa service as a JS function that takes a task
     // if a service, squash the construct?
-    return new JsConstruct([
-        'function (' + (node.channel ? 'args' : 'task') + ') {', fnBody], ['}']);
+    return JS.fnDef([(node.channel ? 'args' : 'task')], statements);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,14 +143,11 @@ module.exports['stmt_list'] = function (node) {
  */
 module.exports['response'] = function (node) {
 
-    var _this = this;
+    var args = JS.arrayLiteral(node.args.map(arg => this.compile(arg)));
 
-    var args = node.args.map(function (arg) {
-        return _this.compile(arg);
-    });
-
-    // we assume the existence of a Task object named 'task'
-    return JsConstruct.makeStatement(['task.respond("', node.channel, '", [', {csv: args}, ']);\nreturn;'], null, true);
+    return JS.stmt(
+        JS.runtimeCall('respond', [JS.string(node.channel), args])
+    ).attach(JS.return());
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -189,7 +187,8 @@ module.exports['assign'] = function (node) {
         }
     }
 
-    return JsConstruct.makeStatement([left, ' ' + node.op + ' ', right, ';\n']);
+    return JS.stmt(JS.assign(left, right));
+
     // this was genius
     // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP
  };
@@ -239,17 +238,15 @@ module.exports['conditional'] = function (node) {
         // negBlock.attach(cont.call());
     }
 
-    var parts = ['if (', predicate, ') ', {block: consequent}, '\n\n'];
-
-    if (negBlock) {
-        parts.push('else ', {block: negBlock}, '\n\n');
-    }
+    var jsCond = JS.condStmt(predicate, consequent, negBlock);
 
     if (async) {
-        return JsConstruct.makeStatement(['var ' + contName + ' = function () {'], ['};'].concat(parts));
+        return JS.stmt(JS.varDeclaration(JS.ID(contName), JS.fnDef([])));
+
+        // return JsConstruct.makeStatement(['var ' + contName + ' = function () {'], ['};'].concat(parts));
     }
 
-    return JsConstruct.makeStatement(parts);
+    return jsCond;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -265,10 +262,7 @@ module.exports['iteration'] = function (node) {
 
     // can render as a while loop if body isn't async
     if (!(body.async)) {
-
-        return JsConstruct.makeStatement([
-            'while (', condition, ')',
-                {block: body}]);
+        return JS.while(condition, body);
     }
 
     // join the body to the wrapper function via setImmediate to form the loop in a way that won't break the stack
@@ -305,17 +299,14 @@ module.exports['message'] = function (node) {
     var subsequent = node.subsequent ? this.compile(node.subsequent) : null;
     var contingency = node.contingency ? this.compile(node.contingency) : null;
 
-    return JsConstruct.buildMessage(target, args, subsequent, contingency);
+    return JS.message(target, args, subsequent, contingency);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module.exports['application_stmt'] = function (node) {
 
-    // slap a semicolon on that bad boy
-    var call = this.compile(node.application);
-    call.notUsed = true; // secret!
-    return JsConstruct.makeStatement([call, ';\n']);
+    return JS.stmt(this.compile(node.application));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -381,7 +372,7 @@ module.exports['id'] = function (node) {
         return new Future(node.name);
     }
 
-    return '$' + node.name;
+    return JS.ID('$' + node.name);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -397,14 +388,14 @@ module.exports['constant'] = function (node) {
     if (node.value.type == 'procedure') {
 
         var id = '$' + node.name;
-        this.define(node.name, id, true);
+        this.define(node.name, JS.ID(id));
         return new JsConstruct.makeStatement(["const ", id, " = ", this.compile(node.value), ';']);
     }
 
     this.define(node.name, this.compile(node.value));
 
     // return an empty construct to allow attachment
-    return new JsConstruct();
+    return JS.empty();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -414,16 +405,8 @@ module.exports['constant'] = function (node) {
  */
 module.exports['cardinality'] = function (node) {
 
-    var right = this.compile(node.operand);
-
-    // todo factor this out into a call to a utility function
-
-    return new JsConstruct([
-        'function (val) {' +
-            "if (typeof val === 'string') return val.length;" +
-            "else if (Array.isArray(val)) return val.length;" +
-            "else if (typeof val === 'object') return Object.keys(val).length;" +
-            "}(", right, ")"]);
+    // offload to the runtime lib
+    return JS.runtimeCall('cardinality', [this.compile(node.operand)]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -433,7 +416,7 @@ module.exports['cardinality'] = function (node) {
  */
 module.exports['complement'] = function (node) {
 
-    return new JsConstruct(['!', this.compile(node.operand)]);
+    return JS.not(this.compile(node.operand));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -450,13 +433,13 @@ module.exports['subscript'] = function (node) {
 
     // to do this properly we'd have to catch it at runtime - could probably do that with splice
     if (node.index.type == 'number' && parseInt(node.index.val) < 0) {
-        index = list + '.length' + node.index.val;
+        index = JS.add(JS.select(list, 'length'), index);
     }
 
     // todo - what if the list expression is a request or somesuch? can't resolve it twice
     // wrap it in a helper function?
 
-    return new JsConstruct([list, '[', index, ']']);
+    return JS.subscript(list, index);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -466,47 +449,50 @@ module.exports['slice'] = function (node) {
     // lean on JS slice since it has the same semantics
 
     var list = this.compile(node.list);
-    var start = node.start ? this.compile(node.start) : '0';
+    var start = node.start ? this.compile(node.start) : JS.num('0');
     var end = node.end ? this.compile(node.end) : null;
 
-    return new JsConstruct([list, '.slice(', start, end ? [',', end, '+1'] : '', ')']);
+    return JS.fnCall(
+        JS.select(list, 'slice'),
+        end ? [start, JS.add(end, JS.num('1'))] : [start]
+    );
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-module.exports['excision'] = function (node) {
-
-    var list = this.compile(node.list);
-    var start = this.compile(node.start);
-    var end;   // optional, so compile only if present
-
-    // Allows syntax with negative indices referring to
-    // positions from the end, but only for number literals.
-    // To do this properly we'd have to catch it at runtime
-
-    if (node.start.type == 'number' && parseInt(node.start.val) < 0) {
-        start = list + '.length' + node.start.val;
-    }
-
-    if (node.end) {
-
-        end = this.compile(node.end);
-
-        if (node.end.type == 'number' && parseInt(node.end.val) < 0) {
-            end = list + '.length' + node.end.val;
-        }
-    }
-
-    // todo - what if the list expression is a request or somesuch? can't resolve it twice
-    // wrap it in a helper function?
-
-    if (node.type == 'excision') {
-        return new JsConstruct([list, '.splice(', start, end ? [',(', end, ')-(' , start, ')+1'] : '', ')']);
-    }
-
-    // slice
-    return new JsConstruct([list, '.slice(', start, ',', end, '+1)']);
-};
+// module.exports['excision'] = function (node) {
+//
+//     var list = this.compile(node.list);
+//     var start = this.compile(node.start);
+//     var end;   // optional, so compile only if present
+//
+//     // Allows syntax with negative indices referring to
+//     // positions from the end, but only for number literals.
+//     // To do this properly we'd have to catch it at runtime
+//
+//     if (node.start.type == 'number' && parseInt(node.start.val) < 0) {
+//         start = list + '.length' + node.start.val;
+//     }
+//
+//     if (node.end) {
+//
+//         end = this.compile(node.end);
+//
+//         if (node.end.type == 'number' && parseInt(node.end.val) < 0) {
+//             end = list + '.length' + node.end.val;
+//         }
+//     }
+//
+//     // todo - what if the list expression is a request or somesuch? can't resolve it twice
+//     // wrap it in a helper function?
+//
+//     if (node.type == 'excision') {
+//         return new JsConstruct([list, '.splice(', start, end ? [',(', end, ')-(' , start, ')+1'] : '', ')']);
+//     }
+//
+//     // slice
+//     return new JsConstruct([list, '.slice(', start, ',', end, '+1)']);
+// };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -514,16 +500,16 @@ module.exports['excision'] = function (node) {
  *
  * @param node
  */
-module.exports['extraction'] = function (node) {
-
-    var list = this.compile(node.list);
-    var index = this.compile(node.index);
-
-    // todo - what if the list expression is a request or somesuch? can't resolve it twice
-    // wrap it in a helper function?
-
-    return new JsConstruct([list, '.splice(', index, ' < 0 ? ', index, ' + ', list, '.length : ', index, ', 1)[0];']);
-};
+// module.exports['extraction'] = function (node) {
+//
+//     var list = this.compile(node.list);
+//     var index = this.compile(node.index);
+//
+//     // todo - what if the list expression is a request or somesuch? can't resolve it twice
+//     // wrap it in a helper function?
+//
+//     return new JsConstruct([list, '.splice(', index, ' < 0 ? ', index, ' + ', list, '.length : ', index, ', 1)[0];']);
+// };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -532,9 +518,7 @@ module.exports['extraction'] = function (node) {
  */
 module.exports['select'] = function (node) {
 
-    var set = this.compile(node.set);
-
-    return new JsConstruct([set, '.', node.member]);
+    return JS.select(this.compile(node.set), node.member);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -544,15 +528,10 @@ module.exports['select'] = function (node) {
  */
 module.exports['in'] = function (node) {
 
-    // should holds apply to strings? maybe as 'contains'? or some non-word operator?
-
     var left = this.compile(node.left);
     var right = this.compile(node.right);
 
-    return new JsConstruct(['function (item, collection) {' +
-            "if (Array.isArray(collection)) return collection.indexOf(item) >= 0;" +
-            "else if (typeof collection === 'object') return collection.hasOwnProperty(item);" +
-            "}(", left, ',', right, ")"]);
+    return JS.runtimeCall('in', [left, right]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -560,18 +539,18 @@ module.exports['in'] = function (node) {
  *
  * @param node
  */
-module.exports['sequence'] = function (node) {
-
-    var first = this.compile(node.first);
-    var last = this.compile(node.last);
-
-    // renders an expression that is a function that takes a single arg -
-    // the action to be performed
-
-    return new JsConstruct(['function (first, last, action) {\n' +
-            'for (var num = first; num <= last; num++) { action(num); }' +
-        "}.bind(null,", first, ',', last, ')']);
-};
+// module.exports['sequence'] = function (node) {
+//
+//     var first = this.compile(node.first);
+//     var last = this.compile(node.last);
+//
+//     // renders an expression that is a function that takes a single arg -
+//     // the action to be performed
+//
+//     return new JsConstruct(['function (first, last, action) {\n' +
+//             'for (var num = first; num <= last; num++) { action(num); }' +
+//         "}.bind(null,", first, ',', last, ')']);
+// };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -583,24 +562,7 @@ module.exports['op'] = function (node) {
     var left = this.compile(node.left);
     var right = this.compile(node.right);
 
-    var op = node.op;
-
-    if (op == 'concat') {
-        return new JsConstruct(['task.concat(', left, ', ', right, ')']);
-    }
-
-    if (op === 'and') {
-        op = '&&';
-    }
-    else if (op === 'or') {
-        op = '||';
-    }
-
-    if (op == '==') {
-        op = '===';
-    }
-
-//    make sure both sides are defined
+//    todo - make sure both sides are defined
 //    could relax this if we want to allow declaration after usage
 //    should also factor this out into a getValue() maybe
 
@@ -612,8 +574,36 @@ module.exports['op'] = function (node) {
 //        throw new Error("right operand not defined");
 //    }
 
-    // use parens to be safe
-    return new JsConstruct(['(', left, ' ', op, ' ', right, ')']);
+    var op = node.op;
+
+    switch (op) {
+
+        case 'concat':
+            return JS.fnCall(JS.select(JS.ID('task'), 'concat'), [left, right]);
+
+        case 'and':
+            return JS.logicalAnd(left, right);
+
+        case 'or':
+            return JS.logicalOr(left, right);
+
+        case '==':
+            return JS.strictEqual(left, right);
+
+        case '+':
+            return JS.add(left, right);
+
+        case '-':
+            return JS.sub(left, right);
+
+        case '*':
+            return JS.mul(left, right);
+
+        case '/':
+            return JS.div(left, right);
+    }
+
+    throw new Error("unknown operator!");
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -622,18 +612,17 @@ module.exports['op'] = function (node) {
 
 module.exports['boolean'] = function (node) {
 
-    return node.val ? 'true' : 'false';
+    return JS.bool(node.val ? 'true' : 'false');
 };
 
 module.exports['number'] = function (node) {
 
-    return node.val;
+    return JS.num(node.val);
 };
-
 
 module.exports['string'] = function (node) {
 
-    return "'" + node.val.replace(/'/g, "\\'") + "'";
+    return JS.string(node.val);
 };
 
 module.exports['array'] = function (node) {
@@ -642,16 +631,16 @@ module.exports['array'] = function (node) {
         return this.compile(item);
     });
 
-    return new JsConstruct(['[', {csv: items}, ']']);
+    return JS.arrayLiteral(items);
 };
 
 module.exports['set'] = function (node) {
 
     const items = node.elements.map((item) => {
-        return [this.compile(item), ': true'];
+        return [this.compile(item), JS.bool(true)];
     });
 
-    return new JsConstruct(['{', {csv: items}, '}']);
+    return JS.objLiteral(items);
 };
 
 module.exports['map'] = function (node) {
@@ -660,20 +649,12 @@ module.exports['map'] = function (node) {
         return this.compile(item);
     });
 
-    return new JsConstruct(['{', {csv: items}, '}']);
+    return JS.objLiteral(items);
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param node
- */
 module.exports['pair'] = function (node) {
 
-    var key = this.compile(node.key);
-    var value = this.compile(node.value);
-
-    return [key, ':', value];
+    return [this.compile(node.key), this.compile(node.value)];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -690,8 +671,7 @@ module.exports['record'] = function (node) {
         return self.compile(field);
     });
 
-    // could use a block annotation here
-    return new JsConstruct(['{', {csv: fields}, '}']);
+    return JS.objLiteral(fields);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -701,32 +681,34 @@ module.exports['record'] = function (node) {
  */
 module.exports['field'] = function (node) {
 
-    var value = this.compile(node.value);
-
     // we don't qualify field labels
-    return [node.label, ':', value];
+    return [node.label, this.compile(node.value)];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module.exports['interpolation'] = function (node) {
 
-    return new JsConstruct(["'", node.left, "' + ",
-        this.compile(node.middle), " + '", node.right, "'"]);
+    return JS.add(
+        JS.add(JS.string(node.left), this.compile(node.middle)),
+        JS.string(node.right));
 };
 
 module.exports['dynastring'] = function (node) {
 
-    return new JsConstruct([this.compile(node.left), " + '", node.middle, "' + ",
-        this.compile(node.right)]);
+    return JS.add(
+        JS.add(this.compile(node.left), JS.string(node.middle)),
+        this.compile(node.right));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 module.exports['increment'] = function (node) {
-    return JsConstruct.makeStatement([ this.compile(node.operand), "++;\n"]);
+
+    return JS.stmt(JS.inc(this.compile(node.operand)));
 };
 
 module.exports['decrement'] = function (node) {
-    return JsConstruct.makeStatement([ this.compile(node.operand), "--;\n"]);
+
+    return JS.stmt(JS.dec(this.compile(node.operand)));
 };

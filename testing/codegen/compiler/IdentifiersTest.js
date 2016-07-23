@@ -8,6 +8,8 @@
 var Compiler = require('../../../codegen/Compiler');
 var Context = require('../../../codegen/Context');
 var Module = require('../../../codegen/Module');
+var JsKit = require('../../../codegen/JsKit');
+var JS = JsKit.parts;
 var util = require('util');
 
 module.exports["identifiers"] = {
@@ -26,7 +28,7 @@ module.exports["identifiers"] = {
 
         var node = {type: 'id', name: 'foo'};
 
-        test.equal(new Context().compile(node), '$foo');
+        test.deepEqual(new Context().compile(node), JS.ID('$foo'));
         test.done();
     },
 
@@ -36,9 +38,10 @@ module.exports["identifiers"] = {
 
         var context = new Context();
 
-        context.define('foo', "42");
+        // define the constant
+        context.compile({type: 'constant', name: 'foo', value: {type: 'number', val: '42'}});
 
-        test.equal(context.compile(node), '42');
+        test.deepEqual(context.compile(node), JS.num('42'));
         test.done();
     },
 
@@ -54,7 +57,7 @@ module.exports["identifiers"] = {
             }
         });
 
-        test.equal(context.compile(node), 'M0.foo');
+        test.deepEqual(context.compile(node), 'M0.foo');
         test.done();
     },
 
@@ -78,7 +81,7 @@ module.exports["identifiers"] = {
 
         context.define("foo", 42);
 
-        test.equal(context.compile(node), 'M0.foo');
+        test.deepEqual(context.compile(node), 'M0.foo');
         test.done();
     }
 };

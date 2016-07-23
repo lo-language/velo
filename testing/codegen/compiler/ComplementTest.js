@@ -7,6 +7,8 @@
 
 var Compiler = require('../../../codegen/Compiler');
 var Context = require('../../../codegen/Context');
+var JsKit = require('../../../codegen/JsKit');
+var JS = JsKit.parts;
 var util = require('util');
 
 module.exports["complement"] = {
@@ -18,7 +20,7 @@ module.exports["complement"] = {
             operand: {type: 'id', name: 'foo'}
         };
 
-        test.equal(new Context().compile(node).render(), "!$foo");
+        test.deepEqual(new Context().compile(node), JS.not(JS.ID('$foo')));
         test.done();
     }
 };

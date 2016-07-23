@@ -6,6 +6,8 @@
 "use strict";
 
 var Context = require('../../../codegen/Context');
+var JsKit = require('../../../codegen/JsKit');
+var JS = JsKit.parts;
 var util = require('util');
 
 module.exports["select"] = {
@@ -22,7 +24,10 @@ module.exports["select"] = {
             "right":"!"
         };
 
-        test.equal(new Context().compile(node).render(), "'hello, ' + $name + '!'");
+        test.deepEqual(new Context().compile(node), JS.add(
+            JS.add(JS.string('hello, '), JS.ID('$name')),
+            JS.string('!')
+        ));
         test.done();
     },
 
@@ -46,7 +51,17 @@ module.exports["select"] = {
             "right":"."
         };
 
-        test.equal(new Context().compile(node).render(), "'I'm sorry, ' + $name + ', I can't do ' + $action + '.'");
+        test.deepEqual(new Context().compile(node), JS.add(
+            JS.add(
+                JS.string("I'm sorry, "),
+                JS.add(
+                    JS.add(JS.ID('$name'), JS.string(", I can't do ")),
+                    JS.ID('$action')
+                )
+            ),
+            JS.string('.')
+        ));
+
         test.done();
     },
 
@@ -78,7 +93,17 @@ module.exports["select"] = {
             "right":"."
         };
 
-        test.equal(new Context().compile(node).render(), "'A = ' + $a + ', B = ' + $b + ', C = ' + $c + '.'");
+        var exp = JS.add(
+            JS.add(
+                JS.string("A = "),
+                JS.add(
+                    JS.add(JS.ID('$a'), JS.string(", B = ")),
+                    JS.add(
+                        JS.add(JS.ID('$b'), JS.string(", C = ")),
+                        JS.ID('$c')))),
+            JS.string('.'));
+
+        test.deepEqual(new Context().compile(node), exp);
         test.done();
     }
 };

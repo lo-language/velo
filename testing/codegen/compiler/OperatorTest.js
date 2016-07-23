@@ -6,12 +6,13 @@
 "use strict";
 
 var Context = require('../../../codegen/Context');
+var JsKit = require('../../../codegen/JsKit');
+var JS = JsKit.parts;
 var util = require('util');
 
 module.exports["op"] = {
 
     "with literals": function (test) {
-
 
         var node = {
             type: 'op',
@@ -20,7 +21,7 @@ module.exports["op"] = {
             right: {type: 'number', val: '2'}
         };
 
-        test.equal(new Context().compile(node).render(), '(1 * 2)');
+        test.deepEqual(new Context().compile(node), JS.mul(JS.num('1'), JS.num('2')));
         test.done();
     },
 
@@ -39,40 +40,24 @@ module.exports["op"] = {
             right: {type: 'number', val: '3'}
         };
 
-        test.equal(new Context().compile(node).render(), '((1 && 2) || 3)');
+        test.deepEqual(new Context().compile(node), JS.logicalOr(
+            JS.logicalAnd(JS.num('1'), JS.num('2')),
+            JS.num('3')));
         test.done();
     },
 
-//    "addition handles lists": function (test) {
-//
-//
-//        var node = {
-//            type: 'op',
-//            op: '+',
-//            left: {type: 'id', name: 'foo'},
-//            right: {type: 'id', name: 'bar'}
-//        };
-//
-//        // patch sub nodes?
-//
-//        test.equal(new Context().compile(node).render(), "function (left, right) {if (Array.isArray(left) || Array.isArray(right)) {return left.concat(right);} else return left + right;}($foo,$bar)");
-//        test.done();
-//    },
-
     "in operator": function (test) {
-
 
         var node = {
             type: 'in',
             left: { type: 'string', val: 'trillian' },
             right: { type: 'id', name: 'dudes' } };
 
-        test.equal(new Context().compile(node).render(), "function (item, collection) {if (Array.isArray(collection)) return collection.indexOf(item) >= 0;else if (typeof collection === 'object') return collection.hasOwnProperty(item);}('trillian',$dudes)");
+        test.deepEqual(new Context().compile(node), JS.runtimeCall('in', [JS.string('trillian'), JS.ID('$dudes')]));
         test.done();
     },
 
     "equality is strict": function (test) {
-
 
         var node = {
             type: 'op',
@@ -81,12 +66,13 @@ module.exports["op"] = {
             right: {type: 'id', name: 'bar'}
         };
 
-        test.equal(new Context().compile(node).render(), "($foo === $bar)");
+        test.deepEqual(new Context().compile(node), JS.strictEqual(JS.ID('$foo'), JS.ID('$bar')));
         test.done();
     },
 
     "concat": function (test) {
 
+        // offloads to the runtime lib
         // if strings, should use + operator
         // if ints, should create an array
         // if arrays, should concat
@@ -98,7 +84,7 @@ module.exports["op"] = {
             right: {type: 'id', name: 'bar'}
         };
 
-        test.equal(new Context().compile(node).render(), "task.concat($foo, $bar)");
+        test.deepEqual(new Context().compile(node), JS.runtimeCall('concat', [JS.ID('$foo'), JS.ID('$bar')]));
         test.done();
     }
 };

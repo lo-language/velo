@@ -103,7 +103,8 @@ __.prototype.doAsync = function (cb) {
     };
 };
 
-// utility method, probably shouldn't be in here but rather somewhere else in runtime
+// utility methods, probably shouldn't be in here but rather somewhere else in runtime
+
 __.prototype.concat = function (left, right) {
 
     if (typeof left == 'string' && typeof right == 'string') {
@@ -117,6 +118,29 @@ __.prototype.concat = function (left, right) {
     }
 
     return [left, right];
+};
+
+__.prototype.cardinality = function (val) {
+
+    if (typeof val === 'string') {
+        return val.length;
+    }
+    else if (Array.isArray(val)) {
+        return val.length;
+    }
+    else if (typeof val === 'object') {
+        return Object.keys(val).length;
+    }
+};
+
+__.prototype.in = function (item, collection) {
+
+    if (Array.isArray(collection)) {
+        return collection.indexOf(item) >= 0;
+    }
+    else if (typeof collection === 'object') {
+        return collection.hasOwnProperty(item);
+    }
 };
 
 __.sendRootRequest = function (service, args, onReply, onFail) {

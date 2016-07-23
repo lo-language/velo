@@ -7,6 +7,8 @@
 
 var Compiler = require('../../../codegen/Compiler');
 var Context = require('../../../codegen/Context');
+var JsKit = require('../../../codegen/JsKit');
+var JS = JsKit.parts;
 var util = require('util');
 
 module.exports["cardinality"] = {
@@ -21,11 +23,9 @@ module.exports["cardinality"] = {
         // todo throw runtime error if none match?
         // todo can get rid of function call here with conditional operator
 
-        test.equal(new Context().compile(node).render(),
-            "function (val) {" +
-                "if (typeof val === 'string') return val.length;" +
-                "else if (Array.isArray(val)) return val.length;" +
-                "else if (typeof val === 'object') return Object.keys(val).length;}($foo)");
+        test.deepEqual(new Context().compile(node), JS.fnCall(
+            JS.select(JS.ID('task'), 'cardinality'),
+            [JS.ID('$foo')]));
 
         test.done();
     }

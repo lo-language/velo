@@ -6,6 +6,8 @@
 "use strict";
 
 var Context = require('../../../codegen/Context');
+var JsKit = require('../../../codegen/JsKit');
+var JS = JsKit.parts;
 var util = require('util');
 
 module.exports["message"] = {
@@ -21,7 +23,8 @@ module.exports["message"] = {
             }
         };
 
-        test.equal(new Context().compile(node).render(), 'task.sendMessage($foo, [], null, null)');
+        test.deepEqual(new Context().compile(node), JS.message(
+            JS.ID('$foo'), [], null, null)),
         test.done();
     },
 
@@ -46,7 +49,7 @@ module.exports["message"] = {
     //        }
     //    };
     //
-    //    test.equal(new Context().compile(node).render(),
+    //    test.equal(new Context().compile(node),
     //        'task.sendMessage($foo, [$url], function (args) {$res = args.shift();\n$body = args.shift();\n$bar = $body;\n}, null);\n\n');
     //    test.done();
     //},
@@ -63,7 +66,7 @@ module.exports["message"] = {
     //        futures: [{type: 'id', name: 'res'}, {type: 'id', name: 'body'}]
     //    };
     //
-    //    test.equal(new Context().compile(node).render(), 'task.sendMessage($foo, [$url], function (args) {$res = args.shift();\n\$body = args.shift();\n}, null);\n\n');
+    //    test.equal(new Context().compile(node), 'task.sendMessage($foo, [$url], function (args) {$res = args.shift();\n\$body = args.shift();\n}, null);\n\n');
     //    test.done();
     //},
 
@@ -95,8 +98,12 @@ module.exports["message"] = {
         var scope = new Context();
         scope.define('answer', '42');
 
-        test.equal(scope.createInner().compile(node).render(),
-            'task.sendMessage($foo, [$url], function (args) {var $bar;\n\n\n$bar = 42;\n}, null)');
+        // test.deepEqual(scope.createInner().compile(node),
+        //     'task.sendMessage($foo, [$url], function (args) {var $bar;\n\n\n$bar = 42;\n}, null)');
+
+        test.deepEqual(new Context().compile(node), JS.message(
+            JS.ID('$foo'), [JS.ID('$url')], JS.handler([]), null));
+        
         test.done();
     }
 

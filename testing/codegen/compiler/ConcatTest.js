@@ -7,13 +7,15 @@
 
 var Compiler = require('../../../codegen/Compiler');
 var Context = require('../../../codegen/Context');
+var JsKit = require('../../../codegen/JsKit');
+var JS = JsKit.parts;
 var util = require('util');
 
 module.exports["basics"] = {
 
     "two lists": function (test) {
 
-        // weld is very runtime-dependent
+        // concat is very runtime-dependent
         // item -> list appends item
         // item -> list[0] prepends item, etc.
         // item -> item creates list of two items
@@ -24,15 +26,15 @@ module.exports["basics"] = {
             "op": "concat",
             "left": {
                 "type": "id",
-                "name": "list"
+                "name": "foo"
             },
             "right": {
                 "type": "id",
-                "name": "item"
+                "name": "bar"
             }
         };
 
-        test.equal(new Context().compile(node).render(), 'task.concat($list, $item)');
+        test.deepEqual(new Context().compile(node), JS.fnCall(JS.select(JS.ID('task'), 'concat'), [JS.ID('$foo'), JS.ID('$bar')]));
         test.done();
     }
 };

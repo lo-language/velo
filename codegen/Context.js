@@ -59,7 +59,7 @@ __.prototype.declare = function (name) {
  * @param value
  * @param isService
  */
-__.prototype.define = function (name, value, isService) {
+__.prototype.define = function (name, value) {
 
     if (this.has(name)) {
         throw new Error(name + " is a constant or variable in this context");

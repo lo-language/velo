@@ -7,6 +7,8 @@
 
 var Compiler = require('../../../codegen/Compiler');
 var Context = require('../../../codegen/Context');
+var JsKit = require('../../../codegen/JsKit');
+var JS = JsKit.parts;
 var util = require('util');
 
 module.exports["constants"] = {
@@ -24,11 +26,11 @@ module.exports["constants"] = {
         test.equal(context.has('port'), false);
         test.equal(context.isConstant('port'), false);
 
-        test.equal(context.compile(node).render(), '');
+        test.deepEqual(context.compile(node), JS.empty());
 
         test.equal(context.has('port'), true);
         test.ok(context.isConstant('port'));
-        test.equal(context.resolve('port'), "443");
+        test.deepEqual(context.resolve('port'), JS.num('443'));
 
         test.done();
     },
@@ -46,11 +48,11 @@ module.exports["constants"] = {
         test.equal(context.has('album'), false);
         test.equal(context.isConstant('album'), false);
 
-        test.equal(context.compile(node).render(), '');
+        test.deepEqual(context.compile(node), JS.empty());
 
         test.equal(context.has('album'), true);
         test.ok(context.isConstant('album'));
-        test.equal(context.resolve('album'), "'Melon Collie'");
+        test.deepEqual(context.resolve('album'), JS.string('Melon Collie'));
 
         test.done();
     },
@@ -85,14 +87,14 @@ module.exports["constants"] = {
         test.equal(context.has('main'), false);
         test.equal(context.isConstant('main'), false);
 
-        test.equal(context.compile(node).render(),
+        test.equal(context.compile(node),
             'const $main = function (task) {var $recur = task.service;\n' +
             'var $next, $result;\n\n$next = task.args[0];\n\n' +
             'task.sendMessage($bar, [42], function (res) {\nvar P0 = res ? res[0] : null;\n$result *= P0;\n}, null);\n\n};');
 
         test.equal(context.has('main'), true);
         test.ok(context.isConstant('main'));
-        test.equal(context.resolve('main'), "$main");
+        test.deepEqual(context.resolve('main'), JS.ID("$main"));
 
         test.done();
     },
@@ -110,11 +112,11 @@ module.exports["constants"] = {
         test.equal(context.has('constructor'), false);
         test.equal(context.isConstant('constructor'), false);
 
-        test.equal(context.compile(node).render(), '');
+        test.deepEqual(context.compile(node), JS.empty());
 
         test.equal(context.has('constructor'), true);
         test.ok(context.isConstant('constructor'));
-        test.equal(context.resolve('constructor'), "'Melon Collie'");
+        test.deepEqual(context.resolve('constructor'), JS.string('Melon Collie'));
 
         test.done();
     }

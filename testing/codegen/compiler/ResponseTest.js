@@ -6,6 +6,8 @@
 "use strict";
 
 var Context = require('../../../codegen/Context');
+var JsKit = require('../../../codegen/JsKit');
+var JS = JsKit.parts;
 var util = require('util');
 
 module.exports["response"] = {
@@ -17,7 +19,9 @@ module.exports["response"] = {
             channel: 'reply',
             args: []};
 
-        test.equal(new Context().compile(node).render(), 'task.respond("reply", []);\nreturn;');
+        test.deepEqual(new Context().compile(node).getAst(),
+            JS.stmt(JS.runtimeCall('respond', [JS.string('reply'), JS.arrayLiteral([])]))
+                .attach(JS.return()).getAst());
         test.done();
     },
 
@@ -30,7 +34,9 @@ module.exports["response"] = {
                 {type: 'number', val: '42'}
             ]};
 
-        test.equal(new Context().compile(node).render(), 'task.respond("reply", [42]);\nreturn;');
+        test.deepEqual(new Context().compile(node).getAst(),
+            JS.stmt(JS.runtimeCall('respond', [JS.string('reply'), JS.arrayLiteral([JS.num('42')])]))
+                .attach(JS.return()).getAst());
         test.done();
     },
 
@@ -44,11 +50,13 @@ module.exports["response"] = {
                 {type: 'string', val: "hot dog!"}
             ]};
 
-        test.equal(new Context().compile(node).render(), 'task.respond("reply", [42, \'hot dog!\']);\nreturn;');
+        test.deepEqual(new Context().compile(node).getAst(),
+            JS.stmt(JS.runtimeCall('respond', [JS.string('reply'), JS.arrayLiteral([JS.num('42'), JS.string("hot dog!")])]))
+                .attach(JS.return()).getAst());
         test.done();
     },
 
-    "fail": function (test) {
+    "fail with one arg": function (test) {
 
         var node = {
             type: 'response',
@@ -57,7 +65,9 @@ module.exports["response"] = {
                 {type: 'number', val: '42'}
             ]};
 
-        test.equal(new Context().compile(node).render(), 'task.respond("fail", [42]);\nreturn;');
+        test.deepEqual(new Context().compile(node).getAst(),
+            JS.stmt(JS.runtimeCall('respond', [JS.string('fail'), JS.arrayLiteral([JS.num('42')])]))
+                .attach(JS.return()).getAst());
         test.done();
     }
 };
