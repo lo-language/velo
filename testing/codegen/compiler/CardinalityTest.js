@@ -5,10 +5,9 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
 var Context = require('../../../codegen/Context');
-var JsKit = require('../../../codegen/JsKit');
-var JS = JsKit.parts;
+const JS = require('../../../codegen/JsPrimitives');
+const JsStmt = require('../../../codegen/JsStmt');
 var util = require('util');
 
 module.exports["cardinality"] = {
@@ -23,9 +22,9 @@ module.exports["cardinality"] = {
         // todo throw runtime error if none match?
         // todo can get rid of function call here with conditional operator
 
-        test.deepEqual(new Context().compile(node), JS.fnCall(
+        test.deepEqual(new Context().compile(node).getTree(), JS.fnCall(
             JS.select(JS.ID('task'), 'cardinality'),
-            [JS.ID('$foo')]));
+            [JS.ID('$foo')]).getTree());
 
         test.done();
     }

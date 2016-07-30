@@ -5,11 +5,11 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
-var Context = require('../../../codegen/Context');
-var JsKit = require('../../../codegen/JsKit');
-var JS = JsKit.parts;
-var util = require('util');
+const Compiler = require('../../../codegen/Compiler');
+const Context = require('../../../codegen/Context');
+const JS = require('../../../codegen/JsPrimitives');
+const JsStmt = require('../../../codegen/JsStmt');
+const util = require('util');
 
 module.exports["assignment"] = {
 
@@ -26,7 +26,7 @@ module.exports["assignment"] = {
 
         test.equal(context.has('foo'), false);
 
-        test.deepEqual(context.compile(node), JS.stmt(JS.assign(JS.ID('$foo'), JS.num('57'))));
+        test.deepEqual(context.compile(node).getTree(), new JsStmt(JS.assign(JS.ID('$foo'), JS.num('57'))).getTree());
         test.equal(context.has('foo'), true);
         test.done();
     },
@@ -42,7 +42,7 @@ module.exports["assignment"] = {
 
         var context = new Context().createInner();
 
-        test.deepEqual(context.compile(node), JS.stmt(JS.assign(JS.subscript(JS.ID('$foo'), JS.ID('$bar')), JS.num('57'))));
+        test.deepEqual(context.compile(node).getTree(), new JsStmt(JS.assign(JS.subscript(JS.ID('$foo'), JS.ID('$bar')), JS.num('57'))).getTree());
         test.done();
     },
 
@@ -58,7 +58,7 @@ module.exports["assignment"] = {
         var context = new Context().createInner();
 
         test.equal(context.has('foo'), false);
-        test.deepEqual(context.compile(node), JS.stmt(JS.assign(JS.ID('$foo'), JS.ID('$bar'))));
+        test.deepEqual(context.compile(node).getTree(), new JsStmt(JS.assign(JS.ID('$foo'), JS.ID('$bar'))).getTree());
         test.equal(context.has('foo'), true);
         test.done();
     },
@@ -98,7 +98,7 @@ module.exports["assignment"] = {
 
         test.equal(context.has('foo'), true);
 
-        test.deepEqual(context.compile(node), JS.stmt(JS.assign(JS.ID('$foo'), JS.num('57'))));
+        test.deepEqual(context.compile(node).getTree(), new JsStmt(JS.assign(JS.ID('$foo'), JS.num('57'))).getTree());
         test.deepEqual(context.getJsVars(), []);
         test.done();
     },

@@ -5,11 +5,11 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
-var Context = require('../../../codegen/Context');
-var JsKit = require('../../../codegen/JsKit');
-var JS = JsKit.parts;
-var util = require('util');
+const Compiler = require('../../../codegen/Compiler');
+const Context = require('../../../codegen/Context');
+const JS = require('../../../codegen/JsPrimitives');
+const JsStmt = require('../../../codegen/JsStmt');
+const util = require('util');
 
 module.exports["constants"] = {
 
@@ -26,11 +26,11 @@ module.exports["constants"] = {
         test.equal(context.has('port'), false);
         test.equal(context.isConstant('port'), false);
 
-        test.deepEqual(context.compile(node), JS.empty());
+        test.deepEqual(context.compile(node).getTree(), new JsStmt(JS.EMPTY).getTree());
 
         test.equal(context.has('port'), true);
         test.ok(context.isConstant('port'));
-        test.deepEqual(context.resolve('port'), JS.num('443'));
+        test.deepEqual(context.resolve('port').getTree(), JS.num('443').getTree());
 
         test.done();
     },
@@ -48,11 +48,11 @@ module.exports["constants"] = {
         test.equal(context.has('album'), false);
         test.equal(context.isConstant('album'), false);
 
-        test.deepEqual(context.compile(node), JS.empty());
+        test.deepEqual(context.compile(node).getTree(), new JsStmt(JS.EMPTY).getTree());
 
         test.equal(context.has('album'), true);
         test.ok(context.isConstant('album'));
-        test.deepEqual(context.resolve('album'), JS.string('Melon Collie'));
+        test.deepEqual(context.resolve('album').getTree(), JS.string('Melon Collie').getTree());
 
         test.done();
     },
@@ -87,14 +87,12 @@ module.exports["constants"] = {
         test.equal(context.has('main'), false);
         test.equal(context.isConstant('main'), false);
 
-        test.equal(context.compile(node),
-            'const $main = function (task) {var $recur = task.service;\n' +
-            'var $next, $result;\n\n$next = task.args[0];\n\n' +
-            'task.sendMessage($bar, [42], function (res) {\nvar P0 = res ? res[0] : null;\n$result *= P0;\n}, null);\n\n};');
+        test.deepEqual(context.compile(node).getTree(), [ 'stmtList', [ 'const', '$main' ] ]);
 
         test.equal(context.has('main'), true);
         test.ok(context.isConstant('main'));
-        test.deepEqual(context.resolve('main'), JS.ID("$main"));
+        console.log(context.resolve('main').getTree());
+        test.deepEqual(context.resolve('main').getTree(), JS.ID("$main").getTree());
 
         test.done();
     },
@@ -112,11 +110,11 @@ module.exports["constants"] = {
         test.equal(context.has('constructor'), false);
         test.equal(context.isConstant('constructor'), false);
 
-        test.deepEqual(context.compile(node), JS.empty());
+        test.deepEqual(context.compile(node).getTree(), new JsStmt(JS.EMPTY).getTree());
 
         test.equal(context.has('constructor'), true);
         test.ok(context.isConstant('constructor'));
-        test.deepEqual(context.resolve('constructor'), JS.string('Melon Collie'));
+        test.deepEqual(context.resolve('constructor').getTree(), JS.string('Melon Collie').getTree());
 
         test.done();
     }

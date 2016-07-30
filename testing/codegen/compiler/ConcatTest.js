@@ -7,8 +7,7 @@
 
 var Compiler = require('../../../codegen/Compiler');
 var Context = require('../../../codegen/Context');
-var JsKit = require('../../../codegen/JsKit');
-var JS = JsKit.parts;
+const JS = require('../../../codegen/JsPrimitives');
 var util = require('util');
 
 module.exports["basics"] = {
@@ -34,7 +33,7 @@ module.exports["basics"] = {
             }
         };
 
-        test.deepEqual(new Context().compile(node), JS.fnCall(JS.select(JS.ID('task'), 'concat'), [JS.ID('$foo'), JS.ID('$bar')]));
+        test.deepEqual(new Context().compile(node).getTree(), JS.fnCall(JS.select(JS.ID('task'), 'concat'), [JS.ID('$foo'), JS.ID('$bar')]).getTree());
         test.done();
     }
 };

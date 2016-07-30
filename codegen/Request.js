@@ -2,24 +2,49 @@
  * Created by spurcell on 6/25/16.
  */
 
+const JS = require('./JsPrimitives');
 const JsFunction = require('./JsFunction');
 
 /**
  * Constructor
  *
- * @param address       JS construct
- * @param args          array of JS constructs
+ * @param address       JS part
+ * @param args          array of JS parts
  * @param replyHandler  JsFunction
  * @param failHandler   JsFunction
- * @param blocking      boolean if this is a blocking request
  */
-var __ = function (address, args, replyHandler, failHandler, blocking) {
+var __ = function (address, args, replyHandler, failHandler) {
 
     this.address = address;
     this.args = args;
     this.replyHandler = replyHandler;
     this.failHandler = failHandler;
-    this.blocking = blocking || false;
+};
+
+// extend JsStmt?
+__.prototype.attach = function (stmtList) {
+    
+    // if we have a replyHandler, extend it, otherwise create one
+
+    if (this.replyHandler == null) {
+        this.replyHandler = new JsFunction('res', stmtList);
+    }
+
+    this.replyHandler.getBody().attach(stmtList);
+
+    // this.replyHandler = JS.fnDef('res', this.next);
+
+    return this;
+};
+
+__.prototype.getAst = function () {
+
+    return JS.runtimeCall('sendMessage', [this.address, JS.arrayLiteral(this.args)].concat(this.replyHandler ? this.replyHandler : []));
+};
+
+__.prototype.getTree = function () {
+
+    return this.getAst().getTree();
 };
 
 /**

@@ -5,7 +5,10 @@
 
 "use strict";
 
-var Context = require('../../codegen/Context');
+const Context = require('../../codegen/Context');
+const JS = require('../../codegen/JsPrimitives');
+const JsStmt = require('../../codegen/JsStmt');
+const Request = require('../../codegen/Request');
 
 module.exports["basics"] = {
 
@@ -265,4 +268,54 @@ module.exports["external constants"] = {
             test.done();
         }
     }
+};
+
+
+module.exports["placeholders"] = {
+
+    "get placeholder": function (test) {
+
+        var context = new Context();
+
+        test.deepEqual(context.pushBlocker().getTree(), JS.ID('P0').getTree());
+
+        test.done();
+    },
+
+    "create statement with no wrappers": function (test) {
+
+        var context = new Context();
+
+        test.deepEqual(
+            context.createStmt(JS.add(JS.ID('$foo'), JS.num('17'))).getTree(),
+            JS.stmtList(JS.add(JS.ID('$foo'), JS.num('17'))).getTree());
+
+        test.done();
+    },
+
+    "create statement with one wrapper": function (test) {
+
+        var context = new Context();
+
+        context.pushBlocker(new Request(JS.ID('$foo'), []));
+
+        var handler = JS.fnDef('res', JS.stmtList(JS.add(JS.ID('$foo'), JS.num('17'))));
+        
+        test.deepEqual(
+            context.createStmt(JS.add(JS.ID('$foo'), JS.num('17'))).getTree(),
+            new Request(JS.ID('$foo'), [], handler).getTree());
+
+        test.done();
+    },
+
+    // "create statement with two wrappers": function (test) {
+    //
+    //     var context = new Context();
+    //
+    //     test.equal(context.pushBlocker(), 'P1');
+    //
+    //     test.equal(context.pushBlocker(), 'P1');
+    //
+    //     test.done();
+    // }
 };

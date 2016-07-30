@@ -6,8 +6,7 @@
 "use strict";
 
 var Context = require('../../../codegen/Context');
-var JsKit = require('../../../codegen/JsKit');
-var JS = JsKit.parts;
+const JS = require('../../../codegen/JsPrimitives');
 var util = require('util');
 
 module.exports["select"] = {
@@ -23,7 +22,7 @@ module.exports["select"] = {
             "member":"bar"
         };
 
-        test.deepEqual(new Context().compile(node), JS.select(JS.ID('$foo'), 'bar'));
+        test.deepEqual(new Context().compile(node).getTree(), JS.select(JS.ID('$foo'), 'bar').getTree());
         test.done();
     }
 };

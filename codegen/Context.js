@@ -13,6 +13,8 @@
 "use strict";
 
 const Compiler = require('./Compiler');
+const JsStmt = require('./JsStmt');
+const JS = require('./JsPrimitives');
 const util = require('util');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,6 +29,7 @@ var __ = function (parent) {
     // our local symbol table, containing params, locals, constants, futures, etc.
     this.symbols = {};
 
+    this.placeHolders = 0; // should this be tracked at the root level? could we get collisions?
     this.contNum = 0;   // count of continuations, used for creating unique names
 };
 
@@ -209,6 +212,38 @@ __.prototype.compile = function (node) {
     return Compiler[node.type].call(this, node);
 };
 
+// we push sync requests; we pop wrapped statements!
+
+/**
+ * Returns a sync call placeholder var.
+ *
+ * @param req   a sync request
+ */
+__.prototype.pushBlocker = function (req) {
+
+    if (this.wrapper) {
+        this.wrapper.attach(req);
+    }
+    else {
+        this.wrapper = req;
+    }
+
+    return JS.ID('P' + this.placeHolders++);
+};
+
+/**
+ * Returns a statement wrapped in whatever wrappers have been pushed.
+ */
+__.prototype.createStmt = function (ast) {
+
+    var stmt = new JsStmt(ast);
+
+    if (this.wrapper) {
+        return this.wrapper.attach(stmt);
+    }
+
+    return stmt;
+};
 
 module.exports = __;
 

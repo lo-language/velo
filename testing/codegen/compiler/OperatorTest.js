@@ -5,10 +5,10 @@
 
 "use strict";
 
-var Context = require('../../../codegen/Context');
-var JsKit = require('../../../codegen/JsKit');
-var JS = JsKit.parts;
-var util = require('util');
+const Context = require('../../../codegen/Context');
+const JS = require('../../../codegen/JsPrimitives');
+const JsStmt = require('../../../codegen/JsStmt');
+const util = require('util');
 
 module.exports["op"] = {
 
@@ -21,7 +21,7 @@ module.exports["op"] = {
             right: {type: 'number', val: '2'}
         };
 
-        test.deepEqual(new Context().compile(node), JS.mul(JS.num('1'), JS.num('2')));
+        test.deepEqual(new Context().compile(node).getTree(), JS.mul(JS.num('1'), JS.num('2')).getTree());
         test.done();
     },
 
@@ -40,9 +40,9 @@ module.exports["op"] = {
             right: {type: 'number', val: '3'}
         };
 
-        test.deepEqual(new Context().compile(node), JS.logicalOr(
+        test.deepEqual(new Context().compile(node).getTree(), JS.logicalOr(
             JS.logicalAnd(JS.num('1'), JS.num('2')),
-            JS.num('3')));
+            JS.num('3')).getTree());
         test.done();
     },
 
@@ -53,7 +53,7 @@ module.exports["op"] = {
             left: { type: 'string', val: 'trillian' },
             right: { type: 'id', name: 'dudes' } };
 
-        test.deepEqual(new Context().compile(node), JS.runtimeCall('in', [JS.string('trillian'), JS.ID('$dudes')]));
+        test.deepEqual(new Context().compile(node).getTree(), JS.runtimeCall('in', [JS.string('trillian'), JS.ID('$dudes')]).getTree());
         test.done();
     },
 
@@ -66,7 +66,7 @@ module.exports["op"] = {
             right: {type: 'id', name: 'bar'}
         };
 
-        test.deepEqual(new Context().compile(node), JS.strictEqual(JS.ID('$foo'), JS.ID('$bar')));
+        test.deepEqual(new Context().compile(node).getTree(), JS.strictEqual(JS.ID('$foo'), JS.ID('$bar')).getTree());
         test.done();
     },
 
@@ -84,7 +84,7 @@ module.exports["op"] = {
             right: {type: 'id', name: 'bar'}
         };
 
-        test.deepEqual(new Context().compile(node), JS.runtimeCall('concat', [JS.ID('$foo'), JS.ID('$bar')]));
+        test.deepEqual(new Context().compile(node).getTree(), JS.runtimeCall('concat', [JS.ID('$foo'), JS.ID('$bar')]).getTree());
         test.done();
     }
 };

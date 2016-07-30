@@ -4,50 +4,59 @@
 
 const Request = require('../../codegen/Request');
 const JsFunction = require('../../codegen/JsFunction');
-const StmtList = require('../../codegen/StmtList');
 const JsStmt = require('../../codegen/JsStmt');
-const JsWriter = require('../../codegen/JsWriter');
+const JS = require('../../codegen/JsPrimitives');
 
 // test all combinations of sync/async, has/lacks replyHandler, has/lacks failHandler, where handlers can be final or non-final
 // should also test with/without following statements
-
-var following = new StmtList(new JsStmt(['assignment', ['id', 'baz'], ['num', '57']]));
 
 module.exports["blocking"] = {
 
     "with no handlers": function (test) {
 
-        var req = new Request(['id', '$foo'], [['num', '42']], null, null, true);
+        var req = new Request(JS.ID('$foo'), [JS.num('42')], null, null);
 
-        test.deepEqual(req.render(following),
-            ['message', ['id', '$foo'], [['num', '42']],
-                new JsFunction(['res'], following).render(),
-                JsFunction.DEFAULT_FAIL_HANDLER.render()]);
-
-        // console.log(JsWriter.render(req.render(following)));
+        test.deepEqual(req.getTree(),
+            [ 'call',
+                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ]);
 
         test.done();
     },
 
-    // "with reply handler": function (test) {
-    //
-    //     var replyHandler = new JsFunction([], new StmtList(new JsStmt(['assignment', ['id', '$bar'], ['num', '16']])));
-    //
-    //     var req = new Request(['id', '$foo'], [['num', '42']], replyHandler, null, true);
-    //
-    //     test.deepEqual(req.render(following),
-    //         ['message', ['id', '$foo'], [['num', '42']], replyHandler.render(following), JsFunction.DEFAULT_FAIL_HANDLER.render()]);
-    //     test.done();
-    // },
+    "with reply handler": function (test) {
+
+        // var replyHandler = new JsFunction([], new StmtList(new JsStmt(['assignment', ['id', '$bar'], ['num', '16']])));
+
+        var replyHandler = new JsFunction(['res'], new JsStmt(JS.assign(JS.ID('baz'), JS.num('57'))));
+        var req = new Request(JS.ID('$foo'), [JS.num('42')], replyHandler, null);
+
+        test.deepEqual(req.getTree(),
+            [ 'call',
+                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                [ [ 'id', '$foo' ],
+                    [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
+                    [ 'function',
+                        [ 'res' ],
+                        [ 'stmtList', [ 'assign', [ 'id', 'baz' ], [ 'num', '57' ] ] ] ] ] ]);
+
+        test.done();
+    },
 
     "with reply handler (final)": function (test) {
 
-        var replyHandler = new JsFunction([], new StmtList(JsStmt.RETURN));
+        var replyHandler = new JsFunction([], JsStmt.return());
 
-        var req = new Request(['id', '$foo'], [['num', '42']], replyHandler, null, true);
+        var req = new Request(JS.ID('$foo'), [JS.num('42')], replyHandler, null);
 
-        test.deepEqual(req.render(following),
-            ['message', ['id', '$foo'], [['num', '42']], replyHandler.render(following), JsFunction.DEFAULT_FAIL_HANDLER.render()]);
+        test.deepEqual(req.getTree(),
+            [ 'call',
+                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                [ [ 'id', '$foo' ],
+                    [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
+                    [ 'function',
+                        [ ],
+                        [ 'stmtList', [ 'return' ] ] ] ] ]);
         test.done();
     },
 

@@ -8,8 +8,7 @@
 var Compiler = require('../../../codegen/Compiler');
 var Context = require('../../../codegen/Context');
 var Module = require('../../../codegen/Module');
-var JsKit = require('../../../codegen/JsKit');
-var JS = JsKit.parts;
+const JS = require('../../../codegen/JsPrimitives');
 var util = require('util');
 
 module.exports["identifiers"] = {
@@ -28,7 +27,7 @@ module.exports["identifiers"] = {
 
         var node = {type: 'id', name: 'foo'};
 
-        test.deepEqual(new Context().compile(node), JS.ID('$foo'));
+        test.deepEqual(new Context().compile(node).getTree(), JS.ID('$foo').getTree());
         test.done();
     },
 
@@ -41,7 +40,7 @@ module.exports["identifiers"] = {
         // define the constant
         context.compile({type: 'constant', name: 'foo', value: {type: 'number', val: '42'}});
 
-        test.deepEqual(context.compile(node), JS.num('42'));
+        test.deepEqual(context.compile(node).getTree(), JS.num('42').getTree());
         test.done();
     },
 

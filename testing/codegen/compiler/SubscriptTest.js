@@ -6,8 +6,7 @@
 "use strict";
 
 var Context = require('../../../codegen/Context');
-var JsKit = require('../../../codegen/JsKit');
-var JS = JsKit.parts;
+const JS = require('../../../codegen/JsPrimitives');
 var util = require('util');
 
 module.exports["subscript"] = {
@@ -20,7 +19,7 @@ module.exports["subscript"] = {
             index: {type: 'number', val: '1'}
         };
 
-        test.deepEqual(new Context().compile(node), JS.subscript(JS.ID('$foo'), JS.num('1')));
+        test.deepEqual(new Context().compile(node).getTree(), JS.subscript(JS.ID('$foo'), JS.num('1')).getTree());
         test.done();
     },
 
@@ -31,11 +30,11 @@ module.exports["subscript"] = {
             list: { type: 'id', name: 'foo' },
             index: {type: 'number', val: '-1'} };
 
-        test.deepEqual(new Context().compile(node), JS.subscript(
+        test.deepEqual(new Context().compile(node).getTree(), JS.subscript(
             JS.ID('$foo'),
             JS.add(
                 JS.select(JS.ID('$foo'), 'length'),
-                JS.num('-1')))
+                JS.num('-1'))).getTree()
         );
         test.done();
     }

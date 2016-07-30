@@ -6,8 +6,7 @@
 "use strict";
 
 var Context = require('../../../codegen/Context');
-var JsKit = require('../../../codegen/JsKit');
-var JS = JsKit.parts;
+const JS = require('../../../codegen/JsPrimitives');
 var util = require('util');
 
 module.exports["message"] = {
@@ -24,7 +23,7 @@ module.exports["message"] = {
         };
 
         test.deepEqual(new Context().compile(node), JS.message(
-            JS.ID('$foo'), [], null, null)),
+            JS.ID('$foo'), [], null, null));
         test.done();
     },
 
@@ -96,14 +95,17 @@ module.exports["message"] = {
         };
 
         var scope = new Context();
-        scope.define('answer', '42');
+        scope.define('answer', JS.num('42'));
 
-        // test.deepEqual(scope.createInner().compile(node),
-        //     'task.sendMessage($foo, [$url], function (args) {var $bar;\n\n\n$bar = 42;\n}, null)');
+        // todo test where bar is defined in an outer scope (shouldn't declare again)
 
-        test.deepEqual(new Context().compile(node), JS.message(
-            JS.ID('$foo'), [JS.ID('$url')], JS.handler([]), null));
-        
+        var handler = JS.fnDef(['args'],
+            JS.varDeclaration('$bar').attach(
+            JS.stmt(JS.assign(JS.ID('$bar'), JS.num('42')))));
+
+        test.deepEqual(scope.createInner().compile(node), JS.message(
+            JS.ID('$foo'), [JS.ID('$url')], handler, null));
+
         test.done();
     }
 

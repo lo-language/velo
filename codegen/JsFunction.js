@@ -1,35 +1,37 @@
 /**
- * Created by spurcell on 6/25/16.
+ * Created by spurcell on 7/24/16.
  */
 
-const StmtList = require('./StmtList');
+const JS = require('./JsPrimitives');
 
 /**
+ * Models a JS function def so we can futz with it.
  *
- * @param params    list of param names
- * @param body      StmtList
+ * todo support providing a name for functions
+ *
+ * @param params    array of param names
+ * @param body          a JsStmt
  * @private
  */
-
 var __ = function (params, body) {
 
     this.params = params;
     this.body = body;
 };
 
+__.prototype.getBody = function () {
 
-/**
- * Renders the function with optional following statements appended to the bottom.
- */
-__.prototype.render = function (following) {
-
-    return ['fnDef', this.params, this.body.render()];
+    return this.body;
 };
 
-/**
- *
- * @returns {__}
- */
-__.DEFAULT_FAIL_HANDLER = new __(['err'], StmtList.createFail([]));
+__.prototype.getAst = function () {
+
+    return JS.fnDef(this.params, this.body);
+};
+
+__.prototype.getTree = function () {
+
+    return this.getAst().getTree();
+};
 
 module.exports = __;

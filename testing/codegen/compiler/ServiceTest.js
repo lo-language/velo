@@ -6,8 +6,7 @@
 "use strict";
 
 var Context = require('../../../codegen/Context');
-var JsKit = require('../../../codegen/JsKit');
-var JS = JsKit.parts;
+const JS = require('../../../codegen/JsPrimitives');
 var util = require('util');
 
 module.exports["service"] = {
@@ -38,9 +37,11 @@ module.exports["service"] = {
 
         ]);
 
-        test.equal(new Context().compile(node),
-            'function (task) {var $recur = task.service;\nvar $next, $result;\n\n$next = task.args[0];\n\n' +
-            'task.sendMessage($bar, [42], function (res) {\nvar P0 = res ? res[0] : null;\n$result *= P0;\n}, null);\n\n}');
+        test.equal(new Context().compile(node).getTree(), result);
+
+        // test.equal(new Context().compile(node),
+        //     'function (task) {var $recur = task.service;\nvar $next, $result;\n\n$next = task.args[0];\n\n' +
+        //     'task.sendMessage($bar, [42], function (res) {\nvar P0 = res ? res[0] : null;\n$result *= P0;\n}, null);\n\n}');
         test.done();
     }
 };

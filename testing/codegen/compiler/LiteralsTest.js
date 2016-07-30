@@ -7,8 +7,7 @@
 
 var Compiler = require('../../../codegen/Compiler');
 var Context = require('../../../codegen/Context');
-var JsKit = require('../../../codegen/JsKit');
-var JS = JsKit.parts;
+const JS = require('../../../codegen/JsPrimitives');
 var util = require('util');
 
 module.exports["literals"] = {
@@ -17,7 +16,7 @@ module.exports["literals"] = {
 
         var node = {type: 'nil'};
 
-        test.deepEqual(new Context().compile(node), JS.NULL);
+        test.deepEqual(new Context().compile(node).getTree(), JS.NULL.getTree());
         test.done();
     },
 
@@ -25,7 +24,7 @@ module.exports["literals"] = {
 
         var node = {type: 'boolean', val: true};
 
-        test.deepEqual(new Context().compile(node), JS.bool('true'));
+        test.deepEqual(new Context().compile(node).getTree(), JS.bool('true').getTree());
         test.done();
     },
 
@@ -33,7 +32,7 @@ module.exports["literals"] = {
 
         var node = {type: 'number', val: '42'};
 
-        test.deepEqual(new Context().compile(node), JS.num('42'));
+        test.deepEqual(new Context().compile(node).getTree(), JS.num('42').getTree());
         test.done();
     },
 
@@ -41,7 +40,7 @@ module.exports["literals"] = {
 
         var node = {type: 'string', val: "turanga leela"};
 
-        test.deepEqual(new Context().compile(node), JS.string('turanga leela'));
+        test.deepEqual(new Context().compile(node).getTree(), JS.string('turanga leela').getTree());
         test.done();
     },
 
@@ -55,7 +54,8 @@ module.exports["literals"] = {
                     { type: 'string', val: 'padme' },
                     { type: 'string', val: 'hum' } ] };
 
-        test.deepEqual(new Context().compile(node), JS.arrayLiteral([JS.string('foo'), JS.string('mani'), JS.string('padme'), JS.string('hum')]));
+        test.deepEqual(new Context().compile(node).getTree(),
+            JS.arrayLiteral([JS.string('foo'), JS.string('mani'), JS.string('padme'), JS.string('hum')]).getTree());
         test.done();
     },
 
@@ -69,12 +69,12 @@ module.exports["literals"] = {
                     { type: 'string', val: 'padme' },
                     { type: 'string', val: 'hum' } ] };
 
-        test.deepEqual(new Context().compile(node), JS.objLiteral([
+        test.deepEqual(new Context().compile(node).getTree(), JS.objLiteral([
             [JS.string('foo'), JS.bool(true)],
             [JS.string('mani'), JS.bool(true)],
             [JS.string('padme'), JS.bool(true)],
             [JS.string('hum'), JS.bool(true)]
-        ]));
+        ]).getTree());
         test.done();
     },
 
@@ -96,12 +96,12 @@ module.exports["literals"] = {
                         key: { type: 'string', val: 'Trillian' },
                         value: { type: 'string', val: 'Earth' } } ] };
 
-        test.deepEqual(new Context().compile(node), JS.objLiteral([
+        test.deepEqual(new Context().compile(node).getTree(), JS.objLiteral([
             [JS.string('Zaphod'), JS.string('Betelgeuse')],
             [JS.string('Ford'), JS.string('Betelgeuse')],
             [JS.string('Arthur'), JS.string('Earth')],
             [JS.string('Trillian'), JS.string('Earth')]
-        ]));
+        ]).getTree());
         
         test.done();
     },
@@ -124,12 +124,12 @@ module.exports["literals"] = {
                         key: { type: 'string', val: 'Trillian' },
                         value: { type: 'string', val: 'Earth' } } ] };
 
-        test.deepEqual(new Context().compile(node), JS.objLiteral([
+        test.deepEqual(new Context().compile(node).getTree(), JS.objLiteral([
             [JS.string('Zaphod'), JS.string('Betelgeuse')],
             [JS.string('Ford'), JS.string('Betelgeuse')],
             [JS.string('Arthur'), JS.string('Earth')],
             [JS.string('Trillian'), JS.string('Earth')]
-        ]));
+        ]).getTree());
 
         test.done();
     }

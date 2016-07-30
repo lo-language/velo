@@ -6,8 +6,7 @@
 "use strict";
 
 var Context = require('../../../codegen/Context');
-var JsKit = require('../../../codegen/JsKit');
-var JS = JsKit.parts;
+const JS = require('../../../codegen/JsPrimitives');
 var util = require('util');
 
 module.exports["slice"] = {
@@ -21,9 +20,9 @@ module.exports["slice"] = {
             end: {type: 'number', val: '3'},
         };
 
-        test.deepEqual(new Context().compile(node), JS.fnCall(
+        test.deepEqual(new Context().compile(node).getTree(), JS.fnCall(
             JS.select(JS.ID('$foo'), 'slice'),
-            [JS.num('1'), JS.add(JS.num('3'), JS.num('1'))]));
+            [JS.num('1'), JS.add(JS.num('3'), JS.num('1'))]).getTree());
 
         test.done();
     },
@@ -35,9 +34,9 @@ module.exports["slice"] = {
             list: {type: 'id', name: 'foo'},
         };
 
-        test.deepEqual(new Context().compile(node), JS.fnCall(
+        test.deepEqual(new Context().compile(node).getTree(), JS.fnCall(
             JS.select(JS.ID('$foo'), 'slice'),
-            [JS.num('0')]));
+            [JS.num('0')]).getTree());
 
         test.done();
     },
@@ -51,9 +50,9 @@ module.exports["slice"] = {
             end: {type: 'number', val: '-1'}
         };
 
-        test.deepEqual(new Context().compile(node), JS.fnCall(
+        test.deepEqual(new Context().compile(node).getTree(), JS.fnCall(
             JS.select(JS.ID('$foo'), 'slice'),
-            [JS.num('-3'), JS.add(JS.num('-1'), JS.num('1'))]));
+            [JS.num('-3'), JS.add(JS.num('-1'), JS.num('1'))]).getTree());
 
         test.done();
     }

@@ -6,8 +6,7 @@
 "use strict";
 
 var Context = require('../../../codegen/Context');
-var JsKit = require('../../../codegen/JsKit');
-var JS = JsKit.parts;
+const JS = require('../../../codegen/JsPrimitives');
 var util = require('util');
 
 module.exports["select"] = {
@@ -24,10 +23,10 @@ module.exports["select"] = {
             "right":"!"
         };
 
-        test.deepEqual(new Context().compile(node), JS.add(
+        test.deepEqual(new Context().compile(node).getTree(), JS.add(
             JS.add(JS.string('hello, '), JS.ID('$name')),
             JS.string('!')
-        ));
+        ).getTree());
         test.done();
     },
 
@@ -51,7 +50,7 @@ module.exports["select"] = {
             "right":"."
         };
 
-        test.deepEqual(new Context().compile(node), JS.add(
+        test.deepEqual(new Context().compile(node).getTree(), JS.add(
             JS.add(
                 JS.string("I'm sorry, "),
                 JS.add(
@@ -60,7 +59,7 @@ module.exports["select"] = {
                 )
             ),
             JS.string('.')
-        ));
+        ).getTree());
 
         test.done();
     },
@@ -103,7 +102,7 @@ module.exports["select"] = {
                         JS.ID('$c')))),
             JS.string('.'));
 
-        test.deepEqual(new Context().compile(node), exp);
+        test.deepEqual(new Context().compile(node).getTree(), exp.getTree());
         test.done();
     }
 };

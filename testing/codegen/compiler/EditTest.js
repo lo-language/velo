@@ -5,11 +5,11 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
-var Context = require('../../../codegen/Context');
-var JsKit = require('../../../codegen/JsKit');
-var JS = JsKit.parts;
-var util = require('util');
+const Compiler = require('../../../codegen/Compiler');
+const Context = require('../../../codegen/Context');
+const JS = require('../../../codegen/JsPrimitives');
+const JsStmt = require('../../../codegen/JsStmt');
+const util = require('util');
 
 module.exports["basics"] = {
 
@@ -20,7 +20,7 @@ module.exports["basics"] = {
             "operand":{type: "id", name: "bar"}
         };
 
-        test.deepEqual(new Context().compile(node), JS.stmt(JS.inc(JS.ID('$bar'))));
+        test.deepEqual(new Context().compile(node).getTree(), new JsStmt(JS.inc(JS.ID('$bar'))).getTree());
         test.done();
     },
 
@@ -31,7 +31,7 @@ module.exports["basics"] = {
             "operand":{type: "id", name: "bar"}
         };
 
-        test.deepEqual(new Context().compile(node), JS.stmt(JS.dec(JS.ID('$bar'))));
+        test.deepEqual(new Context().compile(node).getTree(), new JsStmt(JS.dec(JS.ID('$bar'))).getTree());
         test.done();
     },
 
@@ -46,7 +46,7 @@ module.exports["basics"] = {
             }
         };
 
-        test.deepEqual(new Context().compile(node), JS.stmt(JS.inc(JS.subscript(JS.ID('$bar'), JS.num('1')))));
+        test.deepEqual(new Context().compile(node).getTree(), new JsStmt(JS.inc(JS.subscript(JS.ID('$bar'), JS.num('1')))).getTree());
         test.done();
     },
 };

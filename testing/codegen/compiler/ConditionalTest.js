@@ -6,7 +6,6 @@
 "use strict";
 
 var Compiler = require('../../../codegen/Compiler');
-var JsConstruct = require('../../../codegen/JsConstruct');
 var Context = require('../../../codegen/Context');
 var util = require('util');
 

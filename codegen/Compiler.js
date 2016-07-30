@@ -22,10 +22,11 @@
 
 'use strict';
 
-const Call = require('./Call');
+const JsFunction = require('./JsFunction');
 const Future = require('./Future');
-const JsKit = require('./JsKit');
-const JS = JsKit.parts;
+const JS = require('./JsPrimitives');
+const JsStmt = require('./JsStmt');
+const Request = require('./Request');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -49,7 +50,7 @@ module.exports['module'] = function (node) {
     // wrap our service constant definitions in a scope to prevent collisions with other modules
     // export our constants via a return statement
 
-    return JS.fnDef([], JS.strictMode().attach(JS.return(returnVal)));
+    return new JsFunction([], JS.strictMode().attach(JS.return(returnVal)));
 
     // return new JsConstruct([
     //     "function () {\n\n'use strict';\n\n",
@@ -83,15 +84,10 @@ module.exports['procedure'] = function (node) {
     // maybe split these up?
     // if we have a channel we're a handler with args instead of a task
     // todo could drop this if services took an 'args' arg rather than putting them in the task
-    var argList = node.channel ? 'args' : 'task.args';
+    var argList = node.channel ? JS.ID('args') : JS.select(JS.ID('task'), 'args');
 
-    // process params
-    var params = node.params.map(function (name, index) {
-
-            local.declare(name);
-            return '$' + name + ' = ' + argList + '[' + index + '];\n';
-
-        }).join('') + '\n';
+    // load params into symbol table
+    node.params.forEach(name => local.declare(name));
 
     // compile the statement(s) in the context of the local scope
     var body = local.compile(node.body);
@@ -100,18 +96,46 @@ module.exports['procedure'] = function (node) {
     var localVars = local.getJsVars();
 
     // declare our local vars
-    var statements = [
-        localVars.length > 0 ? 'var ' + localVars.join(', ') + ';\n\n' : '',
-        params, body];
+    var preamble = null;
+
+    localVars.forEach(varName => {
+
+        var decl = new JsStmt.varDecl(varName);
+
+        if (preamble) {
+            console.log(preamble);
+            preamble.attach(decl);
+        }
+        else {
+            preamble = decl;
+        }
+    });
+
+    // bind values to our params
+    node.params.forEach((paramName, index) => {
+
+        var assignment = new JsStmt(JS.assign(JS.ID('$' + paramName), JS.subscript(argList, JS.num(String(index)))));
+
+        if (preamble) {
+            preamble.attach(assignment);
+        }
+        else {
+            preamble = assignment;
+        }
+    });
 
     // todo only include recur where it's referenced (or just remove this feature)
     if (node.channel == null) {
-        statements.unshift('var $recur = task.service;\n');
+        // statements.unshift('var $recur = task.service;\n');
+    }
+
+    if (preamble) {
+        body = preamble.attach(body);
     }
 
     // implements an exa service as a JS function that takes a task
     // if a service, squash the construct?
-    return JS.fnDef([(node.channel ? 'args' : 'task')], statements);
+    return new JsFunction([(node.channel ? 'args' : 'task')], body);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,15 +169,13 @@ module.exports['response'] = function (node) {
 
     var args = JS.arrayLiteral(node.args.map(arg => this.compile(arg)));
 
-    return JS.stmt(
-        JS.runtimeCall('respond', [JS.string(node.channel), args])
-    ).attach(JS.return());
+    return new JsStmt(JS.runtimeCall('respond', [JS.string(node.channel), args])).attach(JsStmt.return());
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * An assignment may alter the current scope by defining a variable in it if the LHS of the assign
- * is an identifier.
+ * There are no explicit declarations right now, so assignment may alter the current scope by
+ * defining a variable in it if the LHS of the assign is an identifier.
  *
  * @param node
  */
@@ -187,7 +209,7 @@ module.exports['assign'] = function (node) {
         }
     }
 
-    return JS.stmt(JS.assign(left, right));
+    return new JsStmt(JS.assign(left, right));
 
     // this was genius
     // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP
@@ -241,7 +263,7 @@ module.exports['conditional'] = function (node) {
     var jsCond = JS.condStmt(predicate, consequent, negBlock);
 
     if (async) {
-        return JS.stmt(JS.varDeclaration(JS.ID(contName), JS.fnDef([])));
+        return new JsStmt(JS.varDeclaration(JS.ID(contName), JS.fnDef([])));
 
         // return JsConstruct.makeStatement(['var ' + contName + ' = function () {'], ['};'].concat(parts));
     }
@@ -303,17 +325,10 @@ module.exports['message'] = function (node) {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module.exports['application_stmt'] = function (node) {
-
-    return JS.stmt(this.compile(node.application));
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Application
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * todo this is exactly the same as dispatch now except for the return expr
+ * todo - this is exactly the same as dispatch now except for the return expr
  * @param node
  */
 module.exports['application'] = function (node) {
@@ -327,8 +342,14 @@ module.exports['application'] = function (node) {
     var subsequent = node.subsequent ? this.compile(node.subsequent) : null;
     var contingency = node.contingency ? this.compile(node.contingency) : null;
 
-    // return a wrapped placeholder
-    return new Call(target, args, subsequent, contingency);
+    // get a placeholder from the context
+    return this.pushBlocker(new Request(target, args, subsequent, contingency));
+};
+
+
+module.exports['application_stmt'] = function (node) {
+
+    return new JsStmt(this.compile(node.application));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -377,6 +398,7 @@ module.exports['id'] = function (node) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * Compile a constant definition statement.
  *
  * @param node
  * @return {String}
@@ -389,13 +411,13 @@ module.exports['constant'] = function (node) {
 
         var id = '$' + node.name;
         this.define(node.name, JS.ID(id));
-        return new JsConstruct.makeStatement(["const ", id, " = ", this.compile(node.value), ';']);
+        return new JsStmt.constDecl(id, this.compile(node.value));
     }
 
     this.define(node.name, this.compile(node.value));
 
-    // return an empty construct to allow attachment
-    return JS.empty();
+    // return an empty statement to allow attachment
+    return new JsStmt(JS.EMPTY);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -579,7 +601,7 @@ module.exports['op'] = function (node) {
     switch (op) {
 
         case 'concat':
-            return JS.fnCall(JS.select(JS.ID('task'), 'concat'), [left, right]);
+            return JS.runtimeCall('concat', [left, right]);
 
         case 'and':
             return JS.logicalAnd(left, right);
@@ -705,10 +727,10 @@ module.exports['dynastring'] = function (node) {
 
 module.exports['increment'] = function (node) {
 
-    return JS.stmt(JS.inc(this.compile(node.operand)));
+    return new JsStmt(JS.inc(this.compile(node.operand)));
 };
 
 module.exports['decrement'] = function (node) {
 
-    return JS.stmt(JS.dec(this.compile(node.operand)));
+    return new JsStmt(JS.dec(this.compile(node.operand)));
 };

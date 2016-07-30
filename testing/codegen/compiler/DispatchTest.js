@@ -5,8 +5,10 @@
 
 "use strict";
 
-var Context = require('../../../codegen/Context');
-var util = require('util');
+const Context = require('../../../codegen/Context');
+const JS = require('../../../codegen/JsPrimitives');
+const JsStmt = require('../../../codegen/JsStmt');
+const util = require('util');
 
 module.exports["dispatch"] = {
 
@@ -36,8 +38,11 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.equal(new Context().compile(node).render(),
-            'task.sendMessage($foo, [], function (args) {var $foo;\n\n\n$foo = 42;\n}, null)');
+        var handler = JS.fnDef(['args'],
+            JS.varDecl('$foo').attach(
+                new JsStmt(JS.assign(JS.ID('$foo'), JS.num('42')))));
+
+        test.deepEqual(new Context().compile(node), JS.message(JS.ID('$foo'), [], handler, null));
         test.done();
     },
 
@@ -67,8 +72,11 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.equal(new Context().compile(node).render(),
-            'task.sendMessage($foo, [], null, function (args) {var $foo;\n\n\n$foo = 42;\n})');
+        var handler = JS.fnDef(['args'],
+            JS.varDecl('$foo').attach(
+                JS.stmt(JS.assign(JS.ID('$foo'), JS.num('42')))));
+
+        test.deepEqual(new Context().compile(node), JS.message(JS.ID('$foo'), [], null, handler));
         test.done();
     },
 
@@ -113,8 +121,15 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.equal(new Context().compile(node).render(),
-            'task.sendMessage($foo, [], function (args) {var $foo;\n\n\n$foo = 42;\n}, function (args) {var $bar;\n\n\n$bar = 57;\n})');
+        var replyHandler = JS.fnDef(['args'],
+            JS.varDecl('$foo').attach(
+                JS.stmt(JS.assign(JS.ID('$foo'), JS.num('42')))));
+
+        var failHandler = JS.fnDef(['args'],
+            JS.varDecl('$bar').attach(
+                JS.stmt(JS.assign(JS.ID('$bar'), JS.num('57')))));
+
+        test.deepEqual(new Context().compile(node), JS.message(JS.ID('$foo'), [], replyHandler, failHandler));
         test.done();
     }
 };
