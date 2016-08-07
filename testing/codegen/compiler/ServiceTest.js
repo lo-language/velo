@@ -31,13 +31,22 @@ module.exports["service"] = {
                 tail: null}
         };
 
-        // create a higher-level 'service' construct?
+        var result = [ 'function',
+            [ 'task' ],
+            [ 'stmtList',
+                [ 'var', '$next' ],
+                [ 'stmtList',
+                    [ 'var', '$result' ],
+                    [ 'stmtList',
+                        [ 'assign', '=',
+                            [ 'id', '$next' ],
+                            [ 'subscript',
+                                [ 'select', [ 'id', 'task' ], 'args' ],
+                                [ 'num', '0' ] ] ],
+                        [ 'stmtList',
+                            [ 'assign', '*=', [ 'id', '$result' ], [ 'id', 'P0' ] ] ] ] ] ] ];
 
-        var result = JS.fnDef([JS.ID('task')], [
-
-        ]);
-
-        test.equal(new Context().compile(node).getTree(), result);
+        test.deepEqual(new Context().compile(node).getTree(), result);
 
         // test.equal(new Context().compile(node),
         //     'function (task) {var $recur = task.service;\nvar $next, $result;\n\n$next = task.args[0];\n\n' +

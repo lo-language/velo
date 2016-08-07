@@ -137,7 +137,7 @@ module.exports["compile with no deps"] = {
 
         mod.compileSelf().then(function (result) {
 
-            test.equal(result.render(),
+            test.equal(result.getJs(),
                 "function () {\n\n'use strict';\n\n\n\nreturn {};\n}");
 
             test.done();
@@ -150,7 +150,7 @@ module.exports["compile with no deps"] = {
 
         mod.compileSelf().then(function (result) {
             
-            test.equal(result.render(),
+            test.equal(result.getJs(),
                 "function () {\n\n'use strict';\n\nconst $foo = " +
                 "function (task) {var $recur = task.service;\nvar $x;\n\n\n$x = 42;\n};\n\nreturn {\"foo\": \$foo\};\n}");
 
@@ -164,7 +164,7 @@ module.exports["compile with no deps"] = {
 
         mod.compileSelf().then(function (result) {
 
-            test.equal(result.render(),
+            test.equal(result.getJs(),
                 "function () {\n\n'use strict';\n\n" +
                 "const $foo = function (task) {var $recur = task.service;\nvar $x;\n\n\n$x = 42;\n};\n\n" +
                 "const $bar = function (task) {var $recur = task.service;\nvar $a;\n\n\n$a = 57;\n};\n\n" +
@@ -194,7 +194,7 @@ module.exports["compile with deps"] = {
 
         mod.compileSelf(program).then(function (result) {
 
-            test.equal(result.render(),
+            test.equal(result.getJs(),
                 "function () {\n\n'use strict';\n\n\n\nreturn {};\n}");
 
             test.done();
@@ -217,7 +217,7 @@ module.exports["compile with deps"] = {
 
         mod.compileSelf(program).then(function (result) {
 
-            test.equal(result.render(),
+            test.equal(result.getJs(),
                 "function () {\n\n'use strict';\n\n" +
                 "const $foo = function (task) {var $recur = task.service;\n" +
                 "var $x;\n\n\n$x = 42;\n};\n\n" +
@@ -233,7 +233,7 @@ module.exports["compile with deps"] = {
     //
     //     mod.compile().then(function (result) {
     //
-    //         test.equal(result.render(),
+    //         test.equal(result.getJs(),
     //             "function () {\n\n'use strict';\n\n" +
     //             "const $foo = function (task) {var $recur = task.service;\nvar $x;\n\n\n$x = 42;\n};\n\n" +
     //             "const $bar = function (task) {var $recur = task.service;\nvar $a;\n\n\n$a = 57;\n};\n\n" +

@@ -293,20 +293,20 @@ module.exports["placeholders"] = {
         test.done();
     },
 
-    "create statement with one wrapper": function (test) {
-
-        var context = new Context();
-
-        context.pushBlocker(new Request(JS.ID('$foo'), []));
-
-        var handler = JS.fnDef('res', JS.stmtList(JS.add(JS.ID('$foo'), JS.num('17'))));
-        
-        test.deepEqual(
-            context.createStmt(JS.add(JS.ID('$foo'), JS.num('17'))).getTree(),
-            new Request(JS.ID('$foo'), [], handler).getTree());
-
-        test.done();
-    },
+    // "create statement with one wrapper": function (test) {
+    //
+    //     var context = new Context();
+    //
+    //     context.pushBlocker(new Request(JS.ID('$foo'), []));
+    //
+    //     var handler = JS.fnDef('res', JS.stmtList(JS.add(JS.ID('$foo'), JS.num('17'))));
+    //
+    //     test.deepEqual(
+    //         context.createStmt(JS.add(JS.ID('$foo'), JS.num('17'))).getTree(),
+    //         new Request(JS.ID('$foo'), [], handler).getTree());
+    //
+    //     test.done();
+    // },
 
     // "create statement with two wrappers": function (test) {
     //

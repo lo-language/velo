@@ -80,61 +80,33 @@ __.prototype.attach = function (stmt) {
     return this;
 };
 
-/**
- * Returns the JS AST for this statement and all following statements. Flattens embedded statements.
- *
- * @returns {*}
- */
-__.prototype.getAst = function () {
+__.prototype._getAst = function () {
 
-    if (this.next) {
-        return JS.stmtList(this.ast, this.next.getAst());
-    }
-
-    // a statement always renders as a statement list
-    return JS.stmtList(this.ast);
+    return JS.stmtList(this.ast, this.next ? this.next._getAst() : null);
 };
 
 __.prototype.getTree = function () {
 
-    return this.getAst().getTree();
+    return this._getAst().getTree();
 };
 
+__.prototype.getJs = function () {
 
-/**
- * Flattens any statements in an AST down to AST.
- *
- * @param item
- * @returns {*}
- */
-// __.flatten = function (item) {
-//
-//     if (Array.isArray(item)) {
-//         return item.map(bit => __.flatten(bit));
-//     }
-//
-//     if (typeof item === 'object' && item instanceof __) {
-//         return item.getAst();
-//     }
-//
-//     return item;
-// };
+    return this._getAst().getJs();
+};
 
 // off-the-shelf statements
 
-__.varDecl = function (name, val) {
+__.strictMode   = function () { return new __(JS.USE_STRICT); };
 
-    return new __(JS.varDecl(name, val));
-};
+__.varDecl      = function (name, val) { return new __(JS.varDecl(name, val)); };
 
-__.constDecl = function (name, val) {
+__.constDecl    = function (name, val) { return new __(JS.constDecl(name, val)); };
 
-    return new __(JS.constDecl(name, val));
-};
+__.return       = function (expr) { return new __(JS.return(expr), true, true); };
 
-__.return = function (expr) {
+__.cond         = function (predicate, consequent, alternate) { return new __(JS.cond(predicate, consequent, alternate)); };
 
-    return new __(JS.return(expr), true);
-};
+__.while        = function (condition, body) { return new __(JS.while(condition, body)); };
 
 module.exports = __;

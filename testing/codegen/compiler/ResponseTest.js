@@ -5,10 +5,10 @@
 
 "use strict";
 
-var Context = require('../../../codegen/Context');
+const Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
-var util = require('util');
-var JsStmt = require('../../../codegen/JsStmt');
+const util = require('util');
+const JsStmt = require('../../../codegen/JsStmt');
 
 module.exports["response"] = {
 
@@ -19,9 +19,9 @@ module.exports["response"] = {
             channel: 'reply',
             args: []};
 
-        test.deepEqual(new Context().compile(node).getAst(),
+        test.deepEqual(new Context().compile(node).getTree(),
             new JsStmt(JS.runtimeCall('respond', [JS.string('reply'), JS.arrayLiteral([])]))
-                .attach(JsStmt.return()).getAst());
+                .attach(JsStmt.return()).getTree());
         test.done();
     },
 
@@ -34,9 +34,9 @@ module.exports["response"] = {
                 {type: 'number', val: '42'}
             ]};
 
-        test.deepEqual(new Context().compile(node).getAst(),
+        test.deepEqual(new Context().compile(node).getTree(),
             new JsStmt(JS.runtimeCall('respond', [JS.string('reply'), JS.arrayLiteral([JS.num('42')])]))
-                .attach(JsStmt.return()).getAst());
+                .attach(JsStmt.return()).getTree());
         test.done();
     },
 
@@ -50,9 +50,9 @@ module.exports["response"] = {
                 {type: 'string', val: "hot dog!"}
             ]};
 
-        test.deepEqual(new Context().compile(node).getAst(),
+        test.deepEqual(new Context().compile(node).getTree(),
             new JsStmt(JS.runtimeCall('respond', [JS.string('reply'), JS.arrayLiteral([JS.num('42'), JS.string("hot dog!")])]))
-                .attach(JsStmt.return()).getAst());
+                .attach(JsStmt.return()).getTree());
         test.done();
     },
 
@@ -65,9 +65,9 @@ module.exports["response"] = {
                 {type: 'number', val: '42'}
             ]};
 
-        test.deepEqual(new Context().compile(node).getAst(),
+        test.deepEqual(new Context().compile(node).getTree(),
             new JsStmt(JS.runtimeCall('respond', [JS.string('fail'), JS.arrayLiteral([JS.num('42')])]))
-                .attach(JsStmt.return()).getAst());
+                .attach(JsStmt.return()).getTree());
         test.done();
     }
 };

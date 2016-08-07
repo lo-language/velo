@@ -39,10 +39,10 @@ module.exports["dispatch"] = {
         };
 
         var handler = JS.fnDef(['args'],
-            JS.varDecl('$foo').attach(
+            JsStmt.varDecl('$foo').attach(
                 new JsStmt(JS.assign(JS.ID('$foo'), JS.num('42')))));
 
-        test.deepEqual(new Context().compile(node), JS.message(JS.ID('$foo'), [], handler, null));
+        test.deepEqual(new Context().compile(node).getTree(), JS.message(JS.ID('$foo'), [], handler, null).getTree());
         test.done();
     },
 
@@ -73,10 +73,10 @@ module.exports["dispatch"] = {
         };
 
         var handler = JS.fnDef(['args'],
-            JS.varDecl('$foo').attach(
-                JS.stmt(JS.assign(JS.ID('$foo'), JS.num('42')))));
+            JsStmt.varDecl('$foo').attach(
+                new JsStmt(JS.assign(JS.ID('$foo'), JS.num('42')))));
 
-        test.deepEqual(new Context().compile(node), JS.message(JS.ID('$foo'), [], null, handler));
+        test.deepEqual(new Context().compile(node).getTree(), JS.message(JS.ID('$foo'), [], null, handler).getTree());
         test.done();
     },
 
@@ -122,14 +122,14 @@ module.exports["dispatch"] = {
         };
 
         var replyHandler = JS.fnDef(['args'],
-            JS.varDecl('$foo').attach(
-                JS.stmt(JS.assign(JS.ID('$foo'), JS.num('42')))));
+            JsStmt.varDecl('$foo').attach(
+                new JsStmt(JS.assign(JS.ID('$foo'), JS.num('42')))));
 
         var failHandler = JS.fnDef(['args'],
-            JS.varDecl('$bar').attach(
-                JS.stmt(JS.assign(JS.ID('$bar'), JS.num('57')))));
+            JsStmt.varDecl('$bar').attach(
+                new JsStmt(JS.assign(JS.ID('$bar'), JS.num('57')))));
 
-        test.deepEqual(new Context().compile(node), JS.message(JS.ID('$foo'), [], replyHandler, failHandler));
+        test.deepEqual(new Context().compile(node).getTree(), JS.message(JS.ID('$foo'), [], replyHandler, failHandler).getTree());
         test.done();
     }
 };

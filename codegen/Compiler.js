@@ -37,20 +37,18 @@ const Request = require('./Request');
 module.exports['module'] = function (node) {
 
     var defs = node.definitions.map(def => {
-        return this.compile(def).render();
-    }).join("\n\n");
+        return this.compile(def);
+    });
+
+    console.log(defs[0].getJs());
 
     var exports = this.getExports();
-
-    var returnVal = JS.objLiteral(Object.keys(exports).map(function (name) {
-
-            return [JS.string(name), exports[name]];
-        }));
+    var pairs = Object.keys(exports).map(name => [JS.string(name), exports[name]]);
 
     // wrap our service constant definitions in a scope to prevent collisions with other modules
     // export our constants via a return statement
 
-    return new JsFunction([], JS.strictMode().attach(JS.return(returnVal)));
+    return new JsFunction([], JsStmt.strictMode().attach(JsStmt.return(JS.objLiteral(pairs))));
 
     // return new JsConstruct([
     //     "function () {\n\n'use strict';\n\n",
@@ -103,7 +101,6 @@ module.exports['procedure'] = function (node) {
         var decl = new JsStmt.varDecl(varName);
 
         if (preamble) {
-            console.log(preamble);
             preamble.attach(decl);
         }
         else {
@@ -209,7 +206,7 @@ module.exports['assign'] = function (node) {
         }
     }
 
-    return new JsStmt(JS.assign(left, right));
+    return new JsStmt(JS.assign(left, right, node.op));
 
     // this was genius
     // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP
@@ -260,10 +257,10 @@ module.exports['conditional'] = function (node) {
         // negBlock.attach(cont.call());
     }
 
-    var jsCond = JS.condStmt(predicate, consequent, negBlock);
+    var jsCond = JsStmt.cond(predicate, consequent, negBlock);
 
     if (async) {
-        return new JsStmt(JS.varDeclaration(JS.ID(contName), JS.fnDef([])));
+        return new JsStmt(JS.varDecl(JS.ID(contName), JS.fnDef([])));
 
         // return JsConstruct.makeStatement(['var ' + contName + ' = function () {'], ['};'].concat(parts));
     }
@@ -284,7 +281,7 @@ module.exports['iteration'] = function (node) {
 
     // can render as a while loop if body isn't async
     if (!(body.async)) {
-        return JS.while(condition, body);
+        return JsStmt.while(condition, body);
     }
 
     // join the body to the wrapper function via setImmediate to form the loop in a way that won't break the stack

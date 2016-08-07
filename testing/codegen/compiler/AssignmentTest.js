@@ -35,14 +35,17 @@ module.exports["assignment"] = {
 
         var node = {
             type: 'assign',
-            op: '=',
+            op: '*=',
             left: {type: 'subscript', list: {type: 'id', name: 'foo'}, index: {type: 'id', name: 'bar'}},
             right: {type: 'number', val: '57'}
         };
 
         var context = new Context().createInner();
 
-        test.deepEqual(context.compile(node).getTree(), new JsStmt(JS.assign(JS.subscript(JS.ID('$foo'), JS.ID('$bar')), JS.num('57'))).getTree());
+        test.deepEqual(context.compile(node).getTree(),
+            new JsStmt(JS.assign(
+                JS.subscript(JS.ID('$foo'), JS.ID('$bar')),
+                JS.num('57'), '*=')).getTree());
         test.done();
     },
 

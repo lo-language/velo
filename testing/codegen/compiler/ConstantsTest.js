@@ -91,7 +91,6 @@ module.exports["constants"] = {
 
         test.equal(context.has('main'), true);
         test.ok(context.isConstant('main'));
-        console.log(context.resolve('main').getTree());
         test.deepEqual(context.resolve('main').getTree(), JS.ID("$main").getTree());
 
         test.done();

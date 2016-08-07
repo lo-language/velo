@@ -19,19 +19,26 @@ var __ = function (params, body) {
     this.body = body;
 };
 
+// enables appending to the body
 __.prototype.getBody = function () {
 
     return this.body;
 };
 
-__.prototype.getAst = function () {
+
+__.prototype._getAst = function () {
 
     return JS.fnDef(this.params, this.body);
 };
 
 __.prototype.getTree = function () {
 
-    return this.getAst().getTree();
+    return this._getAst().getTree();
+};
+
+__.prototype.getJs = function () {
+
+    return this._getAst().getJs();
 };
 
 module.exports = __;

@@ -5,9 +5,10 @@
 
 "use strict";
 
-var Context = require('../../../codegen/Context');
+const Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
-var util = require('util');
+const JsStmt = require('../../../codegen/JsStmt');
+const util = require('util');
 
 module.exports["message"] = {
 
@@ -22,8 +23,8 @@ module.exports["message"] = {
             }
         };
 
-        test.deepEqual(new Context().compile(node), JS.message(
-            JS.ID('$foo'), [], null, null));
+        test.deepEqual(new Context().compile(node).getTree(), JS.message(
+            JS.ID('$foo'), [], null, null).getTree());
         test.done();
     },
 
@@ -100,11 +101,11 @@ module.exports["message"] = {
         // todo test where bar is defined in an outer scope (shouldn't declare again)
 
         var handler = JS.fnDef(['args'],
-            JS.varDeclaration('$bar').attach(
-            JS.stmt(JS.assign(JS.ID('$bar'), JS.num('42')))));
+            JsStmt.varDecl('$bar').attach(
+            new JsStmt(JS.assign(JS.ID('$bar'), JS.num('42')))));
 
-        test.deepEqual(scope.createInner().compile(node), JS.message(
-            JS.ID('$foo'), [JS.ID('$url')], handler, null));
+        test.deepEqual(scope.createInner().compile(node).getTree(), JS.message(
+            JS.ID('$foo'), [JS.ID('$url')], handler, null).getTree());
 
         test.done();
     }

@@ -5,9 +5,10 @@
 
 "use strict";
 
-var Context = require('../../../codegen/Context');
+const Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
-var util = require('util');
+const JsStmt = require('../../../codegen/JsStmt');
+const util = require('util');
 
 module.exports["basics"] = {
 
@@ -21,35 +22,35 @@ module.exports["basics"] = {
 
         var a = new Context().createInner().compile(node);
 
-        test.deepEqual(a.getAst(),
+        test.deepEqual(a.getTree(),
             [ 'stmtList',
                 [ 'while',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
-                        [ 'assignment', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ]);
+                        [ 'assign', '=', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ]);
 
         // try attaching a statement – should get stuck on the end
-        a.attach(JS.stmt(JS.assign(JS.ID('$z'), JS.num('57'))));
+        a.attach(new JsStmt(JS.assign(JS.ID('$z'), JS.num('57'))));
 
-        test.deepEqual(a.getAst(), [ 'stmtList',
+        test.deepEqual(a.getTree(), [ 'stmtList',
             [ 'while',
                 [ 'id', '$foo' ],
                 [ 'stmtList',
-                    [ 'assignment', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ],
+                    [ 'assign', '=', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ],
             [ 'stmtList',
-                [ 'assignment', [ 'id', '$z' ], [ 'num', '57' ] ] ] ]);
+                [ 'assign', '=', [ 'id', '$z' ], [ 'num', '57' ] ] ] ]);
 
         // try attaching another statement
-        a.attach(JS.varDeclaration('bee'));
+        a.attach(JsStmt.varDecl('bee'));
 
-        test.deepEqual(a.getAst(), [ 'stmtList',
+        test.deepEqual(a.getTree(), [ 'stmtList',
             [ 'while',
                 [ 'id', '$foo' ],
                 [ 'stmtList',
-                    [ 'assignment', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ],
+                    [ 'expr-stmt' [ 'assign', '=', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ],
             [ 'stmtList',
-                [ 'assignment', [ 'id', '$z' ], [ 'num', '57' ] ],
-                [ 'stmtList', [ 'varDeclaration', 'bee' ] ] ] ]);
+                [ 'expr-stmt' [ 'assign', '=', [ 'id', '$z' ], [ 'num', '57' ] ] ],
+                [ 'stmtList', [ 'var', 'bee' ] ] ] ]);
 
         test.done();
     },
@@ -73,21 +74,21 @@ module.exports["basics"] = {
     //
     //     var a = new Context().createInner().compile(node);
     //
-    //     test.equal(a.getAst(),
+    //     test.equal(a.getTree(),
     //         'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
     //         'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {}};\n\nloop();\n');
     //
     //     // try attaching a statement
     //     a.attach(new JsConstruct("var z = 57;"));
     //
-    //     test.equal(a.getAst(),
+    //     test.equal(a.getTree(),
     //         'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
     //         'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;}};\n\nloop();\n');
     //
     //     // try attaching another statement
     //     a.attach(new JsConstruct("var bee = 27;"));
     //
-    //     test.equal(a.getAst(),
+    //     test.equal(a.getTree(),
     //         'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
     //         'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
     //

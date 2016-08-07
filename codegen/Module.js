@@ -157,4 +157,11 @@ __.prototype.resolveExternal = function (name, qualifier) {
     return this.deps[qualifier].resolveToGlobal(name);
 };
 
+/**
+ * Renders JS for this module.
+ */
+__.prototype.getJs = function () {
+
+};
+
 module.exports = __;

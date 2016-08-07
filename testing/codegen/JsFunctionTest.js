@@ -2,8 +2,8 @@
  * Created by spurcell on 7/30/16.
  */
 
+const JS = require('../../codegen/JsPrimitives');
 const JsFunction = require('../../codegen/JsFunction');
-const JS = require('../../codegen/JsKit');
 
 module.exports["basics"] = {
 
