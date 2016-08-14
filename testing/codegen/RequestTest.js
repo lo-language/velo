@@ -37,6 +37,7 @@ module.exports["blocking"] = {
                 [ [ 'id', '$foo' ],
                     [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
                     [ 'function',
+                        null,
                         [ 'res' ],
                         [ 'stmtList', [ 'assign', [ 'id', 'baz' ], [ 'num', '57' ] ] ] ] ] ]);
 
@@ -54,9 +55,7 @@ module.exports["blocking"] = {
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ],
                     [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
-                    [ 'function',
-                        [ ],
-                        [ 'stmtList', [ 'return' ] ] ] ] ]);
+                    [ 'function', null, [], [ 'stmtList', [ 'return' ] ] ] ] ]);
         test.done();
     },
 

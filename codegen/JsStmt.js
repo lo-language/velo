@@ -42,7 +42,7 @@ var __ = function (ast, final) {
 };
 
 /**
- * Returns true if this statement list is capped (ends in a return).
+ * Returns true if this statement list is final (ends in a return).
  *
  * isCapped? isFixed? isFrozen? noGrow?
  */
@@ -60,12 +60,22 @@ __.prototype.isFinal = function () {
  */
 __.prototype.attach = function (stmt) {
 
-    if (stmt instanceof __ == false) {
+    if (typeof stmt.attach != 'function') {
         throw new Error("trying to attach non-stmt: " + stmt);
     }
 
-    if (this.final) {
+    // attaching to a final or attaching an empty statement is a no-op
+    if (this.final || stmt.isEmpty()) {
         return this;
+    }
+
+    // if this is an empty statement, pass through
+    // if (this.isEmpty()) {
+    //     return stmt;
+    // }
+
+    if (stmt == this) {
+        throw new Error("oops!");
     }
 
     if (this.next) {
@@ -82,6 +92,10 @@ __.prototype.attach = function (stmt) {
 
 __.prototype._getAst = function () {
 
+    if (this.ast == undefined) {
+        return this.next ? this.next._getAst() : JS.EMPTY;
+    }
+
     return JS.stmtList(this.ast, this.next ? this.next._getAst() : null);
 };
 
@@ -93,6 +107,11 @@ __.prototype.getTree = function () {
 __.prototype.getJs = function () {
 
     return this._getAst().getJs();
+};
+
+__.prototype.isEmpty = function () {
+
+    return this.ast == undefined;
 };
 
 // off-the-shelf statements

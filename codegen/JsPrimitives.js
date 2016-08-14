@@ -12,7 +12,7 @@ const JS = {};
 
 JS.EMPTY = {
 
-    getTree: () => null,
+    getTree: () => undefined,
     getJs: () => ''
 };
 
@@ -74,7 +74,7 @@ JS.objLiteral = (pairs) => {
 
     return {
         getTree: () => ['objLiteral', pairs.map(pair => [pair[0].getTree(), pair[1].getTree()])], // todo
-        getJs: () => '{' + pairs.map(pair => pair[0].getJs() + ':' + pair[1].getJs()).join(',') + '}'
+        getJs: () => '{' + pairs.map(pair => pair[0].getJs() + ': ' + pair[1].getJs()).join(',') + '}'
     };
 };
 
@@ -217,7 +217,7 @@ JS.fnCall = (fnExpr, args) => {
 JS.fnDef = (params, body, name) => {
 
     return {
-        getTree: () => ['function', name ? name : 'anon', params, body.getTree()],
+        getTree: () => ['function', name || null, params, body.getTree()],
         getJs: () => 'function (' + params.join(', ') + ') {\n\n' + body.getJs() + '\n}'
     };
 };

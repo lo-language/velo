@@ -212,37 +212,36 @@ __.prototype.compile = function (node) {
     return Compiler[node.type].call(this, node);
 };
 
-// we push sync requests; we pop wrapped statements!
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Returns a sync call placeholder var.
+ *
+ * @param node
+ */
+__.prototype.compileStmt = function (node) {
+
+    this.wrapper = new JsStmt();
+
+    // a statement could be a context
+    
+    return this.wrapper.attach(this.compile(node));
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Pushes a request onto the stack and returns a placeholder.
  *
  * @param req   a sync request
  */
-__.prototype.pushBlocker = function (req) {
+__.prototype.pushBlockingCall = function (req) {
 
     if (this.wrapper) {
-        this.wrapper.attach(req);
+        this.wrapper = this.wrapper.attach(req);
     }
     else {
-        this.wrapper = req;
+        throw new Error("trying to push a blocking call outside of stmt context");
     }
 
     return JS.ID('P' + this.placeHolders++);
-};
-
-/**
- * Returns a statement wrapped in whatever wrappers have been pushed.
- */
-__.prototype.createStmt = function (ast) {
-
-    var stmt = new JsStmt(ast);
-
-    if (this.wrapper) {
-        return this.wrapper.attach(stmt);
-    }
-
-    return stmt;
 };
 
 module.exports = __;

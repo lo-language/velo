@@ -29,7 +29,7 @@ module.exports["sync"] = {
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
-                        [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ]);
+                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ] ]);
         test.done();
     },
 
@@ -50,9 +50,9 @@ module.exports["sync"] = {
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
-                        [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ],
+                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ],
                     'stmtList',
-                    [ 'assign', [ 'id', '$bar' ], [ 'num', '32' ] ] ] ]);
+                    [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '32' ] ] ] ] ]);
         test.done();
     },
 
@@ -78,14 +78,14 @@ module.exports["sync"] = {
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
-                        [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ],
+                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ],
                     'stmtList',
                     [ 'if',
                         [ 'id', '$bar' ],
                         [ 'stmtList',
-                            [ 'assign', [ 'id', '$bar' ], [ 'num', '32' ] ] ],
+                            [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '32' ] ] ] ],
                         'stmtList',
-                        [ 'assign', [ 'id', '$baz' ], [ 'num', '82' ] ] ] ] ]);
+                        [ 'expr-stmt', [ 'assign', [ 'id', '$baz' ], [ 'num', '82' ] ] ] ] ] ]);
         test.done();
     }
 };

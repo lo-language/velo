@@ -3,3 +3,5 @@ ideas
 node_modules
 docs/output
 .DS_store
+/testing/coverage/
+.istanbul.yml

@@ -26,7 +26,7 @@ module.exports["constants"] = {
         test.equal(context.has('port'), false);
         test.equal(context.isConstant('port'), false);
 
-        test.deepEqual(context.compile(node).getTree(), new JsStmt(JS.EMPTY).getTree());
+        test.ok(context.compile(node).isEmpty());
 
         test.equal(context.has('port'), true);
         test.ok(context.isConstant('port'));
@@ -48,7 +48,7 @@ module.exports["constants"] = {
         test.equal(context.has('album'), false);
         test.equal(context.isConstant('album'), false);
 
-        test.deepEqual(context.compile(node).getTree(), new JsStmt(JS.EMPTY).getTree());
+        test.ok(context.compile(node).isEmpty());
 
         test.equal(context.has('album'), true);
         test.ok(context.isConstant('album'));
@@ -87,11 +87,30 @@ module.exports["constants"] = {
         test.equal(context.has('main'), false);
         test.equal(context.isConstant('main'), false);
 
-        test.deepEqual(context.compile(node).getTree(), [ 'stmtList', [ 'const', '$main' ] ]);
+        test.deepEqual(context.compile(node).getTree(),
+            [ 'stmtList',
+                [ 'const',
+                    '$main',
+                    [ 'function',
+                        null,
+                        [ 'task' ],
+                        [ 'stmtList',
+                            [ 'var', '$next' ],
+                            [ 'stmtList',
+                                [ 'var', '$result' ],
+                                [ 'stmtList',
+                                    [ 'assign',
+                                        [ 'id', '$next' ],
+                                        [ 'subscript',
+                                            [ 'select', [ 'id', 'task' ], 'args' ],
+                                            [ 'num', '0' ] ] ],
+                                    [ 'stmtList',
+                                        [ 'expr-stmt',
+                                            [ 'mul-assign', [ 'id', '$result' ], [ 'id', 'P0' ] ] ] ] ] ] ] ] ] ]);
 
         test.equal(context.has('main'), true);
         test.ok(context.isConstant('main'));
-        test.deepEqual(context.resolve('main').getTree(), JS.ID("$main").getTree());
+        test.deepEqual(context.resolve('main').getTree(), [ 'id', '$main' ]);
 
         test.done();
     },
@@ -109,7 +128,7 @@ module.exports["constants"] = {
         test.equal(context.has('constructor'), false);
         test.equal(context.isConstant('constructor'), false);
 
-        test.deepEqual(context.compile(node).getTree(), new JsStmt(JS.EMPTY).getTree());
+        test.ok(context.compile(node).isEmpty());
 
         test.equal(context.has('constructor'), true);
         test.ok(context.isConstant('constructor'));

@@ -7,16 +7,6 @@ const JsStmt = require('../../codegen/JsStmt');
 
 module.exports['basics'] = {
 
-    "empty": function (test) {
-
-        var n = JS.EMPTY;
-
-        test.deepEqual(n.getTree(), null);
-        test.equal(n.getJs(), '');
-
-        test.done();
-    },
-
     "null": function (test) {
 
         var n = JS.NULL;
@@ -32,7 +22,7 @@ module.exports['basics'] = {
         var n = JS.USE_STRICT;
 
         test.deepEqual(n.getTree(), ['use-strict']);
-        test.equal(n.getJs(), "'use strict';");
+        test.equal(n.getJs(), "'use strict';\n");
 
         test.done();
     },
@@ -104,7 +94,7 @@ module.exports['basics'] = {
         test.deepEqual(n.getTree(), ['objLiteral', [
             [['string', 'foo'], ['num', '42']],
             [['string', 'bar'], ['num', '57']]]]);
-        test.equal(n.getJs(), "{'foo':42,'bar':57}");
+        test.equal(n.getJs(), "{'foo': 42,'bar': 57}");
 
         test.done();
     },
@@ -300,14 +290,26 @@ module.exports["cn calls"] = {
 
 module.exports["fn defs"] = {
 
-    "fn def": function (test) {
+    "anonymous fn def": function (test) {
 
-        var n = JS.fnDef(['bar', 'baz'], new JsStmt(JS.assign(JS.ID('bar'), JS.ID('baz'))), 'foo');
+        var n = JS.fnDef(['bar', 'baz'], new JsStmt(JS.exprStmt(JS.assign(JS.ID('bar'), JS.ID('baz')))));
+
+        test.deepEqual(n.getTree(), [ 'function', null,
+            [ 'bar', 'baz' ],
+            [ 'stmtList', [ 'expr-stmt', [ 'assign', [ 'id', 'bar' ], [ 'id', 'baz' ] ] ] ] ]);
+        test.equal(n.getJs(), "function (bar, baz) {\n\nbar = baz;\n}");
+
+        test.done();
+    },
+
+    "named fn def": function (test) {
+
+        var n = JS.fnDef(['bar', 'baz'], new JsStmt(JS.exprStmt(JS.assign(JS.ID('bar'), JS.ID('baz')))), 'foo');
 
         test.deepEqual(n.getTree(), [ 'function', 'foo',
             [ 'bar', 'baz' ],
-            [ 'stmtList', [ 'assign', [ 'id', 'bar' ], [ 'id', 'baz' ] ] ] ]);
-        test.equal(n.getJs(), "function (bar, baz) {\nbar = baz;\n}");
+            [ 'stmtList', [ 'expr-stmt', [ 'assign', [ 'id', 'bar' ], [ 'id', 'baz' ] ] ] ] ]);
+        test.equal(n.getJs(), "function (bar, baz) {\n\nbar = baz;\n}");
 
         test.done();
     }

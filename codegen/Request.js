@@ -4,9 +4,12 @@
 
 const JS = require('./JsPrimitives');
 const JsFunction = require('./JsFunction');
+const JsStmt = require('./JsStmt');
 
 /**
- * Constructor
+ * A Request is a special kind of statement that attaching things to puts them inside it rather than after it.
+ *
+ * Should it be both sync and async?
  *
  * @param address       JS part
  * @param args          array of JS parts
@@ -21,7 +24,13 @@ var __ = function (address, args, replyHandler, failHandler) {
     this.failHandler = failHandler;
 };
 
-// extend JsStmt?
+__.prototype = Object.create(JsStmt.prototype);
+__.prototype.constructor = __;
+
+__.prototype.isEmpty = function () {
+    return false;
+};
+
 __.prototype.attach = function (stmtList) {
     
     // if we have a replyHandler, extend it, otherwise create one
@@ -29,76 +38,72 @@ __.prototype.attach = function (stmtList) {
     if (this.replyHandler == null) {
         this.replyHandler = new JsFunction('res', stmtList);
     }
-
-    this.replyHandler.getBody().attach(stmtList);
-
-    // this.replyHandler = JS.fnDef('res', this.next);
-
+    else {
+        this.replyHandler.getBody().attach(stmtList);
+    }
+    
     return this;
 };
 
-__.prototype.getAst = function () {
+__.prototype._getAst = function () {
 
-    return JS.runtimeCall('sendMessage', [this.address, JS.arrayLiteral(this.args)].concat(this.replyHandler ? this.replyHandler : []));
+    return JS.stmtList(
+        JS.runtimeCall('sendMessage', [this.address, JS.arrayLiteral(this.args)].concat(this.replyHandler ? this.replyHandler : [])));
 };
 
-__.prototype.getTree = function () {
 
-    return this.getAst().getTree();
-};
-
-/**
- *
- * @param following
- * @returns {*[]}
- */
-__.prototype.render = function (following) {
-
-    // here's where we figure out our handlers
-
-    var onReply;
-    var onFail;
-
-    if (this.blocking) {
-
-        // we're gonna need both handlers
-
-        if (this.failHandler == null) {
-
-            // whip up the default fail handler
-            onFail = JsFunction.DEFAULT_FAIL_HANDLER.render(following);
-        }
-
-        // what should the default reply handler be?
-
-        if (this.replyHandler == null) {
-
-            onReply = new JsFunction(['res'], following).render();
-        }
-        else {
-
-            // we want to open up the function
-
-            console.log(this.replyHandler.body);
-
-            // this.replyHandler.body.attach(following);
-
-            // console.log(this.replyHandler.body);
-            
-            // see if the handler is final
-
-            onReply = this.replyHandler.render(following);
-        }
-    }
-    else {
-
-        // we're non-blocking, so we just use the handlers provided
-
-        onReply = this.replyHandler ? this.replyHandler.render() : ['null'];
-        onFail = this.failHandler ? this.failHandler.render() : ['defaultFailHandler'];
-    }
-
-    return ['message', this.address, this.args, onReply, onFail];
-};
+// /**
+//  *
+//  * @param following
+//  * @returns {*[]}
+//  */
+// __.prototype.render = function (following) {
+//
+//     // here's where we figure out our handlers
+//
+//     var onReply;
+//     var onFail;
+//
+//     if (this.blocking) {
+//
+//         // we're gonna need both handlers
+//
+//         if (this.failHandler == null) {
+//
+//             // whip up the default fail handler
+//             onFail = JsFunction.DEFAULT_FAIL_HANDLER.render(following);
+//         }
+//
+//         // what should the default reply handler be?
+//
+//         if (this.replyHandler == null) {
+//
+//             onReply = new JsFunction(['res'], following).render();
+//         }
+//         else {
+//
+//             // we want to open up the function
+//
+//             console.log(this.replyHandler.body);
+//
+//             // this.replyHandler.body.attach(following);
+//
+//             // console.log(this.replyHandler.body);
+//
+//             // see if the handler is final
+//
+//             onReply = this.replyHandler.render(following);
+//         }
+//     }
+//     else {
+//
+//         // we're non-blocking, so we just use the handlers provided
+//
+//         onReply = this.replyHandler ? this.replyHandler.render() : ['null'];
+//         onFail = this.failHandler ? this.failHandler.render() : ['defaultFailHandler'];
+//     }
+//
+//     return ['message', this.address, this.args, onReply, onFail];
+// };
 
 module.exports = __;

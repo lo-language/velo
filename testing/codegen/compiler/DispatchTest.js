@@ -38,11 +38,17 @@ module.exports["dispatch"] = {
             }
         };
 
-        var handler = JS.fnDef(['args'],
-            JsStmt.varDecl('$foo').attach(
-                new JsStmt(JS.assign(JS.ID('$foo'), JS.num('42')))));
-
-        test.deepEqual(new Context().compile(node).getTree(), JS.message(JS.ID('$foo'), [], handler, null).getTree());
+        test.deepEqual(new Context().compile(node).getTree(), [ 'call',
+            [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+            [ [ 'id', '$foo' ],
+                [ 'arrayLiteral', [] ],
+                [ 'function',
+                    null,
+                    [ 'args' ],
+                    [ 'stmtList',
+                        [ 'var', '$foo' ],
+                        [ 'stmtList',
+                            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '42' ] ] ] ] ] ] ] ]);
         test.done();
     },
 
@@ -121,15 +127,18 @@ module.exports["dispatch"] = {
             }
         };
 
-        var replyHandler = JS.fnDef(['args'],
-            JsStmt.varDecl('$foo').attach(
-                new JsStmt(JS.assign(JS.ID('$foo'), JS.num('42')))));
-
-        var failHandler = JS.fnDef(['args'],
-            JsStmt.varDecl('$bar').attach(
-                new JsStmt(JS.assign(JS.ID('$bar'), JS.num('57')))));
-
-        test.deepEqual(new Context().compile(node).getTree(), JS.message(JS.ID('$foo'), [], replyHandler, failHandler).getTree());
+        test.deepEqual(new Context().compile(node).getTree(),
+            [ 'call',
+                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                [ [ 'id', '$foo' ],
+                    [ 'arrayLiteral', [] ],
+                    [ 'function',
+                        null,
+                        [ 'args' ],
+                        [ 'stmtList',
+                            [ 'var', '$foo' ],
+                            [ 'stmtList',
+                                [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '42' ] ] ] ] ] ] ] ]);
         test.done();
     }
 };

@@ -32,19 +32,21 @@ module.exports["service"] = {
         };
 
         var result = [ 'function',
+            'anon',
             [ 'task' ],
             [ 'stmtList',
                 [ 'var', '$next' ],
                 [ 'stmtList',
                     [ 'var', '$result' ],
                     [ 'stmtList',
-                        [ 'assign', '=',
+                        [ 'assign',
                             [ 'id', '$next' ],
                             [ 'subscript',
                                 [ 'select', [ 'id', 'task' ], 'args' ],
                                 [ 'num', '0' ] ] ],
                         [ 'stmtList',
-                            [ 'assign', '*=', [ 'id', '$result' ], [ 'id', 'P0' ] ] ] ] ] ] ];
+                            [ 'expr-stmt',
+                                [ 'mul-assign', [ 'id', '$result' ], [ 'id', 'P0' ] ] ] ] ] ] ] ];
 
         test.deepEqual(new Context().compile(node).getTree(), result);
 

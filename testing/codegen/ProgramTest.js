@@ -29,7 +29,7 @@ module.exports["include"] = {
 
             test.equal(result, module);
 
-            test.equal(p.render(), "const M0 = function () {\n\n'use strict';\n\n\n\nreturn {};\n}();");
+            test.equal(p.render(), "const M0 = function () {\n\n'use strict';\n\nreturn {};\n}();");
             test.done();
 
         }).done();
@@ -55,8 +55,8 @@ module.exports["include"] = {
 
             test.equal(p.render(),
                 "const M0 = function () {\n\n'use strict';\n\n" +
-                "const $foo = function (task) {var $recur = task.service;\nvar $x;\n\n\n$x = 42;\n};\n\n" +
-                'return {"foo": $foo};\n}();');
+                "const $foo = function (task) {\n\nvar $x;\n$x = 42;\n};\n" +
+                "return {'foo': $foo};\n}();");
             test.done();
 
         }).done();

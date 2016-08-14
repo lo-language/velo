@@ -27,30 +27,31 @@ module.exports["basics"] = {
                 [ 'while',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
-                        [ 'assign', '=', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ]);
+                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ] ]);
 
         // try attaching a statement – should get stuck on the end
         a.attach(new JsStmt(JS.assign(JS.ID('$z'), JS.num('57'))));
 
-        test.deepEqual(a.getTree(), [ 'stmtList',
-            [ 'while',
-                [ 'id', '$foo' ],
-                [ 'stmtList',
-                    [ 'assign', '=', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ],
+        test.deepEqual(a.getTree(),
             [ 'stmtList',
-                [ 'assign', '=', [ 'id', '$z' ], [ 'num', '57' ] ] ] ]);
+                [ 'while',
+                    [ 'id', '$foo' ],
+                    [ 'stmtList',
+                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ],
+                [ 'stmtList', [ 'assign', [ 'id', '$z' ], [ 'num', '57' ] ] ] ]);
 
         // try attaching another statement
         a.attach(JsStmt.varDecl('bee'));
 
-        test.deepEqual(a.getTree(), [ 'stmtList',
-            [ 'while',
-                [ 'id', '$foo' ],
-                [ 'stmtList',
-                    [ 'expr-stmt' [ 'assign', '=', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ],
+        test.deepEqual(a.getTree(),
             [ 'stmtList',
-                [ 'expr-stmt' [ 'assign', '=', [ 'id', '$z' ], [ 'num', '57' ] ] ],
-                [ 'stmtList', [ 'var', 'bee' ] ] ] ]);
+                [ 'while',
+                    [ 'id', '$foo' ],
+                    [ 'stmtList',
+                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ],
+                [ 'stmtList',
+                    [ 'assign', [ 'id', '$z' ], [ 'num', '57' ] ],
+                    [ 'stmtList', [ 'var', 'bee' ] ] ] ]);
 
         test.done();
     },

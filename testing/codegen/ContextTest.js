@@ -271,27 +271,30 @@ module.exports["external constants"] = {
 };
 
 
-module.exports["placeholders"] = {
+module.exports["compileStmt"] = {
 
-    "get placeholder": function (test) {
+    // "get placeholder": function (test) {
+    //
+    //     var context = new Context();
+    //
+    //     // spoof a wrapper
+    //     context.compileStmt();
+    //
+    //     test.deepEqual(context.pushBlockingCall().getTree(), JS.ID('P0').getTree());
+    //
+    //     test.done();
+    // },
 
-        var context = new Context();
-
-        test.deepEqual(context.pushBlocker().getTree(), JS.ID('P0').getTree());
-
-        test.done();
-    },
-
-    "create statement with no wrappers": function (test) {
-
-        var context = new Context();
-
-        test.deepEqual(
-            context.createStmt(JS.add(JS.ID('$foo'), JS.num('17'))).getTree(),
-            JS.stmtList(JS.add(JS.ID('$foo'), JS.num('17'))).getTree());
-
-        test.done();
-    },
+    // "create statement with no wrappers": function (test) {
+    //
+    //     var context = new Context();
+    //
+    //     test.deepEqual(
+    //         context.createStmt(JS.add(JS.ID('$foo'), JS.num('17'))).getTree(),
+    //         JS.stmtList(JS.add(JS.ID('$foo'), JS.num('17'))).getTree());
+    //
+    //     test.done();
+    // },
 
     // "create statement with one wrapper": function (test) {
     //

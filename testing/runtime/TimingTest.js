@@ -35,32 +35,32 @@ module.exports['basics'] = {
         ).done();
     },
 
-    // "simple sync": function (test) {
-    //
-    //     test.expect(1);
-    //
-    //     var sourcer = {
-    //
-    //         acquire: function (modRef) {
-    //             return Q(new Module(
-    //                 'sayHello is -> {\n' +
-    //                 '    reply "hullo!";\n};\n' +
-    //                 'main is -> {\n' +
-    //                 '    reply sayHello();\n};\n'));
-    //         }
-    //     };
-    //
-    //     var p = new Program(sourcer);
-    //
-    //     p.include("foo").then(function () {
-    //         return p.run();
-    //     }).then(
-    //         function (res) {
-    //             test.equal(res, "hullo!");
-    //             test.done();
-    //         }).done();
-    // },
-    //
+    "simple sync": function (test) {
+
+        test.expect(1);
+
+        var sourcer = {
+
+            acquire: function (modRef) {
+                return Q(new Module(
+                    'sayHello is -> {\n' +
+                    '    reply "hullo!";\n};\n' +
+                    'main is -> {\n' +
+                    '    reply sayHello();\n};\n'));
+            }
+        };
+
+        var p = new Program(sourcer);
+
+        p.include("foo").then(function () {
+            return p.run();
+        }).then(
+            function (res) {
+                test.equal(res, "hullo!");
+                test.done();
+            }).done();
+    },
+
     // "sync message, default reply": function (test) {
     //
     //     test.expect(1);

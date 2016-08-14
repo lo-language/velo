@@ -32,29 +32,35 @@ const Request = require('./Request');
 /**
  * Compiles a module, producing a symbol table.
  *
+ * A module compiles to a function that returns a map of names to function defs.
+ *
  * @param node
  */
 module.exports['module'] = function (node) {
 
-    var defs = node.definitions.map(def => {
-        return this.compile(def);
+    var body = JsStmt.strictMode();
+
+    // should module definitions be captured as a link list like statements?
+
+    // how do we handle attaching empty stmts (what you get from a const def) here???
+
+    node.definitions.forEach(def => {
+        body.attach(this.compile(def));
     });
 
-    console.log(defs[0].getJs());
-
     var exports = this.getExports();
-    var pairs = Object.keys(exports).map(name => [JS.string(name), exports[name]]);
+
+    // attach all the export statements
+
+    var pairs = Object.keys(this.getExports()).map(
+        name => [JS.string(name), exports[name]]);
+
+    body.attach(JsStmt.return(JS.objLiteral(pairs)));
 
     // wrap our service constant definitions in a scope to prevent collisions with other modules
     // export our constants via a return statement
 
-    return new JsFunction([], JsStmt.strictMode().attach(JsStmt.return(JS.objLiteral(pairs))));
-
-    // return new JsConstruct([
-    //     "function () {\n\n'use strict';\n\n",
-    //     defs,
-    //     "\n\nreturn ", returnVal, ";\n",
-    //     "}"]);
+    return new JsFunction([], body);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -146,8 +152,8 @@ module.exports['stmt_list'] = function (node) {
 
     //try {
         return node.tail ?
-            this.compile(node.head).attach(this.compile(node.tail)) :
-            this.compile(node.head);
+            this.compileStmt(node.head).attach(this.compileStmt(node.tail)) :
+            this.compileStmt(node.head);
     //}
     //catch (e) {
     //    console.error(e + " while compiling: ");
@@ -206,7 +212,13 @@ module.exports['assign'] = function (node) {
         }
     }
 
-    return new JsStmt(JS.assign(left, right, node.op));
+    var expr = JS.assign;
+
+    if (node.op == '*=') {
+        expr = JS.mulAssign;
+    }
+
+    return new JsStmt(JS.exprStmt(expr(left, right, node.op)));
 
     // this was genius
     // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP
@@ -318,7 +330,7 @@ module.exports['message'] = function (node) {
     var subsequent = node.subsequent ? this.compile(node.subsequent) : null;
     var contingency = node.contingency ? this.compile(node.contingency) : null;
 
-    return JS.message(target, args, subsequent, contingency);
+    return new Request(target, args, subsequent, contingency);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -339,11 +351,16 @@ module.exports['application'] = function (node) {
     var subsequent = node.subsequent ? this.compile(node.subsequent) : null;
     var contingency = node.contingency ? this.compile(node.contingency) : null;
 
-    // get a placeholder from the context
-    return this.pushBlocker(new Request(target, args, subsequent, contingency));
+    // get a placeholder
+    return this.pushBlockingCall(new Request(target, args, subsequent, contingency));
 };
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ * @returns {__}
+ */
 module.exports['application_stmt'] = function (node) {
 
     return new JsStmt(this.compile(node.application));
@@ -407,14 +424,14 @@ module.exports['constant'] = function (node) {
     if (node.value.type == 'procedure') {
 
         var id = '$' + node.name;
-        this.define(node.name, JS.ID(id));
+        this.define(node.name, JS.ID(id), true);
         return new JsStmt.constDecl(id, this.compile(node.value));
     }
 
     this.define(node.name, this.compile(node.value));
 
     // return an empty statement to allow attachment
-    return new JsStmt(JS.EMPTY);
+    return new JsStmt();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -5,9 +5,11 @@
 
 "use strict";
 
-var Module = require('../../codegen/Module');
-var Program = require('../../codegen/Program');
-var Q = require('q');
+const Module = require('../../codegen/Module');
+const Program = require('../../codegen/Program');
+const JS = require('../../codegen/JsPrimitives');
+const JsStmt = require('../../codegen/JsStmt');
+const Q = require('q');
 
 module.exports["basics"] = {
 
@@ -137,8 +139,13 @@ module.exports["compile with no deps"] = {
 
         mod.compileSelf().then(function (result) {
 
-            test.equal(result.getJs(),
-                "function () {\n\n'use strict';\n\n\n\nreturn {};\n}");
+            test.deepEqual(result.getTree(),
+                [ 'function',
+                    null,
+                    [],
+                    [ 'stmtList',
+                        [ 'use-strict' ],
+                        [ 'stmtList', [ 'return', [ 'objLiteral', [] ] ] ] ] ]);
 
             test.done();
         }).done();
@@ -149,10 +156,29 @@ module.exports["compile with no deps"] = {
         var mod = new Module("foo is -> {x = 42;};");
 
         mod.compileSelf().then(function (result) {
-            
-            test.equal(result.getJs(),
-                "function () {\n\n'use strict';\n\nconst $foo = " +
-                "function (task) {var $recur = task.service;\nvar $x;\n\n\n$x = 42;\n};\n\nreturn {\"foo\": \$foo\};\n}");
+
+            test.deepEqual(result.getTree(), [ 'function',
+                null,
+                [],
+                [ 'stmtList',
+                    [ 'use-strict' ],
+                    [ 'stmtList',
+                        [ 'const',
+                            '$foo',
+                            [ 'function',
+                                null,
+                                [ 'task' ],
+                                [ 'stmtList',
+                                    [ 'var', '$x' ],
+                                    [ 'stmtList',
+                                        [ 'expr-stmt', [ 'assign', [ 'id', '$x' ], [ 'num', '42' ] ] ] ] ] ] ],
+                        [ 'stmtList',
+                            [ 'return',
+                                [ 'objLiteral', [ [ [ 'string', 'foo' ], [ 'id', '$foo' ] ] ] ] ] ] ] ] ]);
+
+            // test.equal(result.getJs(),
+            //     "function () {\n\n'use strict';\n\nconst $foo = " +
+            //     "function (task) {var $recur = task.service;\nvar $x;\n\n\n$x = 42;\n};\n\nreturn {\"foo\": \$foo\};\n}");
 
             test.done();
         }).done();
@@ -164,11 +190,42 @@ module.exports["compile with no deps"] = {
 
         mod.compileSelf().then(function (result) {
 
-            test.equal(result.getJs(),
-                "function () {\n\n'use strict';\n\n" +
-                "const $foo = function (task) {var $recur = task.service;\nvar $x;\n\n\n$x = 42;\n};\n\n" +
-                "const $bar = function (task) {var $recur = task.service;\nvar $a;\n\n\n$a = 57;\n};\n\n" +
-                'return {"foo": $foo, "bar": $bar};\n}');
+            test.deepEqual(result.getTree(), [ 'function',
+                null,
+                [],
+                [ 'stmtList',
+                    [ 'use-strict' ],
+                    [ 'stmtList',
+                        [ 'const',
+                            '$foo',
+                            [ 'function',
+                                null,
+                                [ 'task' ],
+                                [ 'stmtList',
+                                    [ 'var', '$x' ],
+                                    [ 'stmtList',
+                                        [ 'expr-stmt', [ 'assign', [ 'id', '$x' ], [ 'num', '42' ] ] ] ] ] ] ],
+                        [ 'stmtList',
+                            [ 'const',
+                                '$bar',
+                                [ 'function',
+                                    null,
+                                    [ 'task' ],
+                                    [ 'stmtList',
+                                        [ 'var', '$a' ],
+                                        [ 'stmtList',
+                                            [ 'expr-stmt', [ 'assign', [ 'id', '$a' ], [ 'num', '57' ] ] ] ] ] ] ],
+                            [ 'stmtList',
+                                [ 'return',
+                                    [ 'objLiteral',
+                                        [ [ [ 'string', 'foo' ], [ 'id', '$foo' ] ],
+                                            [ [ 'string', 'bar' ], [ 'id', '$bar' ] ] ] ] ] ] ] ] ] ]);
+
+            // test.equal(result.getJs(),
+            //     "function () {\n\n'use strict';\n\n" +
+            //     "const $foo = function (task) {var $recur = task.service;\nvar $x;\n\n\n$x = 42;\n};\n\n" +
+            //     "const $bar = function (task) {var $recur = task.service;\nvar $a;\n\n\n$a = 57;\n};\n\n" +
+            //     'return {"foo": $foo, "bar": $bar};\n}');
 
             test.done();
         }).done();
@@ -194,8 +251,16 @@ module.exports["compile with deps"] = {
 
         mod.compileSelf(program).then(function (result) {
 
-            test.equal(result.getJs(),
-                "function () {\n\n'use strict';\n\n\n\nreturn {};\n}");
+            test.deepEqual(result.getTree(),
+                [ 'function',
+                null,
+                [],
+                [ 'stmtList',
+                    [ 'use-strict' ],
+                    [ 'stmtList', [ 'return', [ 'objLiteral', [] ] ] ] ] ]);
+
+            // test.equal(result.getJs(),
+            //     "function () {\n\n'use strict';\n\n\n\nreturn {};\n}");
 
             test.done();
         }).done();
@@ -217,29 +282,33 @@ module.exports["compile with deps"] = {
 
         mod.compileSelf(program).then(function (result) {
 
-            test.equal(result.getJs(),
-                "function () {\n\n'use strict';\n\n" +
-                "const $foo = function (task) {var $recur = task.service;\n" +
-                "var $x;\n\n\n$x = 42;\n};\n\n" +
-                'return {"foo": $foo};\n}');
+            test.deepEqual(result.getTree(),
+                [ 'function',
+                null,
+                [],
+                [ 'stmtList',
+                    [ 'use-strict' ],
+                    [ 'stmtList',
+                        [ 'const',
+                            '$foo',
+                            [ 'function',
+                                null,
+                                [ 'task' ],
+                                [ 'stmtList',
+                                    [ 'var', '$x' ],
+                                    [ 'stmtList',
+                                        [ 'expr-stmt', [ 'assign', [ 'id', '$x' ], [ 'num', '42' ] ] ] ] ] ] ],
+                        [ 'stmtList',
+                            [ 'return',
+                                [ 'objLiteral', [ [ [ 'string', 'foo' ], [ 'id', '$foo' ] ] ] ] ] ] ] ] ]);
+
+            // test.equal(result.getJs(),
+            //     "function () {\n\n'use strict';\n\n" +
+            //     "const $foo = function (task) {var $recur = task.service;\n" +
+            //     "var $x;\n\n\n$x = 42;\n};\n\n" +
+            //     'return {"foo": $foo};\n}');
 
             test.done();
         }).done();
-    },
-
-    // "compilation with two services": function (test) {
-    //
-    //     var mod = new Module("foo is -> {x = 42;};\n\nbar is -> {a = 57;};\n");
-    //
-    //     mod.compile().then(function (result) {
-    //
-    //         test.equal(result.getJs(),
-    //             "function () {\n\n'use strict';\n\n" +
-    //             "const $foo = function (task) {var $recur = task.service;\nvar $x;\n\n\n$x = 42;\n};\n\n" +
-    //             "const $bar = function (task) {var $recur = task.service;\nvar $a;\n\n\n$a = 57;\n};\n\n" +
-    //             "return [$foo, $bar];\n}");
-    //
-    //         test.done();
-    //     }).done();
-    // }
+    }
 };
