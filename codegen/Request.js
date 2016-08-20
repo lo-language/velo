@@ -9,7 +9,7 @@ const JsStmt = require('./JsStmt');
 /**
  * A Request is a special kind of statement that attaching things to puts them inside it rather than after it.
  *
- * Should it be both sync and async?
+ * Should Request support both sync and async?
  *
  * @param address       JS part
  * @param args          array of JS parts
@@ -27,21 +27,24 @@ var __ = function (address, args, replyHandler, failHandler) {
 __.prototype = Object.create(JsStmt.prototype);
 __.prototype.constructor = __;
 
-__.prototype.isEmpty = function () {
-    return false;
-};
 
-__.prototype.attach = function (stmtList) {
+/**
+ * Overrides base class to attach statements to its reply handler's body.
+ *
+ * @param stmt
+ * @returns this    fluent interface
+ */
+__.prototype.attach = function (stmt) {
     
     // if we have a replyHandler, extend it, otherwise create one
 
     if (this.replyHandler == null) {
-        this.replyHandler = new JsFunction('res', stmtList);
+        this.replyHandler = new JsFunction('res', stmt);
     }
     else {
-        this.replyHandler.getBody().attach(stmtList);
+        this.replyHandler.getBody().attach(stmt);
     }
-    
+
     return this;
 };
 

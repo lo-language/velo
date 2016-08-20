@@ -26,7 +26,7 @@ module.exports["constants"] = {
         test.equal(context.has('port'), false);
         test.equal(context.isConstant('port'), false);
 
-        test.ok(context.compile(node).isEmpty());
+        test.equal(context.compile(node).getJs(), '');
 
         test.equal(context.has('port'), true);
         test.ok(context.isConstant('port'));
@@ -48,7 +48,7 @@ module.exports["constants"] = {
         test.equal(context.has('album'), false);
         test.equal(context.isConstant('album'), false);
 
-        test.ok(context.compile(node).isEmpty());
+        test.equal(context.compile(node).getJs(), '');
 
         test.equal(context.has('album'), true);
         test.ok(context.isConstant('album'));
@@ -60,9 +60,9 @@ module.exports["constants"] = {
     "service": function (test) {
 
         var node = {
-            "type":"constant",
-            "name":"main",
-            "value": {
+            type: "constant",
+            name: "main",
+            value: {
                 type: 'procedure',
                 params: ['next'],
                 body: {
@@ -87,26 +87,29 @@ module.exports["constants"] = {
         test.equal(context.has('main'), false);
         test.equal(context.isConstant('main'), false);
 
-        test.deepEqual(context.compile(node).getTree(),
-            [ 'stmtList',
-                [ 'const',
-                    '$main',
-                    [ 'function',
-                        null,
-                        [ 'task' ],
+        test.deepEqual(context.compile(node).getTree(), [ 'stmtList',
+            [ 'const',
+                '$main',
+                [ 'function',
+                    null,
+                    [ 'task' ],
+                    [ 'stmtList',
+                        [ 'var', '$next' ],
                         [ 'stmtList',
-                            [ 'var', '$next' ],
+                            [ 'var', '$result' ],
                             [ 'stmtList',
-                                [ 'var', '$result' ],
+                                [ 'assign',
+                                    [ 'id', '$next' ],
+                                    [ 'subscript',
+                                        [ 'select', [ 'id', 'task' ], 'args' ],
+                                        [ 'num', '0' ] ] ],
                                 [ 'stmtList',
-                                    [ 'assign',
-                                        [ 'id', '$next' ],
-                                        [ 'subscript',
-                                            [ 'select', [ 'id', 'task' ], 'args' ],
-                                            [ 'num', '0' ] ] ],
-                                    [ 'stmtList',
-                                        [ 'expr-stmt',
-                                            [ 'mul-assign', [ 'id', '$result' ], [ 'id', 'P0' ] ] ] ] ] ] ] ] ] ]);
+                                    [ 'call',
+                                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                                        [ [ 'id', '$bar' ],
+                                            [ 'arrayLiteral', [ ['num', '42' ] ] ],
+                                            [ 'function', null, [ 'P0' ], [ 'stmtList', [ "expr-stmt",
+                                                [ "mul-assign", [ "id", "$result" ], [ "id", "P0" ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
 
         test.equal(context.has('main'), true);
         test.ok(context.isConstant('main'));
@@ -128,7 +131,7 @@ module.exports["constants"] = {
         test.equal(context.has('constructor'), false);
         test.equal(context.isConstant('constructor'), false);
 
-        test.ok(context.compile(node).isEmpty());
+        test.equal(context.compile(node).getJs(), '');
 
         test.equal(context.has('constructor'), true);
         test.ok(context.isConstant('constructor'));

@@ -13,8 +13,10 @@
 "use strict";
 
 const Compiler = require('./Compiler');
-const JsStmt = require('./JsStmt');
 const JS = require('./JsPrimitives');
+const JsStmt = require('./JsStmt');
+const JsFunction = require('./JsFunction');
+const Request = require('./Request');
 const util = require('util');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -222,7 +224,7 @@ __.prototype.compileStmt = function (node) {
     this.wrapper = new JsStmt();
 
     // a statement could be a context
-    
+
     return this.wrapper.attach(this.compile(node));
 };
 
@@ -230,18 +232,25 @@ __.prototype.compileStmt = function (node) {
 /**
  * Pushes a request onto the stack and returns a placeholder.
  *
- * @param req   a sync request
+ * @param address
+ * @param args
+ * @param failHandler
  */
-__.prototype.pushBlockingCall = function (req) {
+__.prototype.pushBlockingCall = function (address, args, failHandler) {
 
-    if (this.wrapper) {
-        this.wrapper = this.wrapper.attach(req);
-    }
-    else {
+    if (this.wrapper == null) {
         throw new Error("trying to push a blocking call outside of stmt context");
     }
 
-    return JS.ID('P' + this.placeHolders++);
+    var placeholderName = 'P' + this.placeHolders++;
+    var replyHandler = new JsFunction([placeholderName], new JsStmt());
+
+    // create a reply handler taking the placeholder as its param and with an empty body
+    var req = new Request(address, args, replyHandler, failHandler);
+
+    this.wrapper = this.wrapper.attach(req);
+
+    return JS.ID(placeholderName);
 };
 
 module.exports = __;

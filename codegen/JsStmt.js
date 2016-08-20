@@ -56,7 +56,10 @@ __.prototype.isFinal = function () {
 };
 
 /**
+ * Attaches a statement to this one.
  *
+ * @param stmt
+ * @returns this    fluent interface
  */
 __.prototype.attach = function (stmt) {
 
@@ -64,18 +67,13 @@ __.prototype.attach = function (stmt) {
         throw new Error("trying to attach non-stmt: " + stmt);
     }
 
-    // attaching to a final or attaching an empty statement is a no-op
-    if (this.final || stmt.isEmpty()) {
+    // attaching to a final statement is a no-op
+    if (this.final) {
         return this;
     }
 
-    // if this is an empty statement, pass through
-    // if (this.isEmpty()) {
-    //     return stmt;
-    // }
-
     if (stmt == this) {
-        throw new Error("oops!");
+        throw new Error("oops! tried to attach a statement to itself");
     }
 
     if (this.next) {
@@ -93,7 +91,9 @@ __.prototype.attach = function (stmt) {
 __.prototype._getAst = function () {
 
     if (this.ast == undefined) {
-        return this.next ? this.next._getAst() : JS.EMPTY;
+
+        // we're an empty statement; delegate to the following stmt if there is one
+        return this.next ? this.next._getAst() : null;
     }
 
     return JS.stmtList(this.ast, this.next ? this.next._getAst() : null);
@@ -106,12 +106,9 @@ __.prototype.getTree = function () {
 
 __.prototype.getJs = function () {
 
-    return this._getAst().getJs();
-};
+    var ast = this._getAst();
 
-__.prototype.isEmpty = function () {
-
-    return this.ast == undefined;
+    return ast ? ast.getJs() : '';
 };
 
 // off-the-shelf statements

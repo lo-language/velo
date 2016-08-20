@@ -7,14 +7,109 @@ const JsFunction = require('../../codegen/JsFunction');
 const Request = require('../../codegen/Request');
 const JS = require('../../codegen/JsPrimitives');
 
-module.exports["basics"] = {
+module.exports["render"] = {
 
-    "getTree": function (test) {
+    "empty stmt yields empty string": function (test) {
+
+        var stmt = new JsStmt();
+
+        test.equal(stmt.getJs(), '');
+
+        test.done();
+    }
+};
+
+module.exports["getTree"] = {
+
+    "empty stmt throws": function (test) {
+
+        var stmt = new JsStmt();
+
+        test.throws(stmt.getTree);
+
+        test.done();
+    },
+
+    "no statements": function (test) {
+
+        var ast = JS.assign(JS.ID('$foo'), JS.num('57'));
+
+        test.deepEqual(ast.getTree(), [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ]);
+
+        test.done();
+    },
+
+    "one statement": function (test) {
 
         var stmt = new JsStmt(JS.assign(JS.ID('$foo'), JS.num('42')));
 
         test.deepEqual(stmt.getTree(), ['stmtList', ['assign', ['id', '$foo'], ['num', '42']]]);
         test.equal(stmt.isFinal(), false);
+        test.done();
+    },
+
+    "embedded statement": function (test) {
+
+        var ast = new JsFunction(['task'], new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.num('57')))));
+
+        test.deepEqual(ast.getTree(),
+            [ "function", null, [ "task" ],
+                [ "stmtList",
+                    [ "expr-stmt", [ "assign", [ "id", "$foo" ], [ "num", "57" ] ] ] ] ]);
+
+        test.done();
+    },
+
+    "attached statements": function (test) {
+
+        var stmt = new JsStmt(JS.while(JS.bool('true'), new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.num('57'))))));
+
+        stmt.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('$z'), JS.num('42')))));
+
+        test.deepEqual(stmt.getTree(),
+            [ 'stmtList',
+                [ 'while',
+                    [ 'bool', 'true' ],
+                    [ 'stmtList',
+                        [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ] ],
+                [ 'stmtList',
+                    [ 'expr-stmt', [ 'assign', [ 'id', '$z' ], [ 'num', '42' ] ] ] ] ]);
+
+        test.done();
+    },
+
+    "empty attached stmt": function (test) {
+
+        var stmt = new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.num('57'))));
+
+        test.deepEqual(stmt.getTree(), [ 'stmtList',
+            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
+
+        stmt = stmt.attach(new JsStmt());
+
+        test.deepEqual(stmt.getTree(), [ 'stmtList',
+            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
+
+        stmt = stmt.attach(new JsStmt());
+
+        test.deepEqual(stmt.getTree(), [ 'stmtList',
+            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
+
+        test.done();
+    },
+};
+
+module.exports["attach"] = {
+
+    "attach to empty": function (test) {
+
+        var stmt = new JsStmt();
+
+        stmt.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.num('57')))));
+
+        test.deepEqual(stmt.getTree(), [ 'stmtList',
+            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
+
         test.done();
     },
 
@@ -56,95 +151,6 @@ module.exports["basics"] = {
                 [ 'expr-stmt', [ 'assign', ['id', '$foo'], ['num', '42'] ] ],
                 [ 'stmtList',
                     [ 'return'] ] ]);
-        test.done();
-    }
-};
-
-module.exports["getTree"] = {
-
-    "no statements": function (test) {
-
-        var ast = JS.assign(JS.ID('$foo'), JS.num('57'));
-
-        test.deepEqual(ast.getTree(), [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ]);
-
-        test.done();
-    },
-
-    "statement": function (test) {
-
-        var ast = new JsStmt(JS.assign(JS.ID('$foo'), JS.num('57')));
-
-        test.deepEqual(ast.getTree(), ['stmtList', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ]);
-
-        test.done();
-    },
-
-    "embedded statement": function (test) {
-
-        var ast = new JsFunction(['task'], new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.num('57')))));
-
-        test.deepEqual(ast.getTree(),
-            [ "function", null, [ "task" ],
-                [ "stmtList",
-                    [ "expr-stmt", [ "assign", [ "id", "$foo" ], [ "num", "57" ] ] ] ] ]);
-
-        test.done();
-    },
-
-    "attached statements": function (test) {
-
-        var stmt = new JsStmt(JS.while(JS.bool('true'), new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.num('57'))))));
-
-        stmt.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('$z'), JS.num('42')))));
-
-        test.deepEqual(stmt.getTree(),
-            [ 'stmtList',
-                [ 'while',
-                    [ 'bool', 'true' ],
-                    [ 'stmtList',
-                        [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ] ],
-                [ 'stmtList',
-                    [ 'expr-stmt', [ 'assign', [ 'id', '$z' ], [ 'num', '42' ] ] ] ] ]);
-
-        test.done();
-    }
-};
-
-module.exports["attach"] = {
-
-    "attach to empty": function (test) {
-
-        var stmt = new JsStmt();
-
-        test.deepEqual(stmt.getTree(), undefined);
-
-        // need to reassign
-        stmt = stmt.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.num('57')))));
-
-        test.deepEqual(stmt.getTree(), [ 'stmtList',
-            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
-
-        test.done();
-    },
-
-    "attach empty is a no-op": function (test) {
-
-        var stmt = new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.num('57'))));
-
-        test.deepEqual(stmt.getTree(), [ 'stmtList',
-            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
-
-        stmt = stmt.attach(new JsStmt());
-
-        test.deepEqual(stmt.getTree(), [ 'stmtList',
-            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
-
-        stmt = stmt.attach(new JsStmt());
-
-        test.deepEqual(stmt.getTree(), [ 'stmtList',
-            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
-
         test.done();
     },
 

@@ -23,8 +23,10 @@ module.exports["message"] = {
             }
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.message(
-            JS.ID('$foo'), [], null, null).getTree());
+        test.deepEqual(new Context().compile(node).getTree(), [ 'stmtList',
+            [ 'call',
+                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                [ [ 'id', '$foo' ], [ 'arrayLiteral', [] ] ] ] ]);
         test.done();
     },
 
@@ -100,12 +102,18 @@ module.exports["message"] = {
 
         // todo test where bar is defined in an outer scope (shouldn't declare again)
 
-        var handler = JS.fnDef(['args'],
-            JsStmt.varDecl('$bar').attach(
-            new JsStmt(JS.assign(JS.ID('$bar'), JS.num('42')))));
-
-        test.deepEqual(scope.createInner().compile(node).getTree(), JS.message(
-            JS.ID('$foo'), [JS.ID('$url')], handler, null).getTree());
+        test.deepEqual(scope.createInner().compile(node).getTree(), [ 'stmtList',
+            [ 'call',
+                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                [ [ 'id', '$foo' ],
+                    [ 'arrayLiteral', [ [ 'id', '$url' ] ] ],
+                    [ 'function',
+                        null,
+                        [ 'args' ],
+                        [ 'stmtList',
+                            [ 'var', '$bar' ],
+                            [ 'stmtList',
+                                [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ] ] ] ] ]);
 
         test.done();
     }

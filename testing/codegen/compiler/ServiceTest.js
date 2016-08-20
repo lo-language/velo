@@ -13,6 +13,8 @@ module.exports["service"] = {
 
     "basic": function (test) {
 
+        // should actually throw an error if result isn't defined in the context
+
         var node = {
             type: 'procedure',
             params: ['next'],
@@ -32,7 +34,7 @@ module.exports["service"] = {
         };
 
         var result = [ 'function',
-            'anon',
+            null,
             [ 'task' ],
             [ 'stmtList',
                 [ 'var', '$next' ],
@@ -45,8 +47,15 @@ module.exports["service"] = {
                                 [ 'select', [ 'id', 'task' ], 'args' ],
                                 [ 'num', '0' ] ] ],
                         [ 'stmtList',
-                            [ 'expr-stmt',
-                                [ 'mul-assign', [ 'id', '$result' ], [ 'id', 'P0' ] ] ] ] ] ] ] ];
+                            [ 'call',
+                                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                                [ [ 'id', '$bar' ],
+                                    [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
+                                    [ 'function',
+                                        null,
+                                        [ 'P0' ],
+                                        [ 'stmtList',
+                                            [ 'expr-stmt', [ 'mul-assign', [ 'id', '$result' ], [ 'id', 'P0' ] ] ] ] ] ] ] ] ] ] ] ];
 
         test.deepEqual(new Context().compile(node).getTree(), result);
 

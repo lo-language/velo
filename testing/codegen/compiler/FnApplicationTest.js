@@ -22,12 +22,11 @@ module.exports["embedded calls"] = {
 
         var ctx = new Context();
 
-        ctx.pushBlockingCall = function (req) {
+        ctx.pushBlockingCall = function (target, args, contingency) {
 
-            test.deepEqual(req.getTree(), [ 'stmtList',
-                [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                    [ [ 'id', '$foo' ], [ 'arrayLiteral', [] ] ] ] ]);
+            test.deepEqual(target.getTree(), [ 'id', '$foo' ]);
+            test.deepEqual(args, [ ]);
+            test.deepEqual(contingency, null);
 
             return 'blocker';
         };
@@ -54,12 +53,11 @@ module.exports["embedded calls"] = {
 
         var ctx = new Context();
 
-        ctx.pushBlockingCall = function (req) {
+        ctx.pushBlockingCall = function (target, args, contingency) {
 
-            test.deepEqual(req.getTree(), [ 'stmtList',
-                [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                    [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ]);
+            test.deepEqual(target.getTree(), [ 'id', '$foo' ]);
+            test.deepEqual(args.map(arg => arg.getTree()), [ [ 'num', '42' ] ]);
+            test.deepEqual(contingency, null);
 
             return 'blocker';
         };
@@ -84,12 +82,11 @@ module.exports["embedded calls"] = {
 
         var ctx = new Context();
 
-        ctx.pushBlockingCall = function (req) {
+        ctx.pushBlockingCall = function (target, args, contingency) {
 
-            test.deepEqual(req.getTree(), [ 'stmtList',
-                [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                    [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ], [ 'string', 'hi there' ] ] ] ] ] ]);
+            test.deepEqual(target.getTree(), [ 'id', '$foo' ]);
+            test.deepEqual(args.map(arg => arg.getTree()), [ [ 'num', '42' ], [ 'string', 'hi there' ] ]);
+            test.deepEqual(contingency, null);
 
             return 'blocker';
         };
@@ -123,19 +120,9 @@ module.exports["embedded calls"] = {
         var blockerCount = 0;
 
         var swaps = [
-            ['P0', [ 'stmtList',
-                [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                    [ [ 'id', '$foo' ], [ 'arrayLiteral', [] ] ] ] ] ],
-            ['P1', [ 'stmtList',
-                ['call',
-                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                    [ [ 'id', '$bar' ], [ 'arrayLiteral', [] ] ] ] ] ],
-            ['P2', [ 'stmtList',
-                [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                    [ [ 'id', '$baz' ],
-                        [ 'arrayLiteral', [ [ 'id', 'P0' ], [ 'id', 'P1' ] ] ] ] ] ] ]
+            ['P0', [ 'id', '$foo' ] ],
+            ['P1', [ 'id', '$bar' ] ],
+            ['P2', [ 'id', '$baz' ] ],
         ];
 
         ctx.pushBlockingCall = function (req) {
@@ -176,7 +163,7 @@ module.exports["application statements"] = {
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ],
                     [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
-                    [ 'function', null, 'res', [ 'stmtList', [ 'id', 'P0' ] ] ] ] ] ] );
+                    [ 'function', null, [ 'P0' ], [ 'stmtList', [ 'id', 'P0' ] ] ] ] ] ] );
 
         // test.equal(a.render(), 'task.sendMessage($foo, [42], function (res) {\nvar P0 = res ? res[0] : null;\n}, null);\n\n');
 
@@ -188,7 +175,7 @@ module.exports["application statements"] = {
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ],
                     [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
-                    [ 'function', null, 'res',
+                    [ 'function', null, [ 'P0' ],
                         [ 'stmtList',
                             [ 'id', 'P0' ],
                             [ "stmtList",
@@ -232,7 +219,7 @@ module.exports["application statements"] = {
                 [
                     [ "id", "$foo" ],
                     [ "arrayLiteral", [] ],
-                    [ "function", null, "res",
+                    [ "function", null, [ "P0" ],
                         [ "stmtList",
                             [ "call",
                                 [ "select", [ "id", "task" ], "sendMessage" ],
@@ -242,14 +229,14 @@ module.exports["application statements"] = {
                                     [
                                         "function",
                                         null,
-                                        "res",
+                                        [ "P1" ],
                                         [ "stmtList",
                                             [ "call",
                                                 [ "select", [ "id", "task" ], "sendMessage" ],
                                                 [
                                                     [ "id", "$baz" ],
                                                     [ "arrayLiteral", [ [ "sub", [ "id", "P0" ], [ "id", "P1" ] ] ] ],
-                                                    [ "function", null, "res",
+                                                    [ "function", null, [ "P2" ],
                                                         [ "stmtList", [ "id", "P2" ] ] ] ] ] ] ] ] ] ] ] ] ] ] );
 
         // test.equal(new Context().compile(node).render(),
@@ -292,7 +279,7 @@ module.exports["application statements"] = {
                     [ 'arrayLiteral', [] ],
                     [ 'function',
                         null,
-                        'res',
+                        [ 'P0' ],
                         [ 'stmtList',
                             [ 'call',
                                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
@@ -300,7 +287,7 @@ module.exports["application statements"] = {
                                     [ 'arrayLiteral', [] ],
                                     [ 'function',
                                         null,
-                                        'res',
+                                        [ 'P1' ],
                                         [ 'stmtList',
                                             [ 'call',
                                                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
@@ -308,12 +295,12 @@ module.exports["application statements"] = {
                                                     [ [ "sub", [ "id", "P0" ], [ "id", "P1" ] ] ] ], [
                                                         "function",
                                                         null,
-                                                        "res",
+                                                        [ "P2" ],
                                                         [ "stmtList", [ "call", [ "select", [ "id", "task" ], "sendMessage" ],
                                                                 [
                                                                     [ "id", "$quux" ],
                                                                     [ "arrayLiteral", [ [ "id", "P2" ] ] ],
-                                                                    [ "function", null, "res", [ "stmtList", [ "id", "P3" ] ] ]
+                                                                    [ "function", null, [ "P3" ], [ "stmtList", [ "id", "P3" ] ] ]
                                                                 ] ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
 
         // test.equal(new Context().compile(node).render(),

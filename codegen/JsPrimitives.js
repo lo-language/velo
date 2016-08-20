@@ -10,12 +10,6 @@
 
 const JS = {};
 
-JS.EMPTY = {
-
-    getTree: () => undefined,
-    getJs: () => ''
-};
-
 JS.NULL = {
 
     getTree: () => ['null'],

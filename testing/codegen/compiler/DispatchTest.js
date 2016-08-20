@@ -38,7 +38,8 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), [ 'call',
+        test.deepEqual(new Context().compile(node).getTree(), [ 'stmtList',
+            [ 'call',
             [ 'select', [ 'id', 'task' ], 'sendMessage' ],
             [ [ 'id', '$foo' ],
                 [ 'arrayLiteral', [] ],
@@ -48,7 +49,7 @@ module.exports["dispatch"] = {
                     [ 'stmtList',
                         [ 'var', '$foo' ],
                         [ 'stmtList',
-                            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '42' ] ] ] ] ] ] ] ]);
+                            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '42' ] ] ] ] ] ] ] ] ]);
         test.done();
     },
 
@@ -78,11 +79,10 @@ module.exports["dispatch"] = {
             }
         };
 
-        var handler = JS.fnDef(['args'],
-            JsStmt.varDecl('$foo').attach(
-                new JsStmt(JS.assign(JS.ID('$foo'), JS.num('42')))));
-
-        test.deepEqual(new Context().compile(node).getTree(), JS.message(JS.ID('$foo'), [], null, handler).getTree());
+        test.deepEqual(new Context().compile(node).getTree(), [ 'stmtList',
+            [ 'call',
+                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                [ [ 'id', '$foo' ], [ 'arrayLiteral', [] ] ] ] ]);
         test.done();
     },
 
@@ -128,17 +128,18 @@ module.exports["dispatch"] = {
         };
 
         test.deepEqual(new Context().compile(node).getTree(),
-            [ 'call',
-                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                [ [ 'id', '$foo' ],
-                    [ 'arrayLiteral', [] ],
-                    [ 'function',
-                        null,
-                        [ 'args' ],
-                        [ 'stmtList',
-                            [ 'var', '$foo' ],
+            [ 'stmtList',
+                [ 'call',
+                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                    [ [ 'id', '$foo' ],
+                        [ 'arrayLiteral', [] ],
+                        [ 'function',
+                            null,
+                            [ 'args' ],
                             [ 'stmtList',
-                                [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '42' ] ] ] ] ] ] ] ]);
+                                [ 'var', '$foo' ],
+                                [ 'stmtList',
+                                    [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '42' ] ] ] ] ] ] ] ] ]);
         test.done();
     }
 };
