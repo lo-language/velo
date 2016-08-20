@@ -47,22 +47,22 @@ __.prototype.run = function (args) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 __.prototype.testSuccess = function (test, args, expected) {
-    
+
     return this.run(args).then(
-            function (result) {
+        result => {
 
-                if (expected !== undefined) {
-                    console.log(result);
-                    test.equal(result, expected);
-                }
+            if (expected !== undefined) {
+                console.log(result);
+                test.equal(result, expected);
+            }
 
-                test.done();
+            test.done();
 
-                // this was in here to let us wait on tests that end with a dispatch
-                // setImmediate(test.done.bind(test));
-            },
-            function (err) {
-                console.error("error running " + _this.program + ".exa: " + err);
+            // this was in here to let us wait on tests that end with a dispatch
+            // setImmediate(test.done.bind(test));
+        },
+        err => {
+                console.error("error running " + this.mainMod + ".exa: " + err);
                 console.error(err.stack);
             }
         );

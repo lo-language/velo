@@ -14,24 +14,24 @@ const Harness = require('../Harness');
 const util = require('util');
 
 
-module.exports['factorial'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(__dirname, 'factorial');
-        cb();
-    },
-
-    'success': function (test) {
-        //console.log(this.harness.getJs());
-        this.harness.testSuccess(test, [10], 3628800);
-    },
-
-    'failure': function (test) {
-        this.harness.testFailure(test, [-1], 'I pity the fool!');
-    }
-};
+// module.exports['factorial'] = {
 //
+//     "setUp": function (cb) {
+//
+//         this.harness = new Harness(__dirname, 'factorial');
+//         cb();
+//     },
+//
+//     'success': function (test) {
+//         //console.log(this.harness.getJs());
+//         this.harness.testSuccess(test, [10], 3628800);
+//     },
+//
+//     'failure': function (test) {
+//         this.harness.testFailure(test, [-1], 'I pity the fool!');
+//     }
+// };
+
 // module.exports['factorial2'] = {
 //
 //     "setUp": function (cb) {
@@ -54,21 +54,21 @@ module.exports['factorial'] = {
 //         this.harness.testSuccess(test, [[10], io]);
 //     }
 // };
-//
-// module.exports['collections'] = {
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'collections');
-//         cb();
-//     },
-//
-//     'all': function (test) {
-//
-//         this.harness.testSuccess(test);
-//     }
-// };
-//
+
+module.exports['collections'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'collections');
+        cb();
+    },
+
+    'all': function (test) {
+
+        this.harness.testSuccess(test);
+    }
+};
+
 // module.exports['helloWorld'] = {
 //
 //     "setUp": function (cb) {
@@ -131,23 +131,23 @@ module.exports['factorial'] = {
 //         this.harness.testSuccess(test, [1], 'positive');
 //     }
 // };
-//
-// module.exports['iteration'] = {
-//
-//     // test that uncaught errors are properly escalated out of the program
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'iteration');
-//         cb();
-//     },
-//
-//     "stack doesn't overflow": function (test) {
-//
-//         this.harness.testSuccess(test, [100000], 100000);
-//     }
-// };
-//
+
+module.exports['iteration'] = {
+
+    // test that uncaught errors are properly escalated out of the program
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'iteration');
+        cb();
+    },
+
+    "stack doesn't overflow": function (test) {
+
+        this.harness.testSuccess(test, [100000], 100000).done();
+    }
+};
+
 // module.exports['procedure'] = {
 //
 //     "setUp": function (cb) {

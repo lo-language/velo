@@ -12,16 +12,36 @@ const util = require('util');
 
 module.exports["op"] = {
 
-    "with literals": function (test) {
+    "basic operators": function (test) {
 
-        var node = {
-            type: 'op',
-            op: '*',
-            left: {type: 'number', val: '1'},
-            right: {type: 'number', val: '2'}
-        };
+        var cases = [
+            ['+', 'add'],
+            ['-', 'sub'],
+            ['*', 'mul'],
+            ['/', 'div'],
+            ['%', 'mod'],
+            ['==', 'strict-equal'],
+            ['and', '&&'],
+            ['or', '||'],
+            ['<', 'lt'],
+            ['>', 'gt'],
+            ['<=', 'lte'],
+            ['>=', 'gte'],
+            ['!=', 'not-equal']
+        ];
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.mul(JS.num('1'), JS.num('2')).getTree());
+        cases.forEach(op => {
+
+            var node = {
+                type: 'op',
+                op: op[0],
+                left: {type: 'number', val: '1'},
+                right: {type: 'number', val: '2'}
+            };
+
+            test.deepEqual(new Context().compile(node).getTree(), [ op[1], [ 'num', '1' ], [ 'num', '2' ] ]);
+        });
+
         test.done();
     },
 

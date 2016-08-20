@@ -152,6 +152,56 @@ module.exports["operators"] = {
         test.done();
     },
 
+    "not equal": function (test) {
+
+        var n = JS.notEqual(JS.ID('foo'), JS.ID('bar'));
+
+        test.deepEqual(n.getTree(), [ 'not-equal', [ 'id', 'foo' ], ['id', 'bar'] ]);
+        test.equal(n.getJs(), "foo != bar");
+
+        test.done();
+    },
+
+    "lt": function (test) {
+
+        var n = JS.lt(JS.ID('foo'), JS.ID('bar'));
+
+        test.deepEqual(n.getTree(), [ 'lt', [ 'id', 'foo' ], ['id', 'bar'] ]);
+        test.equal(n.getJs(), "foo < bar");
+
+        test.done();
+    },
+
+    "gt": function (test) {
+
+        var n = JS.gt(JS.ID('foo'), JS.ID('bar'));
+
+        test.deepEqual(n.getTree(), [ 'gt', [ 'id', 'foo' ], ['id', 'bar'] ]);
+        test.equal(n.getJs(), "foo > bar");
+
+        test.done();
+    },
+
+    "lte": function (test) {
+
+        var n = JS.lte(JS.ID('foo'), JS.ID('bar'));
+
+        test.deepEqual(n.getTree(), [ 'lte', [ 'id', 'foo' ], ['id', 'bar'] ]);
+        test.equal(n.getJs(), "foo <= bar");
+
+        test.done();
+    },
+
+    "gte": function (test) {
+
+        var n = JS.gte(JS.ID('foo'), JS.ID('bar'));
+
+        test.deepEqual(n.getTree(), [ 'gte', [ 'id', 'foo' ], ['id', 'bar'] ]);
+        test.equal(n.getJs(), "foo >= bar");
+
+        test.done();
+    },
+
     "add": function (test) {
 
         var n = JS.add(JS.ID('foo'), JS.ID('bar'));
@@ -253,7 +303,7 @@ module.exports["operators"] = {
     }
 };
 
-module.exports["cn calls"] = {
+module.exports["fn calls"] = {
 
     "fn call with one arg": function (test) {
 
@@ -376,6 +426,32 @@ module.exports["statements"] = {
                 [ 'expr-stmt', [ 'assign', [ 'id', 'bar' ], [ 'id', 'baz' ] ] ] ] ]);
 
         test.equal(n.getJs(), "foo = bar;\nbar = baz;");
+
+        test.done();
+    },
+
+    "cond stmt": function (test) {
+
+        // consequent only - no else
+
+        var n = JS.cond(JS.bool('true'), JS.exprStmt(JS.assign(JS.ID('baz'), JS.num('48'))));
+
+        test.deepEqual(n.getTree(), [ 'if',
+            [ 'bool', 'true' ],
+            [ 'expr-stmt', [ 'assign', [ 'id', 'baz' ], [ 'num', '48' ] ] ] ]);
+        test.equal(n.getJs(), "if (true) {\nbaz = 48;\n}");
+
+        test.done();
+    },
+
+    "while stmt": function (test) {
+
+        var n = JS.while(JS.bool('true'), JS.exprStmt(JS.assign(JS.ID('baz'), JS.num('48'))));
+
+        test.deepEqual(n.getTree(), [ 'while',
+            [ 'bool', 'true' ],
+            [ 'expr-stmt', [ 'assign', [ 'id', 'baz' ], [ 'num', '48' ] ] ] ]);
+        test.equal(n.getJs(), "while (true) {\nbaz = 48;\n}");
 
         test.done();
     }

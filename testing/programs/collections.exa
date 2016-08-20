@@ -48,34 +48,34 @@ main is -> {
     }
 
     // Array excision
-    snip = cut words[1];
-
-    if snip != "mani" {
-        fail "crud";
-    }
-
-    if #words != 3 {
-        fail "too bad";
-    }
-
-    words = ["foo", "mani", "padme", "hum"];
-    subset = cut words[1..2];
-
-    if #subset != 2 {
-        fail "that's not good";
-    }
-
-    if #words != 2 {
-        fail "problem found";
-    }
-
-    if subset[0] != "mani" {
-        fail "my goodness";
-    }
-
-    if words[1] != "hum" {
-        fail "that's a real shame";
-    }
+//    snip = cut words[1];
+//
+//    if snip != "mani" {
+//        fail "crud";
+//    }
+//
+//    if #words != 3 {
+//        fail "too bad";
+//    }
+//
+//    words = ["foo", "mani", "padme", "hum"];
+//    subset = cut words[1..2];
+//
+//    if #subset != 2 {
+//        fail "that's not good";
+//    }
+//
+//    if #words != 2 {
+//        fail "problem found";
+//    }
+//
+//    if subset[0] != "mani" {
+//        fail "my goodness";
+//    }
+//
+//    if words[1] != "hum" {
+//        fail "that's a real shame";
+//    }
 
     // Map literals (including empty), access, and cardinality
 

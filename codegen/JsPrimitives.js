@@ -112,6 +112,46 @@ JS.strictEqual = (left, right) => {
     };
 };
 
+JS.notEqual = (left, right) => {
+
+    return {
+        getTree: () => ['not-equal', left.getTree(), right.getTree()],
+        getJs: () => left.getJs() + ' != ' + right.getJs()
+    };
+};
+
+JS.lt = (left, right) => {
+
+    return {
+        getTree: () => ['lt', left.getTree(), right.getTree()],
+        getJs: () => left.getJs() + ' < ' + right.getJs()
+    };
+};
+
+JS.gt = (left, right) => {
+
+    return {
+        getTree: () => ['gt', left.getTree(), right.getTree()],
+        getJs: () => left.getJs() + ' > ' + right.getJs()
+    };
+};
+
+JS.lte = (left, right) => {
+
+    return {
+        getTree: () => ['lte', left.getTree(), right.getTree()],
+        getJs: () => left.getJs() + ' <= ' + right.getJs()
+    };
+};
+
+JS.gte = (left, right) => {
+
+    return {
+        getTree: () => ['gte', left.getTree(), right.getTree()],
+        getJs: () => left.getJs() + ' >= ' + right.getJs()
+    };
+};
+
 JS.add = (left, right) => {
 
     return {
@@ -217,7 +257,7 @@ JS.fnDef = (params, body, name) => {
 };
 
 JS.stmtList = (head, tail) => {
-
+    
     return {
 
         getTree: function () {
@@ -258,7 +298,7 @@ JS.cond = (predicate, consequent, alt) => {
 
     return {
         getTree: () => ['if', predicate.getTree(), consequent.getTree()].concat(alt ? alt.getTree() : []),
-        getJs: 'tbd'
+        getJs: () => 'if (' + predicate.getJs() + ') {\n' + consequent.getJs() + '\n}'
     }
 };
 
@@ -266,7 +306,7 @@ JS.while = (condition, body) => {
 
     return {
         getTree: () => ['while', condition.getTree(), body.getTree()],
-        getJs: 'tbd'
+        getJs: () => 'while (' + condition.getJs() + ') {\n' + body.getJs() + '\n}'
     }
 };
 
@@ -284,67 +324,4 @@ JS.message = (target, args, subsequent, contingency) => {
     return JS.runtimeCall('sendMessage', [target, JS.arrayLiteral(args)]);
 };
 
-
-//
-// while: (condition, statements) => new JsStmt(['while', condition, statements]),
-//
-// strictMode: ast => new JsStmt(['strictMode']),
-//
-// // higher-level constructs
-//
-// runtimeCall: (name, args) => JS.fnCall(JS.select(JS.ID('task'), name), args),
-//
-// message: (target, args, replyHandler, failHandler) => JS.runtimeCall('sendMessage', [
-//     target, JS.arrayLiteral(args), replyHandler ? replyHandler : JS.NULL, failHandler ? failHandler : JS.NULL
-// ])
-
 module.exports = JS;
-
-
-// ['stmtList', headStmt]
-// ['stmtList', headStmt, ['stmtList', head2Stmt]]
-// ['stmtList', headStmt, ['stmtList', head2Stmt, ['stmtList', head3Stmt]]
-
-// var writer = {
-//
-//
-//     subscript: ast => render(ast[1]) + '[' + render(ast[2]) + ']',
-//
-//     returnStmt: ast => 'return' + (ast[1] ? ' ' + render(ast[1]) : '') + ';',
-//
-//     strictMode: ast => "'use strict';",
-//
-//
-//     if: ast => {
-//
-//         var parts = ['if (', predicate, ') ', {block: consequent}, '\n\n'];
-//
-//         if (negBlock) {
-//             parts.push('else ', {block: negBlock}, '\n\n');
-//         }
-//     },
-//
-//     fnDef: ast => 'function (' + ast[1].join(', ') + ') {\n' + render(ast[2]) + '\n}',
-//
-//     fnCall: ast => {
-//
-//         var argList = ast[2].map(render).join(', ');
-//
-//         return ast[1] + '(' + argList + ')';
-//     },
-//
-//     stmtList: ast => {
-//
-//         var head = render(ast[1]);
-//
-//         if (ast[2]) {
-//             return head + '\n' + render(ast[2]);
-//         }
-//
-//         return head;
-//     },
-//
-//     message: ast => render(['fnCall', 'task.sendMessage', [
-//                         ast[1], ['arrayLiteral', ast[2]], ast[3], ast[4]]
-//                     ])
-// };

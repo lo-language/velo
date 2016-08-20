@@ -628,6 +628,21 @@ module.exports['op'] = function (node) {
         case '==':
             return JS.strictEqual(left, right);
 
+        case '!=':
+            return JS.notEqual(left, right);
+
+        case '<':
+            return JS.lt(left, right);
+
+        case '>':
+            return JS.gt(left, right);
+
+        case '<=':
+            return JS.lte(left, right);
+
+        case '>=':
+            return JS.gte(left, right);
+
         case '+':
             return JS.add(left, right);
 
@@ -639,9 +654,12 @@ module.exports['op'] = function (node) {
 
         case '/':
             return JS.div(left, right);
+
+        case '%':
+            return JS.mod(left, right);
     }
 
-    throw new Error("unknown operator!");
+    throw new Error("unknown operator: " + op);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
