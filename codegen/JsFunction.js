@@ -31,14 +31,14 @@ __.prototype._getAst = function () {
     return JS.fnDef(this.params, this.body);
 };
 
-__.prototype.getTree = function () {
+__.prototype.renderTree = function () {
 
-    return this._getAst().getTree();
+    return this._getAst().renderTree();
 };
 
-__.prototype.getJs = function () {
+__.prototype.renderJs = function () {
 
-    return this._getAst().getJs();
+    return this._getAst().renderJs();
 };
 
 module.exports = __;

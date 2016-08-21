@@ -19,7 +19,7 @@ module.exports["complement"] = {
             operand: {type: 'id', name: 'foo'}
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.not(JS.ID('$foo')).getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), JS.not(JS.ID('$foo')).renderTree());
         test.done();
     }
 };

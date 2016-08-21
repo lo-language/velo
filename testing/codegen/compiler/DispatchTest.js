@@ -38,7 +38,7 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), [ 'stmtList',
+        test.deepEqual(new Context().compile(node).renderTree(), [ 'stmtList',
             [ 'call',
             [ 'select', [ 'id', 'task' ], 'sendMessage' ],
             [ [ 'id', '$foo' ],
@@ -79,7 +79,7 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), [ 'stmtList',
+        test.deepEqual(new Context().compile(node).renderTree(), [ 'stmtList',
             [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ], [ 'arrayLiteral', [] ] ] ] ]);
@@ -127,7 +127,7 @@ module.exports["dispatch"] = {
             }
         };
 
-        test.deepEqual(new Context().compile(node).getTree(),
+        test.deepEqual(new Context().compile(node).renderTree(),
             [ 'stmtList',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendMessage' ],

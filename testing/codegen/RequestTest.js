@@ -16,7 +16,7 @@ module.exports["blocking"] = {
 
         var req = new Request(JS.ID('$foo'), [JS.num('42')], null, null);
 
-        test.deepEqual(req.getTree(),
+        test.deepEqual(req.renderTree(),
             [ 'stmtList', [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ]);
@@ -31,7 +31,7 @@ module.exports["blocking"] = {
         var replyHandler = new JsFunction(['res'], new JsStmt(JS.assign(JS.ID('baz'), JS.num('57'))));
         var req = new Request(JS.ID('$foo'), [JS.num('42')], replyHandler, null);
 
-        test.deepEqual(req.getTree(),
+        test.deepEqual(req.renderTree(),
             [ 'stmtList', [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ],
@@ -50,7 +50,7 @@ module.exports["blocking"] = {
 
         var req = new Request(JS.ID('$foo'), [JS.num('42')], replyHandler, null);
 
-        test.deepEqual(req.getTree(),
+        test.deepEqual(req.renderTree(),
             [ 'stmtList', [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ],

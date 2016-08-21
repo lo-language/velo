@@ -86,7 +86,7 @@ __.prototype.render = function () {
     return Object.keys(this.modules).map(moduleId => {
 
         // todo put the const name in as the fn name for JS
-        return "const " + moduleId + " = " + this.modules[moduleId].getJs() + "();";
+        return "const " + moduleId + " = " + this.modules[moduleId].renderJs() + "();";
     }
     ).join("\n\n");
 };
@@ -103,7 +103,6 @@ __.prototype.run = function (args) {
         '\n\nM0["main"](rootTask);\n\n';
 
     try {
-        console.log(body);
         var main = new Function("rootTask", body);
 
         var d = Q.defer();

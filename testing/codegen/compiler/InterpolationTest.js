@@ -23,10 +23,10 @@ module.exports["select"] = {
             "right":"!"
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.add(
+        test.deepEqual(new Context().compile(node).renderTree(), JS.add(
             JS.add(JS.string('hello, '), JS.ID('$name')),
             JS.string('!')
-        ).getTree());
+        ).renderTree());
         test.done();
     },
 
@@ -50,7 +50,7 @@ module.exports["select"] = {
             "right":"."
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.add(
+        test.deepEqual(new Context().compile(node).renderTree(), JS.add(
             JS.add(
                 JS.string("I'm sorry, "),
                 JS.add(
@@ -59,7 +59,7 @@ module.exports["select"] = {
                 )
             ),
             JS.string('.')
-        ).getTree());
+        ).renderTree());
 
         test.done();
     },
@@ -102,7 +102,7 @@ module.exports["select"] = {
                         JS.ID('$c')))),
             JS.string('.'));
 
-        test.deepEqual(new Context().compile(node).getTree(), exp.getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), exp.renderTree());
         test.done();
     }
 };

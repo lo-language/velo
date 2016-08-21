@@ -11,10 +11,10 @@ module.exports["basics"] = {
 
         var fn = new JsFunction(['a', 'b'], JS.stmtList(JS.assign(JS.ID('$foo'), JS.ID('a'))));
 
-        test.deepEqual(fn.getTree(),
+        test.deepEqual(fn.renderTree(),
             JS.fnDef(
                 ['a', 'b'],
-                JS.stmtList(JS.assign(JS.ID('$foo'), JS.ID('a')))).getTree());
+                JS.stmtList(JS.assign(JS.ID('$foo'), JS.ID('a')))).renderTree());
 
         test.equal(fn.getBody(), fn.body);
         test.done();

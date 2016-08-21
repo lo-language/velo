@@ -99,16 +99,16 @@ __.prototype._getAst = function () {
     return JS.stmtList(this.ast, this.next ? this.next._getAst() : null);
 };
 
-__.prototype.getTree = function () {
+__.prototype.renderTree = function () {
 
-    return this._getAst().getTree();
+    return this._getAst().renderTree();
 };
 
-__.prototype.getJs = function () {
+__.prototype.renderJs = function () {
 
     var ast = this._getAst();
 
-    return ast ? ast.getJs() : '';
+    return ast ? ast.renderJs() : '';
 };
 
 // off-the-shelf statements

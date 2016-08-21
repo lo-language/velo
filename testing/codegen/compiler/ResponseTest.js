@@ -19,9 +19,9 @@ module.exports["response"] = {
             channel: 'reply',
             args: []};
 
-        test.deepEqual(new Context().compile(node).getTree(),
+        test.deepEqual(new Context().compile(node).renderTree(),
             new JsStmt(JS.runtimeCall('respond', [JS.string('reply'), JS.arrayLiteral([])]))
-                .attach(JsStmt.return()).getTree());
+                .attach(JsStmt.return()).renderTree());
         test.done();
     },
 
@@ -34,9 +34,9 @@ module.exports["response"] = {
                 {type: 'number', val: '42'}
             ]};
 
-        test.deepEqual(new Context().compile(node).getTree(),
+        test.deepEqual(new Context().compile(node).renderTree(),
             new JsStmt(JS.runtimeCall('respond', [JS.string('reply'), JS.arrayLiteral([JS.num('42')])]))
-                .attach(JsStmt.return()).getTree());
+                .attach(JsStmt.return()).renderTree());
         test.done();
     },
 
@@ -50,9 +50,9 @@ module.exports["response"] = {
                 {type: 'string', val: "hot dog!"}
             ]};
 
-        test.deepEqual(new Context().compile(node).getTree(),
+        test.deepEqual(new Context().compile(node).renderTree(),
             new JsStmt(JS.runtimeCall('respond', [JS.string('reply'), JS.arrayLiteral([JS.num('42'), JS.string("hot dog!")])]))
-                .attach(JsStmt.return()).getTree());
+                .attach(JsStmt.return()).renderTree());
         test.done();
     },
 
@@ -65,9 +65,9 @@ module.exports["response"] = {
                 {type: 'number', val: '42'}
             ]};
 
-        test.deepEqual(new Context().compile(node).getTree(),
+        test.deepEqual(new Context().compile(node).renderTree(),
             new JsStmt(JS.runtimeCall('respond', [JS.string('fail'), JS.arrayLiteral([JS.num('42')])]))
-                .attach(JsStmt.return()).getTree());
+                .attach(JsStmt.return()).renderTree());
         test.done();
     }
 };

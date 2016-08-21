@@ -139,7 +139,7 @@ module.exports["compile with no deps"] = {
 
         mod.compileSelf().then(function (result) {
 
-            test.deepEqual(result.getTree(),
+            test.deepEqual(result.renderTree(),
                 [ 'function',
                     null,
                     [],
@@ -157,7 +157,7 @@ module.exports["compile with no deps"] = {
 
         mod.compileSelf().then(function (result) {
 
-            test.deepEqual(result.getTree(), [ 'function',
+            test.deepEqual(result.renderTree(), [ 'function',
                 null,
                 [],
                 [ 'stmtList',
@@ -176,7 +176,7 @@ module.exports["compile with no deps"] = {
                             [ 'return',
                                 [ 'objLiteral', [ [ [ 'string', 'foo' ], [ 'id', '$foo' ] ] ] ] ] ] ] ] ]);
 
-            // test.equal(result.getJs(),
+            // test.equal(result.renderJs(),
             //     "function () {\n\n'use strict';\n\nconst $foo = " +
             //     "function (task) {var $recur = task.service;\nvar $x;\n\n\n$x = 42;\n};\n\nreturn {\"foo\": \$foo\};\n}");
 
@@ -190,7 +190,7 @@ module.exports["compile with no deps"] = {
 
         mod.compileSelf().then(function (result) {
 
-            test.deepEqual(result.getTree(), [ 'function',
+            test.deepEqual(result.renderTree(), [ 'function',
                 null,
                 [],
                 [ 'stmtList',
@@ -221,7 +221,7 @@ module.exports["compile with no deps"] = {
                                         [ [ [ 'string', 'foo' ], [ 'id', '$foo' ] ],
                                             [ [ 'string', 'bar' ], [ 'id', '$bar' ] ] ] ] ] ] ] ] ] ]);
 
-            // test.equal(result.getJs(),
+            // test.equal(result.renderJs(),
             //     "function () {\n\n'use strict';\n\n" +
             //     "const $foo = function (task) {var $recur = task.service;\nvar $x;\n\n\n$x = 42;\n};\n\n" +
             //     "const $bar = function (task) {var $recur = task.service;\nvar $a;\n\n\n$a = 57;\n};\n\n" +
@@ -251,7 +251,7 @@ module.exports["compile with deps"] = {
 
         mod.compileSelf(program).then(function (result) {
 
-            test.deepEqual(result.getTree(),
+            test.deepEqual(result.renderTree(),
                 [ 'function',
                 null,
                 [],
@@ -259,7 +259,7 @@ module.exports["compile with deps"] = {
                     [ 'use-strict' ],
                     [ 'stmtList', [ 'return', [ 'objLiteral', [] ] ] ] ] ]);
 
-            // test.equal(result.getJs(),
+            // test.equal(result.renderJs(),
             //     "function () {\n\n'use strict';\n\n\n\nreturn {};\n}");
 
             test.done();
@@ -282,7 +282,7 @@ module.exports["compile with deps"] = {
 
         mod.compileSelf(program).then(function (result) {
 
-            test.deepEqual(result.getTree(),
+            test.deepEqual(result.renderTree(),
                 [ 'function',
                 null,
                 [],
@@ -302,7 +302,7 @@ module.exports["compile with deps"] = {
                             [ 'return',
                                 [ 'objLiteral', [ [ [ 'string', 'foo' ], [ 'id', '$foo' ] ] ] ] ] ] ] ] ]);
 
-            // test.equal(result.getJs(),
+            // test.equal(result.renderJs(),
             //     "function () {\n\n'use strict';\n\n" +
             //     "const $foo = function (task) {var $recur = task.service;\n" +
             //     "var $x;\n\n\n$x = 42;\n};\n\n" +

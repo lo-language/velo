@@ -13,7 +13,7 @@ module.exports["render"] = {
 
         var stmt = new JsStmt();
 
-        test.equal(stmt.getJs(), '');
+        test.equal(stmt.renderJs(), '');
 
         test.done();
     }
@@ -34,7 +34,7 @@ module.exports["getTree"] = {
 
         var ast = JS.assign(JS.ID('$foo'), JS.num('57'));
 
-        test.deepEqual(ast.getTree(), [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ]);
+        test.deepEqual(ast.renderTree(), [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ]);
 
         test.done();
     },
@@ -43,7 +43,7 @@ module.exports["getTree"] = {
 
         var stmt = new JsStmt(JS.assign(JS.ID('$foo'), JS.num('42')));
 
-        test.deepEqual(stmt.getTree(), ['stmtList', ['assign', ['id', '$foo'], ['num', '42']]]);
+        test.deepEqual(stmt.renderTree(), ['stmtList', ['assign', ['id', '$foo'], ['num', '42']]]);
         test.equal(stmt.isFinal(), false);
         test.done();
     },
@@ -52,7 +52,7 @@ module.exports["getTree"] = {
 
         var ast = new JsFunction(['task'], new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.num('57')))));
 
-        test.deepEqual(ast.getTree(),
+        test.deepEqual(ast.renderTree(),
             [ "function", null, [ "task" ],
                 [ "stmtList",
                     [ "expr-stmt", [ "assign", [ "id", "$foo" ], [ "num", "57" ] ] ] ] ]);
@@ -66,7 +66,7 @@ module.exports["getTree"] = {
 
         stmt.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('$z'), JS.num('42')))));
 
-        test.deepEqual(stmt.getTree(),
+        test.deepEqual(stmt.renderTree(),
             [ 'stmtList',
                 [ 'while',
                     [ 'bool', 'true' ],
@@ -82,17 +82,17 @@ module.exports["getTree"] = {
 
         var stmt = new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.num('57'))));
 
-        test.deepEqual(stmt.getTree(), [ 'stmtList',
+        test.deepEqual(stmt.renderTree(), [ 'stmtList',
             [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
 
         stmt = stmt.attach(new JsStmt());
 
-        test.deepEqual(stmt.getTree(), [ 'stmtList',
+        test.deepEqual(stmt.renderTree(), [ 'stmtList',
             [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
 
         stmt = stmt.attach(new JsStmt());
 
-        test.deepEqual(stmt.getTree(), [ 'stmtList',
+        test.deepEqual(stmt.renderTree(), [ 'stmtList',
             [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
 
         test.done();
@@ -107,7 +107,7 @@ module.exports["attach"] = {
 
         stmt.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.num('57')))));
 
-        test.deepEqual(stmt.getTree(), [ 'stmtList',
+        test.deepEqual(stmt.renderTree(), [ 'stmtList',
             [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
 
         test.done();
@@ -119,7 +119,7 @@ module.exports["attach"] = {
 
         stmt.attach(new JsStmt(JS.assign(JS.ID('$bar'), JS.ID('$baz'))));
 
-        test.deepEqual(stmt.getTree(),
+        test.deepEqual(stmt.renderTree(),
             ['stmtList',
                 ['assign', ['id', '$foo'], ['num', '42']],
                 ['stmtList',
@@ -134,7 +134,7 @@ module.exports["attach"] = {
 
         stmt.attach(new JsStmt(['assign', ['id', '$bar'], ['id', '$baz']]));
 
-        test.deepEqual(stmt.getTree(), ['stmtList', ['return']]);
+        test.deepEqual(stmt.renderTree(), ['stmtList', ['return']]);
         test.done();
     },
 
@@ -146,7 +146,7 @@ module.exports["attach"] = {
         stmt.attach(new JsStmt(JS.return(), true));
         test.equal(stmt.isFinal(), true);
 
-        test.deepEqual(stmt.getTree(),
+        test.deepEqual(stmt.renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt', [ 'assign', ['id', '$foo'], ['num', '42'] ] ],
                 [ 'stmtList',
@@ -158,12 +158,12 @@ module.exports["attach"] = {
 
         var stmt = new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.num('57'))));
 
-        test.deepEqual(stmt.getTree(), [ 'stmtList',
+        test.deepEqual(stmt.renderTree(), [ 'stmtList',
             [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
 
         stmt = stmt.attach(new Request(JS.ID('$foo'), [JS.num('42')], null, null));
 
-        test.deepEqual(stmt.getTree(), [ 'stmtList',
+        test.deepEqual(stmt.renderTree(), [ 'stmtList',
             [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ],
             [ 'stmtList',
                 [ 'call',

@@ -273,52 +273,96 @@ module.exports["external constants"] = {
 
 module.exports["compileStmt"] = {
 
-    // "get placeholder": function (test) {
-    //
-    //     var context = new Context();
-    //
-    //     // spoof a wrapper
-    //     context.compileStmt();
-    //
-    //     test.deepEqual(context.pushBlockingCall().getTree(), JS.ID('P0').getTree());
-    //
-    //     test.done();
-    // },
+    "with no wrappers": function (test) {
 
-    // "create statement with no wrappers": function (test) {
-    //
-    //     var context = new Context();
-    //
-    //     test.deepEqual(
-    //         context.createStmt(JS.add(JS.ID('$foo'), JS.num('17'))).getTree(),
-    //         JS.stmtList(JS.add(JS.ID('$foo'), JS.num('17'))).getTree());
-    //
-    //     test.done();
-    // },
+        var node = {
+            type: 'assign',
+            op: '*=',
+            left: {type: 'subscript', list: {type: 'id', name: 'foo'}, index: {type: 'id', name: 'bar'}},
+            right: {type: 'number', val: '57'}
+        };
 
-    // "create statement with one wrapper": function (test) {
-    //
-    //     var context = new Context();
-    //
-    //     context.pushBlocker(new Request(JS.ID('$foo'), []));
-    //
-    //     var handler = JS.fnDef('res', JS.stmtList(JS.add(JS.ID('$foo'), JS.num('17'))));
-    //
-    //     test.deepEqual(
-    //         context.createStmt(JS.add(JS.ID('$foo'), JS.num('17'))).getTree(),
-    //         new Request(JS.ID('$foo'), [], handler).getTree());
-    //
-    //     test.done();
-    // },
+        var context = new Context();
 
-    // "create statement with two wrappers": function (test) {
-    //
-    //     var context = new Context();
-    //
-    //     test.equal(context.pushBlocker(), 'P1');
-    //
-    //     test.equal(context.pushBlocker(), 'P1');
-    //
-    //     test.done();
-    // }
+        // spoof a wrapper
+        var s = context.compileStmt(node);
+
+        test.deepEqual(s.renderTree(), [ 'stmtList',
+            [ 'expr-stmt',
+                [ 'mul-assign',
+                    [ 'subscript', [ 'id', '$foo' ], [ 'id', '$bar' ] ],
+                    [ 'num', '57' ] ] ] ]);
+
+        test.equal(s.async, false);
+
+        test.done();
+    },
+
+    "with one wrapper": function (test) {
+
+        var node = {
+            type: 'application_stmt',
+            application: {
+                type: 'application',
+                address: {type: 'id', name: 'foo'},
+                args: [
+                    {type: 'number', val: '42'}
+                ]}
+        };
+
+        var context = new Context();
+
+        // spoof a wrapper
+        var s = context.compileStmt(node);
+
+        test.deepEqual(s.renderTree(), [ 'stmtList',
+            [ 'call',
+                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                [ [ 'id', '$foo' ],
+                    [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
+                    [ 'function', null, [ 'P0' ], [ 'stmtList', [ 'id', 'P0' ] ] ] ] ] ]);
+
+        test.equal(s.async, true);
+
+        test.done();
+    },
+
+    "with two wrappers": function (test) {
+
+        var node = {
+            type: 'application_stmt',
+            application: {
+                type: 'application',
+                address: {type: 'id', name: 'baz'},
+                args: [ {
+                        type: 'application',
+                        address: {type: 'id', name: 'foo'},
+                        args: []
+                    }]}
+        };
+
+        var context = new Context();
+
+        // spoof a wrapper
+        var s = context.compileStmt(node);
+
+        test.deepEqual(s.renderTree(), [ 'stmtList',
+            [ 'call',
+                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                [ [ 'id', '$foo' ],
+                    [ 'arrayLiteral', [] ],
+                    [ 'function',
+                        null,
+                        [ 'P0' ],
+                        [ 'stmtList',
+                            [ 'call',
+                                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                                [ [ 'id', '$baz' ],
+                                    [ 'arrayLiteral', [ [ 'id', 'P0' ] ] ],
+                                    [ 'function', null, [ 'P1' ], [ 'stmtList', [ 'id', 'P1' ] ] ] ] ] ] ] ] ] ]);
+
+        test.equal(s.async, true);
+
+        test.done();
+    }
 };

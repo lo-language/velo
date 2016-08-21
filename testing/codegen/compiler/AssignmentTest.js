@@ -26,7 +26,7 @@ module.exports["assignment"] = {
 
         test.equal(context.has('foo'), false);
 
-        test.deepEqual(context.compile(node).getTree(),
+        test.deepEqual(context.compile(node).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
         test.equal(context.has('foo'), true);
@@ -44,7 +44,7 @@ module.exports["assignment"] = {
 
         var context = new Context().createInner();
 
-        test.deepEqual(context.compile(node).getTree(),
+        test.deepEqual(context.compile(node).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'mul-assign',
@@ -65,7 +65,7 @@ module.exports["assignment"] = {
         var context = new Context().createInner();
 
         test.equal(context.has('foo'), false);
-        test.deepEqual(context.compile(node).getTree(),
+        test.deepEqual(context.compile(node).renderTree(),
             [ 'stmtList',
             [ 'expr-stmt',
                 [ 'assign', [ 'id', '$foo' ], [ 'id', '$bar' ] ] ] ]);
@@ -108,7 +108,7 @@ module.exports["assignment"] = {
 
         test.equal(context.has('foo'), true);
 
-        test.deepEqual(context.compile(node).getTree(),
+        test.deepEqual(context.compile(node).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
         test.deepEqual(context.getJsVars(), []);

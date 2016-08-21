@@ -12,5 +12,5 @@ main is -> (num) {
         reply 1;
     }
 
-    reply num * recur(num - 1);
+    reply num * main(num - 1);
 };

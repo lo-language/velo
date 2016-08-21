@@ -22,7 +22,7 @@ module.exports["select"] = {
             "member":"bar"
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.select(JS.ID('$foo'), 'bar').getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), JS.select(JS.ID('$foo'), 'bar').renderTree());
         test.done();
     }
 };

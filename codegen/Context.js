@@ -223,7 +223,7 @@ __.prototype.compileStmt = function (node) {
 
     this.wrapper = new JsStmt();
 
-    // a statement could be a context
+    // a statement could be a context itself...
 
     return this.wrapper.attach(this.compile(node));
 };
@@ -247,6 +247,9 @@ __.prototype.pushBlockingCall = function (address, args, failHandler) {
 
     // create a reply handler taking the placeholder as its param and with an empty body
     var req = new Request(address, args, replyHandler, failHandler);
+
+    // flag this stmt as async
+    this.wrapper.async = true;
 
     this.wrapper = this.wrapper.attach(req);
 

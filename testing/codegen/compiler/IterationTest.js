@@ -22,7 +22,7 @@ module.exports["basics"] = {
 
         var a = new Context().createInner().compile(node);
 
-        test.deepEqual(a.getTree(),
+        test.deepEqual(a.renderTree(),
             [ 'stmtList',
                 [ 'while',
                     [ 'id', '$foo' ],
@@ -32,7 +32,7 @@ module.exports["basics"] = {
         // try attaching a statement – should get stuck on the end
         a.attach(new JsStmt(JS.assign(JS.ID('$z'), JS.num('57'))));
 
-        test.deepEqual(a.getTree(),
+        test.deepEqual(a.renderTree(),
             [ 'stmtList',
                 [ 'while',
                     [ 'id', '$foo' ],
@@ -43,7 +43,7 @@ module.exports["basics"] = {
         // try attaching another statement
         a.attach(JsStmt.varDecl('bee'));
 
-        test.deepEqual(a.getTree(),
+        test.deepEqual(a.renderTree(),
             [ 'stmtList',
                 [ 'while',
                     [ 'id', '$foo' ],
@@ -56,47 +56,71 @@ module.exports["basics"] = {
         test.done();
     },
 
-    // "async loop": function (test) {
-    //
-    //     var node = {
-    //         type: 'iteration',
-    //         condition: {type: 'id', name: 'foo'},
-    //         statements: {type: 'stmt_list',
-    //             head: {
-    //                 type: 'application_stmt',
-    //                 application: {
-    //                     type: 'application',
-    //                     address: {type: 'id', name: 'foo'},
-    //                     args: [{type: 'number', val: '57'}]
-    //                 }
-    //             },
-    //             tail: null}
-    //     };
-    //
-    //     var a = new Context().createInner().compile(node);
-    //
-    //     test.equal(a.getTree(),
-    //         'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
-    //         'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {}};\n\nloop();\n');
-    //
-    //     // try attaching a statement
-    //     a.attach(new JsConstruct("var z = 57;"));
-    //
-    //     test.equal(a.getTree(),
-    //         'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
-    //         'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;}};\n\nloop();\n');
-    //
-    //     // try attaching another statement
-    //     a.attach(new JsConstruct("var bee = 27;"));
-    //
-    //     test.equal(a.getTree(),
-    //         'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
-    //         'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
-    //
-    //     test.done();
-    // },
-    //
-    // "loop with async cond": function (test) {
+    "async in body": function (test) {
+
+        var node = {
+            type: 'iteration',
+            condition: {type: 'id', name: 'foo'},
+            statements: {type: 'stmt_list',
+                head: {
+                    type: 'application_stmt',
+                    application: {
+                        type: 'application',
+                        address: {type: 'id', name: 'bar'},
+                        args: [{type: 'number', val: '57'}]
+                    }
+                },
+                tail: null}
+        };
+
+        var a = new Context().createInner().compile(node);
+
+        test.deepEqual(a.renderTree(), [ 'stmtList',
+            [ 'assign',
+                [ 'id', 'loop' ],
+                [ 'function',
+                    null,
+                    [],
+                    [ 'if',
+                        [ 'id', '$foo' ],
+                        [ 'stmtList',
+                            [ 'call',
+                                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                                [ [ 'id', '$bar' ],
+                                    [ 'arrayLiteral', [ [ 'num', '57' ] ] ],
+                                    [ 'function',
+                                        null,
+                                        [ 'P0' ],
+                                        [ 'stmtList',
+                                            [ 'id', 'P0' ],
+                                            [ 'stmtList',
+                                                [ 'expr-stmt', [ 'call', [ 'id', "setImmediate"
+                                            ], [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "loop" ] ] ] ] ] ] ] ] ] ] ] ] ] ] ],
+            [ 'stmtList',
+                [ 'expr-stmt', [ 'call', [ 'id', 'loop' ], [] ] ] ] ]);
+
+        // test.equal(a.renderTree(),
+        //     'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
+        //     'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {}};\n\nloop();\n');
+        //
+        // // try attaching a statement
+        // a.attach(new JsConstruct("var z = 57;"));
+        //
+        // test.equal(a.renderTree(),
+        //     'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
+        //     'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;}};\n\nloop();\n');
+        //
+        // // try attaching another statement
+        // a.attach(new JsConstruct("var bee = 27;"));
+        //
+        // test.equal(a.renderTree(),
+        //     'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
+        //     'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
+
+        test.done();
+    },
+
+    // "loop with blocker in cond": function (test) {
     //
     //     var node = {
     //         type: 'iteration',

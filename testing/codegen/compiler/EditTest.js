@@ -20,7 +20,7 @@ module.exports["basics"] = {
             "operand":{type: "id", name: "bar"}
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), new JsStmt(JS.inc(JS.ID('$bar'))).getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), new JsStmt(JS.inc(JS.ID('$bar'))).renderTree());
         test.done();
     },
 
@@ -31,7 +31,7 @@ module.exports["basics"] = {
             "operand":{type: "id", name: "bar"}
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), new JsStmt(JS.dec(JS.ID('$bar'))).getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), new JsStmt(JS.dec(JS.ID('$bar'))).renderTree());
         test.done();
     },
 
@@ -46,7 +46,7 @@ module.exports["basics"] = {
             }
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), new JsStmt(JS.inc(JS.subscript(JS.ID('$bar'), JS.num('1')))).getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), new JsStmt(JS.inc(JS.subscript(JS.ID('$bar'), JS.num('1')))).renderTree());
         test.done();
     },
 };

@@ -33,7 +33,7 @@ module.exports["basics"] = {
             }
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.fnCall(JS.select(JS.ID('task'), 'concat'), [JS.ID('$foo'), JS.ID('$bar')]).getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), JS.fnCall(JS.select(JS.ID('task'), 'concat'), [JS.ID('$foo'), JS.ID('$bar')]).renderTree());
         test.done();
     }
 };

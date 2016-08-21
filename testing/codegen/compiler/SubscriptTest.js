@@ -19,7 +19,7 @@ module.exports["subscript"] = {
             index: {type: 'number', val: '1'}
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.subscript(JS.ID('$foo'), JS.num('1')).getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), JS.subscript(JS.ID('$foo'), JS.num('1')).renderTree());
         test.done();
     },
 
@@ -30,11 +30,11 @@ module.exports["subscript"] = {
             list: { type: 'id', name: 'foo' },
             index: {type: 'number', val: '-1'} };
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.subscript(
+        test.deepEqual(new Context().compile(node).renderTree(), JS.subscript(
             JS.ID('$foo'),
             JS.add(
                 JS.select(JS.ID('$foo'), 'length'),
-                JS.num('-1'))).getTree()
+                JS.num('-1'))).renderTree()
         );
         test.done();
     }

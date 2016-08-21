@@ -12,247 +12,247 @@ const JS = {};
 
 JS.NULL = {
 
-    getTree: () => ['null'],
-    getJs: () => 'null'
+    renderTree: () => ['null'],
+    renderJs: () => 'null'
 };
 
 // todo make this a stmt
 JS.USE_STRICT = {
 
-    getTree: () => ['use-strict'],
-    getJs: () => "'use strict';\n"
+    renderTree: () => ['use-strict'],
+    renderJs: () => "'use strict';\n"
 };
 
 JS.ID = (name) => {
 
     return {
-        getTree: () => ['id', name],
+        renderTree: () => ['id', name],
         getResolved: function () {return this;},
-        getJs: () => name
+        renderJs: () => name
     };
 };
 
 JS.bool = (val) => {
 
     return {
-        getTree: () => ['bool', val],
-        getJs: () => val
+        renderTree: () => ['bool', val],
+        renderJs: () => val
     };
 };
 
 JS.num = (val) => {
 
     return {
-        getTree: () => ['num', val],
-        getJs: () => val
+        renderTree: () => ['num', val],
+        renderJs: () => val
     };
 };
 
 JS.string = (val) => {
 
     return {
-        getTree: () => ['string', val],
-        getJs: () => "'" + val.replace(/'/g, "\\'") + "'"
+        renderTree: () => ['string', val],
+        renderJs: () => "'" + val.replace(/'/g, "\\'") + "'"
     };
 };
 
 JS.arrayLiteral = (exprs) => {
 
     return {
-        getTree: () => ['arrayLiteral', exprs.map(expr => expr.getTree())], // todo
-        getJs: () => '[' + exprs.map(expr => expr.getJs()).join(', ') + ']'
+        renderTree: () => ['arrayLiteral', exprs.map(expr => expr.renderTree())], // todo
+        renderJs: () => '[' + exprs.map(expr => expr.renderJs()).join(', ') + ']'
     };
 };
 
 JS.objLiteral = (pairs) => {
 
     return {
-        getTree: () => ['objLiteral', pairs.map(pair => [pair[0].getTree(), pair[1].getTree()])], // todo
-        getJs: () => '{' + pairs.map(pair => pair[0].getJs() + ': ' + pair[1].getJs()).join(',') + '}'
+        renderTree: () => ['objLiteral', pairs.map(pair => [pair[0].renderTree(), pair[1].renderTree()])], // todo
+        renderJs: () => '{' + pairs.map(pair => pair[0].renderJs() + ': ' + pair[1].renderJs()).join(',') + '}'
     };
 };
 
 JS.subscript = (array, index) => {
 
     return {
-        getTree: () => ['subscript', array.getTree(), index.getTree()],
-        getJs: () => array.getJs() + '[' + index.getJs() + ']'
+        renderTree: () => ['subscript', array.renderTree(), index.renderTree()],
+        renderJs: () => array.renderJs() + '[' + index.renderJs() + ']'
     };
 };
 
 JS.select = (obj, property) => {
 
     return {
-        getTree: () => ['select', obj.getTree(), property],
-        getJs: () => obj.getJs() + '.' + property
+        renderTree: () => ['select', obj.renderTree(), property],
+        renderJs: () => obj.renderJs() + '.' + property
     };
 };
 
 JS.logicalAnd = (left, right) => {
 
     return {
-        getTree: () => ['&&', left.getTree(), right.getTree()],
-        getJs: () => left.getJs() + ' && ' + right.getJs()
+        renderTree: () => ['&&', left.renderTree(), right.renderTree()],
+        renderJs: () => left.renderJs() + ' && ' + right.renderJs()
     };
 };
 
 JS.logicalOr = (left, right) => {
 
     return {
-        getTree: () => ['||', left.getTree(), right.getTree()],
-        getJs: () => left.getJs() + ' || ' + right.getJs()
+        renderTree: () => ['||', left.renderTree(), right.renderTree()],
+        renderJs: () => left.renderJs() + ' || ' + right.renderJs()
     };
 };
 
 JS.strictEqual = (left, right) => {
 
     return {
-        getTree: () => ['strict-equal', left.getTree(), right.getTree()],
-        getJs: () => left.getJs() + ' === ' + right.getJs()
+        renderTree: () => ['strict-equal', left.renderTree(), right.renderTree()],
+        renderJs: () => left.renderJs() + ' === ' + right.renderJs()
     };
 };
 
 JS.notEqual = (left, right) => {
 
     return {
-        getTree: () => ['not-equal', left.getTree(), right.getTree()],
-        getJs: () => left.getJs() + ' != ' + right.getJs()
+        renderTree: () => ['not-equal', left.renderTree(), right.renderTree()],
+        renderJs: () => left.renderJs() + ' != ' + right.renderJs()
     };
 };
 
 JS.lt = (left, right) => {
 
     return {
-        getTree: () => ['lt', left.getTree(), right.getTree()],
-        getJs: () => left.getJs() + ' < ' + right.getJs()
+        renderTree: () => ['lt', left.renderTree(), right.renderTree()],
+        renderJs: () => left.renderJs() + ' < ' + right.renderJs()
     };
 };
 
 JS.gt = (left, right) => {
 
     return {
-        getTree: () => ['gt', left.getTree(), right.getTree()],
-        getJs: () => left.getJs() + ' > ' + right.getJs()
+        renderTree: () => ['gt', left.renderTree(), right.renderTree()],
+        renderJs: () => left.renderJs() + ' > ' + right.renderJs()
     };
 };
 
 JS.lte = (left, right) => {
 
     return {
-        getTree: () => ['lte', left.getTree(), right.getTree()],
-        getJs: () => left.getJs() + ' <= ' + right.getJs()
+        renderTree: () => ['lte', left.renderTree(), right.renderTree()],
+        renderJs: () => left.renderJs() + ' <= ' + right.renderJs()
     };
 };
 
 JS.gte = (left, right) => {
 
     return {
-        getTree: () => ['gte', left.getTree(), right.getTree()],
-        getJs: () => left.getJs() + ' >= ' + right.getJs()
+        renderTree: () => ['gte', left.renderTree(), right.renderTree()],
+        renderJs: () => left.renderJs() + ' >= ' + right.renderJs()
     };
 };
 
 JS.add = (left, right) => {
 
     return {
-        getTree: () => ['add', left.getTree(), right.getTree()],
-        getJs: () => '(' + left.getJs() + ' + ' + right.getJs() + ')'
+        renderTree: () => ['add', left.renderTree(), right.renderTree()],
+        renderJs: () => '(' + left.renderJs() + ' + ' + right.renderJs() + ')'
     };
 };
 
 JS.sub = (left, right) => {
 
     return {
-        getTree: () => ['sub', left.getTree(), right.getTree()],
-        getJs: () => '(' + left.getJs() + ' - ' + right.getJs() + ')'
+        renderTree: () => ['sub', left.renderTree(), right.renderTree()],
+        renderJs: () => '(' + left.renderJs() + ' - ' + right.renderJs() + ')'
     };
 };
 
 JS.mul = (left, right) => {
 
     return {
-        getTree: () => ['mul', left.getTree(), right.getTree()],
-        getJs: () => '(' + left.getJs() + ' * ' + right.getJs() + ')'
+        renderTree: () => ['mul', left.renderTree(), right.renderTree()],
+        renderJs: () => '(' + left.renderJs() + ' * ' + right.renderJs() + ')'
     };
 };
 
 JS.div = (left, right) => {
 
     return {
-        getTree: () => ['div', left.getTree(), right.getTree()],
-        getJs: () => '(' + left.getJs() + ' / ' + right.getJs() + ')'
+        renderTree: () => ['div', left.renderTree(), right.renderTree()],
+        renderJs: () => '(' + left.renderJs() + ' / ' + right.renderJs() + ')'
     };
 };
 
 JS.mod = (left, right) => {
 
     return {
-        getTree: () => ['mod', left.getTree(), right.getTree()],
-        getJs: () => '(' + left.getJs() + ' % ' + right.getJs() + ')'
+        renderTree: () => ['mod', left.renderTree(), right.renderTree()],
+        renderJs: () => '(' + left.renderJs() + ' % ' + right.renderJs() + ')'
     };
 };
 
 JS.inc = (expr) => {
 
     return {
-        getTree: () => ['inc', expr.getTree()],
-        getJs: () => '(' + expr.getJs() + '++' + ')'
+        renderTree: () => ['inc', expr.renderTree()],
+        renderJs: () => '(' + expr.renderJs() + '++' + ')'
     };
 };
 
 JS.dec = (expr) => {
 
     return {
-        getTree: () => ['dec', expr.getTree()],
-        getJs: () => '(' + expr.getJs() + '--' + ')'
+        renderTree: () => ['dec', expr.renderTree()],
+        renderJs: () => '(' + expr.renderJs() + '--' + ')'
     };
 };
 
 JS.not = (expr) => {
 
     return {
-        getTree: () => ['not', expr.getTree()],
-        getJs: () => '(!' + expr.getJs() + ')'
+        renderTree: () => ['not', expr.renderTree()],
+        renderJs: () => '(!' + expr.renderJs() + ')'
     };
 };
 
 JS.exprStmt = (expr) => {
 
     return {
-        getTree: () => ['expr-stmt', expr.getTree()],
-        getJs: () =>  expr.getJs() + ';'
+        renderTree: () => ['expr-stmt', expr.renderTree()],
+        renderJs: () =>  expr.renderJs() + ';'
     };
 };
 
 JS.assign = (lvalue, rvalue) => {
 
     return {
-        getTree: () => ['assign', lvalue.getTree(), rvalue.getTree()],
-        getJs: () =>  `${lvalue.getJs()} = ${rvalue.getJs()}`
+        renderTree: () => ['assign', lvalue.renderTree(), rvalue.renderTree()],
+        renderJs: () =>  `${lvalue.renderJs()} = ${rvalue.renderJs()}`
     };
 };
 
 JS.mulAssign = (lvalue, rvalue) => {
 
     return {
-        getTree: () => ['mul-assign', lvalue.getTree(), rvalue.getTree()],
-        getJs: () =>  `${lvalue.getJs()} *= ${rvalue.getJs()}`
+        renderTree: () => ['mul-assign', lvalue.renderTree(), rvalue.renderTree()],
+        renderJs: () =>  `${lvalue.renderJs()} *= ${rvalue.renderJs()}`
     };
 };
 
 JS.fnCall = (fnExpr, args) => {
 
     return {
-        getTree: () => ['call', fnExpr.getTree(), args.map(arg => arg.getTree())],
-        getJs: () => fnExpr.getJs() + '(' + args.map(arg => arg.getJs()).join(', ') + ')'
+        renderTree: () => ['call', fnExpr.renderTree(), args.map(arg => arg.renderTree())],
+        renderJs: () => fnExpr.renderJs() + '(' + args.map(arg => arg.renderJs()).join(', ') + ')'
     };
 };
 
 JS.fnDef = (params, body, name) => {
 
     return {
-        getTree: () => ['function', name || null, params, body.getTree()],
-        getJs: () => 'function (' + params.join(', ') + ') {\n\n' + body.getJs() + '\n}'
+        renderTree: () => ['function', name || null, params, body.renderTree()],
+        renderJs: () => 'function (' + params.join(', ') + ') {\n\n' + body.renderJs() + '\n}'
     };
 };
 
@@ -260,12 +260,12 @@ JS.stmtList = (head, tail) => {
     
     return {
 
-        getTree: function () {
-            return tail ? ['stmtList', head.getTree(), tail.getTree()] : ['stmtList', head.getTree()];
+        renderTree: function () {
+            return tail ? ['stmtList', head.renderTree(), tail.renderTree()] : ['stmtList', head.renderTree()];
         },
 
-        getJs: function () {
-            return head.getJs() + (tail ? '\n' + tail.getJs() : '');
+        renderJs: function () {
+            return head.renderJs() + (tail ? '\n' + tail.renderJs() : '');
         }
     };
 };
@@ -273,40 +273,40 @@ JS.stmtList = (head, tail) => {
 JS.varDecl = (name, value) => {
 
     return {
-        getTree: () => value ? ['var', name, value.getTree()] : ['var', name],
-        getJs: () => 'var ' + name + (value ? ' = ' + value.getJs() : '') + ';'
+        renderTree: () => value ? ['var', name, value.renderTree()] : ['var', name],
+        renderJs: () => 'var ' + name + (value ? ' = ' + value.renderJs() : '') + ';'
     };
 };
 
 JS.constDecl = (name, value) => {
 
     return {
-        getTree: () => ['const', name, value.getTree()],
-        getJs: () => 'const ' + name + ' = ' + value.getJs() + ';'
+        renderTree: () => ['const', name, value.renderTree()],
+        renderJs: () => 'const ' + name + ' = ' + value.renderJs() + ';'
     };
 };
 
 JS.return = (expr) => {
 
     return {
-        getTree: () => expr ? ['return', expr.getTree()] : ['return'],
-        getJs: () => 'return' + (expr ? ' ' + expr.getJs() : '') + ';'
+        renderTree: () => expr ? ['return', expr.renderTree()] : ['return'],
+        renderJs: () => 'return' + (expr ? ' ' + expr.renderJs() : '') + ';'
     };
 };
 
 JS.cond = (predicate, consequent, alt) => {
 
     return {
-        getTree: () => ['if', predicate.getTree(), consequent.getTree()].concat(alt ? alt.getTree() : []),
-        getJs: () => 'if (' + predicate.getJs() + ') {\n' + consequent.getJs() + '\n}'
+        renderTree: () => ['if', predicate.renderTree(), consequent.renderTree()].concat(alt ? alt.renderTree() : []),
+        renderJs: () => 'if (' + predicate.renderJs() + ') {\n' + consequent.renderJs() + '\n}'
     }
 };
 
 JS.while = (condition, body) => {
 
     return {
-        getTree: () => ['while', condition.getTree(), body.getTree()],
-        getJs: () => 'while (' + condition.getJs() + ') {\n' + body.getJs() + '\n}'
+        renderTree: () => ['while', condition.renderTree(), body.renderTree()],
+        renderJs: () => 'while (' + condition.renderJs() + ') {\n' + body.renderJs() + '\n}'
     }
 };
 

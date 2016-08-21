@@ -57,7 +57,7 @@ module.exports["service"] = {
                                         [ 'stmtList',
                                             [ 'expr-stmt', [ 'mul-assign', [ 'id', '$result' ], [ 'id', 'P0' ] ] ] ] ] ] ] ] ] ] ] ];
 
-        test.deepEqual(new Context().compile(node).getTree(), result);
+        test.deepEqual(new Context().compile(node).renderTree(), result);
 
         // test.equal(new Context().compile(node),
         //     'function (task) {var $recur = task.service;\nvar $next, $result;\n\n$next = task.args[0];\n\n' +

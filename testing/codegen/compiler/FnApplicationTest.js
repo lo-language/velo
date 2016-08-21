@@ -24,7 +24,7 @@ module.exports["embedded calls"] = {
 
         ctx.pushBlockingCall = function (target, args, contingency) {
 
-            test.deepEqual(target.getTree(), [ 'id', '$foo' ]);
+            test.deepEqual(target.renderTree(), [ 'id', '$foo' ]);
             test.deepEqual(args, [ ]);
             test.deepEqual(contingency, null);
 
@@ -55,8 +55,8 @@ module.exports["embedded calls"] = {
 
         ctx.pushBlockingCall = function (target, args, contingency) {
 
-            test.deepEqual(target.getTree(), [ 'id', '$foo' ]);
-            test.deepEqual(args.map(arg => arg.getTree()), [ [ 'num', '42' ] ]);
+            test.deepEqual(target.renderTree(), [ 'id', '$foo' ]);
+            test.deepEqual(args.map(arg => arg.renderTree()), [ [ 'num', '42' ] ]);
             test.deepEqual(contingency, null);
 
             return 'blocker';
@@ -84,8 +84,8 @@ module.exports["embedded calls"] = {
 
         ctx.pushBlockingCall = function (target, args, contingency) {
 
-            test.deepEqual(target.getTree(), [ 'id', '$foo' ]);
-            test.deepEqual(args.map(arg => arg.getTree()), [ [ 'num', '42' ], [ 'string', 'hi there' ] ]);
+            test.deepEqual(target.renderTree(), [ 'id', '$foo' ]);
+            test.deepEqual(args.map(arg => arg.renderTree()), [ [ 'num', '42' ], [ 'string', 'hi there' ] ]);
             test.deepEqual(contingency, null);
 
             return 'blocker';
@@ -129,14 +129,14 @@ module.exports["embedded calls"] = {
 
             var exp = swaps.shift();
 
-            test.deepEqual(req.getTree(), exp[1]);
+            test.deepEqual(req.renderTree(), exp[1]);
 
             return JS.ID(exp[0]);
         };
 
         var result = ctx.compile(node);
 
-        test.deepEqual(result.getTree(), [ 'id', 'P2' ]);
+        test.deepEqual(result.renderTree(), [ 'id', 'P2' ]);
         // test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($bar, [], function (res) {\nvar P1 = res ? res[0] : null;\ntask.sendMessage($baz, [P0, P1], function (res) {\nvar P0 = res ? res[0] : null;\nP0}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     }
@@ -158,7 +158,7 @@ module.exports["application statements"] = {
 
         var result = new Context().compileStmt(node);
 
-        test.deepEqual(result.getTree(), [ 'stmtList',
+        test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ],
@@ -170,7 +170,7 @@ module.exports["application statements"] = {
         // add a statement - should be tucked inside the replyhandler
         result.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID("foo"), JS.ID("bar")))));
 
-        test.deepEqual(result.getTree(), [ 'stmtList',
+        test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ],
@@ -213,7 +213,7 @@ module.exports["application statements"] = {
 
         var result = new Context().compileStmt(node);
 
-        test.deepEqual(result.getTree(), [ "stmtList",
+        test.deepEqual(result.renderTree(), [ "stmtList",
             [ "call",
                 [ "select", [ "id", "task" ], "sendMessage" ],
                 [
@@ -272,7 +272,7 @@ module.exports["application statements"] = {
 
         var result = new Context().compileStmt(node);
 
-        test.deepEqual(result.getTree(), [ 'stmtList',
+        test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ],
@@ -342,7 +342,7 @@ module.exports["application statements"] = {
 
         var result = new Context().compileStmt(node);
 
-        // test.deepEqual(result.getTree(), [ ]);
+        // test.deepEqual(result.renderTree(), [ ]);
 
         // test.equal(new Context().compile(node).render(),
         //     "task.sendMessage($factorial, [$args[0]], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($io.stdout.write, ['' + P0 + '\\n'], null, null);\n}, null);\n\n");

@@ -39,7 +39,7 @@ module.exports["op"] = {
                 right: {type: 'number', val: '2'}
             };
 
-            test.deepEqual(new Context().compile(node).getTree(), [ op[1], [ 'num', '1' ], [ 'num', '2' ] ]);
+            test.deepEqual(new Context().compile(node).renderTree(), [ op[1], [ 'num', '1' ], [ 'num', '2' ] ]);
         });
 
         test.done();
@@ -60,9 +60,9 @@ module.exports["op"] = {
             right: {type: 'number', val: '3'}
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.logicalOr(
+        test.deepEqual(new Context().compile(node).renderTree(), JS.logicalOr(
             JS.logicalAnd(JS.num('1'), JS.num('2')),
-            JS.num('3')).getTree());
+            JS.num('3')).renderTree());
         test.done();
     },
 
@@ -73,7 +73,7 @@ module.exports["op"] = {
             left: { type: 'string', val: 'trillian' },
             right: { type: 'id', name: 'dudes' } };
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.runtimeCall('in', [JS.string('trillian'), JS.ID('$dudes')]).getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), JS.runtimeCall('in', [JS.string('trillian'), JS.ID('$dudes')]).renderTree());
         test.done();
     },
 
@@ -86,7 +86,7 @@ module.exports["op"] = {
             right: {type: 'id', name: 'bar'}
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.strictEqual(JS.ID('$foo'), JS.ID('$bar')).getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), JS.strictEqual(JS.ID('$foo'), JS.ID('$bar')).renderTree());
         test.done();
     },
 
@@ -104,7 +104,7 @@ module.exports["op"] = {
             right: {type: 'id', name: 'bar'}
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.runtimeCall('concat', [JS.ID('$foo'), JS.ID('$bar')]).getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), JS.runtimeCall('concat', [JS.ID('$foo'), JS.ID('$bar')]).renderTree());
         test.done();
     }
 };

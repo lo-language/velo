@@ -27,7 +27,7 @@ module.exports["identifiers"] = {
 
         var node = {type: 'id', name: 'foo'};
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.ID('$foo').getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), JS.ID('$foo').renderTree());
         test.done();
     },
 
@@ -40,7 +40,7 @@ module.exports["identifiers"] = {
         // define the constant
         context.compile({type: 'constant', name: 'foo', value: {type: 'number', val: '42'}});
 
-        test.deepEqual(context.compile(node).getTree(), JS.num('42').getTree());
+        test.deepEqual(context.compile(node).renderTree(), JS.num('42').renderTree());
         test.done();
     },
 

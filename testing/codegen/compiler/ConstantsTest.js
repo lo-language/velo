@@ -26,11 +26,11 @@ module.exports["constants"] = {
         test.equal(context.has('port'), false);
         test.equal(context.isConstant('port'), false);
 
-        test.equal(context.compile(node).getJs(), '');
+        test.equal(context.compile(node).renderJs(), '');
 
         test.equal(context.has('port'), true);
         test.ok(context.isConstant('port'));
-        test.deepEqual(context.resolve('port').getTree(), JS.num('443').getTree());
+        test.deepEqual(context.resolve('port').renderTree(), JS.num('443').renderTree());
 
         test.done();
     },
@@ -48,11 +48,11 @@ module.exports["constants"] = {
         test.equal(context.has('album'), false);
         test.equal(context.isConstant('album'), false);
 
-        test.equal(context.compile(node).getJs(), '');
+        test.equal(context.compile(node).renderJs(), '');
 
         test.equal(context.has('album'), true);
         test.ok(context.isConstant('album'));
-        test.deepEqual(context.resolve('album').getTree(), JS.string('Melon Collie').getTree());
+        test.deepEqual(context.resolve('album').renderTree(), JS.string('Melon Collie').renderTree());
 
         test.done();
     },
@@ -87,7 +87,7 @@ module.exports["constants"] = {
         test.equal(context.has('main'), false);
         test.equal(context.isConstant('main'), false);
 
-        test.deepEqual(context.compile(node).getTree(), [ 'stmtList',
+        test.deepEqual(context.compile(node).renderTree(), [ 'stmtList',
             [ 'const',
                 '$main',
                 [ 'function',
@@ -113,7 +113,7 @@ module.exports["constants"] = {
 
         test.equal(context.has('main'), true);
         test.ok(context.isConstant('main'));
-        test.deepEqual(context.resolve('main').getTree(), [ 'id', '$main' ]);
+        test.deepEqual(context.resolve('main').renderTree(), [ 'id', '$main' ]);
 
         test.done();
     },
@@ -131,11 +131,11 @@ module.exports["constants"] = {
         test.equal(context.has('constructor'), false);
         test.equal(context.isConstant('constructor'), false);
 
-        test.equal(context.compile(node).getJs(), '');
+        test.equal(context.compile(node).renderJs(), '');
 
         test.equal(context.has('constructor'), true);
         test.ok(context.isConstant('constructor'));
-        test.deepEqual(context.resolve('constructor').getTree(), JS.string('Melon Collie').getTree());
+        test.deepEqual(context.resolve('constructor').renderTree(), JS.string('Melon Collie').renderTree());
 
         test.done();
     }

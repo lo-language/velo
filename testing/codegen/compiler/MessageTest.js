@@ -23,7 +23,7 @@ module.exports["message"] = {
             }
         };
 
-        test.deepEqual(new Context().compile(node).getTree(), [ 'stmtList',
+        test.deepEqual(new Context().compile(node).renderTree(), [ 'stmtList',
             [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ], [ 'arrayLiteral', [] ] ] ] ]);
@@ -102,7 +102,7 @@ module.exports["message"] = {
 
         // todo test where bar is defined in an outer scope (shouldn't declare again)
 
-        test.deepEqual(scope.createInner().compile(node).getTree(), [ 'stmtList',
+        test.deepEqual(scope.createInner().compile(node).renderTree(), [ 'stmtList',
             [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ],

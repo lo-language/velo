@@ -22,9 +22,9 @@ module.exports["cardinality"] = {
         // todo throw runtime error if none match?
         // todo can get rid of function call here with conditional operator
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.fnCall(
+        test.deepEqual(new Context().compile(node).renderTree(), JS.fnCall(
             JS.select(JS.ID('task'), 'cardinality'),
-            [JS.ID('$foo')]).getTree());
+            [JS.ID('$foo')]).renderTree());
 
         test.done();
     }

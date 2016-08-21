@@ -16,7 +16,7 @@ module.exports["literals"] = {
 
         var node = {type: 'nil'};
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.NULL.getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), JS.NULL.renderTree());
         test.done();
     },
 
@@ -24,7 +24,7 @@ module.exports["literals"] = {
 
         var node = {type: 'boolean', val: true};
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.bool('true').getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), JS.bool('true').renderTree());
         test.done();
     },
 
@@ -32,7 +32,7 @@ module.exports["literals"] = {
 
         var node = {type: 'number', val: '42'};
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.num('42').getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), JS.num('42').renderTree());
         test.done();
     },
 
@@ -40,7 +40,7 @@ module.exports["literals"] = {
 
         var node = {type: 'string', val: "turanga leela"};
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.string('turanga leela').getTree());
+        test.deepEqual(new Context().compile(node).renderTree(), JS.string('turanga leela').renderTree());
         test.done();
     },
 
@@ -54,8 +54,8 @@ module.exports["literals"] = {
                     { type: 'string', val: 'padme' },
                     { type: 'string', val: 'hum' } ] };
 
-        test.deepEqual(new Context().compile(node).getTree(),
-            JS.arrayLiteral([JS.string('foo'), JS.string('mani'), JS.string('padme'), JS.string('hum')]).getTree());
+        test.deepEqual(new Context().compile(node).renderTree(),
+            JS.arrayLiteral([JS.string('foo'), JS.string('mani'), JS.string('padme'), JS.string('hum')]).renderTree());
         test.done();
     },
 
@@ -69,12 +69,12 @@ module.exports["literals"] = {
                     { type: 'string', val: 'padme' },
                     { type: 'string', val: 'hum' } ] };
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.objLiteral([
+        test.deepEqual(new Context().compile(node).renderTree(), JS.objLiteral([
             [JS.string('foo'), JS.bool(true)],
             [JS.string('mani'), JS.bool(true)],
             [JS.string('padme'), JS.bool(true)],
             [JS.string('hum'), JS.bool(true)]
-        ]).getTree());
+        ]).renderTree());
         test.done();
     },
 
@@ -96,12 +96,12 @@ module.exports["literals"] = {
                         key: { type: 'string', val: 'Trillian' },
                         value: { type: 'string', val: 'Earth' } } ] };
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.objLiteral([
+        test.deepEqual(new Context().compile(node).renderTree(), JS.objLiteral([
             [JS.string('Zaphod'), JS.string('Betelgeuse')],
             [JS.string('Ford'), JS.string('Betelgeuse')],
             [JS.string('Arthur'), JS.string('Earth')],
             [JS.string('Trillian'), JS.string('Earth')]
-        ]).getTree());
+        ]).renderTree());
         
         test.done();
     },
@@ -124,12 +124,12 @@ module.exports["literals"] = {
                         key: { type: 'string', val: 'Trillian' },
                         value: { type: 'string', val: 'Earth' } } ] };
 
-        test.deepEqual(new Context().compile(node).getTree(), JS.objLiteral([
+        test.deepEqual(new Context().compile(node).renderTree(), JS.objLiteral([
             [JS.string('Zaphod'), JS.string('Betelgeuse')],
             [JS.string('Ford'), JS.string('Betelgeuse')],
             [JS.string('Arthur'), JS.string('Earth')],
             [JS.string('Trillian'), JS.string('Earth')]
-        ]).getTree());
+        ]).renderTree());
 
         test.done();
     }

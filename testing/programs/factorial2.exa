@@ -10,7 +10,7 @@ main is -> (args, io) {
             reply 1;
         }
 
-        reply num * recur(num - 1);
+        reply num * main(num - 1);
     };
 
     @io.stdout.write("`factorial(args[0])`\n");

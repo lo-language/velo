@@ -297,16 +297,24 @@ module.exports['iteration'] = function (node) {
     }
 
     // join the body to the wrapper function via setImmediate to form the loop in a way that won't break the stack
-    body.attach(new JsConstruct("setImmediate(task.doAsync(loop));"));
+    body.attach(new JsStmt(JS.exprStmt(JS.fnCall(JS.ID("setImmediate"), [JS.runtimeCall('doAsync', [JS.ID('loop')])]))));
 
-    return JsConstruct.makeStatement([
+    // we want the expansion joint to be in the else
 
-        "let loop = function () {",
-            "if (", condition, ") ",
-                {block: body},
-            "else {"], ["}};\n\n",
-        "loop();\n" // enter the loop
-    ]);
+    var stmt = new JsStmt(JS.assign(JS.ID('loop'), new JsFunction([], JS.cond(condition, body))));
+
+    // enter the loop
+    return stmt.attach(new JsStmt(JS.exprStmt(JS.fnCall(JS.ID('loop'), []))));
+
+    //
+    // return JsConstruct.makeStatement([
+    //
+    //     "let loop = function () {",
+    //         "if (", condition, ") ",
+    //             {block: body},
+    //         "else {"], ["}};\n\n",
+    //     "loop();\n" // enter the loop
+    // ]);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -495,59 +503,6 @@ module.exports['slice'] = function (node) {
         end ? [start, JS.add(end, JS.num('1'))] : [start]
     );
 };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// module.exports['excision'] = function (node) {
-//
-//     var list = this.compile(node.list);
-//     var start = this.compile(node.start);
-//     var end;   // optional, so compile only if present
-//
-//     // Allows syntax with negative indices referring to
-//     // positions from the end, but only for number literals.
-//     // To do this properly we'd have to catch it at runtime
-//
-//     if (node.start.type == 'number' && parseInt(node.start.val) < 0) {
-//         start = list + '.length' + node.start.val;
-//     }
-//
-//     if (node.end) {
-//
-//         end = this.compile(node.end);
-//
-//         if (node.end.type == 'number' && parseInt(node.end.val) < 0) {
-//             end = list + '.length' + node.end.val;
-//         }
-//     }
-//
-//     // todo - what if the list expression is a request or somesuch? can't resolve it twice
-//     // wrap it in a helper function?
-//
-//     if (node.type == 'excision') {
-//         return new JsConstruct([list, '.splice(', start, end ? [',(', end, ')-(' , start, ')+1'] : '', ')']);
-//     }
-//
-//     // slice
-//     return new JsConstruct([list, '.slice(', start, ',', end, '+1)']);
-// };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * An extraction is a mutating expression.
- *
- * @param node
- */
-// module.exports['extraction'] = function (node) {
-//
-//     var list = this.compile(node.list);
-//     var index = this.compile(node.index);
-//
-//     // todo - what if the list expression is a request or somesuch? can't resolve it twice
-//     // wrap it in a helper function?
-//
-//     return new JsConstruct([list, '.splice(', index, ' < 0 ? ', index, ' + ', list, '.length : ', index, ', 1)[0];']);
-// };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**

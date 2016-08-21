@@ -12,5 +12,5 @@ main is -> (n) {
         reply n;
     }
 
-    reply recur(n - 1) + recur(n - 2);
+    reply main(n - 1) + main(n - 2);
 };
