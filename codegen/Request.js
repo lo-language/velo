@@ -42,7 +42,7 @@ __.prototype.attach = function (stmt) {
         this.replyHandler = new JsFunction('res', stmt);
     }
     else {
-        this.replyHandler.getBody().attach(stmt);
+        this.replyHandler.append(stmt);
     }
 
     return this;

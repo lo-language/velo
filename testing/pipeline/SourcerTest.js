@@ -16,7 +16,7 @@ module.exports['basics'] = {
 
         sourcer.acquire("factorial").then(module => {
 
-            test.equal(module.source.length, 196);
+            test.equal(module.source.length, 195);
             test.done();
         });
     },

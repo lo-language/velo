@@ -72,6 +72,30 @@ JS.objLiteral = (pairs) => {
     };
 };
 
+JS.varDecl = (name, value) => {
+
+    return {
+        renderTree: () => value ? ['var', name, value.renderTree()] : ['var', name],
+        renderJs: () => 'var ' + name + (value ? ' = ' + value.renderJs() : '') + ';'
+    };
+};
+
+JS.letDecl = (name, value) => {
+
+    return {
+        renderTree: () => value ? ['let', name, value.renderTree()] : ['let', name],
+        renderJs: () => 'let ' + name + (value ? ' = ' + value.renderJs() : '') + ';'
+    };
+};
+
+JS.constDecl = (name, value) => {
+
+    return {
+        renderTree: () => ['const', name, value.renderTree()],
+        renderJs: () => 'const ' + name + ' = ' + value.renderJs() + ';'
+    };
+};
+
 JS.subscript = (array, index) => {
 
     return {
@@ -270,22 +294,6 @@ JS.stmtList = (head, tail) => {
     };
 };
 
-JS.varDecl = (name, value) => {
-
-    return {
-        renderTree: () => value ? ['var', name, value.renderTree()] : ['var', name],
-        renderJs: () => 'var ' + name + (value ? ' = ' + value.renderJs() : '') + ';'
-    };
-};
-
-JS.constDecl = (name, value) => {
-
-    return {
-        renderTree: () => ['const', name, value.renderTree()],
-        renderJs: () => 'const ' + name + ' = ' + value.renderJs() + ';'
-    };
-};
-
 JS.return = (expr) => {
 
     return {
@@ -297,8 +305,9 @@ JS.return = (expr) => {
 JS.cond = (predicate, consequent, alt) => {
 
     return {
-        renderTree: () => ['if', predicate.renderTree(), consequent.renderTree()].concat(alt ? alt.renderTree() : []),
-        renderJs: () => 'if (' + predicate.renderJs() + ') {\n' + consequent.renderJs() + '\n}'
+        renderTree: () => ['if', predicate.renderTree(), consequent.renderTree()].concat(alt ? [alt.renderTree()] : []),
+        renderJs: () => 'if (' + predicate.renderJs() + ') {\n' + consequent.renderJs() + '\n}' +
+        (alt ? ' else {\n' + alt.renderJs() + '\n}' : '')
     }
 };
 

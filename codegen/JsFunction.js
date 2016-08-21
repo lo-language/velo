@@ -19,10 +19,15 @@ var __ = function (params, body) {
     this.body = body;
 };
 
-// enables appending to the body
-__.prototype.getBody = function () {
+/**
+ * Like attach, but adds to the body of this function.
+ *
+ * @param stmt
+ * @returns {*}
+ */
+__.prototype.append = function (stmt) {
 
-    return this.body;
+    this.body.attach(stmt);
 };
 
 

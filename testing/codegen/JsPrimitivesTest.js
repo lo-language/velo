@@ -384,6 +384,23 @@ module.exports["statements"] = {
         test.done();
     },
 
+    "let declaration": function (test) {
+
+        var n = JS.letDecl('baz');
+
+        test.deepEqual(n.renderTree(), [ 'let', 'baz' ]);
+        test.equal(n.renderJs(), "let baz;");
+
+        // with initializer
+
+        n = JS.letDecl('fish', JS.string("Lauwiliwilinukunuku'oio'oi"));
+
+        test.deepEqual(n.renderTree(), [ 'let', 'fish', [ 'string', "Lauwiliwilinukunuku'oio'oi" ] ]);
+        test.equal(n.renderJs(), "let fish = 'Lauwiliwilinukunuku\\'oio\\'oi';");
+
+        test.done();
+    },
+
     "const declaration": function (test) {
 
         var n = JS.constDecl('pi', JS.num('3.14159'));
@@ -434,12 +451,26 @@ module.exports["statements"] = {
 
         // consequent only - no else
 
-        var n = JS.cond(JS.bool('true'), JS.exprStmt(JS.assign(JS.ID('baz'), JS.num('48'))));
+        var n = JS.cond(JS.bool('true'), new JsStmt(JS.exprStmt(JS.assign(JS.ID('baz'), JS.num('48')))));
 
         test.deepEqual(n.renderTree(), [ 'if',
             [ 'bool', 'true' ],
-            [ 'expr-stmt', [ 'assign', [ 'id', 'baz' ], [ 'num', '48' ] ] ] ]);
+            [ 'stmtList', [ 'expr-stmt', [ 'assign', [ 'id', 'baz' ], [ 'num', '48' ] ] ] ] ]);
+
         test.equal(n.renderJs(), "if (true) {\nbaz = 48;\n}");
+
+        // now with alt branch
+
+        n = JS.cond(JS.bool('true'),
+            new JsStmt(JS.exprStmt(JS.assign(JS.ID('bazball'), JS.num('48')))),
+                new JsStmt(JS.exprStmt(JS.assign(JS.ID('frobozz'), JS.num('64')))));
+
+        test.deepEqual(n.renderTree(), [ 'if',
+            [ 'bool', 'true' ], [ 'stmtList',
+                [ 'expr-stmt', [ 'assign', [ 'id', 'bazball' ], [ 'num', '48' ] ] ] ], [ 'stmtList',
+                    [ 'expr-stmt', [ 'assign', [ 'id', 'frobozz' ], [ 'num', '64' ] ] ] ] ]);
+
+        test.equal(n.renderJs(), "if (true) {\nbazball = 48;\n} else {\nfrobozz = 64;\n}");
 
         test.done();
     },

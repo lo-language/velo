@@ -22,10 +22,11 @@
 
 'use strict';
 
-const JsFunction = require('./JsFunction');
-const Future = require('./Future');
 const JS = require('./JsPrimitives');
 const JsStmt = require('./JsStmt');
+const JsFunction = require('./JsFunction');
+const AsyncWhile = require('./AsyncWhile');
+const Future = require('./Future');
 const Request = require('./Request');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -296,25 +297,7 @@ module.exports['iteration'] = function (node) {
         return JsStmt.while(condition, body);
     }
 
-    // join the body to the wrapper function via setImmediate to form the loop in a way that won't break the stack
-    body.attach(new JsStmt(JS.exprStmt(JS.fnCall(JS.ID("setImmediate"), [JS.runtimeCall('doAsync', [JS.ID('loop')])]))));
-
-    // we want the expansion joint to be in the else
-
-    var stmt = new JsStmt(JS.assign(JS.ID('loop'), new JsFunction([], JS.cond(condition, body))));
-
-    // enter the loop
-    return stmt.attach(new JsStmt(JS.exprStmt(JS.fnCall(JS.ID('loop'), []))));
-
-    //
-    // return JsConstruct.makeStatement([
-    //
-    //     "let loop = function () {",
-    //         "if (", condition, ") ",
-    //             {block: body},
-    //         "else {"], ["}};\n\n",
-    //     "loop();\n" // enter the loop
-    // ]);
+    return new AsyncWhile(condition, body);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
