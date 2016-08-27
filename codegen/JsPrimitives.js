@@ -59,7 +59,7 @@ JS.string = (val) => {
 JS.arrayLiteral = (exprs) => {
 
     return {
-        renderTree: () => ['arrayLiteral', exprs.map(expr => expr.renderTree())], // todo
+        renderTree: () => ['arrayLiteral', exprs.map(expr => expr.renderTree())],
         renderJs: () => '[' + exprs.map(expr => expr.renderJs()).join(', ') + ']'
     };
 };
@@ -67,7 +67,7 @@ JS.arrayLiteral = (exprs) => {
 JS.objLiteral = (pairs) => {
 
     return {
-        renderTree: () => ['objLiteral', pairs.map(pair => [pair[0].renderTree(), pair[1].renderTree()])], // todo
+        renderTree: () => ['objLiteral', pairs.map(pair => [pair[0].renderTree(), pair[1].renderTree()])],
         renderJs: () => '{' + pairs.map(pair => pair[0].renderJs() + ': ' + pair[1].renderJs()).join(',') + '}'
     };
 };

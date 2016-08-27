@@ -668,7 +668,7 @@ module.exports['record'] = function (node) {
 module.exports['field'] = function (node) {
 
     // we don't qualify field labels
-    return [node.label, this.compile(node.value)];
+    return [JS.string(node.label), this.compile(node.value)];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -44,11 +44,11 @@ __.prototype.constructor = __;
  */
 __.prototype.compileSelf = function (program) {
 
-    var ast = new ASTBuilder().parse(this.source);
+    this.ast = new ASTBuilder().parse(this.source);
 
     // acquire any dependencies with a depth-first search
 
-    var refs = ast.references || [];
+    var refs = this.ast.references || [];
 
     return Q.all(refs.map(dep => {
 
@@ -61,7 +61,7 @@ __.prototype.compileSelf = function (program) {
     })).then(() => {
 
         // ok, all our dependencies have been compiled and are ready to use
-        return this.compile(ast);
+        return this.compile(this.ast);
     });
 };
 

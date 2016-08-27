@@ -111,25 +111,25 @@ module.exports["literals"] = {
         var node = {
             type: 'record',
             fields:
-                [ { type: 'pair',
-                    key: { type: 'string', val: 'Zaphod' },
-                    value: { type: 'string', val: 'Betelgeuse' } },
-                    { type: 'pair',
-                        key: { type: 'string', val: 'Ford' },
+                [
+                    { type: 'field',
+                        label: 'Zaphod',
                         value: { type: 'string', val: 'Betelgeuse' } },
-                    { type: 'pair',
-                        key: { type: 'string', val: 'Arthur' },
+                    { type: 'field',
+                        label: 'Ford',
+                        value: { type: 'string', val: 'Betelgeuse' } },
+                    { type: 'field',
+                        label: 'Arthur',
                         value: { type: 'string', val: 'Earth' } },
-                    { type: 'pair',
-                        key: { type: 'string', val: 'Trillian' },
+                    { type: 'field',
+                        label: 'Trillian',
                         value: { type: 'string', val: 'Earth' } } ] };
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.objLiteral([
-            [JS.string('Zaphod'), JS.string('Betelgeuse')],
-            [JS.string('Ford'), JS.string('Betelgeuse')],
-            [JS.string('Arthur'), JS.string('Earth')],
-            [JS.string('Trillian'), JS.string('Earth')]
-        ]).renderTree());
+        test.deepEqual(new Context().compile(node).renderTree(), [ 'objLiteral',
+            [ [ [ 'string', 'Zaphod' ], [ 'string', 'Betelgeuse' ] ],
+                [ [ 'string', 'Ford' ], [ 'string', 'Betelgeuse' ] ],
+                [ [ 'string', 'Arthur' ], [ 'string', 'Earth' ] ],
+                [ [ 'string', 'Trillian' ], [ 'string', 'Earth' ] ] ] ]);
 
         test.done();
     }

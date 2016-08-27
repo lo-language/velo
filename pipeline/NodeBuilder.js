@@ -42,14 +42,18 @@ __.prototype.build = function (program, path) {
 
         }).then(function (runtime) {
 
-                var body = runtime + '\n\n' + program.render() +
-                    '__.sendRootRequest(M0["main"], [process.args], function () {process.exit(0);}, function () {process.exit(1);});\n';
+            var body = runtime + '\n\n' + program.render() +
+                '__.sendRootRequest(M0["main"], [process.args], function () {process.exit(0);}, function () {process.exit(1);});\n';
 
-                target.write(body, function () {
-                    target.end();
-                })
-            })
-        });
+
+            target.write(body, function () {
+                target.end();
+            });
+        // }).catch(function (err) {
+        //
+        //     Object.keys(program.modules).map(moduleId => { console.log(program.modules[moduleId]); });
+        }).done();
+    });
 
     target.on('finish', function () {
         d.resolve();
