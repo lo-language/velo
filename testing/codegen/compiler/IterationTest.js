@@ -20,7 +20,7 @@ module.exports["basics"] = {
             statements: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null}
         };
 
-        var a = new Context().createInner().compile(node);
+        var a = new Context().createInner().compileStmt(node);
 
         test.deepEqual(a.renderTree(),
             [ 'stmtList',
@@ -73,13 +73,13 @@ module.exports["basics"] = {
                 tail: null}
         };
 
-        var a = new Context().createInner().compile(node);
+        var a = new Context().createInner().compileStmt(node);
 
         test.deepEqual(a.renderTree(), [ 'stmtList',
             [ 'let', 'loop',
                 [ 'function',
                     null,
-                    [],
+                    [], [ 'stmtList',
                     [ 'if',
                         [ 'id', '$foo' ],
                         [ 'stmtList',
@@ -91,10 +91,8 @@ module.exports["basics"] = {
                                         null,
                                         [ 'P0' ],
                                         [ 'stmtList',
-                                            [ 'id', 'P0' ],
-                                            [ 'stmtList',
-                                                [ 'expr-stmt', [ 'call', [ 'id', "setImmediate"
-                                            ], [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "loop" ] ] ] ] ] ] ] ] ] ] ] ] ] ] ],
+                                            [ 'expr-stmt', [ 'call', [ 'id', "setImmediate" ], [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "loop" ] ] ] ] ] ] ] ] ] ] ],
+                         ] ] ] ],
             [ 'stmtList',
                 [ 'expr-stmt', [ 'call', [ 'id', 'loop' ], [] ] ] ] ]);
 
@@ -119,40 +117,64 @@ module.exports["basics"] = {
         test.done();
     },
 
-    "loop with blocker in cond": function (test) {
+    "async body and cond": function (test) {
 
         var node = {
             type: 'iteration',
-            condition: {type: 'id', name: 'foo'},
+            condition: {
+                type: 'application',
+                address: {type: 'id', name: 'foo'},
+                args: []
+            },
             statements: {type: 'stmt_list',
                 head: {
-                    type: 'conditional',
-                    predicate: {type: 'id', name: 'bar'},
-                    consequent: {
-                        type: 'stmt_list',
-                        head: {type: 'assign', op: '=',
-                            left: {type: 'id', name: 'baz'},
-                            right: {type: 'number', val: "4"},
-                        tail: null
-                        }
-                    },
-                    alternate: {
-                        type: 'stmt_list',
-                        head: {
-                            type: 'application_stmt',
-                            application: {
-                                type: 'application',
-                                address: {type: 'id', name: 'foo'},
-                                args: [{type: 'number', val: '57'}]
-                            }
-                        },
-                        tail: null
+                    type: 'application_stmt',
+                    application: {
+                        type: 'application',
+                        address: {type: 'id', name: 'bar'},
+                        args: [{type: 'number', val: '57'}]
                     }
                 },
                 tail: null}
         };
 
-        // var a = new Context().createInner().compile(node);
+        var a = new Context().createInner().compileStmt(node);
+
+        test.deepEqual(a.renderTree(), [ 'stmtList',
+            [ 'let',
+                'loop',
+                [ 'function',
+                    null,
+                    [],
+                    [ 'stmtList',
+                        [ 'call',
+                            [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                            [ [ 'id', '$foo' ],
+                                [ 'arrayLiteral', [] ],
+                                [ 'function',
+                                    null,
+                                    [ 'P0' ],
+                                    [ 'stmtList',
+                                        [ 'if',
+                                            [ 'id', 'P0' ],
+                                            [ 'stmtList',
+                                                [ 'call',
+                                                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                                                    [ [ 'id', '$bar' ],
+                                                        [ 'arrayLiteral', [ [ 'num', '57' ] ] ],
+                                                        [ 'function',
+                                                            null,
+                                                            [ 'P0' ],
+                                                            [ 'stmtList',
+                                                                [ 'expr-stmt',
+                                                                    [ 'call',
+                                                                        [ 'id', 'setImmediate' ],
+                                                                        [ [ 'call',
+                                                                            [ 'select', [ 'id', 'task' ], 'doAsync' ],
+                                                                            [ [ 'id', 'loop' ] ] ] ] ] ] ] ] ] ] ],
+                                             ] ] ] ] ] ] ] ],
+            [ 'stmtList',
+                [ 'expr-stmt', [ 'call', [ 'id', 'loop' ], [] ] ] ] ]);
 
         // test.equal(a.render(),
         //     'let loop = function () {if ($foo) {var cont0 = function () {setImmediate(task.doAsync(loop));};' +

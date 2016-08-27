@@ -236,49 +236,25 @@ module.exports['conditional'] = function (node) {
     // the trick is sync logic in the branches because we only want to resolve if
     // necessary
 
-    // generate unique continuation names
-    var contName;
+    // todo - is there a bug where we're compiling statements within statements?
+    // todo same bug in iterations!?
+    // since we're in a stmt here that might have async bits, and then our blocks might have bits?
+    // we DO need to support more than one level of stmt nesting
+
+    this.pushWrapper();
 
     var predicate = this.compile(node.predicate);
     var consequent = this.compile(node.consequent);
-    var negBlock = false;
+    var alternate = node.alternate ? this.compile(node.alternate) : null;
 
-    var async = consequent.async;
+    var wrapper = this.popWrapper();
 
-    if (node.alternate) {
-        negBlock = this.compile(node.alternate);
-        async = async || negBlock.async;
+    // shortcut if none of the bits are async
+    if (wrapper.isEmpty()) {
+        return new JsStmt.cond(predicate, consequent, alternate);
     }
 
-    if (async) {
-
-        // we need both branches
-        if (negBlock == false) {
-            negBlock = new JsConstruct([]);
-        }
-
-        // and need to call the continuation as the last statement in both branches
-        // var cont = new Continuation(this.contNum++);
-
-        // generate unique continuation names
-        contName = "cont" + this.contNum++;
-
-        consequent.attach(new JsConstruct(contName + "();"));
-        negBlock.attach(new JsConstruct(contName + "();"));
-
-        // consequent.attach(cont.call());
-        // negBlock.attach(cont.call());
-    }
-
-    var jsCond = JsStmt.cond(predicate, consequent, negBlock);
-
-    if (async) {
-        return new JsStmt(JS.varDecl(JS.ID(contName), JS.fnDef([])));
-
-        // return JsConstruct.makeStatement(['var ' + contName + ' = function () {'], ['};'].concat(parts));
-    }
-
-    return jsCond;
+    return new AsyncCond(predicate, consequent, alternate, wrapper);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -289,15 +265,20 @@ module.exports['conditional'] = function (node) {
  */
 module.exports['iteration'] = function (node) {
 
+    // create a new context
+    this.pushWrapper();
     var condition = this.compile(node.condition);
+    var wrapper = this.popWrapper();
+
     var body = this.compile(node.statements);
 
-    // can render as a while loop if body isn't async
-    if (!(body.async)) {
+    if (wrapper.isEmpty() && body.async == false) {
         return JsStmt.while(condition, body);
     }
 
-    return new AsyncWhile(condition, body);
+    // i think it's kinda weird to pass the wrapper in like this...
+    // but we can't apply the wrapper till after we've attached a next stmt...
+    return new AsyncWhile(condition, body, wrapper);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -356,7 +337,11 @@ module.exports['application'] = function (node) {
  */
 module.exports['application_stmt'] = function (node) {
 
-    return new JsStmt(this.compile(node.application));
+    // compile but ignore the result because it's just a placeholder var as a stattment
+    this.compile(node.application);
+
+    // if we ever support true sync calls, this would have to be flexible, but for now, we can just throw the result away
+    return new JsStmt();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

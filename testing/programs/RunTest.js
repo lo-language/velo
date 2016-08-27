@@ -93,7 +93,7 @@ module.exports['collections'] = {
 //         this.harness.testSuccess(test, [[], io, {}]);
 //     }
 // };
-//
+
 // module.exports['fibonacci'] = {
 //
 //     "setUp": function (cb) {
@@ -111,26 +111,26 @@ module.exports['collections'] = {
 //     }
 // };
 
-// module.exports['conditionals'] = {
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'conditionals');
-//         cb();
-//     },
-//
-//     'neg': function (test) {
-//         this.harness.testSuccess(test, [-1], 'negative');
-//     },
-//
-//     'zero': function (test) {
-//         this.harness.testSuccess(test, [0], 'zero!');
-//     },
-//
-//     'pos': function (test) {
-//         this.harness.testSuccess(test, [1], 'positive');
-//     }
-// };
+module.exports['conditionals'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'conditionals');
+        cb();
+    },
+
+    'neg': function (test) {
+        this.harness.testSuccess(test, [-1], 'negative');
+    },
+
+    'zero': function (test) {
+        this.harness.testSuccess(test, [0], 'zero!');
+    },
+
+    'pos': function (test) {
+        this.harness.testSuccess(test, [1], 'positive');
+    }
+};
 
 module.exports['iteration'] = {
 
@@ -148,20 +148,20 @@ module.exports['iteration'] = {
     }
 };
 
-// module.exports['procedure'] = {
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'procedure');
-//         cb();
-//     },
-//
-//     'success': function (test) {
-//
-//         this.harness.testSuccess(test, [], 60);
-//     }
-// };
-//
+module.exports['procedure'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'procedure');
+        cb();
+    },
+
+    'success': function (test) {
+
+        this.harness.testSuccess(test, [], 60);
+    }
+};
+
 // module.exports['conditional in loop'] = {
 //
 //     "setUp": function (cb) {
@@ -245,35 +245,35 @@ module.exports['iteration'] = {
 // };
 
 
-module.exports['reply handling'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(__dirname, 'replyHandling');
-        cb();
-    },
-
-    'success': function (test) {
-
-        test.expect(1);
-
-        // both functions just reply immediately
-        // todo add a test that does this experiment within a reply handler
-
-        this.harness.run([
-            function (task) {
-                task.respond("reply");
-            },
-            function (task) {
-                task.respond("reply", 33);
-            }
-        ]).then(
-            function (res) {
-                test.equal(res, 42);
-                test.done();
-            });
-    }
-};
+// module.exports['reply handling'] = {
+//
+//     "setUp": function (cb) {
+//
+//         this.harness = new Harness(__dirname, 'replyHandling');
+//         cb();
+//     },
+//
+//     'success': function (test) {
+//
+//         test.expect(1);
+//
+//         // both functions just reply immediately
+//         // todo add a test that does this experiment within a reply handler
+//
+//         this.harness.run([
+//             function (task) {
+//                 task.respond("reply");
+//             },
+//             function (task) {
+//                 task.respond("reply", 33);
+//             }
+//         ]).then(
+//             function (res) {
+//                 test.equal(res, 42);
+//                 test.done();
+//             });
+//     }
+// };
 
 
 // //module.exports['recovery'] = {

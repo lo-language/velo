@@ -6,12 +6,13 @@ const JS = require('../../codegen/JsPrimitives');
 const JsStmt = require('../../codegen/JsStmt');
 const JsFunction = require('../../codegen/JsFunction');
 const AsyncWhile = require('../../codegen/AsyncWhile');
+const Wrapper = require('../../codegen/Wrapper');
 
 module.exports["basics"] = {
 
     "rendering": function (test) {
 
-        var loop = new AsyncWhile(JS.ID('$foo'), new JsStmt());
+        var loop = new AsyncWhile(JS.ID('$foo'), new JsStmt(), new Wrapper());
 
         test.deepEqual(loop.renderTree(), [ 'stmtList',
             [ 'let',
@@ -19,7 +20,8 @@ module.exports["basics"] = {
                 [ 'function',
                     null,
                     [],
-                    [ 'if',
+                    [ 'stmtList',
+                        [ 'if',
                         [ 'id', '$foo' ],
                         [ 'stmtList',
                             [ 'expr-stmt',
@@ -27,7 +29,7 @@ module.exports["basics"] = {
                                     [ 'id', 'setImmediate' ],
                                     [ [ 'call',
                                         [ 'select', [ 'id', 'task' ], 'doAsync' ],
-                                        [ [ 'id', 'loop' ] ] ] ] ] ] ] ] ] ],
+                                        [ [ 'id', 'loop' ] ] ] ] ] ] ] ] ] ] ],
             [ 'stmtList',
                 [ 'expr-stmt', [ 'call', [ 'id', 'loop' ], [] ] ] ] ]);
 
@@ -36,17 +38,18 @@ module.exports["basics"] = {
 
     "attach": function (test) {
 
-        var loop = new AsyncWhile(JS.ID('$foo'), new JsStmt());
+        var loop = new AsyncWhile(JS.ID('$foo'), new JsStmt(), new Wrapper());
 
         loop.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('$bazball'), JS.num('48')))));
-        
+
         test.deepEqual(loop.renderTree(), [ 'stmtList',
             [ 'let',
                 'loop',
                 [ 'function',
                     null,
                     [],
-                    [ 'if',
+                    [ 'stmtList',
+                        [ 'if',
                         [ 'id', '$foo' ],
                         [ 'stmtList',
                             [ 'expr-stmt',
@@ -57,7 +60,7 @@ module.exports["basics"] = {
                                         [ [ 'id', 'loop' ] ] ] ] ] ] ],
                         [ 'stmtList',
                             [ 'expr-stmt',
-                                [ 'assign', [ 'id', '$bazball' ], [ 'num', '48' ] ] ] ] ] ] ],
+                                [ 'assign', [ 'id', '$bazball' ], [ 'num', '48' ] ] ] ] ] ] ] ],
             [ 'stmtList',
                 [ 'expr-stmt', [ 'call', [ 'id', 'loop' ], [] ] ] ] ]);
 

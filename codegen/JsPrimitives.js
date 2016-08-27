@@ -285,10 +285,20 @@ JS.stmtList = (head, tail) => {
     return {
 
         renderTree: function () {
+
+            if (head == null) {
+                return [ 'stmtList' ];
+            }
+
             return tail ? ['stmtList', head.renderTree(), tail.renderTree()] : ['stmtList', head.renderTree()];
         },
 
         renderJs: function () {
+
+            if (head == null) {
+                return '';
+            }
+
             return head.renderJs() + (tail ? '\n' + tail.renderJs() : '');
         }
     };

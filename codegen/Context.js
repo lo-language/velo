@@ -17,6 +17,7 @@ const JS = require('./JsPrimitives');
 const JsStmt = require('./JsStmt');
 const JsFunction = require('./JsFunction');
 const Request = require('./Request');
+const Wrapper = require('./Wrapper');
 const util = require('util');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,8 +32,7 @@ var __ = function (parent) {
     // our local symbol table, containing params, locals, constants, futures, etc.
     this.symbols = {};
 
-    this.placeHolders = 0; // should this be tracked at the root level? could we get collisions?
-    this.contNum = 0;   // count of continuations, used for creating unique names
+    this.wrappers = [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -221,11 +221,31 @@ __.prototype.compile = function (node) {
  */
 __.prototype.compileStmt = function (node) {
 
-    this.wrapper = new JsStmt();
+    this.pushWrapper();
 
-    // a statement could be a context itself...
+    var result = this.compile(node);
 
-    return this.wrapper.attach(this.compile(node));
+    return this.popWrapper().wrap(result);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ */
+__.prototype.pushWrapper = function () {
+
+    this.wrappers.push(new Wrapper());
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ */
+__.prototype.popWrapper = function () {
+
+    return this.wrappers.pop();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -238,22 +258,11 @@ __.prototype.compileStmt = function (node) {
  */
 __.prototype.pushBlockingCall = function (address, args, failHandler) {
 
-    if (this.wrapper == null) {
+    if (this.wrappers.length == 0) {
         throw new Error("trying to push a blocking call outside of stmt context");
     }
 
-    var placeholderName = 'P' + this.placeHolders++;
-    var replyHandler = new JsFunction([placeholderName], new JsStmt());
-
-    // create a reply handler taking the placeholder as its param and with an empty body
-    var req = new Request(address, args, replyHandler, failHandler);
-
-    // flag this stmt as async
-    this.wrapper.async = true;
-
-    this.wrapper = this.wrapper.attach(req);
-
-    return JS.ID(placeholderName);
+    return this.wrappers[this.wrappers.length - 1].pushRequest(address, args, failHandler);
 };
 
 module.exports = __;

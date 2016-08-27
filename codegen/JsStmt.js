@@ -23,22 +23,17 @@ const JS = require('./JsPrimitives');
 
 /**
  * Constructor
- *
- * Resolves any blockers found by wrapping the JS statement in an async call w/callback
+ * 
+ * @param ast
+ * @param final
+ * @private
  */
 var __ = function (ast, final) {
 
     this.ast = ast;
     this.final = final || false;
     this.async = false;
-
-    // special case - if we're just a call, just return the wrapper
-    // keeps us from having handlers with just a var name as a statement
-
-    // if (typeof ast === 'object' && ast.getWrapper) {
-    //     this.ast = ast.getWrapper();
-    //     return;
-    // }
+    this.next = null;
 };
 
 /**
@@ -93,7 +88,7 @@ __.prototype._getAst = function () {
     if (this.ast == undefined) {
 
         // we're an empty statement; delegate to the following stmt if there is one
-        return this.next ? this.next._getAst() : null;
+        return this.next ? this.next._getAst() : JS.stmtList();
     }
 
     return JS.stmtList(this.ast, this.next ? this.next._getAst() : null);

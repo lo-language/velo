@@ -9,7 +9,7 @@ const JsStmt = require('./JsStmt');
 /**
  * A Request is a special kind of statement that attaching things to puts them inside it rather than after it.
  *
- * Should Request support both sync and async?
+ * todo support properly async requests
  *
  * @param address       JS part
  * @param args          array of JS parts
@@ -22,6 +22,7 @@ var __ = function (address, args, replyHandler, failHandler) {
     this.args = args;
     this.replyHandler = replyHandler;
     this.failHandler = failHandler;
+    this.async = true;
 };
 
 __.prototype = Object.create(JsStmt.prototype);

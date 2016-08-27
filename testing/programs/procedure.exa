@@ -16,7 +16,7 @@ foo is -> (x) {
 
 factorial is -> (num) {
 
-    again = recur;
+    again = factorial;
 
     if num <= 1 {
         reply num;

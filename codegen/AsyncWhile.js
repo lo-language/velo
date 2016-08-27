@@ -13,13 +13,18 @@ const JsStmt = require('./JsStmt');
  * @param body
  * @private
  */
-var __ = function (cond, body) {
+var __ = function (cond, body, wrapper) {
 
+    JsStmt.call(this);
+    
     this.cond = cond;
     this.body = body;
+    this.wrapper = wrapper;
+
     this.next = null;
 
     // join the body to the wrapper function via setImmediate to form a loop in a way that won't break the stack
+    // (this is me trying to emulate tail-recursion)
     this.body.attach(new JsStmt(JS.exprStmt(
         JS.fnCall(JS.ID("setImmediate"), [JS.runtimeCall('doAsync', [JS.ID('loop')])]))));
 };
@@ -34,11 +39,9 @@ __.prototype._getAst = function () {
     // see if there's a next statement
     var cond = this.next ? JS.cond(this.cond, this.body, this.next) : JS.cond(this.cond, this.body);
 
-    // define a wrapper function called "loop"
-    var stmt = new JsStmt(JS.letDecl('loop', new JsFunction([], cond)));
+    var loopDecl = new JsStmt(JS.letDecl('loop', JS.fnDef([], this.wrapper.wrap(new JsStmt(cond)))));
 
-    // enter the loop
-    return stmt.attach(new JsStmt(JS.exprStmt(JS.fnCall(JS.ID('loop'), []))));
+    return loopDecl.attach(new JsStmt(JS.exprStmt(JS.fnCall(JS.ID('loop'), []))));
 };
 
 module.exports = __;

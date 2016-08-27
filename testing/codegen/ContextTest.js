@@ -320,7 +320,7 @@ module.exports["compileStmt"] = {
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ],
                     [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
-                    [ 'function', null, [ 'P0' ], [ 'stmtList', [ 'id', 'P0' ] ] ] ] ] ]);
+                    [ 'function', null, [ 'P0' ], [ 'stmtList' ] ] ] ] ]);
 
         test.equal(s.async, true);
 
@@ -359,7 +359,7 @@ module.exports["compileStmt"] = {
                                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                                 [ [ 'id', '$baz' ],
                                     [ 'arrayLiteral', [ [ 'id', 'P0' ] ] ],
-                                    [ 'function', null, [ 'P1' ], [ 'stmtList', [ 'id', 'P1' ] ] ] ] ] ] ] ] ] ]);
+                                    [ 'function', null, [ 'P1' ], [ 'stmtList' ] ] ] ] ] ] ] ] ]);
 
         test.equal(s.async, true);
 

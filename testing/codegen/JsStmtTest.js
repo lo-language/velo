@@ -88,12 +88,14 @@ module.exports["getTree"] = {
         stmt = stmt.attach(new JsStmt());
 
         test.deepEqual(stmt.renderTree(), [ 'stmtList',
-            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
+            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ],
+            [ 'stmtList' ] ]);
 
         stmt = stmt.attach(new JsStmt());
 
         test.deepEqual(stmt.renderTree(), [ 'stmtList',
-            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
+            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ],
+            [ 'stmtList' ] ]);
 
         test.done();
     },
