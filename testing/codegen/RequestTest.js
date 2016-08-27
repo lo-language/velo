@@ -17,9 +17,10 @@ module.exports["blocking"] = {
         var req = new Request(JS.ID('$foo'), [JS.num('42')], null, null);
 
         test.deepEqual(req.renderTree(),
-            [ 'stmtList', [ 'call',
-                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ]);
+            [ 'stmtList',
+                [ 'call',
+                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                    [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ]);
 
         test.done();
     },
@@ -32,14 +33,15 @@ module.exports["blocking"] = {
         var req = new Request(JS.ID('$foo'), [JS.num('42')], replyHandler, null);
 
         test.deepEqual(req.renderTree(),
-            [ 'stmtList', [ 'call',
-                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                [ [ 'id', '$foo' ],
-                    [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
-                    [ 'function',
-                        null,
-                        [ 'res' ],
-                        [ 'stmtList', [ 'assign', [ 'id', 'baz' ], [ 'num', '57' ] ] ] ] ] ] ]);
+            [ 'stmtList',
+                [ 'call',
+                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                    [ [ 'id', '$foo' ],
+                        [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
+                        [ 'function',
+                            null,
+                            [ 'res' ],
+                            [ 'stmtList', [ 'assign', [ 'id', 'baz' ], [ 'num', '57' ] ] ] ] ] ] ]);
 
         test.done();
     },
@@ -50,8 +52,8 @@ module.exports["blocking"] = {
 
         var req = new Request(JS.ID('$foo'), [JS.num('42')], replyHandler, null);
 
-        test.deepEqual(req.renderTree(),
-            [ 'stmtList', [ 'call',
+        test.deepEqual(req.renderTree(), [ 'stmtList',
+            [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ],
                     [ 'arrayLiteral', [ [ 'num', '42' ] ] ],

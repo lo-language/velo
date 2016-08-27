@@ -173,7 +173,9 @@ module.exports['response'] = function (node) {
 
     var args = JS.arrayLiteral(node.args.map(arg => this.compile(arg)));
 
-    return new JsStmt(JS.runtimeCall('respond', [JS.string(node.channel), args])).attach(JsStmt.return());
+    // todo - only render the return if there are following statements? but then shouldn't we throw a compiler warning?
+
+    return new JsStmt(JS.exprStmt(JS.runtimeCall('respond', [JS.string(node.channel), args]))).attach(JsStmt.return());
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

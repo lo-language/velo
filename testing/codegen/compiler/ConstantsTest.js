@@ -103,13 +103,13 @@ module.exports["constants"] = {
                                     [ 'subscript',
                                         [ 'select', [ 'id', 'task' ], 'args' ],
                                         [ 'num', '0' ] ] ] ],
-                                [ 'stmtList',
+                                [ 'stmtList', [ 'expr-stmt',
                                     [ 'call',
                                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                                         [ [ 'id', '$bar' ],
                                             [ 'arrayLiteral', [ ['num', '42' ] ] ],
                                             [ 'function', null, [ 'P0' ], [ 'stmtList', [ "expr-stmt",
-                                                [ "mul-assign", [ "id", "$result" ], [ "id", "P0" ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
+                                                [ "mul-assign", [ "id", "$result" ], [ "id", "P0" ] ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
 
         test.equal(context.has('main'), true);
         test.ok(context.isConstant('main'));

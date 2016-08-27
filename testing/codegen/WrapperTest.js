@@ -40,16 +40,17 @@ module.exports["basics"] = {
         var stmt = wrapper.wrap(new JsStmt(JS.exprStmt(JS.assign(JS.ID('bazball'), JS.num('11')))));
 
         test.deepEqual(stmt.renderTree(), [ 'stmtList',
-            [ 'call',
-                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                [ [ 'id', 'foo' ],
-                    [ 'arrayLiteral', [ [ 'num', '57' ], [ 'string', 'hello' ] ] ],
-                    [ 'function',
-                        null,
-                        [ 'P0' ],
-                        [ 'stmtList',
-                            [ 'expr-stmt',
-                                [ 'assign', [ 'id', 'bazball' ], [ 'num', '11' ] ] ] ] ] ] ] ]);
+            [ 'expr-stmt',
+                [ 'call',
+                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                    [ [ 'id', 'foo' ],
+                        [ 'arrayLiteral', [ [ 'num', '57' ], [ 'string', 'hello' ] ] ],
+                        [ 'function',
+                            null,
+                            [ 'P0' ],
+                            [ 'stmtList',
+                                [ 'expr-stmt',
+                                    [ 'assign', [ 'id', 'bazball' ], [ 'num', '11' ] ] ] ] ] ] ] ] ]);
 
         test.done();
     },
@@ -69,7 +70,7 @@ module.exports["basics"] = {
 
         var stmt = wrapper.wrap(new JsStmt(JS.exprStmt(JS.assign(JS.ID('bazball'), JS.num('11')))));
 
-        test.deepEqual(stmt.renderTree(), [ 'stmtList',
+        test.deepEqual(stmt.renderTree(), [ 'stmtList', [ 'expr-stmt',
             [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', 'foo' ],
@@ -77,7 +78,7 @@ module.exports["basics"] = {
                     [ 'function',
                         null,
                         [ 'P0' ],
-                        [ 'stmtList',
+                        [ 'stmtList', [ 'expr-stmt',
                             [ 'call',
                                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                                 [ [ 'id', 'bar' ],
@@ -86,7 +87,7 @@ module.exports["basics"] = {
                                         null,
                                         [ 'P1' ],
                                         [ 'stmtList',
-                                            [ 'expr-stmt', [ 'assign', [ 'id', 'bazball' ], [ 'num', '11' ] ] ] ] ] ] ] ] ] ] ] ]);
+                                            [ 'expr-stmt', [ 'assign', [ 'id', 'bazball' ], [ 'num', '11' ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
 
         test.done();
     }

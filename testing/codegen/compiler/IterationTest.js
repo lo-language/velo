@@ -82,7 +82,7 @@ module.exports["basics"] = {
                     [], [ 'stmtList',
                     [ 'if',
                         [ 'id', '$foo' ],
-                        [ 'stmtList',
+                        [ 'stmtList', [ 'expr-stmt',
                             [ 'call',
                                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                                 [ [ 'id', '$bar' ],
@@ -91,8 +91,7 @@ module.exports["basics"] = {
                                         null,
                                         [ 'P0' ],
                                         [ 'stmtList',
-                                            [ 'expr-stmt', [ 'call', [ 'id', "setImmediate" ], [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "loop" ] ] ] ] ] ] ] ] ] ] ],
-                         ] ] ] ],
+                                            [ 'expr-stmt', [ 'call', [ 'id', "setImmediate" ], [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "loop" ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ],
             [ 'stmtList',
                 [ 'expr-stmt', [ 'call', [ 'id', 'loop' ], [] ] ] ] ]);
 
@@ -146,7 +145,7 @@ module.exports["basics"] = {
                 [ 'function',
                     null,
                     [],
-                    [ 'stmtList',
+                    [ 'stmtList', [ 'expr-stmt',
                         [ 'call',
                             [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                             [ [ 'id', '$foo' ],
@@ -157,7 +156,7 @@ module.exports["basics"] = {
                                     [ 'stmtList',
                                         [ 'if',
                                             [ 'id', 'P0' ],
-                                            [ 'stmtList',
+                                            [ 'stmtList', [ 'expr-stmt',
                                                 [ 'call',
                                                     [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                                                     [ [ 'id', '$bar' ],
@@ -171,8 +170,7 @@ module.exports["basics"] = {
                                                                         [ 'id', 'setImmediate' ],
                                                                         [ [ 'call',
                                                                             [ 'select', [ 'id', 'task' ], 'doAsync' ],
-                                                                            [ [ 'id', 'loop' ] ] ] ] ] ] ] ] ] ] ],
-                                             ] ] ] ] ] ] ] ],
+                                                                            [ [ 'id', 'loop' ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ],
             [ 'stmtList',
                 [ 'expr-stmt', [ 'call', [ 'id', 'loop' ], [] ] ] ] ]);
 

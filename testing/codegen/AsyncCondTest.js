@@ -21,11 +21,12 @@ module.exports["basics"] = {
             [ 'if',
                 [ 'id', '$foo' ],
                 [ 'stmtList',
-                    [ 'call',
-                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                        [ [ 'id', '$foo' ],
-                            [ 'arrayLiteral', [] ],
-                            [ 'function', null, [ 'P0' ], [ 'stmtList' ] ] ] ] ] ] ]);
+                    [ 'expr-stmt',
+                        [ 'call',
+                            [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                            [ [ 'id', '$foo' ],
+                                [ 'arrayLiteral', [] ],
+                                [ 'function', null, [ 'P0' ], [ 'stmtList' ] ] ] ] ] ] ] ]);
 
         test.done();
     },

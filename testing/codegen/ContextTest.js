@@ -316,11 +316,12 @@ module.exports["compileStmt"] = {
         var s = context.compileStmt(node);
 
         test.deepEqual(s.renderTree(), [ 'stmtList',
-            [ 'call',
-                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                [ [ 'id', '$foo' ],
-                    [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
-                    [ 'function', null, [ 'P0' ], [ 'stmtList' ] ] ] ] ]);
+            [ 'expr-stmt',
+                [ 'call',
+                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                    [ [ 'id', '$foo' ],
+                        [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
+                        [ 'function', null, [ 'P0' ], [ 'stmtList' ] ] ] ] ] ]);
 
         test.equal(s.async, true);
 
@@ -347,19 +348,21 @@ module.exports["compileStmt"] = {
         var s = context.compileStmt(node);
 
         test.deepEqual(s.renderTree(), [ 'stmtList',
-            [ 'call',
-                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                [ [ 'id', '$foo' ],
-                    [ 'arrayLiteral', [] ],
-                    [ 'function',
-                        null,
-                        [ 'P0' ],
-                        [ 'stmtList',
-                            [ 'call',
-                                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                                [ [ 'id', '$baz' ],
-                                    [ 'arrayLiteral', [ [ 'id', 'P0' ] ] ],
-                                    [ 'function', null, [ 'P1' ], [ 'stmtList' ] ] ] ] ] ] ] ] ]);
+            [ 'expr-stmt',
+                [ 'call',
+                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                    [ [ 'id', '$foo' ],
+                        [ 'arrayLiteral', [] ],
+                        [ 'function',
+                            null,
+                            [ 'P0' ],
+                            [ 'stmtList',
+                                [ 'expr-stmt',
+                                    [ 'call',
+                                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                                        [ [ 'id', '$baz' ],
+                                            [ 'arrayLiteral', [ [ 'id', 'P0' ] ] ],
+                                            [ 'function', null, [ 'P1' ], [ 'stmtList' ] ] ] ] ] ] ] ] ] ] ]);
 
         test.equal(s.async, true);
 

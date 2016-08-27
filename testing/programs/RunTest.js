@@ -32,28 +32,28 @@ module.exports['factorial'] = {
     }
 };
 
-// module.exports['factorial2'] = {
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'factorial2');
-//         cb();
-//     },
-//
-//     'success': function (test) {
-//
-//         var io = {
-//             stdout: {
-//                 write: function (task) {
-//                     test.equal(task.args[0], '3628800\n');
-//                     task.respond("reply");
-//                 }
-//             }
-//         };
-//
-//         this.harness.testSuccess(test, [[10], io]);
-//     }
-// };
+module.exports['factorial2'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'factorial2');
+        cb();
+    },
+
+    'success': function (test) {
+
+        var io = {
+            stdout: {
+                write: function (task) {
+                    test.equal(task.args[0], '3628800\n');
+                    task.respond("reply");
+                }
+            }
+        };
+
+        this.harness.testSuccess(test, [[10], io]);
+    }
+};
 
 module.exports['collections'] = {
 
@@ -94,22 +94,22 @@ module.exports['helloWorld'] = {
     }
 };
 
-// module.exports['fibonacci'] = {
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'fibonacci');
-//         cb();
-//     },
-//
-//     'success': function (test) {
-//         this.harness.testSuccess(test, [10], 55);
-//     },
-//
-//     'failure': function (test) {
-//         this.harness.testFailure(test, [-1], 'Whatsamatta, you?');
-//     }
-// };
+module.exports['fibonacci'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'fibonacci');
+        cb();
+    },
+
+    'success': function (test) {
+        this.harness.testSuccess(test, [10], 55);
+    },
+
+    'failure': function (test) {
+        this.harness.testFailure(test, [-1], 'Whatsamatta, you?');
+    }
+};
 
 module.exports['conditionals'] = {
 
@@ -262,10 +262,10 @@ module.exports['reply handling'] = {
 
         this.harness.run([
             function (task) {
-                task.respond("reply");
+                task.respond("reply", []);
             },
             function (task) {
-                task.respond("reply", 33);
+                task.respond("reply", [33]);
             }
         ]).then(
             function (res) {

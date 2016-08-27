@@ -159,11 +159,12 @@ module.exports["application statements"] = {
         var result = new Context().compileStmt(node);
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
-            [ 'call',
-                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                [ [ 'id', '$foo' ],
-                    [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
-                    [ 'function', null, [ 'P0' ], [ 'stmtList' ] ] ] ] ] );
+            [ 'expr-stmt',
+                [ 'call',
+                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                    [ [ 'id', '$foo' ],
+                        [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
+                        [ 'function', null, [ 'P0' ], [ 'stmtList' ] ] ] ] ] ]);
 
         // test.equal(a.render(), 'task.sendMessage($foo, [42], function (res) {\nvar P0 = res ? res[0] : null;\n}, null);\n\n');
 
@@ -171,13 +172,16 @@ module.exports["application statements"] = {
         result.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID("foo"), JS.ID("bar")))));
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
-            [ 'call',
-                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                [ [ 'id', '$foo' ],
-                    [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
-                    [ 'function', null, [ 'P0' ],
-                        [ 'stmtList',
-                            [ "expr-stmt", [ "assign", [ "id", "foo" ], [ "id", "bar" ] ] ] ] ] ] ] ] );
+            [ 'expr-stmt',
+                [ 'call',
+                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                    [ [ 'id', '$foo' ],
+                        [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
+                        [ 'function',
+                            null,
+                            [ 'P0' ],
+                            [ 'stmtList',
+                                [ 'expr-stmt', [ 'assign', [ 'id', 'foo' ], [ 'id', 'bar' ] ] ] ] ] ] ] ] ]);
 
         // test.equal(a.render(), 'task.sendMessage($foo, [42], function (res) {\nvar P0 = res ? res[0] : null;\nfoo = bar;}, null);\n\n');
 
@@ -209,14 +213,14 @@ module.exports["application statements"] = {
 
         var result = new Context().compileStmt(node);
 
-        test.deepEqual(result.renderTree(), [ "stmtList",
+        test.deepEqual(result.renderTree(), [ "stmtList", [ 'expr-stmt',
             [ "call",
                 [ "select", [ "id", "task" ], "sendMessage" ],
                 [
                     [ "id", "$foo" ],
                     [ "arrayLiteral", [] ],
                     [ "function", null, [ "P0" ],
-                        [ "stmtList",
+                        [ "stmtList", [ 'expr-stmt',
                             [ "call",
                                 [ "select", [ "id", "task" ], "sendMessage" ],
                                 [
@@ -226,14 +230,14 @@ module.exports["application statements"] = {
                                         "function",
                                         null,
                                         [ "P1" ],
-                                        [ "stmtList",
+                                        [ "stmtList", [ 'expr-stmt',
                                             [ "call",
                                                 [ "select", [ "id", "task" ], "sendMessage" ],
                                                 [
                                                     [ "id", "$baz" ],
                                                     [ "arrayLiteral", [ [ "sub", [ "id", "P0" ], [ "id", "P1" ] ] ] ],
                                                     [ "function", null, [ "P2" ],
-                                                        [ "stmtList" ] ] ] ] ] ] ] ] ] ] ] ] ] );
+                                                        [ "stmtList" ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
 
         // test.equal(new Context().compile(node).render(),
         //     "task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($bar, [], function (res) {\nvar P1 = res ? res[0] : null;\ntask.sendMessage($baz, [(P0 - P1)], function (res) {\nvar P0 = res ? res[0] : null;\n}, null);\n\n}, null);\n\n}, null);\n\n");
@@ -268,7 +272,7 @@ module.exports["application statements"] = {
 
         var result = new Context().compileStmt(node);
 
-        test.deepEqual(result.renderTree(), [ 'stmtList',
+        test.deepEqual(result.renderTree(), [ 'stmtList', [ 'expr-stmt',
             [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ],
@@ -276,7 +280,7 @@ module.exports["application statements"] = {
                     [ 'function',
                         null,
                         [ 'P0' ],
-                        [ 'stmtList',
+                        [ 'stmtList', [ 'expr-stmt',
                             [ 'call',
                                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                                 [ [ 'id', '$bar' ],
@@ -284,7 +288,7 @@ module.exports["application statements"] = {
                                     [ 'function',
                                         null,
                                         [ 'P1' ],
-                                        [ 'stmtList',
+                                        [ 'stmtList', [ 'expr-stmt',
                                             [ 'call',
                                                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                                                 [ [ 'id', '$baz' ], [ "arrayLiteral",
@@ -292,12 +296,12 @@ module.exports["application statements"] = {
                                                         "function",
                                                         null,
                                                         [ "P2" ],
-                                                        [ "stmtList", [ "call", [ "select", [ "id", "task" ], "sendMessage" ],
+                                                        [ "stmtList", [ 'expr-stmt', [ "call", [ "select", [ "id", "task" ], "sendMessage" ],
                                                                 [
                                                                     [ "id", "$quux" ],
                                                                     [ "arrayLiteral", [ [ "id", "P2" ] ] ],
                                                                     [ "function", null, [ "P3" ], [ "stmtList" ] ]
-                                                                ] ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
+                                                                ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
 
         // test.equal(new Context().compile(node).render(),
         //     "task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($bar, [], function (res) {\nvar P1 = res ? res[0] : null;\ntask.sendMessage($baz, [(P0 - P1)], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($quux, [P0], function (res) {\nvar P0 = res ? res[0] : null;\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n");

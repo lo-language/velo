@@ -27,6 +27,10 @@ var __ = function (address, args, replyHandler, failHandler, async) {
 
     this.ast = JS.runtimeCall('sendMessage', [this.address, JS.arrayLiteral(this.args)].concat(this.replyHandler ? this.replyHandler : []));
 
+    if (this.async) {
+        this.ast = JS.exprStmt(this.ast);
+    }
+
 };
 
 __.prototype = Object.create(JsStmt.prototype);
@@ -49,7 +53,7 @@ __.prototype.attach = function (stmt) {
 
     if (this.replyHandler == null) {
         this.replyHandler = new JsFunction('res', stmt);
-        this.ast = JS.runtimeCall('sendMessage', [this.address, JS.arrayLiteral(this.args), this.replyHandler]);
+        this.ast = JS.exprStmt(JS.runtimeCall('sendMessage', [this.address, JS.arrayLiteral(this.args), this.replyHandler]));
     }
     else {
         this.replyHandler.append(stmt);

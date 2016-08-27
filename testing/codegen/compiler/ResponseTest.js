@@ -20,8 +20,12 @@ module.exports["response"] = {
             args: []};
 
         test.deepEqual(new Context().compile(node).renderTree(),
-            new JsStmt(JS.runtimeCall('respond', [JS.string('reply'), JS.arrayLiteral([])]))
-                .attach(JsStmt.return()).renderTree());
+            [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'respond' ],
+                        [ [ 'string', 'reply' ], [ 'arrayLiteral', [] ] ] ] ],
+                [ 'stmtList', [ 'return' ] ] ]);
         test.done();
     },
 
@@ -35,8 +39,13 @@ module.exports["response"] = {
             ]};
 
         test.deepEqual(new Context().compile(node).renderTree(),
-            new JsStmt(JS.runtimeCall('respond', [JS.string('reply'), JS.arrayLiteral([JS.num('42')])]))
-                .attach(JsStmt.return()).renderTree());
+            [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'respond' ],
+                        [ [ 'string', 'reply' ],
+                            [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ],
+                [ 'stmtList', [ 'return' ] ] ]);
         test.done();
     },
 
@@ -51,8 +60,14 @@ module.exports["response"] = {
             ]};
 
         test.deepEqual(new Context().compile(node).renderTree(),
-            new JsStmt(JS.runtimeCall('respond', [JS.string('reply'), JS.arrayLiteral([JS.num('42'), JS.string("hot dog!")])]))
-                .attach(JsStmt.return()).renderTree());
+            [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'respond' ],
+                        [ [ 'string', 'reply' ],
+                            [ 'arrayLiteral',
+                                [ [ 'num', '42' ], [ 'string', 'hot dog!' ] ] ] ] ] ],
+                [ 'stmtList', [ 'return' ] ] ]);
         test.done();
     },
 
@@ -66,8 +81,13 @@ module.exports["response"] = {
             ]};
 
         test.deepEqual(new Context().compile(node).renderTree(),
-            new JsStmt(JS.runtimeCall('respond', [JS.string('fail'), JS.arrayLiteral([JS.num('42')])]))
-                .attach(JsStmt.return()).renderTree());
+            [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'respond' ],
+                        [ [ 'string', 'fail' ],
+                            [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ],
+                [ 'stmtList', [ 'return' ] ] ]);
         test.done();
     }
 };
