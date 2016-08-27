@@ -53,6 +53,54 @@ module.exports["dispatch"] = {
         test.done();
     },
 
+    "attach": function (test) {
+
+        var node = {
+            "type":"message",
+            "args": [],
+            "address": {
+                "type": "id",
+                "name": "foo"
+            },
+            "subsequent": {
+                type: "procedure",
+                channel: "reply",
+                params: [],
+                body: {
+                    type: "stmt_list",
+                    head: {
+                        type: 'assign',
+                        op: '=',
+                        left: {type: 'id', name: 'foo'},
+                        right: {type: 'number', val: '42'}
+                    },
+                    tail: null
+                }
+            }
+        };
+
+        var result = new Context().compile(node);
+
+        result.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('$bazball'), JS.num('42')))));
+
+        test.deepEqual(result.renderTree(), [ 'stmtList',
+            [ 'call',
+                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                [ [ 'id', '$foo' ],
+                    [ 'arrayLiteral', [] ],
+                    [ 'function',
+                        null,
+                        [ 'args' ],
+                        [ 'stmtList',
+                            [ 'var', '$foo' ],
+                            [ 'stmtList',
+                                [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '42' ] ] ] ] ] ] ] ],
+            [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'assign', [ 'id', '$bazball' ], [ 'num', '42' ] ] ] ] ]);
+        test.done();
+    },
+
     "contingency handler only": function (test) {
 
         var node = {

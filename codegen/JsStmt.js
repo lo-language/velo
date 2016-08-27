@@ -23,7 +23,7 @@ const JS = require('./JsPrimitives');
 
 /**
  * Constructor
- * 
+ *
  * @param ast
  * @param final
  * @private

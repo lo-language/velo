@@ -281,7 +281,7 @@ JS.fnDef = (params, body, name) => {
 };
 
 JS.stmtList = (head, tail) => {
-    
+
     return {
 
         renderTree: function () {
@@ -336,11 +336,6 @@ JS.runtimeCall = (fnName, args) => {
     return JS.fnCall(
         JS.select(JS.ID('task'), fnName),
         args);
-};
-
-JS.message = (target, args, subsequent, contingency) => {
-
-    return JS.runtimeCall('sendMessage', [target, JS.arrayLiteral(args)]);
 };
 
 module.exports = JS;

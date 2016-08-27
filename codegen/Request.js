@@ -15,14 +15,18 @@ const JsStmt = require('./JsStmt');
  * @param args          array of JS parts
  * @param replyHandler  JsFunction
  * @param failHandler   JsFunction
+ * @param async
  */
-var __ = function (address, args, replyHandler, failHandler) {
+var __ = function (address, args, replyHandler, failHandler, async) {
 
     this.address = address;
     this.args = args;
     this.replyHandler = replyHandler;
     this.failHandler = failHandler;
-    this.async = true;
+    this.async = async || false;
+
+    this.ast = JS.runtimeCall('sendMessage', [this.address, JS.arrayLiteral(this.args)].concat(this.replyHandler ? this.replyHandler : []));
+
 };
 
 __.prototype = Object.create(JsStmt.prototype);
@@ -36,23 +40,22 @@ __.prototype.constructor = __;
  * @returns this    fluent interface
  */
 __.prototype.attach = function (stmt) {
-    
+
+    if (this.async == false) {
+        return JsStmt.prototype.attach.call(this, stmt);
+    }
+
     // if we have a replyHandler, extend it, otherwise create one
 
     if (this.replyHandler == null) {
         this.replyHandler = new JsFunction('res', stmt);
+        this.ast = JS.runtimeCall('sendMessage', [this.address, JS.arrayLiteral(this.args), this.replyHandler]);
     }
     else {
         this.replyHandler.append(stmt);
     }
 
     return this;
-};
-
-__.prototype._getAst = function () {
-
-    return JS.stmtList(
-        JS.runtimeCall('sendMessage', [this.address, JS.arrayLiteral(this.args)].concat(this.replyHandler ? this.replyHandler : [])));
 };
 
 

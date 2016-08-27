@@ -41,7 +41,7 @@ __.prototype.pushRequest = function (address, args, failHandler) {
     // create a reply handler taking the placeholder as its param and with an empty body
     var replyHandler = new JsFunction([placeholderName], new JsStmt());
 
-    var req = new Request(address, args, replyHandler, failHandler);
+    var req = new Request(address, args, replyHandler, failHandler, true);
 
     if (this.requests) {
         this.requests.attach(req);

@@ -118,7 +118,7 @@ module.exports['procedure'] = function (node) {
     // bind values to our params
     node.params.forEach((paramName, index) => {
 
-        var assignment = new JsStmt(JS.assign(JS.ID('$' + paramName), JS.subscript(argList, JS.num(String(index)))));
+        var assignment = new JsStmt(JS.exprStmt(JS.assign(JS.ID('$' + paramName), JS.subscript(argList, JS.num(String(index))))));
 
         if (preamble) {
             preamble.attach(assignment);
