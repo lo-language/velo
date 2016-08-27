@@ -47,9 +47,9 @@ module.exports["assignment"] = {
         test.deepEqual(context.compile(node).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
-                    [ 'mul-assign',
+                    [ 'assign',
                         [ 'subscript', [ 'id', '$foo' ], [ 'id', '$bar' ] ],
-                        [ 'num', '57' ] ] ] ]);
+                        [ 'num', '57' ], '*=' ] ] ]);
         test.done();
     },
 
@@ -73,23 +73,33 @@ module.exports["assignment"] = {
         test.done();
     },
 
-    // "assign application to id": function (test) {
-    //
-    //     var node = {
-    //         type: 'assign',
-    //         op: '=',
-    //         left: {type: 'id', name: 'foo'},
-    //         right: {type: 'application', address: {type: 'id', name: 'bar'}, args: []}
-    //     };
-    //
-    //     var context = new Context().createInner();
-    //
-    //     test.equal(context.has('foo'), false);
-    //     test.deepEqual(context.compile(node), 'task.sendMessage($bar, [], function (res) {\nvar P0 = res ? res[0] : null;\n$foo = P0;\n}, null);\n\n');
-    //     test.equal(context.has('foo'), true);
-    //
-    //     test.done();
-    // },
+    "assign application to id": function (test) {
+
+        var node = {
+            type: 'assign',
+            op: '=',
+            left: {type: 'id', name: 'foo'},
+            right: {type: 'application', address: {type: 'id', name: 'bar'}, args: []}
+        };
+
+        var context = new Context().createInner();
+
+        test.equal(context.has('foo'), false);
+        test.deepEqual(context.compileStmt(node).renderTree(), [ 'stmtList',
+            [ 'expr-stmt',
+                [ 'call',
+                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                    [ [ 'id', '$bar' ],
+                        [ 'arrayLiteral', [] ],
+                        [ 'function',
+                            null,
+                            [ 'P0' ],
+                            [ 'stmtList',
+                                [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'id', 'P0' ] ] ] ] ] ] ] ] ]);
+        test.equal(context.has('foo'), true);
+
+        test.done();
+    },
 
     "doesn't declare if in parent context": function (test) {
 

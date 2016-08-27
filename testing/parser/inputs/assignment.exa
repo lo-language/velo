@@ -1,7 +1,7 @@
 test is -> {
 
-    bar = baz;
-    binky = 64;
+    bar *= baz;
+    binky += 64;
     message = "hi there";
     foo = true;
     baz = #someList;

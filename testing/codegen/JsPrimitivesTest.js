@@ -294,9 +294,9 @@ module.exports["operators"] = {
 
     "mul assign": function (test) {
 
-        var n = JS.mulAssign(JS.ID('foo'), JS.num('57'));
+        var n = JS.assign(JS.ID('foo'), JS.num('57'), '*=');
 
-        test.deepEqual(n.renderTree(), [ 'mul-assign', [ 'id', 'foo' ], [ 'num', '57' ] ]);
+        test.deepEqual(n.renderTree(), [ 'assign', [ 'id', 'foo' ], [ 'num', '57' ], '*=' ]);
         test.equal(n.renderJs(), "foo *= 57");
 
         test.done();

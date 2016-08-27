@@ -289,9 +289,9 @@ module.exports["compileStmt"] = {
 
         test.deepEqual(s.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
-                [ 'mul-assign',
+                [ 'assign',
                     [ 'subscript', [ 'id', '$foo' ], [ 'id', '$bar' ] ],
-                    [ 'num', '57' ] ] ] ]);
+                    [ 'num', '57' ], '*=' ] ] ]);
 
         test.equal(s.async, false);
 

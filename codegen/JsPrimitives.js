@@ -248,19 +248,11 @@ JS.exprStmt = (expr) => {
     };
 };
 
-JS.assign = (lvalue, rvalue) => {
+JS.assign = (lvalue, rvalue, op) => {
 
     return {
-        renderTree: () => ['assign', lvalue.renderTree(), rvalue.renderTree()],
-        renderJs: () =>  `${lvalue.renderJs()} = ${rvalue.renderJs()}`
-    };
-};
-
-JS.mulAssign = (lvalue, rvalue) => {
-
-    return {
-        renderTree: () => ['mul-assign', lvalue.renderTree(), rvalue.renderTree()],
-        renderJs: () =>  `${lvalue.renderJs()} *= ${rvalue.renderJs()}`
+        renderTree: () => ['assign', lvalue.renderTree(), rvalue.renderTree()].concat(op ? [op] : []),
+        renderJs: () =>  lvalue.renderJs() + ' ' + (op ? op : '=') + ' ' + rvalue.renderJs()
     };
 };
 

@@ -215,13 +215,7 @@ module.exports['assign'] = function (node) {
         }
     }
 
-    var expr = JS.assign;
-
-    if (node.op == '*=') {
-        expr = JS.mulAssign;
-    }
-
-    return new JsStmt(JS.exprStmt(expr(left, right, node.op)));
+    return new JsStmt(JS.exprStmt(JS.assign(left, right, node.op == '=' ? null : node.op)));
 
     // this was genius
     // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP

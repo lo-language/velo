@@ -109,7 +109,7 @@ module.exports["constants"] = {
                                         [ [ 'id', '$bar' ],
                                             [ 'arrayLiteral', [ ['num', '42' ] ] ],
                                             [ 'function', null, [ 'P0' ], [ 'stmtList', [ "expr-stmt",
-                                                [ "mul-assign", [ "id", "$result" ], [ "id", "P0" ] ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
+                                                [ "assign", [ "id", "$result" ], [ "id", "P0" ], '*=' ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
 
         test.equal(context.has('main'), true);
         test.ok(context.isConstant('main'));
