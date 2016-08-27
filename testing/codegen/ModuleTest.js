@@ -38,7 +38,7 @@ module.exports["basics"] = {
         module.define("foo", "$foo", true);
 
         test.equal(module.resolveToGlobal("pi"), 3);
-        test.equal(module.resolveToGlobal("foo"), "M0.foo");
+        test.deepEqual(module.resolveToGlobal("foo").renderTree(), [ 'select', [ 'id', 'M0' ], 'foo' ]);
 
         test.done();
     },
@@ -126,7 +126,7 @@ module.exports["resolveExternal"] = {
         mod.deps["Bar"] = dep;
 
         test.equal(mod.resolveExternal("PI", "Bar"), 3);
-        test.equal(mod.resolveExternal("cos", "Bar"), "XX.cos");
+        test.deepEqual(mod.resolveExternal("cos", "Bar").renderTree(), [ 'select', [ 'id', 'XX' ], 'cos' ]);
         test.done();
     }
 };

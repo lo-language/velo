@@ -14,7 +14,8 @@
 'use strict';
 
 const ASTBuilder = require('./../parser/ASTBuilder');
-const Context = require('./../codegen/Context');
+const Context = require('./Context');
+const JS = require('./JsPrimitives');
 const Q = require('q');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,7 +86,7 @@ __.prototype.getExports = function () {
 __.prototype.resolveToGlobal = function (name) {
 
     if (this.exports[name]) {
-        return this.id + "." + name;
+        return JS.select(JS.ID(this.id), name);
     }
 
     return this.resolve(name);
