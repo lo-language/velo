@@ -69,30 +69,30 @@ module.exports['collections'] = {
     }
 };
 
-// module.exports['helloWorld'] = {
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'helloWorld');
-//         cb();
-//     },
-//
-//     'success': function (test) {
-//
-//         test.expect(1);
-//
-//         var io = {
-//             out: {
-//                 write: function (task) {
-//                     test.equal(task.args[0], "hello, world!");
-//                     task.respond("reply");
-//                 }
-//             }
-//         };
-//
-//         this.harness.testSuccess(test, [[], io, {}]);
-//     }
-// };
+module.exports['helloWorld'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'helloWorld');
+        cb();
+    },
+
+    'success': function (test) {
+
+        test.expect(1);
+
+        var io = {
+            out: {
+                write: function (task) {
+                    test.equal(task.args[0], "hello, world!");
+                    task.respond("reply");
+                }
+            }
+        };
+
+        this.harness.testSuccess(test, [[], io, {}]);
+    }
+};
 
 // module.exports['fibonacci'] = {
 //
@@ -162,31 +162,31 @@ module.exports['procedure'] = {
     }
 };
 
-// module.exports['conditional in loop'] = {
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'condInLoop');
-//         cb();
-//     },
-//
-//     'success': function (test) {
-//
-//         var logMessages = [];
-//
-//         this.harness.testSuccess(test, [
-//             function (task) {
-//
-//                 logMessages.push(task.args[0]);
-//                 task.respond("reply");
-//             }
-//         ], 5).then(function () {
-//
-//             test.deepEqual(logMessages, [ 'howdy!\n', 'howdy!\n', 'hello hello!\n', 'ok.\n', 'ok.\n' ]);
-//         });
-//     }
-// };
-//
+module.exports['conditional in loop'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'condInLoop');
+        cb();
+    },
+
+    'success': function (test) {
+
+        var logMessages = [];
+
+        this.harness.testSuccess(test, [
+            function (task) {
+
+                logMessages.push(task.args[0]);
+                task.respond("reply");
+            }
+        ], 5).then(function () {
+
+            test.deepEqual(logMessages, [ 'howdy!\n', 'howdy!\n', 'hello hello!\n', 'ok.\n', 'ok.\n' ]);
+        });
+    }
+};
+
 // module.exports['futures2'] = {
 //
 //     // test that uncaught errors are properly escalated out of the program
@@ -245,35 +245,35 @@ module.exports['procedure'] = {
 // };
 
 
-// module.exports['reply handling'] = {
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'replyHandling');
-//         cb();
-//     },
-//
-//     'success': function (test) {
-//
-//         test.expect(1);
-//
-//         // both functions just reply immediately
-//         // todo add a test that does this experiment within a reply handler
-//
-//         this.harness.run([
-//             function (task) {
-//                 task.respond("reply");
-//             },
-//             function (task) {
-//                 task.respond("reply", 33);
-//             }
-//         ]).then(
-//             function (res) {
-//                 test.equal(res, 42);
-//                 test.done();
-//             });
-//     }
-// };
+module.exports['reply handling'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'replyHandling');
+        cb();
+    },
+
+    'success': function (test) {
+
+        test.expect(1);
+
+        // both functions just reply immediately
+        // todo add a test that does this experiment within a reply handler
+
+        this.harness.run([
+            function (task) {
+                task.respond("reply");
+            },
+            function (task) {
+                task.respond("reply", 33);
+            }
+        ]).then(
+            function (res) {
+                test.equal(res, 42);
+                test.done();
+            });
+    }
+};
 
 
 // //module.exports['recovery'] = {

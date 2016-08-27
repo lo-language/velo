@@ -105,8 +105,6 @@ __.prototype.run = function (args) {
     try {
         var main = new Function("rootTask", body);
 
-        console.log(body);
-
         var d = Q.defer();
 
         Task.sendRootRequest(main, args, d.resolve.bind(d), d.reject.bind(d));

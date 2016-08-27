@@ -337,10 +337,15 @@ module.exports['application'] = function (node) {
  */
 module.exports['application_stmt'] = function (node) {
 
-    // compile but ignore the result because it's just a placeholder var as a stattment
-    this.compile(node.application);
+    var result = this.compile(node.application);
 
+    if (node.application.type == 'message') {
+        return new JsStmt(JS.exprStmt(result));
+    }
+
+    // compile but ignore the result because it's just a placeholder var as a statement
     // if we ever support true sync calls, this would have to be flexible, but for now, we can just throw the result away
+
     return new JsStmt();
 };
 
