@@ -1,12 +1,12 @@
 /**
+ * Models a JS function def so we can futz with it.
+ *
  * Created by spurcell on 7/24/16.
  */
 
 const JS = require('./JsPrimitives');
 
 /**
- * Models a JS function def so we can futz with it.
- *
  * todo support providing a name for functions
  *
  * @param params    array of param names

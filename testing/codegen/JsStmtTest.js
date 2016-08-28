@@ -98,7 +98,7 @@ module.exports["getTree"] = {
             [ 'stmtList' ] ]);
 
         test.done();
-    },
+    }
 };
 
 module.exports["attach"] = {
@@ -106,8 +106,10 @@ module.exports["attach"] = {
     "attach to empty": function (test) {
 
         var stmt = new JsStmt();
+        test.equal(stmt.isAsync(), false);
 
         stmt.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.num('57')))));
+        test.equal(stmt.isAsync(), false);
 
         test.deepEqual(stmt.renderTree(), [ 'stmtList',
             [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
@@ -153,6 +155,17 @@ module.exports["attach"] = {
                 [ 'expr-stmt', [ 'assign', ['id', '$foo'], ['num', '42'] ] ],
                 [ 'stmtList',
                     [ 'return'] ] ]);
+        test.done();
+    },
+
+    "attach async": function (test) {
+
+        var stmt = new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.num('42'))));
+        test.equal(stmt.isFinal(), false);
+
+        stmt.attach({attach: function () {}, isAsync: () => true});
+        test.equal(stmt.isAsync(), true);
+
         test.done();
     },
 

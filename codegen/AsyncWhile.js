@@ -11,6 +11,7 @@ const JsStmt = require('./JsStmt');
  *
  * @param cond
  * @param body
+ * @param wrapper
  * @private
  */
 var __ = function (cond, body, wrapper) {
@@ -21,6 +22,7 @@ var __ = function (cond, body, wrapper) {
     this.body = body;
     this.wrapper = wrapper;
 
+    this.async = true;
     this.next = null;
 
     // join the body to the wrapper function via setImmediate to form a loop in a way that won't break the stack

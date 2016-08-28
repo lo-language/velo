@@ -36,6 +36,19 @@ var __ = function (ast, final) {
     this.next = null;
 };
 
+__.prototype.isAsync = function () {
+
+    if (this.async == true) {
+        return true;
+    }
+
+    if (this.next) {
+        return this.next.isAsync();
+    }
+
+    return false;
+};
+
 /**
  * Returns true if this statement list is final (ends in a return).
  *

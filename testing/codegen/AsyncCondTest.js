@@ -15,9 +15,11 @@ module.exports["basics"] = {
         var asyncCall = new Wrapper();
         asyncCall.pushRequest(JS.ID('$foo'), []);
 
-        var loop = new AsyncCond(JS.ID('$foo'), asyncCall.wrap(new JsStmt()), null, new Wrapper());
+        var stmt = new AsyncCond(JS.ID('$foo'), asyncCall.wrap(new JsStmt()), null, new Wrapper());
 
-        test.deepEqual(loop.renderTree(), [ 'stmtList',
+        test.equal(stmt.isAsync(), true);
+
+        test.deepEqual(stmt.renderTree(), [ 'stmtList',
             [ 'if',
                 [ 'id', '$foo' ],
                 [ 'stmtList',
@@ -33,13 +35,15 @@ module.exports["basics"] = {
 
     "attach": function (test) {
 
-        var loop = new AsyncCond(JS.ID('$foo'), new JsStmt(), null, new Wrapper());
-
-        test.deepEqual(loop.renderTree(), [ 'stmtList', [ 'if', [ 'id', '$foo' ], [ 'stmtList' ] ] ]);
-
-        loop.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('$bazball'), JS.num('48')))));
+        var stmt = new AsyncCond(JS.ID('$foo'), new JsStmt(), null, new Wrapper());
         
-        test.deepEqual(loop.renderTree(), [ 'stmtList',
+        test.equal(stmt.isAsync(), true);
+
+        test.deepEqual(stmt.renderTree(), [ 'stmtList', [ 'if', [ 'id', '$foo' ], [ 'stmtList' ] ] ]);
+
+        stmt.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('$bazball'), JS.num('48')))));
+        
+        test.deepEqual(stmt.renderTree(), [ 'stmtList',
             [ 'let',
                 'cont',
                 [ 'function',

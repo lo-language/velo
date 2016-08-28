@@ -14,6 +14,8 @@ module.exports["basics"] = {
 
         var loop = new AsyncWhile(JS.ID('$foo'), new JsStmt(), new Wrapper());
 
+        test.equal(loop.isAsync(), true);
+
         test.deepEqual(loop.renderTree(), [ 'stmtList',
             [ 'let',
                 'loop',
@@ -39,6 +41,8 @@ module.exports["basics"] = {
     "attach": function (test) {
 
         var loop = new AsyncWhile(JS.ID('$foo'), new JsStmt(), new Wrapper());
+
+        test.equal(loop.isAsync(), true);
 
         loop.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('$bazball'), JS.num('48')))));
 

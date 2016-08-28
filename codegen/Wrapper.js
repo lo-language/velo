@@ -13,6 +13,8 @@ const JsStmt = require('./JsStmt');
  * Constructor
  *
  * todo should Wrapper just extend context??
+ *
+ * or should a wrapper be a statement we attach other stmts to?
  */
 var __ = function () {
 
