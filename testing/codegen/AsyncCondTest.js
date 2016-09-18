@@ -7,6 +7,7 @@ const Context = require('../../codegen/Context');
 const JsStmt = require('../../codegen/JsStmt');
 const JsFunction = require('../../codegen/JsFunction');
 const AsyncCond = require('../../codegen/AsyncCond');
+const Request = require('../../codegen/Request');
 const Wrapper = require('../../codegen/Wrapper');
 
 module.exports["basics"] = {
@@ -46,7 +47,7 @@ module.exports["basics"] = {
     "async predicate": function (test) {
 
         var asyncCall = new Wrapper();
-        asyncCall.pushRequest(JS.ID('$foo'), []);
+        asyncCall.pushRequest(new Request(JS.ID('$foo'), [], null, null, true));
 
         var stmt = new AsyncCond(JS.ID('$foo'), asyncCall.wrap(new JsStmt()), null, new Wrapper());
 

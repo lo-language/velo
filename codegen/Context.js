@@ -264,17 +264,15 @@ __.prototype.popWrapper = function () {
 /**
  * Pushes a request onto the stack and returns a placeholder.
  *
- * @param address
- * @param args
- * @param failHandler
+ * @param request
  */
-__.prototype.pushBlockingCall = function (address, args, failHandler) {
+__.prototype.pushBlockingCall = function (request) {
 
     if (this.wrappers.length == 0) {
         throw new Error("trying to push a blocking call outside of stmt context");
     }
 
-    return this.wrappers[this.wrappers.length - 1].pushRequest(address, args, failHandler);
+    return this.wrappers[this.wrappers.length - 1].pushRequest(request);
 };
 
 module.exports = __;

@@ -29,27 +29,24 @@ __.prototype.isEmpty = function () {
 
 /**
  * Pushes a request onto the stack and returns a placeholder.
- *
- * todo should this take a Request instead?
- *
- * @param address
- * @param args
- * @param failHandler
+ **
+ * @param request
  */
-__.prototype.pushRequest = function (address, args, failHandler) {
+__.prototype.pushRequest = function (request) {
 
-    var placeholderName = 'P' + this.placeHolders++;
+    if (request.getReplyHandler() == null) {
 
-    // create a reply handler taking the placeholder as its param and with an empty body
-    var replyHandler = new JsFunction([placeholderName], new JsStmt());
+        // create a reply handler taking the placeholder as its param and with an empty body
 
-    var req = new Request(address, args, replyHandler, failHandler, true);
+        var placeholderName = 'P' + this.placeHolders++;
+        request.setReplyHandler(new JsFunction([placeholderName], new JsStmt()));
+    }
 
     if (this.requests) {
-        this.requests.attach(req);
+        this.requests.attach(request);
     }
     else {
-        this.requests = req;
+        this.requests = request;
     }
 
     return JS.ID(placeholderName);
@@ -67,7 +64,6 @@ __.prototype.wrap = function (stmt) {
     }
 
     return stmt;
-
 };
 
 module.exports = __;

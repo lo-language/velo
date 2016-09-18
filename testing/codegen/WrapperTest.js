@@ -5,6 +5,7 @@
 "use strict";
 
 const Wrapper = require('../../codegen/Wrapper');
+const Request = require('../../codegen/Request');
 const JS = require('../../codegen/JsPrimitives');
 const JsStmt = require('../../codegen/JsStmt');
 const util = require('util');
@@ -32,7 +33,7 @@ module.exports["basics"] = {
 
         var wrapper = new Wrapper();
 
-        var placeholder = wrapper.pushRequest(JS.ID('foo'), [JS.num('57'), JS.string('hello')]);
+        var placeholder = wrapper.pushRequest(new Request(JS.ID('foo'), [JS.num('57'), JS.string('hello')], null, null, true));
         test.equal(wrapper.isEmpty(), false);
 
         test.deepEqual(placeholder.renderTree(), [ 'id', 'P0' ]);
@@ -59,10 +60,10 @@ module.exports["basics"] = {
 
         var wrapper = new Wrapper();
 
-        var ph1 = wrapper.pushRequest(JS.ID('foo'), [JS.num('57')]);
+        var ph1 = wrapper.pushRequest(new Request(JS.ID('foo'), [JS.num('57')], null, null, true));
         test.equal(wrapper.isEmpty(), false);
 
-        var ph2 = wrapper.pushRequest(JS.ID('bar'), [JS.string('hello')]);
+        var ph2 = wrapper.pushRequest(new Request(JS.ID('bar'), [JS.string('hello')], null, null, true));
         test.equal(wrapper.isEmpty(), false);
 
         test.deepEqual(ph1.renderTree(), [ 'id', 'P0' ]);

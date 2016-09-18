@@ -22,11 +22,13 @@ module.exports["embedded calls"] = {
 
         var ctx = new Context();
 
-        ctx.pushBlockingCall = function (target, args, contingency) {
+        ctx.pushBlockingCall = function (request) {
 
-            test.deepEqual(target.renderTree(), [ 'id', '$foo' ]);
-            test.deepEqual(args, [ ]);
-            test.deepEqual(contingency, null);
+            test.deepEqual(request.renderTree(), [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                        [ [ 'id', '$foo' ], [ 'arrayLiteral', [] ] ] ] ] ]);
 
             return 'blocker';
         };
@@ -36,8 +38,6 @@ module.exports["embedded calls"] = {
         // should put a blocker into the context and return a placeholder
 
         test.equal(result, 'blocker');
-
-        // test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\nP0}, null);\n\n');
         test.done();
     },
 
@@ -53,11 +53,13 @@ module.exports["embedded calls"] = {
 
         var ctx = new Context();
 
-        ctx.pushBlockingCall = function (target, args, contingency) {
+        ctx.pushBlockingCall = function (request) {
 
-            test.deepEqual(target.renderTree(), [ 'id', '$foo' ]);
-            test.deepEqual(args.map(arg => arg.renderTree()), [ [ 'num', '42' ] ]);
-            test.deepEqual(contingency, null);
+            test.deepEqual(request.renderTree(), [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                        [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ]] ] ] ] ] ]);
 
             return 'blocker';
         };
@@ -65,7 +67,6 @@ module.exports["embedded calls"] = {
         var result = ctx.compile(node);
 
         test.equal(result, 'blocker');
-        // test.equal(JsConstruct.makeStatement(result).render(), 'task.sendMessage($foo, [42], function (res) {\nvar P0 = res ? res[0] : null;\nP0}, null);\n\n');
         test.done();
     },
 
@@ -82,11 +83,13 @@ module.exports["embedded calls"] = {
 
         var ctx = new Context();
 
-        ctx.pushBlockingCall = function (target, args, contingency) {
+        ctx.pushBlockingCall = function (request) {
 
-            test.deepEqual(target.renderTree(), [ 'id', '$foo' ]);
-            test.deepEqual(args.map(arg => arg.renderTree()), [ [ 'num', '42' ], [ 'string', 'hi there' ] ]);
-            test.deepEqual(contingency, null);
+            test.deepEqual(request.renderTree(), [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                        [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ], [ 'string', 'hi there' ]] ] ] ] ] ]);
 
             return 'blocker';
         };
@@ -94,8 +97,6 @@ module.exports["embedded calls"] = {
         var result = ctx.compile(node);
 
         test.equal(result, 'blocker');
-
-        // test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [42, 'hi there'], function (res) {\nvar P0 = res ? res[0] : null;\nP0}, null);\n\n");
         test.done();
     },
 
@@ -120,9 +121,23 @@ module.exports["embedded calls"] = {
         var blockerCount = 0;
 
         var swaps = [
-            ['P0', [ 'id', '$foo' ] ],
-            ['P1', [ 'id', '$bar' ] ],
-            ['P2', [ 'id', '$baz' ] ],
+            ['P0', [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                        [ [ 'id', '$foo' ],
+                            [ 'arrayLiteral', [ ] ] ] ] ] ] ],
+            ['P1', [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                        [ [ 'id', '$bar' ], [ 'arrayLiteral', [] ] ] ] ] ] ],
+            ['P2', [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                        [ [ 'id', '$baz' ],
+                            [ 'arrayLiteral', [ [ 'id', 'P0' ], [ 'id', 'P1' ] ] ] ] ] ] ] ],
         ];
 
         ctx.pushBlockingCall = function (req) {
@@ -137,7 +152,6 @@ module.exports["embedded calls"] = {
         var result = ctx.compile(node);
 
         test.deepEqual(result.renderTree(), [ 'id', 'P2' ]);
-        // test.equal(JsConstruct.makeStatement(result).render(), "task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($bar, [], function (res) {\nvar P1 = res ? res[0] : null;\ntask.sendMessage($baz, [P0, P1], function (res) {\nvar P0 = res ? res[0] : null;\nP0}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     }
 };
@@ -166,9 +180,7 @@ module.exports["application statements"] = {
                         [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
                         [ 'function', null, [ 'P0' ], [ 'stmtList' ] ] ] ] ] ]);
 
-        // test.equal(a.render(), 'task.sendMessage($foo, [42], function (res) {\nvar P0 = res ? res[0] : null;\n}, null);\n\n');
-
-        // add a statement - should be tucked inside the replyhandler
+        // attach a statement - should be tucked inside the replyhandler
         result.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID("foo"), JS.ID("bar")))));
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
@@ -182,8 +194,6 @@ module.exports["application statements"] = {
                             [ 'P0' ],
                             [ 'stmtList',
                                 [ 'expr-stmt', [ 'assign', [ 'id', 'foo' ], [ 'id', 'bar' ] ] ] ] ] ] ] ] ]);
-
-        // test.equal(a.render(), 'task.sendMessage($foo, [42], function (res) {\nvar P0 = res ? res[0] : null;\nfoo = bar;}, null);\n\n');
 
         test.done();
     },
@@ -239,8 +249,6 @@ module.exports["application statements"] = {
                                                     [ "function", null, [ "P2" ],
                                                         [ "stmtList" ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
 
-        // test.equal(new Context().compile(node).render(),
-        //     "task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($bar, [], function (res) {\nvar P1 = res ? res[0] : null;\ntask.sendMessage($baz, [(P0 - P1)], function (res) {\nvar P0 = res ? res[0] : null;\n}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     },
 
@@ -303,8 +311,6 @@ module.exports["application statements"] = {
                                                                     [ "function", null, [ "P3" ], [ "stmtList" ] ]
                                                                 ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
 
-        // test.equal(new Context().compile(node).render(),
-        //     "task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($bar, [], function (res) {\nvar P1 = res ? res[0] : null;\ntask.sendMessage($baz, [(P0 - P1)], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($quux, [P0], function (res) {\nvar P0 = res ? res[0] : null;\n}, null);\n\n}, null);\n\n}, null);\n\n}, null);\n\n");
         test.done();
     },
 
@@ -342,10 +348,99 @@ module.exports["application statements"] = {
 
         var result = new Context().compileStmt(node);
 
-        // test.deepEqual(result.renderTree(), [ ]);
+        test.deepEqual(result.renderTree(),
+            [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                        [ [ 'id', '$factorial' ],
+                            [ 'arrayLiteral',
+                                [ [ 'subscript', [ 'id', '$args' ], [ 'num', '0' ] ] ] ],
+                            [ 'function',
+                                null,
+                                [ 'P0' ],
+                                [ 'stmtList',
+                                    [ 'expr-stmt',
+                                        [ 'stmtList',
+                                            [ 'call',
+                                                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                                                [ [ 'select', ['select', [ 'id', '$io' ], 'stdout'], 'write' ],
+                                                    [ 'arrayLiteral', [[
+                                                        "add", [
+                                                            "add",
+                                                            [ "string", "" ], [ "id", "P0" ] ], [ "string", "\\n" ]
+                                                    ]] ] ] ] ] ] ] ] ] ] ] ]);
 
-        // test.equal(new Context().compile(node).render(),
-        //     "task.sendMessage($factorial, [$args[0]], function (res) {\nvar P0 = res ? res[0] : null;\ntask.sendMessage($io.stdout.write, ['' + P0 + '\\n'], null, null);\n}, null);\n\n");
+        test.done();
+    }
+};
+
+
+module.exports["with handlers"] = {
+
+    "application with reply handler": function (test) {
+
+        // findWords("hello") -> (rest) {
+        //     reply "hello";
+        // };
+
+        var node = {
+            type: 'application_stmt',
+            application: {
+                type: 'message',
+                address: {
+                    type: 'id',
+                    name: 'findWords'
+                },
+                args: [{
+                    type: 'string',
+                    val: 'hello'
+                }],
+                "subsequent": {
+                    "type": "procedure",
+                    "params": ["rest"],
+                    "body": {
+                        "type": "stmt_list",
+                        "head": {
+                            "type": "response",
+                            "channel": "reply",
+                            "args": [
+                                {
+                                    "type": "string",
+                                    "val": "hello"
+                                }
+                            ]
+                        },
+                        "tail": null
+                    },
+                    "channel": "reply"
+                }
+            }
+        };
+
+        var result = new Context().compileStmt(node);
+
+        test.deepEqual(result.renderTree(), [ 'stmtList',
+            [ 'expr-stmt',
+                [ 'stmtList',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                        [ [ 'id', '$findWords' ],
+                            [ 'arrayLiteral', [ [ 'string', 'hello' ] ] ],
+                            [ 'function',
+                                null,
+                                [ 'args' ],
+                                [ 'stmtList',
+                                    [ 'var', '$rest' ],
+                                    [ 'stmtList',
+                                        [ 'expr-stmt',
+                                            [ 'assign',
+                                                [ 'id', '$rest' ],
+                                                [ 'subscript', ["id", "args"], ["num", "0"] ] ] ],
+                                        [ 'stmtList',
+                                            [ 'expr-stmt', [ 'call', ["select", [ "id", "task" ], "respond"], [ [ "string", "reply" ],
+                                                [ "arrayLiteral", [ [ "string", "hello" ] ] ] ] ] ],
+                                            [ 'stmtList', [ 'return' ] ] ] ] ] ] ] ] ] ] ]);
 
         test.done();
     }

@@ -323,13 +323,11 @@ module.exports['application'] = function (node) {
         return this.compile(arg);
     });
 
-    // todo raise exception if we have a subsequent block on an application expr
-
-    var subsequent = node.subsequent ? this.compile(node.subsequent) : null;
-    var contingency = node.contingency ? this.compile(node.contingency) : null;
+    var replyHandler = node.subsequent ? this.compile(node.subsequent) : null;
+    var failHandler = node.contingency ? this.compile(node.contingency) : null;
 
     // get a placeholder
-    return this.pushBlockingCall(target, args, contingency);
+    return this.pushBlockingCall(new Request(target, args, replyHandler, failHandler, true));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
