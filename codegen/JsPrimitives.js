@@ -220,7 +220,7 @@ JS.inc = (expr) => {
 
     return {
         renderTree: () => ['inc', expr.renderTree()],
-        renderJs: () => '(' + expr.renderJs() + '++' + ')'
+        renderJs: () => expr.renderJs() + '++'
     };
 };
 
@@ -228,7 +228,7 @@ JS.dec = (expr) => {
 
     return {
         renderTree: () => ['dec', expr.renderTree()],
-        renderJs: () => '(' + expr.renderJs() + '--' + ')'
+        renderJs: () => expr.renderJs() + '--'
     };
 };
 

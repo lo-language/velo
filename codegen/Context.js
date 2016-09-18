@@ -33,6 +33,8 @@ var __ = function (parent) {
     this.symbols = {};
 
     this.wrappers = [];
+
+    this.cont = 0;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,6 +77,16 @@ __.prototype.define = function (name, value) {
         name: name,
         value: value
     };
+};
+
+/**
+ * Define a continuation
+ *
+ * @param body
+ */
+__.prototype.getContName = function () {
+
+    return 'cont' + this.cont++;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

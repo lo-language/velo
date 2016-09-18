@@ -20,7 +20,7 @@ module.exports["basics"] = {
             "operand":{type: "id", name: "bar"}
         };
 
-        test.deepEqual(new Context().compile(node).renderTree(), new JsStmt(JS.inc(JS.ID('$bar'))).renderTree());
+        test.deepEqual(new Context().compile(node).renderTree(), [ 'stmtList', [ 'expr-stmt', [ 'inc', [ 'id', '$bar' ] ] ] ]);
         test.done();
     },
 
@@ -31,7 +31,7 @@ module.exports["basics"] = {
             "operand":{type: "id", name: "bar"}
         };
 
-        test.deepEqual(new Context().compile(node).renderTree(), new JsStmt(JS.dec(JS.ID('$bar'))).renderTree());
+        test.deepEqual(new Context().compile(node).renderTree(), [ 'stmtList', [ 'expr-stmt', [ 'dec', [ 'id', '$bar' ] ] ] ]);
         test.done();
     },
 
@@ -46,7 +46,9 @@ module.exports["basics"] = {
             }
         };
 
-        test.deepEqual(new Context().compile(node).renderTree(), new JsStmt(JS.inc(JS.subscript(JS.ID('$bar'), JS.num('1')))).renderTree());
+        test.deepEqual(new Context().compile(node).renderTree(), [ 'stmtList',
+            [ 'expr-stmt',
+                [ 'inc', [ 'subscript', [ 'id', '$bar' ], [ 'num', '1' ] ] ] ] ]);
         test.done();
     },
 };

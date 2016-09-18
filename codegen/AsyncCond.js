@@ -13,9 +13,10 @@ const JsStmt = require('./JsStmt');
  * @param cons      consequent stmt
  * @param alt       alternate stmt
  * @param wrapper   async wrapper
+ * @param context   compilation context, needed to get a continuation name
  * @private
  */
-var __ = function (pred, cons, alt, wrapper) {
+var __ = function (pred, cons, alt, wrapper, context) {
 
     JsStmt.call(this);
 
@@ -23,10 +24,19 @@ var __ = function (pred, cons, alt, wrapper) {
     this.cons = cons;
     this.alt = alt;
     this.wrapper = wrapper;
+    this.context = context;
 
     this.next = null;
 
-    this.async = true;
+    this.async = cons.isAsync();
+
+    if (alt && alt.isAsync()) {
+        this.async = true;
+    }
+
+    if (wrapper.isEmpty() == false) {
+        this.async = true;
+    }
 
     // todo make utility for defining continuations in a context?
     // how do we manage loop/continuation names??
@@ -42,16 +52,18 @@ __.prototype._getAst = function () {
 
     if (this.next) {
 
+        var contName = this.context.getContName();
+
         // create a continuation for the following statements
-        var contDecl = new JsStmt(JS.letDecl('cont', JS.fnDef([], this.next)));
+        var contDecl = new JsStmt(JS.constDecl(contName, JS.fnDef([], this.next)));
 
         if (this.alt == null) {
             this.alt = new JsStmt();
         }
 
         // add continuation call to tip of both branches
-        this.cons.attach(new JsStmt(JS.exprStmt(JS.fnCall(JS.ID('cont'), []))));
-        this.alt.attach(new JsStmt(JS.exprStmt(JS.fnCall(JS.ID('cont'), []))));
+        this.cons.attach(new JsStmt(JS.exprStmt(JS.fnCall(JS.ID(contName), []))));
+        this.alt.attach(new JsStmt(JS.exprStmt(JS.fnCall(JS.ID(contName), []))));
 
         // put the continuation def inside the wrapper
         return this.wrapper.wrap(contDecl.attach(JsStmt.cond(this.pred, this.cons, this.alt)));

@@ -95,13 +95,30 @@ module.exports["basics"] = {
             [ 'stmtList',
                 [ 'expr-stmt', [ 'call', [ 'id', 'loop' ], [] ] ] ] ]);
 
-        // test.equal(a.renderTree(),
-        //     'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
-        //     'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {}};\n\nloop();\n');
-        //
         // // try attaching a statement
-        // a.attach(new JsConstruct("var z = 57;"));
-        //
+        a.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('z'), JS.num('57')))));
+
+        test.deepEqual(a.renderTree(), [ 'stmtList',
+            [ 'let',
+                'loop',
+                [ 'function',
+                    null,
+                    [],
+                    [ 'stmtList',
+                        [ 'if',
+                            [ 'id', '$foo' ],
+                            [ 'stmtList',
+                                [ 'expr-stmt',
+                                    [ 'call',
+                                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                                        [ [ 'id', '$bar' ],
+                                            [ 'arrayLiteral', [ [ 'num', '57' ] ] ],
+                                            [ 'function', null, [ 'P0' ], [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', "setImmediate" ], [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "loop" ] ] ] ] ] ] ] ] ] ] ] ],
+                            [ 'stmtList',
+                                [ 'expr-stmt', [ 'assign', [ 'id', 'z' ], [ 'num', '57' ] ] ] ] ] ] ] ],
+            [ 'stmtList',
+                [ 'expr-stmt', [ 'call', [ 'id', 'loop' ], [] ] ] ] ]);
+
         // test.equal(a.renderTree(),
         //     'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
         //     'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;}};\n\nloop();\n');
@@ -194,6 +211,32 @@ module.exports["basics"] = {
         //     'let loop = function () {if ($foo) {var cont0 = function () {setImmediate(task.doAsync(loop));};' +
         //     'if ($bar) {$baz = 4;\ncont0();}\n\nelse {task.sendMessage($foo, [57], function (res) ' +
         //     '{\nvar P0 = res ? res[0] : null;\ncont0();}, null);\n\n}\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
+
+        test.done();
+    },
+
+    "indirectly async body": function (test) {
+
+        var node = {
+            type: 'iteration',
+            condition: {
+                type: 'application',
+                address: {type: 'id', name: 'foo'},
+                args: []
+            },
+            statements: {type: 'stmt_list',
+                head: {
+                    type: 'application_stmt',
+                    application: {
+                        type: 'application',
+                        address: {type: 'id', name: 'bar'},
+                        args: [{type: 'number', val: '57'}]
+                    }
+                },
+                tail: null}
+        };
+
+        var a = new Context().createInner().compileStmt(node);
 
         test.done();
     }

@@ -52,7 +52,7 @@ __.prototype.isAsync = function () {
 /**
  * Returns true if this statement list is final (ends in a return).
  *
- * isCapped? isFixed? isFrozen? noGrow?
+ * isTerminal? isTerminated?
  */
 __.prototype.isFinal = function () {
 

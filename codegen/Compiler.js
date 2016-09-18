@@ -26,6 +26,7 @@ const JS = require('./JsPrimitives');
 const JsStmt = require('./JsStmt');
 const JsFunction = require('./JsFunction');
 const AsyncWhile = require('./AsyncWhile');
+const AsyncCond = require('./AsyncCond');
 const Future = require('./Future');
 const Request = require('./Request');
 
@@ -238,19 +239,24 @@ module.exports['conditional'] = function (node) {
     // we DO need to support more than one level of stmt nesting
 
     this.pushWrapper();
-
     var predicate = this.compile(node.predicate);
+    var wrapper = this.popWrapper();
+
     var consequent = this.compile(node.consequent);
     var alternate = node.alternate ? this.compile(node.alternate) : null;
 
-    var wrapper = this.popWrapper();
+    var async = consequent.isAsync();
+
+    if (alternate && alternate.isAsync()) {
+        async = true;
+    }
 
     // shortcut if none of the bits are async
-    if (wrapper.isEmpty()) {
+    if (async == false && wrapper.isEmpty()) {
         return new JsStmt.cond(predicate, consequent, alternate);
     }
 
-    return new AsyncCond(predicate, consequent, alternate, wrapper);
+    return new AsyncCond(predicate, consequent, alternate, wrapper, this);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -268,7 +274,8 @@ module.exports['iteration'] = function (node) {
 
     var body = this.compile(node.statements);
 
-    if (wrapper.isEmpty() && body.async == false) {
+    if (wrapper.isEmpty() && body.isAsync() == false) {
+        // console.log(body.renderTree());
         return JsStmt.while(condition, body);
     }
 
@@ -685,10 +692,10 @@ module.exports['dynastring'] = function (node) {
 
 module.exports['increment'] = function (node) {
 
-    return new JsStmt(JS.inc(this.compile(node.operand)));
+    return new JsStmt(JS.exprStmt(JS.inc(this.compile(node.operand))));
 };
 
 module.exports['decrement'] = function (node) {
 
-    return new JsStmt(JS.dec(this.compile(node.operand)));
+    return new JsStmt(JS.exprStmt(JS.dec(this.compile(node.operand))));
 };

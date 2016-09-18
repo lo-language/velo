@@ -257,7 +257,7 @@ module.exports["operators"] = {
         var n = JS.inc(JS.ID('foo'));
 
         test.deepEqual(n.renderTree(), [ 'inc', [ 'id', 'foo' ] ]);
-        test.equal(n.renderJs(), "(foo++)");
+        test.equal(n.renderJs(), "foo++");
 
         test.done();
     },
@@ -267,7 +267,7 @@ module.exports["operators"] = {
         var n = JS.dec(JS.ID('foo'));
 
         test.deepEqual(n.renderTree(), [ 'dec', [ 'id', 'foo' ] ]);
-        test.equal(n.renderJs(), "(foo--)");
+        test.equal(n.renderJs(), "foo--");
 
         test.done();
     },
