@@ -36,7 +36,7 @@ module.exports["basics"] = {
         var placeholder = wrapper.pushRequest(new Request(JS.ID('foo'), [JS.num('57'), JS.string('hello')], null, null, true));
         test.equal(wrapper.isEmpty(), false);
 
-        test.deepEqual(placeholder.renderTree(), [ 'id', 'P0' ]);
+        test.deepEqual(placeholder.renderTree(), ["subscript", [ 'id', 'res0' ], [ "num", "0" ]]);
 
         var stmt = wrapper.wrap(new JsStmt(JS.exprStmt(JS.assign(JS.ID('bazball'), JS.num('11')))));
 
@@ -48,7 +48,7 @@ module.exports["basics"] = {
                         [ 'arrayLiteral', [ [ 'num', '57' ], [ 'string', 'hello' ] ] ],
                         [ 'function',
                             null,
-                            [ 'P0' ],
+                            [ 'res0' ],
                             [ 'stmtList',
                                 [ 'expr-stmt',
                                     [ 'assign', [ 'id', 'bazball' ], [ 'num', '11' ] ] ] ] ] ] ] ] ]);
@@ -66,8 +66,8 @@ module.exports["basics"] = {
         var ph2 = wrapper.pushRequest(new Request(JS.ID('bar'), [JS.string('hello')], null, null, true));
         test.equal(wrapper.isEmpty(), false);
 
-        test.deepEqual(ph1.renderTree(), [ 'id', 'P0' ]);
-        test.deepEqual(ph2.renderTree(), [ 'id', 'P1' ]);
+        test.deepEqual(ph1.renderTree(), [ "subscript", [ 'id', 'res0' ], [ "num", "0" ]]);
+        test.deepEqual(ph2.renderTree(), [ "subscript", [ 'id', 'res1' ], [ "num", "0" ]]);
 
         var stmt = wrapper.wrap(new JsStmt(JS.exprStmt(JS.assign(JS.ID('bazball'), JS.num('11')))));
 
@@ -78,7 +78,7 @@ module.exports["basics"] = {
                     [ 'arrayLiteral', [ [ 'num', '57' ] ] ],
                     [ 'function',
                         null,
-                        [ 'P0' ],
+                        [ 'res0' ],
                         [ 'stmtList', [ 'expr-stmt',
                             [ 'call',
                                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
@@ -86,7 +86,7 @@ module.exports["basics"] = {
                                     [ 'arrayLiteral', [ [ 'string', 'hello' ] ] ],
                                     [ 'function',
                                         null,
-                                        [ 'P1' ],
+                                        [ 'res1' ],
                                         [ 'stmtList',
                                             [ 'expr-stmt', [ 'assign', [ 'id', 'bazball' ], [ 'num', '11' ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
 

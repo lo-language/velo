@@ -121,23 +121,23 @@ module.exports["embedded calls"] = {
         var blockerCount = 0;
 
         var swaps = [
-            ['P0', [ 'stmtList',
+            ['res0', [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                         [ [ 'id', '$foo' ],
                             [ 'arrayLiteral', [ ] ] ] ] ] ] ],
-            ['P1', [ 'stmtList',
+            ['res1', [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                         [ [ 'id', '$bar' ], [ 'arrayLiteral', [] ] ] ] ] ] ],
-            ['P2', [ 'stmtList',
+            ['res2', [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                         [ [ 'id', '$baz' ],
-                            [ 'arrayLiteral', [ [ 'id', 'P0' ], [ 'id', 'P1' ] ] ] ] ] ] ] ],
+                            [ 'arrayLiteral', [ [ 'id', 'res0' ], [ 'id', 'res1' ] ] ] ] ] ] ] ],
         ];
 
         ctx.pushBlockingCall = function (req) {
@@ -151,7 +151,7 @@ module.exports["embedded calls"] = {
 
         var result = ctx.compile(node);
 
-        test.deepEqual(result.renderTree(), [ 'id', 'P2' ]);
+        test.deepEqual(result.renderTree(), [ 'id', 'res2' ]);
         test.done();
     }
 };
@@ -178,7 +178,7 @@ module.exports["application statements"] = {
                     [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                     [ [ 'id', '$foo' ],
                         [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
-                        [ 'function', null, [ 'P0' ], [ 'stmtList' ] ] ] ] ] ]);
+                        [ 'function', null, [ 'res0' ], [ 'stmtList' ] ] ] ] ] ]);
 
         // attach a statement - should be tucked inside the replyhandler
         result.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID("foo"), JS.ID("bar")))));
@@ -191,7 +191,7 @@ module.exports["application statements"] = {
                         [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
                         [ 'function',
                             null,
-                            [ 'P0' ],
+                            [ 'res0' ],
                             [ 'stmtList',
                                 [ 'expr-stmt', [ 'assign', [ 'id', 'foo' ], [ 'id', 'bar' ] ] ] ] ] ] ] ] ]);
 
@@ -229,7 +229,7 @@ module.exports["application statements"] = {
                 [
                     [ "id", "$foo" ],
                     [ "arrayLiteral", [] ],
-                    [ "function", null, [ "P0" ],
+                    [ "function", null, [ "res0" ],
                         [ "stmtList", [ 'expr-stmt',
                             [ "call",
                                 [ "select", [ "id", "task" ], "sendMessage" ],
@@ -239,14 +239,15 @@ module.exports["application statements"] = {
                                     [
                                         "function",
                                         null,
-                                        [ "P1" ],
+                                        [ "res1" ],
                                         [ "stmtList", [ 'expr-stmt',
                                             [ "call",
                                                 [ "select", [ "id", "task" ], "sendMessage" ],
                                                 [
                                                     [ "id", "$baz" ],
-                                                    [ "arrayLiteral", [ [ "sub", [ "id", "P0" ], [ "id", "P1" ] ] ] ],
-                                                    [ "function", null, [ "P2" ],
+                                                    [ "arrayLiteral", [ [ "sub", [ "subscript", [ "id", "res0" ], [ "num", "0" ] ],
+                                                        [ "subscript", [ "id", "res1" ], [ "num", "0" ] ] ] ] ],
+                                                    [ "function", null, [ "res2" ],
                                                         [ "stmtList" ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
 
         test.done();
@@ -287,7 +288,7 @@ module.exports["application statements"] = {
                     [ 'arrayLiteral', [] ],
                     [ 'function',
                         null,
-                        [ 'P0' ],
+                        [ 'res0' ],
                         [ 'stmtList', [ 'expr-stmt',
                             [ 'call',
                                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
@@ -295,20 +296,20 @@ module.exports["application statements"] = {
                                     [ 'arrayLiteral', [] ],
                                     [ 'function',
                                         null,
-                                        [ 'P1' ],
+                                        [ 'res1' ],
                                         [ 'stmtList', [ 'expr-stmt',
                                             [ 'call',
                                                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                                                 [ [ 'id', '$baz' ], [ "arrayLiteral",
-                                                    [ [ "sub", [ "id", "P0" ], [ "id", "P1" ] ] ] ], [
+                                                    [ [ "sub", [ "subscript", [ "id", "res0" ], [ "num", "0" ] ], [ "subscript", [ "id", "res1" ], [ "num", "0" ]] ] ] ], [
                                                         "function",
                                                         null,
-                                                        [ "P2" ],
+                                                        [ "res2" ],
                                                         [ "stmtList", [ 'expr-stmt', [ "call", [ "select", [ "id", "task" ], "sendMessage" ],
                                                                 [
                                                                     [ "id", "$quux" ],
-                                                                    [ "arrayLiteral", [ [ "id", "P2" ] ] ],
-                                                                    [ "function", null, [ "P3" ], [ "stmtList" ] ]
+                                                                    [ "arrayLiteral", [ [ "subscript", [ "id", "res2" ], [ "num", "0" ]] ] ],
+                                                                    [ "function", null, [ "res3" ], [ "stmtList" ] ]
                                                                 ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
 
         test.done();
@@ -358,7 +359,7 @@ module.exports["application statements"] = {
                                 [ [ 'subscript', [ 'id', '$args' ], [ 'num', '0' ] ] ] ],
                             [ 'function',
                                 null,
-                                [ 'P0' ],
+                                [ 'res0' ],
                                 [ 'stmtList',
                                     [ 'expr-stmt',
                                         [ 'stmtList',
@@ -368,7 +369,7 @@ module.exports["application statements"] = {
                                                     [ 'arrayLiteral', [[
                                                         "add", [
                                                             "add",
-                                                            [ "string", "" ], [ "id", "P0" ] ], [ "string", "\\n" ]
+                                                            [ "string", "" ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ], [ "string", "\\n" ]
                                                     ]] ] ] ] ] ] ] ] ] ] ] ]);
 
         test.done();

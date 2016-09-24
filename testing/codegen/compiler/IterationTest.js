@@ -89,7 +89,7 @@ module.exports["basics"] = {
                                     [ 'arrayLiteral', [ [ 'num', '57' ] ] ],
                                     [ 'function',
                                         null,
-                                        [ 'P0' ],
+                                        [ 'res0' ],
                                         [ 'stmtList',
                                             [ 'expr-stmt', [ 'call', [ 'id', "setImmediate" ], [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "loop" ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ],
             [ 'stmtList',
@@ -113,7 +113,7 @@ module.exports["basics"] = {
                                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                                         [ [ 'id', '$bar' ],
                                             [ 'arrayLiteral', [ [ 'num', '57' ] ] ],
-                                            [ 'function', null, [ 'P0' ], [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', "setImmediate" ], [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "loop" ] ] ] ] ] ] ] ] ] ] ] ],
+                                            [ 'function', null, [ 'res0' ], [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', "setImmediate" ], [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "loop" ] ] ] ] ] ] ] ] ] ] ] ],
                             [ 'stmtList',
                                 [ 'expr-stmt', [ 'assign', [ 'id', 'z' ], [ 'num', '57' ] ] ] ] ] ] ] ],
             [ 'stmtList',
@@ -121,14 +121,14 @@ module.exports["basics"] = {
 
         // test.equal(a.renderTree(),
         //     'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
-        //     'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;}};\n\nloop();\n');
+        //     'function (res) {\nvar res0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;}};\n\nloop();\n');
         //
         // // try attaching another statement
         // a.attach(new JsConstruct("var bee = 27;"));
         //
         // test.equal(a.renderTree(),
         //     'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
-        //     'function (res) {\nvar P0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
+        //     'function (res) {\nvar res0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
 
         test.done();
     },
@@ -169,10 +169,10 @@ module.exports["basics"] = {
                                 [ 'arrayLiteral', [] ],
                                 [ 'function',
                                     null,
-                                    [ 'P0' ],
+                                    [ 'res0' ],
                                     [ 'stmtList',
                                         [ 'if',
-                                            [ 'id', 'P0' ],
+                                            [ "subscript", [ 'id', 'res0' ], [ "num", "0" ] ],
                                             [ 'stmtList', [ 'expr-stmt',
                                                 [ 'call',
                                                     [ 'select', [ 'id', 'task' ], 'sendMessage' ],
@@ -180,7 +180,7 @@ module.exports["basics"] = {
                                                         [ 'arrayLiteral', [ [ 'num', '57' ] ] ],
                                                         [ 'function',
                                                             null,
-                                                            [ 'P0' ],
+                                                            [ 'res0' ],
                                                             [ 'stmtList',
                                                                 [ 'expr-stmt',
                                                                     [ 'call',
@@ -194,7 +194,7 @@ module.exports["basics"] = {
         // test.equal(a.render(),
         //     'let loop = function () {if ($foo) {var cont0 = function () {setImmediate(task.doAsync(loop));};' +
         //     'if ($bar) {$baz = 4;\ncont0();}\n\nelse {task.sendMessage($foo, [57], function (res) ' +
-        //     '{\nvar P0 = res ? res[0] : null;\ncont0();}, null);\n\n}\n\n}else {}};\n\nloop();\n');
+        //     '{\nvar res0 = res ? res[0] : null;\ncont0();}, null);\n\n}\n\n}else {}};\n\nloop();\n');
         //
         // // try attaching a statement
         // a.attach(new JsConstruct("var z = 57;"));
@@ -202,7 +202,7 @@ module.exports["basics"] = {
         // test.equal(a.render(),
         //     'let loop = function () {if ($foo) {var cont0 = function () {setImmediate(task.doAsync(loop));};' +
         //     'if ($bar) {$baz = 4;\ncont0();}\n\nelse {task.sendMessage($foo, [57], function (res) ' +
-        //     '{\nvar P0 = res ? res[0] : null;\ncont0();}, null);\n\n}\n\n}else {var z = 57;}};\n\nloop();\n');
+        //     '{\nvar res0 = res ? res[0] : null;\ncont0();}, null);\n\n}\n\n}else {var z = 57;}};\n\nloop();\n');
         //
         // // try attaching another statement
         // a.attach(new JsConstruct("var bee = 27;"));
@@ -210,7 +210,7 @@ module.exports["basics"] = {
         // test.equal(a.render(),
         //     'let loop = function () {if ($foo) {var cont0 = function () {setImmediate(task.doAsync(loop));};' +
         //     'if ($bar) {$baz = 4;\ncont0();}\n\nelse {task.sendMessage($foo, [57], function (res) ' +
-        //     '{\nvar P0 = res ? res[0] : null;\ncont0();}, null);\n\n}\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
+        //     '{\nvar res0 = res ? res[0] : null;\ncont0();}, null);\n\n}\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
 
         test.done();
     },

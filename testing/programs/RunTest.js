@@ -245,6 +245,33 @@ module.exports['conditional in loop'] = {
 // };
 
 
+module.exports['reply arity'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'replyArity');
+        cb();
+    },
+
+    'success': function (test) {
+
+        test.expect(1);
+
+        // both functions just reply immediately
+        // todo add a test that does this experiment within a reply handler
+
+        this.harness.run([{
+            equal: function (task) {
+
+                test.deepEqual(task.args[0], task.args[1]);
+            }
+        }]).then(
+            function (res) {
+                test.done();
+            });
+    }
+};
+
 module.exports['reply handling'] = {
 
     "setUp": function (cb) {

@@ -62,7 +62,7 @@ module.exports["basics"] = {
                             [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                             [ [ 'id', '$foo' ],
                                 [ 'arrayLiteral', [] ],
-                                [ 'function', null, [ 'P0' ], [ 'stmtList' ] ] ] ] ] ] ] ]);
+                                [ 'function', null, [ 'res0' ], [ 'stmtList' ] ] ] ] ] ] ] ]);
 
         test.done();
     }

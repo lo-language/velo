@@ -53,9 +53,9 @@ module.exports["service"] = {
                                     [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
                                     [ 'function',
                                         null,
-                                        [ 'P0' ],
+                                        [ 'res0' ],
                                         [ 'stmtList',
-                                            [ 'expr-stmt', [ 'assign', [ 'id', '$result' ], [ 'id', 'P0' ], '*=' ] ] ] ] ] ] ] ] ] ] ] ];
+                                            [ 'expr-stmt', [ 'assign', [ 'id', '$result' ], [ "subscript", [ 'id', 'res0' ], [ "num", "0" ]], '*=' ] ] ] ] ] ] ] ] ] ] ] ];
 
         test.deepEqual(new Context().compile(node).renderTree(), result);
 

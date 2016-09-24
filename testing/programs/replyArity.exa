@@ -1,0 +1,13 @@
+
+main is -> (test) {
+
+    foo() -> (result) {
+
+        test.equal(result, ["Voigt", "Kampff", "machine"]);
+    };
+};
+
+foo is -> {
+
+    reply ["Voigt", "Kampff", "machine"];
+};

@@ -38,7 +38,7 @@ __.prototype.pushRequest = function (request) {
 
         // create a reply handler taking the placeholder as its param and with an empty body
 
-        var placeholderName = 'P' + this.placeHolders++;
+        var placeholderName = 'res' + this.placeHolders++;
         request.setReplyHandler(new JsFunction([placeholderName], new JsStmt()));
     }
 
@@ -49,7 +49,7 @@ __.prototype.pushRequest = function (request) {
         this.requests = request;
     }
 
-    return JS.ID(placeholderName);
+    return JS.subscript(JS.ID(placeholderName), JS.num('0'));
 };
 
 /**
