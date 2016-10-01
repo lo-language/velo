@@ -26,7 +26,7 @@ module.exports["message"] = {
         test.deepEqual(new Context().compile(node).renderTree(), [ 'stmtList',
             [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                [ [ 'id', '$foo' ], [ 'arrayLiteral', [] ] ] ] ]);
+                [ [ 'id', '$foo' ], [ 'arrayLiteral', [] ], [ 'null' ] ] ] ]);
         test.done();
     },
 

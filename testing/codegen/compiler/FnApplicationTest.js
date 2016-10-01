@@ -28,7 +28,7 @@ module.exports["embedded calls"] = {
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                        [ [ 'id', '$foo' ], [ 'arrayLiteral', [] ] ] ] ] ]);
+                        [ [ 'id', '$foo' ], [ 'arrayLiteral', [] ], [ 'null' ] ] ] ] ]);
 
             return 'blocker';
         };
@@ -59,7 +59,7 @@ module.exports["embedded calls"] = {
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                        [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ]] ] ] ] ] ]);
+                        [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ] ] ], [ 'null' ] ] ] ] ]);
 
             return 'blocker';
         };
@@ -89,7 +89,7 @@ module.exports["embedded calls"] = {
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                        [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ], [ 'string', 'hi there' ]] ] ] ] ] ]);
+                        [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ], [ 'string', 'hi there' ] ] ], [ 'null' ] ] ] ] ]);
 
             return 'blocker';
         };
@@ -126,18 +126,18 @@ module.exports["embedded calls"] = {
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                         [ [ 'id', '$foo' ],
-                            [ 'arrayLiteral', [ ] ] ] ] ] ] ],
+                            [ 'arrayLiteral', [ ] ], [ 'null' ] ] ] ] ] ],
             ['res1', [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                        [ [ 'id', '$bar' ], [ 'arrayLiteral', [] ] ] ] ] ] ],
+                        [ [ 'id', '$bar' ], [ 'arrayLiteral', [] ], [ 'null' ] ] ] ] ] ],
             ['res2', [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                         [ [ 'id', '$baz' ],
-                            [ 'arrayLiteral', [ [ 'id', 'res0' ], [ 'id', 'res1' ] ] ] ] ] ] ] ],
+                            [ 'arrayLiteral', [ [ 'id', 'res0' ], [ 'id', 'res1' ] ] ], [ 'null' ] ] ] ] ] ],
         ];
 
         ctx.pushBlockingCall = function (req) {
@@ -370,7 +370,7 @@ module.exports["application statements"] = {
                                                         "add", [
                                                             "add",
                                                             [ "string", "" ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ], [ "string", "\\n" ]
-                                                    ]] ] ] ] ] ] ] ] ] ] ] ]);
+                                                    ] ] ], [ 'null' ] ] ] ] ] ] ] ] ] ] ]);
 
         test.done();
     }

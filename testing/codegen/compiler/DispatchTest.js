@@ -130,7 +130,16 @@ module.exports["dispatch"] = {
         test.deepEqual(new Context().compile(node).renderTree(), [ 'stmtList',
             [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                [ [ 'id', '$foo' ], [ 'arrayLiteral', [] ] ] ] ]);
+                [ [ 'id', '$foo' ],
+                    [ 'arrayLiteral', [] ],
+                    [ 'null' ],
+                    [ 'function',
+                        null,
+                        [ 'args' ],
+                        [ 'stmtList',
+                            [ 'var', '$foo' ],
+                            [ 'stmtList',
+                                [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '42' ] ] ] ] ] ] ] ] ]);
         test.done();
     },
 
@@ -187,7 +196,14 @@ module.exports["dispatch"] = {
                             [ 'stmtList',
                                 [ 'var', '$foo' ],
                                 [ 'stmtList',
-                                    [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '42' ] ] ] ] ] ] ] ] ]);
+                                    [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '42' ] ] ] ] ] ],
+                        [ 'function',
+                            null,
+                            [ 'args' ],
+                            [ 'stmtList',
+                                [ 'var', '$bar' ],
+                                [ 'stmtList',
+                                    [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '57' ] ] ] ] ] ] ] ] ]);
         test.done();
     }
 };

@@ -31,7 +31,7 @@ __.prototype.acquire = function (modRef) {
 
     // read the file
     return Q.denodeify(fs.readFile)(path, 'utf8').then(source => {
-        return new Module(source);
+        return new Module(source, modRef);
     },
 
     function () {

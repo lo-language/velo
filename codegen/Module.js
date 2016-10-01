@@ -23,14 +23,16 @@ const Q = require('q');
  * Constructor
  *
  * @param source    the exa source for this module
+ * @param name      optional name
  */
-var __ = function (source) {
+var __ = function (source, name) {
 
     Context.call(this);
 
     this.source = source;
     this.deps = {};
     this.exports = {};
+    this.name = name || "<anonymous module>";
 };
 
 __.prototype = Object.create(Context.prototype);
@@ -45,7 +47,11 @@ __.prototype.constructor = __;
  */
 __.prototype.compileSelf = function (program) {
 
+    process.stderr.write("PARSING   " + this.name);
+    var start = new Date();
     this.ast = new ASTBuilder().parse(this.source);
+    process.stderr.write(" [" + (new Date().getTime() - start.getTime()) + "ms]\n");
+
 
     // acquire any dependencies with a depth-first search
 
@@ -62,7 +68,11 @@ __.prototype.compileSelf = function (program) {
     })).then(() => {
 
         // ok, all our dependencies have been compiled and are ready to use
-        return this.compile(this.ast);
+        process.stderr.write("COMPILING " + this.name);
+        var start = new Date();
+        var result = this.compile(this.ast);
+        process.stderr.write(" [" + (new Date().getTime() - start.getTime()) + "ms]\n");
+        return result;
     });
 };
 

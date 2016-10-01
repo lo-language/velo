@@ -183,7 +183,7 @@ module.exports["attach"] = {
             [ 'stmtList',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                    [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ] ]);
+                    [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ] ] ], [ 'null' ] ] ] ] ]);
 
         test.done();
     }

@@ -25,7 +25,9 @@ var __ = function (address, args, replyHandler, failHandler, async) {
     this.failHandler = failHandler;
     this.async = async || false;
 
-    this.ast = JS.runtimeCall('sendMessage', [this.address, JS.arrayLiteral(this.args)].concat(this.replyHandler ? this.replyHandler : []));
+    this.ast = JS.runtimeCall('sendMessage', [
+        this.address,
+        JS.arrayLiteral(this.args)].concat(replyHandler ? replyHandler : [JS.NULL]).concat(failHandler ? failHandler : []));
 
     if (this.async) {
         this.ast = JS.exprStmt(this.ast);

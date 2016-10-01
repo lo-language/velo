@@ -22,14 +22,12 @@ module.exports["blocking"] = {
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                    [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ] ]);
+                    [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ] ] ], [ 'null' ] ] ] ] ]);
 
         test.done();
     },
 
     "with reply handler": function (test) {
-
-        // var replyHandler = new JsFunction([], new StmtList(new JsStmt(['assignment', ['id', '$bar'], ['num', '16']])));
 
         var replyHandler = new JsFunction(['res'], new JsStmt(JS.assign(JS.ID('baz'), JS.num('57'))));
         var req = new Request(JS.ID('$foo'), [JS.num('42')], replyHandler, null, true);
@@ -70,6 +68,23 @@ module.exports["blocking"] = {
 
 
     "with fail handler": function (test) {
+
+        var failHandler = new JsFunction(['err'], new JsStmt(JS.assign(JS.ID('baz'), JS.num('57'))));
+        var req = new Request(JS.ID('$foo'), [JS.num('42')], null, failHandler, true);
+
+        test.equal(req.isAsync(), true);
+
+        test.deepEqual(req.renderTree(), [ 'stmtList',
+            [ 'expr-stmt',
+                [ 'call',
+                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                    [ [ 'id', '$foo' ],
+                        [ 'arrayLiteral', [ [ 'num', '42' ] ] ], [ 'null' ],
+                        [ 'function',
+                            null,
+                            [ 'err' ],
+                            [ 'stmtList', [ 'assign', [ 'id', 'baz' ], [ 'num', '57' ] ] ] ] ] ] ] ]);
+
         test.done();
     },
 
@@ -108,7 +123,7 @@ module.exports["non-blocking"] = {
             [ 'stmtList',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                    [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ]);
+                    [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ] ] ], [ 'null' ] ] ] ]);
 
         test.done();
     },
