@@ -14,6 +14,30 @@ const Harness = require('../Harness');
 const util = require('util');
 
 
+// module.exports['fail'] = {
+//
+//     "setUp": function (cb) {
+//
+//         this.harness = new Harness(__dirname, 'fail');
+//         cb();
+//     },
+//
+//     'success': function (test) {
+//
+//         test.expect(1);
+//
+//         this.harness.run([{
+//             ok: function (task) {
+//
+//                 test.ok(task.args[0]);
+//             }
+//         }]).then(
+//             function (res) {
+//                 test.done();
+//             });
+//     }
+// };
+
 module.exports['factorial'] = {
 
     "setUp": function (cb) {
@@ -268,7 +292,7 @@ module.exports['reply arity'] = {
         }]).then(
             function (res) {
                 test.done();
-            });
+            }).done();
     }
 };
 

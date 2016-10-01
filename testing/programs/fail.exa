@@ -1,0 +1,19 @@
+/*
+ * tests the semantics of fail handlers: omission means ignore
+ */
+
+main is -> (test) {
+
+    mightFail() -> {
+
+        test.ok(false);
+    }
+
+    test.ok(true);
+};
+
+
+mightFail is -> {
+
+    fail "d'oh!";
+};

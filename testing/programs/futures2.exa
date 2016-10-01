@@ -1,6 +1,6 @@
 main is -> (httpGet, writeLine) {
 
-    sendRequest = -> (url) {
+    sendRequest is -> (url) {
 
         @httpGet(url) -> (res, body) {
 
@@ -8,7 +8,7 @@ main is -> (httpGet, writeLine) {
             @writeLine("body length: `#body`\n");
 
             reply #body;
-        };
+        }
 
         @writeLine("sent request to `url`\n");
     };

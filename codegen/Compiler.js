@@ -70,6 +70,16 @@ module.exports['module'] = function (node) {
  *
  * @param node
  */
+module.exports['skip'] = function (node) {
+
+    return new JsStmt();
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *
+ * @param node
+ */
 module.exports['nil'] = function (node) {
 
     return JS.NULL;
@@ -152,15 +162,9 @@ module.exports['stmt_list'] = function (node) {
 
     // hooray for Lisp!
 
-    //try {
-        return node.tail ?
-            this.compileStmt(node.head).attach(this.compileStmt(node.tail)) :
-            this.compileStmt(node.head);
-    //}
-    //catch (e) {
-    //    console.error(e + " while compiling: ");
-    //    console.error(node);
-    //}
+    return node.tail ?
+        this.compileStmt(node.head).attach(this.compileStmt(node.tail)) :
+        this.compileStmt(node.head);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -84,10 +84,7 @@ module.exports['basics'] = {
             function (res) {
                 test.equal(res, undefined);
                 test.done();
-            },
-            function () {
-                test.fail();
-            });
+            }).done();
     },
 
     "sync message, explicit reply": function (test) {

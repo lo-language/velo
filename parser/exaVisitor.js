@@ -52,6 +52,16 @@ exaVisitor.prototype.visitCondStmt = function(ctx) {
 };
 
 
+// Visit a parse tree produced by exaParser#syncReqStmt.
+exaVisitor.prototype.visitSyncReqStmt = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#asyncReqStmt.
+exaVisitor.prototype.visitAsyncReqStmt = function(ctx) {
+};
+
+
 // Visit a parse tree produced by exaParser#send.
 exaVisitor.prototype.visitSend = function(ctx) {
 };
@@ -62,8 +72,8 @@ exaVisitor.prototype.visitIteration = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#exprStmt.
-exaVisitor.prototype.visitExprStmt = function(ctx) {
+// Visit a parse tree produced by exaParser#handlers.
+exaVisitor.prototype.visitHandlers = function(ctx) {
 };
 
 
@@ -117,13 +127,13 @@ exaVisitor.prototype.visitCompare = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#dispatch.
-exaVisitor.prototype.visitDispatch = function(ctx) {
+// Visit a parse tree produced by exaParser#subscript.
+exaVisitor.prototype.visitSubscript = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#subscript.
-exaVisitor.prototype.visitSubscript = function(ctx) {
+// Visit a parse tree produced by exaParser#asyncReqExpr.
+exaVisitor.prototype.visitAsyncReqExpr = function(ctx) {
 };
 
 
@@ -167,11 +177,6 @@ exaVisitor.prototype.visitLogical = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#async.
-exaVisitor.prototype.visitAsync = function(ctx) {
-};
-
-
 // Visit a parse tree produced by exaParser#field.
 exaVisitor.prototype.visitField = function(ctx) {
 };
@@ -184,6 +189,11 @@ exaVisitor.prototype.visitSlice = function(ctx) {
 
 // Visit a parse tree produced by exaParser#bytes.
 exaVisitor.prototype.visitBytes = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#syncReqExpr.
+exaVisitor.prototype.visitSyncReqExpr = function(ctx) {
 };
 
 
@@ -252,8 +262,8 @@ exaVisitor.prototype.visitArray = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#frame.
-exaVisitor.prototype.visitFrame = function(ctx) {
+// Visit a parse tree produced by exaParser#form.
+exaVisitor.prototype.visitForm = function(ctx) {
 };
 
 

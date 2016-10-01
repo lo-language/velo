@@ -64,9 +64,17 @@ statement
     | expr assignment_op expr ';'                           # assignment
     | expr op=('++'|'--') ';'                               # incDec
     | conditional                                           # condStmt
+    | expr '(' exprList? ')' handlers                       # syncReqStmt
+    | '@' expr '(' exprList? ')' handlers                   # asyncReqStmt
     | expr '>>' expr ';'                                    # send  // fire-and-forget to be clear and prevent us from using @syntax; is NOT a request, note that it is a statement, not an expression; precludes reply. could reuse -> here instead
     | 'while' expr block                                    # iteration
-    | expr ';'                                              # exprStmt
+    ;
+
+handlers
+    : ';'
+    | replyHandler
+    | failHandler
+    | replyHandler failHandler
     ;
 
 definition
@@ -100,8 +108,8 @@ block
     ;
 
 expr
-    : expr '(' exprList? ')' replyHandler? failHandler?         # dispatch  // blocking request. the value of the expr is the *return value*
-    | '@' expr '(' exprList? ')' replyHandler? failHandler?     # async // non-blocking request. the value of the expr is a *future*
+    : expr '(' exprList? ')'                                    # syncReqExpr  // blocking request. the value of the expr is the *return value*
+    | '@' expr '(' exprList? ')'                                # asyncReqExpr // non-blocking request. the value of the expr is a *future*
     | '#' expr                                                  # cardinality
     | 'not' expr                                                # negation
     | 'bytes' expr                                              # bytes
@@ -129,8 +137,7 @@ replyHandler
     ;
 
 failHandler
-    : 'on' 'fail' procedure // unless fail?
-    | 'ignore' 'fail'
+    : 'on' 'fail' procedure
     ;
 
 interpolated
@@ -144,14 +151,14 @@ exprList
 
 // literals
 
-// are arrays and frames immutable?
+// are arrays and forms immutable?
 literal
     : 'nil'                                     # nil
     | BOOL                                      # bool
     | NUMBER                                    # number
     | STRING                                    # string
     | '[' exprList? ']'                         # array
-    | '[' fieldList ']'                         # frame // record? compound? composite?
+    | '[' fieldList ']'                         # form // record? compound? composite? frame?
     | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
     | procedure                                 # service
     | 'on' expr procedure                       # subscription  // maybe not a literal

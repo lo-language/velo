@@ -13,7 +13,6 @@ test is -> {
 
     // async calls
 
-    foo;
     @foo(18);
 
     @sessionStore.getByID(sessionID);
@@ -24,14 +23,14 @@ test is -> {
     // handle success only
     @bar(48) -> {
         reply "hello";
-    };
+    }
 
     // handle failure only
     @baz(128) -> (result) {
     }
     on fail -> (err) {
         reply "bummer";
-    };
+    }
 
     // todo
     // after baz(12) mute;
@@ -42,24 +41,24 @@ test is -> {
     }
     on fail -> {
         reply "darn";
-    };
+    }
 
 
     // nested requests
     // should we support pipes like 42 -> foo -> bar -> baz?
-    result = @foo(42) -> {
+    @foo(42) -> {
 
-        result = @bar(result) -> {
+        @bar(result) -> {
 
             yarp = @baz(result);
         }
         on fail -> {
             fail "narp";
-        };
+        }
     }
     on fail -> {
         reply "darn";
-    };
+    }
 
     // sync form in expressions
 
@@ -67,25 +66,17 @@ test is -> {
 
     x = foo() + 7;
 
-    // error handler only
-    x = foo() on fail -> (error) {
+    // fail handler only
+
+    foo() on fail -> (error) {
         substitute "ok";
-    };
+    }
 
     // both handlers
-    x = bar() -> (result) {
+    bar() -> (result) {
         reply "ok";
     }
     on fail -> (error) {
         substitute "ok";
-    };
-
-    x = bar() -> (result) {
-        reply "ok";
     }
-    ignore fail;
-
-    y = @foo() on fail -> (error) {
-        substitute "ok";
-    };
 };

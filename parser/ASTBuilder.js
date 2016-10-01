@@ -149,15 +149,6 @@ __.prototype.visitNestedIf = function(ctx) {
 };
 
 
-__.prototype.visitExprStmt = function(ctx) {
-
-    return {
-        type: 'application_stmt',   // todo should arguably be expr_stmt
-        application: ctx.expr().accept(this)
-    };
-};
-
-
 __.prototype.visitResponse = function(ctx) {
 
     return {
@@ -319,11 +310,36 @@ __.prototype.visitInterpolated = function(ctx) {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// messages
+// request expressions
 
-__.prototype.visitDispatch = function(ctx) {
+__.prototype.visitSyncReqExpr = function(ctx) {
 
     var args = ctx.exprList();
+
+    return {
+        type: 'application',
+        address: ctx.expr().accept(this),
+        args: args ? args.accept(this) : []
+    };
+};
+
+__.prototype.visitAsyncReqExpr = function(ctx) {
+
+    var args = ctx.exprList();
+
+    return {
+        type: 'message',
+        address: ctx.expr().accept(this),
+        args: args ? args.accept(this) : []
+    };
+};
+
+// request statements
+
+__.prototype.visitSyncReqStmt = function(ctx) {
+
+    var args = ctx.exprList();
+    var handlers = ctx.handlers().accept(this);
 
     var res = {
         type: 'application',
@@ -331,21 +347,24 @@ __.prototype.visitDispatch = function(ctx) {
         args: args ? args.accept(this) : []
     };
 
-    if (ctx.replyHandler()) {
-        res.subsequent = ctx.replyHandler().accept(this);
+    if (handlers.subsequent) {
+        res.subsequent = handlers.subsequent;
     }
 
-    if (ctx.failHandler()) {
-        res.contingency = ctx.failHandler().accept(this);
+    if (handlers.contingency) {
+        res.contingency = handlers.contingency;
     }
 
-    return res;
+    return {
+        type: 'application_stmt',
+        application: res
+    };
 };
 
-
-__.prototype.visitAsync = function(ctx) {
+__.prototype.visitAsyncReqStmt = function(ctx) {
 
     var args = ctx.exprList();
+    var handlers = ctx.handlers().accept(this);
 
     var res = {
         type: 'message',
@@ -353,6 +372,21 @@ __.prototype.visitAsync = function(ctx) {
         args: args ? args.accept(this) : []
     };
 
+    if (handlers.subsequent) {
+        res.subsequent = handlers.subsequent;
+    }
+
+    if (handlers.contingency) {
+        res.contingency = handlers.contingency;
+    }
+
+    return res;
+};
+
+__.prototype.visitHandlers = function (ctx) {
+
+    var res = {};
+
     if (ctx.replyHandler()) {
         res.subsequent = ctx.replyHandler().accept(this);
     }
@@ -363,7 +397,6 @@ __.prototype.visitAsync = function(ctx) {
 
     return res;
 };
-
 
 __.prototype.visitReplyHandler = function(ctx) {
 
@@ -435,15 +468,13 @@ __.prototype.visitService = function(ctx) {
     return ctx.procedure().accept(this);
 };
 
-__.prototype.visitFrame = function(ctx) {
+__.prototype.visitForm = function(ctx) {
 
     return {
         type: 'record',
         labels: true,
         fields: ctx.fieldList().accept(this)
     };
-
-    return {type: 'record', fields: []};
 };
 
 
@@ -653,26 +684,5 @@ __.prototype.visitSlice = function(ctx) {
     return res;
 };
 
-__.prototype.visitExtraction = function(ctx) {
-
-    return {
-        type: 'extraction',
-        list: ctx.expr(0).accept(this),
-        index: ctx.expr(1).accept(this)
-    };
-};
-
-__.prototype.visitExcision = function(ctx) {
-
-    var start = ctx.expr(1);
-    var end = ctx.expr(2);
-
-    return {
-        type: 'excision',
-        list: ctx.expr(0).accept(this),
-        start: start.accept(this),
-        end: end? end.accept(this) : null
-    };
-};
 
 module.exports = __;
