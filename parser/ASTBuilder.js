@@ -388,10 +388,10 @@ __.prototype.visitSink = function (ctx) {
     return ctx.procedure().accept(this);
 };
 
-__.prototype.visitChannel = function (ctx) {
+__.prototype.visitEvent = function (ctx) {
 
     return {
-        type: 'channel',
+        type: 'event',
         params: ctx.paramList() ? ctx.paramList().accept(this) : [],
     };
 };

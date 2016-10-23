@@ -163,7 +163,7 @@ literal
     | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
     | sink                                      # handler
     | '<->' procedure                           # service
-    | '-<' paramList?                           # channel
+    | '-<' paramList?                           # event
     | 'on' expr sink                            # subscribe  // maybe not a literal
     ;
 

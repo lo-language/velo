@@ -17,7 +17,7 @@
               "name": "timeStep"
             },
             "right": {
-              "type": "channel",
+              "type": "event",
               "params": []
             }
           },
@@ -27,7 +27,7 @@
               "type": "constant",
               "name": "click",
               "value": {
-                "type": "channel",
+                "type": "event",
                 "params": [
                   "x",
                   "y"
@@ -40,7 +40,7 @@
                 "type": "constant",
                 "name": "myEvent",
                 "value": {
-                  "type": "channel",
+                  "type": "event",
                   "params": []
                 }
               },

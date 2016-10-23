@@ -3118,23 +3118,23 @@ ServiceContext.prototype.accept = function(visitor) {
 };
 
 
-function ChannelContext(parser, ctx) {
+function EventContext(parser, ctx) {
 	LiteralContext.call(this, parser);
     LiteralContext.prototype.copyFrom.call(this, ctx);
     return this;
 }
 
-ChannelContext.prototype = Object.create(LiteralContext.prototype);
-ChannelContext.prototype.constructor = ChannelContext;
+EventContext.prototype = Object.create(LiteralContext.prototype);
+EventContext.prototype.constructor = EventContext;
 
-exaParser.ChannelContext = ChannelContext;
+exaParser.EventContext = EventContext;
 
-ChannelContext.prototype.paramList = function() {
+EventContext.prototype.paramList = function() {
     return this.getTypedRuleContext(ParamListContext,0);
 };
-ChannelContext.prototype.accept = function(visitor) {
+EventContext.prototype.accept = function(visitor) {
     if ( visitor instanceof exaVisitor ) {
-        return visitor.visitChannel(this);
+        return visitor.visitEvent(this);
     } else {
         return visitor.visitChildren(this);
     }
@@ -3251,7 +3251,7 @@ exaParser.prototype.literal = function() {
             break;
 
         case 10:
-            localctx = new ChannelContext(this, localctx);
+            localctx = new EventContext(this, localctx);
             this.enterOuterAlt(localctx, 10);
             this.state = 285;
             this.match(exaParser.T__47);

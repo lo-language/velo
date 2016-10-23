@@ -282,8 +282,8 @@ exaVisitor.prototype.visitService = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#channel.
-exaVisitor.prototype.visitChannel = function(ctx) {
+// Visit a parse tree produced by exaParser#event.
+exaVisitor.prototype.visitEvent = function(ctx) {
 };
 
 
