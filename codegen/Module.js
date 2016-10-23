@@ -17,6 +17,7 @@ const ASTBuilder = require('./../parser/ASTBuilder');
 const Context = require('./Context');
 const JS = require('./JsPrimitives');
 const Q = require('q');
+const util = require('util');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -52,6 +53,7 @@ __.prototype.compileSelf = function (program) {
     this.ast = new ASTBuilder().parse(this.source);
     process.stderr.write(" [" + (new Date().getTime() - start.getTime()) + "ms]\n");
 
+    // console.log(util.inspect(this.ast, {depth: null}));
 
     // acquire any dependencies with a depth-first search
 

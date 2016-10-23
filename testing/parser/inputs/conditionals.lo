@@ -3,7 +3,7 @@
  * 2/1/15
  */
 
-test is -> {
+test is <-> {
 
     if foo > 2 {
         x++;

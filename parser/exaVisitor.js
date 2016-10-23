@@ -52,13 +52,13 @@ exaVisitor.prototype.visitCondStmt = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#syncReqStmt.
-exaVisitor.prototype.visitSyncReqStmt = function(ctx) {
+// Visit a parse tree produced by exaParser#syncRequest.
+exaVisitor.prototype.visitSyncRequest = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#asyncReqStmt.
-exaVisitor.prototype.visitAsyncReqStmt = function(ctx) {
+// Visit a parse tree produced by exaParser#asyncRequest.
+exaVisitor.prototype.visitAsyncRequest = function(ctx) {
 };
 
 
@@ -72,13 +72,28 @@ exaVisitor.prototype.visitIteration = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#handlers.
-exaVisitor.prototype.visitHandlers = function(ctx) {
+// Visit a parse tree produced by exaParser#scan.
+exaVisitor.prototype.visitScan = function(ctx) {
 };
 
 
 // Visit a parse tree produced by exaParser#constant.
 exaVisitor.prototype.visitConstant = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#handlers.
+exaVisitor.prototype.visitHandlers = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#replyHandler.
+exaVisitor.prototype.visitReplyHandler = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#failHandler.
+exaVisitor.prototype.visitFailHandler = function(ctx) {
 };
 
 
@@ -107,11 +122,6 @@ exaVisitor.prototype.visitBlock = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#excision.
-exaVisitor.prototype.visitExcision = function(ctx) {
-};
-
-
 // Visit a parse tree produced by exaParser#negation.
 exaVisitor.prototype.visitNegation = function(ctx) {
 };
@@ -129,11 +139,6 @@ exaVisitor.prototype.visitCompare = function(ctx) {
 
 // Visit a parse tree produced by exaParser#subscript.
 exaVisitor.prototype.visitSubscript = function(ctx) {
-};
-
-
-// Visit a parse tree produced by exaParser#asyncReqExpr.
-exaVisitor.prototype.visitAsyncReqExpr = function(ctx) {
 };
 
 
@@ -157,11 +162,6 @@ exaVisitor.prototype.visitConcat = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#extraction.
-exaVisitor.prototype.visitExtraction = function(ctx) {
-};
-
-
 // Visit a parse tree produced by exaParser#cardinality.
 exaVisitor.prototype.visitCardinality = function(ctx) {
 };
@@ -182,6 +182,11 @@ exaVisitor.prototype.visitField = function(ctx) {
 };
 
 
+// Visit a parse tree produced by exaParser#asyncCall.
+exaVisitor.prototype.visitAsyncCall = function(ctx) {
+};
+
+
 // Visit a parse tree produced by exaParser#slice.
 exaVisitor.prototype.visitSlice = function(ctx) {
 };
@@ -192,8 +197,8 @@ exaVisitor.prototype.visitBytes = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#syncReqExpr.
-exaVisitor.prototype.visitSyncReqExpr = function(ctx) {
+// Visit a parse tree produced by exaParser#syncCall.
+exaVisitor.prototype.visitSyncCall = function(ctx) {
 };
 
 
@@ -207,6 +212,11 @@ exaVisitor.prototype.visitWrap = function(ctx) {
 };
 
 
+// Visit a parse tree produced by exaParser#map.
+exaVisitor.prototype.visitMap = function(ctx) {
+};
+
+
 // Visit a parse tree produced by exaParser#litExpr.
 exaVisitor.prototype.visitLitExpr = function(ctx) {
 };
@@ -214,16 +224,6 @@ exaVisitor.prototype.visitLitExpr = function(ctx) {
 
 // Visit a parse tree produced by exaParser#destructure.
 exaVisitor.prototype.visitDestructure = function(ctx) {
-};
-
-
-// Visit a parse tree produced by exaParser#replyHandler.
-exaVisitor.prototype.visitReplyHandler = function(ctx) {
-};
-
-
-// Visit a parse tree produced by exaParser#failHandler.
-exaVisitor.prototype.visitFailHandler = function(ctx) {
 };
 
 
@@ -272,13 +272,28 @@ exaVisitor.prototype.visitSet = function(ctx) {
 };
 
 
+// Visit a parse tree produced by exaParser#handler.
+exaVisitor.prototype.visitHandler = function(ctx) {
+};
+
+
 // Visit a parse tree produced by exaParser#service.
 exaVisitor.prototype.visitService = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#subscription.
-exaVisitor.prototype.visitSubscription = function(ctx) {
+// Visit a parse tree produced by exaParser#channel.
+exaVisitor.prototype.visitChannel = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#subscribe.
+exaVisitor.prototype.visitSubscribe = function(ctx) {
+};
+
+
+// Visit a parse tree produced by exaParser#sink.
+exaVisitor.prototype.visitSink = function(ctx) {
 };
 
 

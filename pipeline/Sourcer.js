@@ -27,7 +27,7 @@ var __ = function (basePath) {
  */
 __.prototype.acquire = function (modRef) {
 
-    var path = this.basePath + '/' + modRef + '.exa';
+    var path = this.basePath + '/' + modRef + '.lo';
 
     // read the file
     return Q.denodeify(fs.readFile)(path, 'utf8').then(source => {

@@ -14,7 +14,7 @@
 
 'use strict';
 
-process.title = 'exa';
+process.title = 'lo';
 
 const util = require('util');
 const path = require('path');
@@ -36,19 +36,26 @@ if (sourceFile == null) {
 
 // get the path of the module
 var modulePath = path.dirname(sourceFile);
-var moduleName = path.basename(sourceFile, '.exa');
+var moduleName = path.basename(sourceFile, '.lo');
 
 var program = new Program(new Sourcer(modulePath), moduleName);
 
-program.compile().then(function () {
+program.compile().then(
+    function () {
 
-    // see if we should build
+        // see if we should build
 
-    if (argv.build != null) {
-        return new NodeBuilder().build(program, argv.build);
-    }
+        if (argv.build != null) {
+            return new NodeBuilder().build(program, argv.build);
+        }
 
-    IO.args = argv;
-    return program.run([argv._, IO, System]);
+        IO.args = argv;
+        return program.run([argv._, IO, System]);
 
-}).done();
+    }).catch(
+    function (err) {
+
+        // todo include line failed at
+        console.error("FAIL", err);
+        process.exit(1);
+    });

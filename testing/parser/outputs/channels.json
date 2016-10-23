@@ -1,0 +1,55 @@
+{
+  "type": "module",
+  "definitions": [
+    {
+      "type": "constant",
+      "name": "test",
+      "value": {
+        "type": "procedure",
+        "params": [],
+        "body": {
+          "type": "stmt_list",
+          "head": {
+            "type": "assign",
+            "op": "=",
+            "left": {
+              "type": "id",
+              "name": "timeStep"
+            },
+            "right": {
+              "type": "channel",
+              "params": []
+            }
+          },
+          "tail": {
+            "type": "stmt_list",
+            "head": {
+              "type": "constant",
+              "name": "click",
+              "value": {
+                "type": "channel",
+                "params": [
+                  "x",
+                  "y"
+                ]
+              }
+            },
+            "tail": {
+              "type": "stmt_list",
+              "head": {
+                "type": "constant",
+                "name": "myEvent",
+                "value": {
+                  "type": "channel",
+                  "params": []
+                }
+              },
+              "tail": null
+            }
+          }
+        }
+      }
+    }
+  ],
+  "references": null
+}

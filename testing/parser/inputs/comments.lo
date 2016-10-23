@@ -11,7 +11,7 @@
      // Leading whitespace before a comment should be ignored
      /* Leading whitespace before a comment should be ignored */
 
-test is -> {
+test is <-> {
 
     // Line comment should be ignored
 

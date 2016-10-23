@@ -312,7 +312,7 @@ __.prototype.visitInterpolated = function(ctx) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // request expressions
 
-__.prototype.visitSyncReqExpr = function(ctx) {
+__.prototype.visitSyncCall = function(ctx) {
 
     var args = ctx.exprList();
 
@@ -323,12 +323,12 @@ __.prototype.visitSyncReqExpr = function(ctx) {
     };
 };
 
-__.prototype.visitAsyncReqExpr = function(ctx) {
+__.prototype.visitAsyncCall = function(ctx) {
 
     var args = ctx.exprList();
 
     return {
-        type: 'message',
+        type: 'future',
         address: ctx.expr().accept(this),
         args: args ? args.accept(this) : []
     };
@@ -336,7 +336,7 @@ __.prototype.visitAsyncReqExpr = function(ctx) {
 
 // request statements
 
-__.prototype.visitSyncReqStmt = function(ctx) {
+__.prototype.visitSyncRequest = function(ctx) {
 
     var args = ctx.exprList();
     var handlers = ctx.handlers().accept(this);
@@ -361,7 +361,7 @@ __.prototype.visitSyncReqStmt = function(ctx) {
     };
 };
 
-__.prototype.visitAsyncReqStmt = function(ctx) {
+__.prototype.visitAsyncRequest = function(ctx) {
 
     var args = ctx.exprList();
     var handlers = ctx.handlers().accept(this);
@@ -383,6 +383,24 @@ __.prototype.visitAsyncReqStmt = function(ctx) {
     return res;
 };
 
+__.prototype.visitSink = function (ctx) {
+
+    return ctx.procedure().accept(this);
+};
+
+__.prototype.visitChannel = function (ctx) {
+
+    return {
+        type: 'channel',
+        params: ctx.paramList() ? ctx.paramList().accept(this) : [],
+    };
+};
+
+__.prototype.visitHandler = function (ctx) {
+
+    return ctx.sink().accept(this);
+};
+
 __.prototype.visitHandlers = function (ctx) {
 
     var res = {};
@@ -400,7 +418,7 @@ __.prototype.visitHandlers = function (ctx) {
 
 __.prototype.visitReplyHandler = function(ctx) {
 
-    var procedure = ctx.procedure().accept(this);
+    var procedure = ctx.sink().accept(this);
 
     // save a little compiler hint here
     procedure.channel = "reply";
@@ -411,9 +429,9 @@ __.prototype.visitReplyHandler = function(ctx) {
 
 __.prototype.visitFailHandler = function(ctx) {
 
-    if (ctx.procedure()) {
+    if (ctx.sink()) {
 
-        var procedure = ctx.procedure().accept(this);
+        var procedure = ctx.sink().accept(this);
 
         // save a little compiler hint here
         procedure.channel = "fail";
@@ -623,6 +641,25 @@ __.prototype.visitCardinality = function(ctx) {
     };
 };
 
+__.prototype.visitScan = function(ctx) {
+
+    return {
+        type: 'scan',
+        over: ctx.expr(0).accept(this),
+        into: ctx.expr(1).accept(this)
+    };
+};
+
+__.prototype.visitMap = function(ctx) {
+
+    return {
+        type: 'op',
+        op: 'map',
+        over: ctx.expr(0).accept(this),
+        into: ctx.expr(1).accept(this)
+    };
+};
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -651,8 +688,6 @@ __.prototype.visitMembership = function(ctx) {
         right: ctx.expr(1).accept(this)
     };
 };
-
-
 
 __.prototype.visitSubscript = function(ctx) {
 

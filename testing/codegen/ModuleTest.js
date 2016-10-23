@@ -153,7 +153,7 @@ module.exports["compile with no deps"] = {
 
     "compilation with one service": function (test) {
 
-        var mod = new Module("foo is -> {x = 42;};");
+        var mod = new Module("foo is <-> {x = 42;};");
 
         mod.compileSelf().then(function (result) {
 
@@ -186,7 +186,7 @@ module.exports["compile with no deps"] = {
 
     "compilation with two services": function (test) {
 
-        var mod = new Module("foo is -> {x = 42;};\n\nbar is -> {a = 57;};\n");
+        var mod = new Module("foo is <-> {x = 42;};\n\nbar is <-> {a = 57;};\n");
 
         mod.compileSelf().then(function (result) {
 
@@ -270,7 +270,7 @@ module.exports["compile with deps"] = {
 
         test.expect(2);
 
-        var mod = new Module("references:\n\nTrig <Math/Trig>\nfoo is -> {x = 42;};");
+        var mod = new Module("references:\n\nTrig <Math/Trig>\nfoo is <-> {x = 42;};");
 
         var program = {
             include: function (modRef) {

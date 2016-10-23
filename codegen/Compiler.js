@@ -29,6 +29,7 @@ const AsyncWhile = require('./AsyncWhile');
 const AsyncCond = require('./AsyncCond');
 const Future = require('./Future');
 const Request = require('./Request');
+const ReqExpr = require('./ReqExpr');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -296,7 +297,7 @@ module.exports['iteration'] = function (node) {
  *
  * @param node
  */
-module.exports['message'] = function (node) {
+module.exports['future'] = function (node) {
 
     // compile the parts
 
@@ -306,10 +307,7 @@ module.exports['message'] = function (node) {
         return this.compile(arg);
     });
 
-    var subsequent = node.subsequent ? this.compile(node.subsequent) : null;
-    var contingency = node.contingency ? this.compile(node.contingency) : null;
-
-    return new Request(target, args, subsequent, contingency);
+    return new ReqExpr(target, args);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,10 @@
+main is -> (max) {
+
+    num = 0;
+
+    while num < max {
+        num++;
+    }
+
+    reply num;
+};

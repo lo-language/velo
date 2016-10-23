@@ -444,5 +444,74 @@ module.exports["with handlers"] = {
                                             [ 'stmtList', [ 'return' ] ] ] ] ] ] ] ] ] ] ]);
 
         test.done();
+    },
+
+
+    "application with fail handler": function (test) {
+
+        // findWords("hello") on fail -> (rest) {
+        //     reply "hello";
+        // };
+
+        var node = {
+            type: 'application_stmt',
+            application: {
+                type: 'message',
+                address: {
+                    type: 'id',
+                    name: 'findWords'
+                },
+                args: [{
+                    type: 'string',
+                    val: 'hello'
+                }],
+                "contingency": {
+                    "type": "procedure",
+                    "params": ["rest"],
+                    "body": {
+                        "type": "stmt_list",
+                        "head": {
+                            "type": "response",
+                            "channel": "reply",
+                            "args": [
+                                {
+                                    "type": "string",
+                                    "val": "hello"
+                                }
+                            ]
+                        },
+                        "tail": null
+                    },
+                    "channel": "fail"
+                }
+            }
+        };
+
+        var result = new Context().compileStmt(node);
+
+        test.deepEqual(result.renderTree(), [ 'stmtList',
+            [ 'expr-stmt',
+                [ 'stmtList',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                        [ [ 'id', '$findWords' ],
+                            [ 'arrayLiteral', [ [ 'string', 'hello' ] ] ],
+                            [ 'null' ],
+                            [ 'function',
+                                null,
+                                [ 'args' ],
+                                [ 'stmtList',
+                                    [ 'var', '$rest' ],
+                                    [ 'stmtList',
+                                        [ 'expr-stmt',
+                                            [ 'assign',
+                                                [ 'id', '$rest' ],
+                                                [ 'subscript', ["id", "args"], ["num", "0"] ] ] ],
+                                        [ 'stmtList',
+                                            [ 'expr-stmt', [ 'call', ["select", [ "id", "task" ], "respond"], [ [ "string", "reply" ],
+                                                [ "arrayLiteral", [ [ "string", "hello" ] ] ] ] ] ],
+                                            [ 'stmtList', [ 'return' ] ] ] ] ] ] ] ] ] ] ]);
+
+        test.done();
     }
 };

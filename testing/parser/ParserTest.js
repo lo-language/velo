@@ -11,7 +11,7 @@ var path = require('path');
 var ASTBulder = require('../../parser/ASTBuilder');
 var parser = new ASTBulder();
 
-var EXT = '.exa';
+var EXT = '.lo';
 
 // go through the tests directory and generate a test for each file
 var files = fs.readdirSync(__dirname + '/inputs');

@@ -1,0 +1,12 @@
+test is <-> (log) {
+
+    scan foo -> (item) {
+
+        log(item);
+    }
+
+    x = map foo <-> (item) {
+
+        reply item * 2;
+    };
+};

@@ -6,7 +6,6 @@
 
 const JS = require('./JsPrimitives');
 const JsFunction = require('./JsFunction');
-const Request = require('./Request');
 const JsStmt = require('./JsStmt');
 
 /**

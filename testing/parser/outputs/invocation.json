@@ -123,7 +123,7 @@
                           ]
                         },
                         "right": {
-                          "type": "message",
+                          "type": "future",
                           "address": {
                             "type": "id",
                             "name": "foo"
@@ -320,7 +320,7 @@
                                               "name": "yarp"
                                             },
                                             "right": {
-                                              "type": "message",
+                                              "type": "future",
                                               "address": {
                                                 "type": "id",
                                                 "name": "baz"

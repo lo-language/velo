@@ -49,7 +49,7 @@ module
 // would a colon after references improve readability?
 // or should there be a colon between the ID and the modref?
 references
-    : ('references'|'refs') ':' (ID MODREF)+ // should this not be an ID? maybe a 'label' instead?
+    : (ID MODREF)+ // should this not be an ID? maybe a 'label' instead?
     ;
 
 // we do this the old-fashioned way because that's what the compiler wants
@@ -64,10 +64,15 @@ statement
     | expr assignment_op expr ';'                           # assignment
     | expr op=('++'|'--') ';'                               # incDec
     | conditional                                           # condStmt
-    | expr '(' exprList? ')' handlers                       # syncReqStmt
-    | '@' expr '(' exprList? ')' handlers                   # asyncReqStmt
+    | expr '(' exprList? ')' handlers                       # syncRequest
+    | '@' expr '(' exprList? ')' handlers                   # asyncRequest
     | expr '>>' expr ';'                                    # send  // fire-and-forget to be clear and prevent us from using @syntax; is NOT a request, note that it is a statement, not an expression; precludes reply. could reuse -> here instead
     | 'while' expr block                                    # iteration
+    | 'scan' expr expr                                      # scan
+    ;
+
+definition
+    : ID 'is' literal ';'                                   # constant
     ;
 
 handlers
@@ -77,9 +82,14 @@ handlers
     | replyHandler failHandler
     ;
 
-definition
-    : ID 'is' literal ';'                                   # constant
+replyHandler
+    : sink
     ;
+
+failHandler
+    : 'on' 'fail' sink
+    ;
+
 
 // assignments are statements, not expressions!
 // todo multiple lvalues separated by commas for destructuring
@@ -108,8 +118,8 @@ block
     ;
 
 expr
-    : expr '(' exprList? ')'                                    # syncReqExpr  // blocking request. the value of the expr is the *return value*
-    | '@' expr '(' exprList? ')'                                # asyncReqExpr // non-blocking request. the value of the expr is a *future*
+    : expr '(' exprList? ')'                                    # syncCall  // blocking request. the value of the expr is the *return value*
+    | '@' expr '(' exprList? ')'                                # asyncCall // non-blocking request. the value of the expr is a *future*
     | '#' expr                                                  # cardinality
     | 'not' expr                                                # negation
     | 'bytes' expr                                              # bytes
@@ -122,22 +132,13 @@ expr
     | '(' expr ')'                                              # wrap
     | expr '[' expr ']'                                         # subscript
     | expr '[' expr '..' expr? ']'                              # slice
-    | 'cut' expr '[' expr ']'                                   # extraction
-    | 'cut' expr '[' expr '..' expr? ']'                        # excision
+    | 'map' expr expr                                           # map
     | expr '.' ID                                               # field
     | '(' ID (',' ID)+ ')'                                      # destructure
     | INTER_BEGIN interpolated INTER_END                        # dynastring
     | literal                                                   # litExpr
     | ID ':' ID                                                 # externalId
     | ID                                                        # id
-    ;
-
-replyHandler
-    : procedure
-    ;
-
-failHandler
-    : 'on' 'fail' procedure
     ;
 
 interpolated
@@ -160,13 +161,19 @@ literal
     | '[' exprList? ']'                         # array
     | '[' fieldList ']'                         # form // record? compound? composite? frame?
     | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
-    | procedure                                 # service
-    | 'on' expr procedure                       # subscription  // maybe not a literal
+    | sink                                      # handler
+    | '<->' procedure                           # service
+    | '-<' paramList?                           # channel
+    | 'on' expr sink                            # subscribe  // maybe not a literal
+    ;
+
+sink
+    : '->' procedure
     ;
 
 procedure
-    : '->' paramList? block
-    | '->' ID (',' ID)*
+    : paramList? block
+    | ID (',' ID)*  // I'm not really sure what I was going for here -- maybe direct assignment sugar for setters?
     ;
 
 paramList
@@ -182,13 +189,6 @@ pairList
     : (expr PAIR_SEP expr ','?)+
     ;
 
-
-//dataflow
-//    : 'scan' expr sink
-//    | 'scan' expr '..' expr sink
-//    | expr '>>' sink
-//    ;
-//
 //sink
 //    : procedure
 //    | 'into' expr
