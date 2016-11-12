@@ -130,7 +130,7 @@ module.exports['basics'] = {
 
             acquire: function (modRef) {
                 return Q(new Module(
-                    'main is -> (write) {\n' +
+                    'main is <-> (write) {\n' +
                     '@write("hi there!");\n};\n'));
             }
         };

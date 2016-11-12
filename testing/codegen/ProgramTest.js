@@ -68,8 +68,8 @@ module.exports["run"] = {
     "program with chained modules": function (test) {
 
         var modules = {
-            main: new Module("references:\nfoo <foo>\nmain is -> {x = 42;};"),
-            foo: new Module("references:\nbar <bar>\nfoo is -> {x = 42;};"),
+            main: new Module("foo <foo>\nmain is -> {x = 42;};"),
+            foo: new Module("\nbar <bar>\nfoo is -> {x = 42;};"),
             bar: new Module("bar is -> {x = 42;};")
         };
 

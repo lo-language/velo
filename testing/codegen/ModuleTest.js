@@ -239,7 +239,7 @@ module.exports["compile with deps"] = {
         test.expect(2);
 
 
-        var mod = new Module("references:\n\nTrig <Math/Trig>\nfoo is 42;");
+        var mod = new Module("Trig <Math/Trig>\nfoo is 42;");
 
         var program = {
             include: function (modRef) {
@@ -270,7 +270,7 @@ module.exports["compile with deps"] = {
 
         test.expect(2);
 
-        var mod = new Module("references:\n\nTrig <Math/Trig>\nfoo is <-> {x = 42;};");
+        var mod = new Module("Trig <Math/Trig>\nfoo is <-> {x = 42;};");
 
         var program = {
             include: function (modRef) {
