@@ -4,11 +4,18 @@
 
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+const AsyncWhile = require('../codegen/AsyncWhile');
+const JsStmt = require('../codegen/JsStmt');
+
+
 /**
  * A "function call" (request) expression
  *
  * @param address
  * @param args
+ * @param replyHandler
+ * @param failHandler
  * @param async
  */
 var __ = function (address, args, replyHandler, failHandler, async) {
@@ -25,23 +32,15 @@ var __ = function (address, args, replyHandler, failHandler, async) {
  */
 __.prototype.getAst = function () {
 
-    var res = {
-        type: this.async ? 'message' : 'application',
-        address: this.address.getAst(),
-        args: this.args.map(arg => arg.getAst())
-    };
-
-    if (this.replyHandler) {
-        res.subsequent = this.replyHandler.getAst();
-    }
-
-    if (this.failHandler) {
-        res.contingency = this.failHandler.getAst();
-    }
-
     return {
         type: 'application_stmt',
-        application: res
+        application: {
+            type: this.async ? 'message' : 'application',
+            address: this.address.getAst(),
+            args: this.args.map(arg => arg.getAst()),
+            subsequent: this.replyHandler ? this.replyHandler.getAst() : undefined,
+            contingency: this.failHandler ? this.failHandler.getAst() : undefined
+        }
     };
 };
 

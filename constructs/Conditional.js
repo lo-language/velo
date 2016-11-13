@@ -57,9 +57,10 @@ __.prototype.compile = function (context) {
     // since we're in a stmt here that might have async bits, and then our blocks might have bits?
     // we DO need to support more than one level of stmt nesting
 
-    context.pushWrapper();
+    context.openStatement();
+
     var predicate = this.predicate.compile(context);
-    var wrapper = context.popWrapper();
+    var wrapper = context.wrapper;
 
     var consequent = this.consequent.compile(context);
     var alternate = this.alternate ? this.alternate.compile(context) : null;
@@ -75,8 +76,8 @@ __.prototype.compile = function (context) {
         return new JsStmt.cond(predicate, consequent, alternate);
     }
 
-    // todo -- collapse asynccond into this class?
-    return new AsyncCond(predicate, consequent, alternate, wrapper, this);
+    // todo collapse asynccond into this class
+    return new AsyncCond(predicate, consequent, alternate, context.wrapper, this);
 };
 
 module.exports = __;

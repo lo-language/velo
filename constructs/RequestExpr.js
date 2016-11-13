@@ -4,6 +4,12 @@
 
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+const JsStmt = require('../codegen/JsStmt');
+const Request = require('../codegen/Request');
+const Identifier = require('./Identifier');
+
+
 /**
  * A "function call" (request) expression
  *
@@ -32,11 +38,21 @@ __.prototype.getAst = function () {
 
 /**
  * Compiles this node to JS in the given context.
+ * The context needs to be a statement context in this case.
  *
  * @param context
  */
 __.prototype.compile = function (context) {
 
+    var target = this.address.compile(context);
+
+    var args = this.args.map(arg => {
+        return arg.compile(context);
+    });
+
+    // get a placeholder
+    // we push a request into the context whether sync or async
+    return context.pushBlockingCall(new Request(target, args, null, null, this.async));
 };
 
 module.exports = __;

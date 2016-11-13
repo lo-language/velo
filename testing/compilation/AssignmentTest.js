@@ -24,6 +24,7 @@ module.exports["assignment"] = {
         test.deepEqual(node.compile(context).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
+
         test.equal(context.has('foo'), true);
         test.done();
     },
@@ -47,8 +48,10 @@ module.exports["assignment"] = {
 
     "assign id to id": function (test) {
 
-        var node = new Lo.assignment('=',
-            new Lo.identifier('foo'), new Lo.identifier('bar'));
+        var node = new Lo.assignment(
+            '=',
+            new Lo.identifier('foo'),
+            new Lo.identifier('bar'));
 
         var context = new Context().createInner();
 
@@ -63,17 +66,17 @@ module.exports["assignment"] = {
 
     "assign application to id": function (test) {
 
-        var node = {
-            type: 'assign',
-            op: '=',
-            left: {type: 'id', name: 'foo'},
-            right: {type: 'application', address: {type: 'id', name: 'bar'}, args: []}
-        };
+        var node = new Lo.assignment(
+            '=',
+            new Lo.identifier('foo'),
+            new Lo.requestExpr(new Lo.identifier('bar'), [])
+        );
 
         var context = new Context().createInner();
 
         test.equal(context.has('foo'), false);
-        test.deepEqual(context.compileStmt(node).renderTree(), [ 'stmtList',
+
+        test.deepEqual(node.compile(context).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendMessage' ],

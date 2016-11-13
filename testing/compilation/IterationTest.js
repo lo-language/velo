@@ -8,19 +8,24 @@
 const Context = require('../../codegen/Context');
 const JS = require('../../codegen/JsPrimitives');
 const JsStmt = require('../../codegen/JsStmt');
-const util = require('util');
+const Lo = require('../../constructs');
 
 module.exports["basics"] = {
 
     "sync loop": function (test) {
 
-        var node = {
-            type: 'iteration',
-            condition: {type: 'id', name: 'foo'},
-            statements: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null}
-        };
+        var node = new Lo.while(
+            new Lo.identifier('foo'),
+            new Lo.stmtList(
+                new Lo.assignment(
+                    '=',
+                    new Lo.identifier('bar'),
+                    new Lo.literal('number', '42')
+                )
+            )
+        );
 
-        var a = new Context().createInner().compileStmt(node);
+        var a = node.compile(new Context().createInner());
 
         test.deepEqual(a.renderTree(),
             [ 'stmtList',
@@ -58,22 +63,17 @@ module.exports["basics"] = {
 
     "async in body": function (test) {
 
-        var node = {
-            type: 'iteration',
-            condition: {type: 'id', name: 'foo'},
-            statements: {type: 'stmt_list',
-                head: {
-                    type: 'application_stmt',
-                    application: {
-                        type: 'application',
-                        address: {type: 'id', name: 'bar'},
-                        args: [{type: 'number', val: '57'}]
-                    }
-                },
-                tail: null}
-        };
+        var node = new Lo.while(
+            new Lo.identifier('foo'),
+            new Lo.stmtList(
+                new Lo.requestStmt(
+                    new Lo.identifier('bar'),
+                    [new Lo.literal('number', '57')]
+                )
+            )
+        );
 
-        var a = new Context().createInner().compileStmt(node);
+        var a = node.compile(new Context().createInner());
 
         test.deepEqual(a.renderTree(), [ 'stmtList',
             [ 'let', 'loop',

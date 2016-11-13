@@ -7,7 +7,6 @@
 const JS = require('../codegen/JsPrimitives');
 const JsStmt = require('../codegen/JsStmt');
 
-
 /**
  * A linked list of statements.
  */
@@ -36,28 +35,17 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
+    // todo could we put move this into the parser somehow?
+
     if (this.head == null) {
         return new JsStmt();
     }
 
-    context.pushWrapper();
+    // hooray for Lisp!
 
-    var head = context.popWrapper().wrap(this.head.compile(context));
-
-    if (this.tail) {
-
-        context.pushWrapper();
-
-        return head.attach(context.popWrapper().wrap(this.head.compile(context)));
-    }
-
-    return head;
-
-    // // hooray for Lisp!
-    //
-    // return this.tail ?
-    //     this.head.compileStmt(context).attach(this.tail.compileStmt(context)) :
-    //     this.head.compileStmt(context);
+    return this.tail ?
+        this.head.compile(context).attach(this.tail.compile(context)) :
+        this.head.compile(context);
 };
 
 module.exports = __;

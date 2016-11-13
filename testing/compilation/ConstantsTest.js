@@ -63,7 +63,8 @@ module.exports["constants"] = {
                             [new Lo.literal('number', '42')]
                         )
                     )
-                )
+                ),
+                true
             ));
 
         var context = new Context();

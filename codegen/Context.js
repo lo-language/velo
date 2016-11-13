@@ -32,8 +32,7 @@ var __ = function (parent) {
     // our local symbol table, containing params, locals, constants, futures, etc.
     this.symbols = {};
 
-    this.wrappers = [];
-
+    this.wrapper = null;
     this.cont = 0;
 };
 
@@ -213,7 +212,48 @@ __.prototype.createInner = function () { // push? nest? inner? derive? pushDown?
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
+ * Creates and returns a new child statement context.
  *
+ * @return {*}
+ */
+__.prototype.openStatement = function () {
+
+    this.wrapper = new Wrapper();
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Pushes a request onto the stack and returns a placeholder.
+ *
+ * @param request
+ */
+__.prototype.pushBlockingCall = function (request) {
+
+    if (this.wrapper == null) {
+        throw new Error("trying to push a blocking call outside of stmt context");
+    }
+
+    return this.wrapper.pushRequest(request);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Closes the current statement context, wrapping the given JS AST node as necessary
+ *
+ * @return {*}
+ */
+__.prototype.closeStatement = function (node) {
+
+    var result = this.wrapper.wrap(node);
+
+    this.wrapper = null;
+
+    return result;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * @deprecated
  * @return {*}
  */
 __.prototype.compile = function (node) {
@@ -226,54 +266,4 @@ __.prototype.compile = function (node) {
     return Compiler[node.type].call(this, node);
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param node
- */
-__.prototype.compileStmt = function (node) {
-
-    this.pushWrapper();
-
-    var result = this.compile(node);
-
-    return this.popWrapper().wrap(result);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param node
- */
-__.prototype.pushWrapper = function () {
-
-    this.wrappers.push(new Wrapper());
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- *
- * @param node
- */
-__.prototype.popWrapper = function () {
-
-    return this.wrappers.pop();
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Pushes a request onto the stack and returns a placeholder.
- *
- * @param request
- */
-__.prototype.pushBlockingCall = function (request) {
-
-    if (this.wrappers.length == 0) {
-        throw new Error("trying to push a blocking call outside of stmt context");
-    }
-
-    return this.wrappers[this.wrappers.length - 1].pushRequest(request);
-};
-
 module.exports = __;
-

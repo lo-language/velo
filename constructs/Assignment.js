@@ -8,7 +8,6 @@ const JS = require('../codegen/JsPrimitives');
 const JsStmt = require('../codegen/JsStmt');
 const Identifier = require('./Identifier');
 
-
 /**
  * An assignment statement.
  *
@@ -43,6 +42,8 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
+    context.openStatement();
+
     // if the left node is a bare ID, then we compile it as an lvalue
     // otherwise all IDs are compiled as rvalues
 
@@ -71,7 +72,7 @@ __.prototype.compile = function (context) {
         }
     }
 
-    return new JsStmt(JS.exprStmt(JS.assign(left, right, this.op == '=' ? null : this.op)));
+    return context.closeStatement(new JsStmt(JS.exprStmt(JS.assign(left, right, this.op == '=' ? null : this.op))));
 
     // this was genius
     // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP
