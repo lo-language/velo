@@ -35,7 +35,8 @@
                       "type": "id",
                       "name": "item"
                     }
-                  ]
+                  ],
+                  "async": false
                 },
                 "tail": null
               }

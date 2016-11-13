@@ -312,7 +312,7 @@ __.prototype.visitAsyncRequest = function(ctx) {
         args ? args.accept(this) : [],
         handlers.subsequent,
         handlers.contingency,
-        false
+        true
     );
 };
 

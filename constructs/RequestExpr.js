@@ -30,9 +30,10 @@ var __ = function (address, args, async) {
 __.prototype.getAst = function () {
 
     return {
-        type: this.async ? 'future' : 'application',
+        type: 'request_expr',
         address: this.address.getAst(),
-        args: this.args.map(arg => arg.getAst())
+        args: this.args.map(arg => arg.getAst()),
+        async: this.async
     };
 };
 

@@ -185,13 +185,14 @@
                               "name": "server"
                             },
                             "right": {
-                              "type": "application",
+                              "type": "request_expr",
                               "address": {
                                 "type": "id",
                                 "name": "createServer",
                                 "scope": "HTTP"
                               },
-                              "args": []
+                              "args": [],
+                              "async": false
                             }
                           },
                           "tail": null

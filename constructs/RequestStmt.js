@@ -37,7 +37,8 @@ __.prototype.getAst = function () {
         address: this.address.getAst(),
         args: this.args.map(arg => arg.getAst()),
         subsequent: this.replyHandler ? this.replyHandler.getAst() : undefined,
-        contingency: this.failHandler ? this.failHandler.getAst() : undefined
+        contingency: this.failHandler ? this.failHandler.getAst() : undefined,
+        async: this.async
     };
 };
 
