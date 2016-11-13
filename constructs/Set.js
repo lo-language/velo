@@ -4,6 +4,9 @@
 
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+
+
 /**
  * An set literal
  *
@@ -32,6 +35,10 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
+    return JS.objLiteral(
+        this.elements.map(item => {
+        return [item.compile(context), JS.bool(true)];
+    }));
 };
 
 module.exports = __;

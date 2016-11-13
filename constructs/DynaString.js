@@ -4,6 +4,9 @@
 
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+
+
 /**
  *
  * @param left
@@ -37,6 +40,9 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
+    return JS.add(
+        JS.add(this.left.compile(context), JS.string(this.infix)),
+        this.right.compile(context));
 };
 
 module.exports = __;

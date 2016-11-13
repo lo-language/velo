@@ -5,6 +5,7 @@
 
 "use strict";
 
+const Lo = require('../../../constructs');
 const Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
 const JsStmt = require('../../../codegen/JsStmt');
@@ -14,11 +15,9 @@ module.exports["embedded calls"] = {
 
     "no args": function (test) {
 
-        var node = {
-            type: 'application',
-            address: {type: 'id', name: 'foo'},
-            args: []
-        };
+        var node = new Lo.requestStmt(
+            new Lo.identifier('foo'), []
+        );
 
         var ctx = new Context();
 

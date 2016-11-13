@@ -8,7 +8,7 @@
 const Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
 const JsStmt = require('../../../codegen/JsStmt');
-const util = require('util');
+const Lo = require('../../../constructs');
 
 module.exports["op"] = {
 
@@ -32,14 +32,9 @@ module.exports["op"] = {
 
         cases.forEach(op => {
 
-            var node = {
-                type: 'op',
-                op: op[0],
-                left: {type: 'number', val: '1'},
-                right: {type: 'number', val: '2'}
-            };
+            var node = new Lo.binaryOpExpr(op[0], new Lo.literal('number', '1'), new Lo.literal('number', '2'));
 
-            test.deepEqual(new Context().compile(node).renderTree(), [ op[1], [ 'num', '1' ], [ 'num', '2' ] ]);
+            test.deepEqual(node.compile(new Context()).renderTree(), [ op[1], [ 'num', '1' ], [ 'num', '2' ] ]);
         });
 
         test.done();
@@ -47,46 +42,40 @@ module.exports["op"] = {
 
     "translates and/or": function (test) {
 
+        var node = new Lo.binaryOpExpr(
+            'or',
+            new Lo.binaryOpExpr(
+                'and',
+                new Lo.literal('number', '1'),
+                new Lo.literal('number', '2')),
+            new Lo.literal('number', '3'));
 
-        var node = {
-            type: 'op',
-            op: 'or',
-            left:{
-                type: 'op',
-                op: 'and',
-                left: {type: 'number', val: '1'},
-                right: {type: 'number', val: '2'}
-            },
-            right: {type: 'number', val: '3'}
-        };
-
-        test.deepEqual(new Context().compile(node).renderTree(), JS.logicalOr(
-            JS.logicalAnd(JS.num('1'), JS.num('2')),
-            JS.num('3')).renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(), [ '||',
+            [ '&&', [ 'num', '1' ], [ 'num', '2' ] ],
+            [ 'num', '3' ] ]);
         test.done();
     },
 
     "in operator": function (test) {
 
-        var node = {
-            type: 'in',
-            left: { type: 'string', val: 'trillian' },
-            right: { type: 'id', name: 'dudes' } };
+        var node = new Lo.membership(
+            new Lo.literal('string', 'trillian'),
+            new Lo.identifier('dudes'));
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.runtimeCall('in', [JS.string('trillian'), JS.ID('$dudes')]).renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(), [ 'call',
+            [ 'select', [ 'id', 'task' ], 'in' ],
+            [ [ 'string', 'trillian' ], [ 'id', '$dudes' ] ] ]);
         test.done();
     },
 
     "equality is strict": function (test) {
 
-        var node = {
-            type: 'op',
-            op: '==',
-            left: {type: 'id', name: 'foo'},
-            right: {type: 'id', name: 'bar'}
-        };
+        var node = new Lo.binaryOpExpr(
+                '==',
+                new Lo.identifier('foo'),
+                new Lo.identifier('bar'));
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.strictEqual(JS.ID('$foo'), JS.ID('$bar')).renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(), [ 'strict-equal', [ 'id', '$foo' ], [ 'id', '$bar' ] ]);
         test.done();
     },
 
@@ -97,14 +86,14 @@ module.exports["op"] = {
         // if ints, should create an array
         // if arrays, should concat
 
-        var node = {
-            type: 'op',
-            op: 'concat',
-            left: {type: 'id', name: 'foo'},
-            right: {type: 'id', name: 'bar'}
-        };
+        var node = new Lo.binaryOpExpr(
+            'concat',
+            new Lo.identifier('foo'),
+            new Lo.identifier('bar'));
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.runtimeCall('concat', [JS.ID('$foo'), JS.ID('$bar')]).renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(), [ 'call',
+            [ 'select', [ 'id', 'task' ], 'concat' ],
+            [ [ 'id', '$foo' ], [ 'id', '$bar' ] ] ]);
         test.done();
     }
 };

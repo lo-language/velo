@@ -4,6 +4,9 @@
 
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+
+
 /**
  * An map literal
  *
@@ -32,6 +35,9 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
+    return JS.objLiteral(this.elements.map(item => {
+        return item.compile(context);
+    }));
 };
 
 module.exports = __;

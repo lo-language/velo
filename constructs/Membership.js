@@ -4,6 +4,9 @@
 
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+
+
 /**
  * A set membership test operator expression
  *
@@ -35,6 +38,11 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
+    return JS.runtimeCall(
+        'in', [
+            this.left.compile(context),
+            this.right.compile(context)
+        ]);
 };
 
 module.exports = __;

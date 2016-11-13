@@ -5,71 +5,61 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
-var Context = require('../../../codegen/Context');
+const Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
-var util = require('util');
+const JsStmt = require('../../../codegen/JsStmt');
+const Lo = require('../../../constructs');
 
 module.exports["literals"] = {
 
-    "nil": function (test) {
-
-        var node = {type: 'nil'};
-
-        test.deepEqual(new Context().compile(node).renderTree(), JS.NULL.renderTree());
-        test.done();
-    },
-
     "boolean": function (test) {
 
-        var node = {type: 'boolean', val: true};
+        var node = new Lo.literal('boolean', 'true');
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.bool('true').renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(), JS.bool('true').renderTree());
         test.done();
     },
 
     "number": function (test) {
 
-        var node = {type: 'number', val: '42'};
+        var node = new Lo.literal('number', '42');
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.num('42').renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(), JS.num('42').renderTree());
         test.done();
     },
 
     "string": function (test) {
 
-        var node = {type: 'string', val: "turanga leela"};
+        var node = new Lo.literal('string', "turanga leela");
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.string('turanga leela').renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(), JS.string('turanga leela').renderTree());
         test.done();
     },
 
     "array": function (test) {
 
-        var node = {
-            type: 'array',
-            elements:
-                [ { type: 'string', val: 'foo' },
-                    { type: 'string', val: 'mani' },
-                    { type: 'string', val: 'padme' },
-                    { type: 'string', val: 'hum' } ] };
+        var node = new Lo.array([
+            new Lo.literal('string', "foo"),
+            new Lo.literal('string', "mani"),
+            new Lo.literal('string', "padme"),
+            new Lo.literal('string', "hum")
+        ]);
 
-        test.deepEqual(new Context().compile(node).renderTree(),
+        test.deepEqual(node.compile(new Context()).renderTree(),
             JS.arrayLiteral([JS.string('foo'), JS.string('mani'), JS.string('padme'), JS.string('hum')]).renderTree());
         test.done();
     },
 
     "set": function (test) {
 
-        var node = {
-            type: 'set',
-            elements:
-                [ { type: 'string', val: 'foo' },
-                    { type: 'string', val: 'mani' },
-                    { type: 'string', val: 'padme' },
-                    { type: 'string', val: 'hum' } ] };
+        var node = new Lo.setLiteral([
+            new Lo.literal('string', "foo"),
+            new Lo.literal('string', "mani"),
+            new Lo.literal('string', "padme"),
+            new Lo.literal('string', "hum")
+        ]);
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.objLiteral([
+        test.deepEqual(node.compile(new Context()).renderTree(), JS.objLiteral([
             [JS.string('foo'), JS.bool(true)],
             [JS.string('mani'), JS.bool(true)],
             [JS.string('padme'), JS.bool(true)],
@@ -80,52 +70,32 @@ module.exports["literals"] = {
 
     "map": function (test) {
 
-        var node = {
-            type: 'map',
-            elements:
-                [ { type: 'pair',
-                    key: { type: 'string', val: 'Zaphod' },
-                    value: { type: 'string', val: 'Betelgeuse' } },
-                    { type: 'pair',
-                        key: { type: 'string', val: 'Ford' },
-                        value: { type: 'string', val: 'Betelgeuse' } },
-                    { type: 'pair',
-                        key: { type: 'string', val: 'Arthur' },
-                        value: { type: 'string', val: 'Earth' } },
-                    { type: 'pair',
-                        key: { type: 'string', val: 'Trillian' },
-                        value: { type: 'string', val: 'Earth' } } ] };
+        var node = new Lo.mapLiteral([
+            new Lo.pair(new Lo.literal('string', "Zaphod"), new Lo.literal('string', "Betelgeuse")),
+            new Lo.pair(new Lo.literal('string', "Ford"), new Lo.literal('string', "Betelgeuse")),
+            new Lo.pair(new Lo.literal('string', "Arthur"), new Lo.literal('string', "Earth")),
+            new Lo.pair(new Lo.literal('string', "Trillian"), new Lo.literal('string', "Earth")),
+        ]);
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.objLiteral([
-            [JS.string('Zaphod'), JS.string('Betelgeuse')],
-            [JS.string('Ford'), JS.string('Betelgeuse')],
-            [JS.string('Arthur'), JS.string('Earth')],
-            [JS.string('Trillian'), JS.string('Earth')]
-        ]).renderTree());
-        
+        test.deepEqual(node.compile(new Context()).renderTree(), [ 'objLiteral',
+            [ [ [ 'string', 'Zaphod' ], [ 'string', 'Betelgeuse' ] ],
+                [ [ 'string', 'Ford' ], [ 'string', 'Betelgeuse' ] ],
+                [ [ 'string', 'Arthur' ], [ 'string', 'Earth' ] ],
+                [ [ 'string', 'Trillian' ], [ 'string', 'Earth' ] ] ] ]);
+
         test.done();
     },
 
     "record": function (test) {
 
-        var node = {
-            type: 'record',
-            fields:
-                [
-                    { type: 'field',
-                        label: 'Zaphod',
-                        value: { type: 'string', val: 'Betelgeuse' } },
-                    { type: 'field',
-                        label: 'Ford',
-                        value: { type: 'string', val: 'Betelgeuse' } },
-                    { type: 'field',
-                        label: 'Arthur',
-                        value: { type: 'string', val: 'Earth' } },
-                    { type: 'field',
-                        label: 'Trillian',
-                        value: { type: 'string', val: 'Earth' } } ] };
+        var node = new Lo.record([
+            new Lo.field('Zaphod', new Lo.literal('string', 'Betelgeuse')),
+            new Lo.field('Ford', new Lo.literal('string', 'Betelgeuse')),
+            new Lo.field('Arthur', new Lo.literal('string', 'Earth')),
+            new Lo.field('Trillian', new Lo.literal('string', 'Earth')),
+        ]);
 
-        test.deepEqual(new Context().compile(node).renderTree(), [ 'objLiteral',
+        test.deepEqual(node.compile(new Context()).renderTree(), [ 'objLiteral',
             [ [ [ 'string', 'Zaphod' ], [ 'string', 'Betelgeuse' ] ],
                 [ [ 'string', 'Ford' ], [ 'string', 'Betelgeuse' ] ],
                 [ [ 'string', 'Arthur' ], [ 'string', 'Earth' ] ],

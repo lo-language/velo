@@ -4,6 +4,9 @@
 
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+
+
 /**
  * A record literal
  *
@@ -32,6 +35,9 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
+    return JS.objLiteral(this.fields.map(field => {
+        return field.compile(context);
+    }));
 };
 
 module.exports = __;

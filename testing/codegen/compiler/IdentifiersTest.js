@@ -5,48 +5,36 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
+const Lo = require('../../../constructs');
 var Context = require('../../../codegen/Context');
-var Module = require('../../../codegen/Module');
-const JS = require('../../../codegen/JsPrimitives');
-var util = require('util');
 
 module.exports["identifiers"] = {
 
-//    "undefined usage": function (test) {
-//
-//        var node = {type: 'id', name: 'foo'};
-//
-//        var result = Compiler.compile(node);
-//
-//        test.throws(result.getExpr, Error, "undefined value");
-//        test.done();
-//    },
-
     "normal var": function (test) {
 
-        var node = {type: 'id', name: 'foo'};
+        var node = new Lo.identifier('foo');
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.ID('$foo').renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(),
+            ['id', '$foo']);
         test.done();
     },
 
     "constant": function (test) {
 
-        var node = {type: 'id', name: 'foo'};
+        var node = new Lo.identifier('foo');
 
         var context = new Context();
 
         // define the constant
-        context.compile({type: 'constant', name: 'foo', value: {type: 'number', val: '42'}});
+        new Lo.constant('foo', new Lo.literal('number', '42')).compile(context);
 
-        test.deepEqual(context.compile(node).renderTree(), JS.num('42').renderTree());
+        test.deepEqual(node.compile(context).renderTree(), [ 'num', '42' ]);
         test.done();
     },
 
     "external ID": function (test) {
 
-        var node = {type: 'id', scope: 'HTTP', name: 'foo'};
+        var node = new Lo.identifier('foo', 'HTTP');
 
         var context = new Context({
 
@@ -56,7 +44,7 @@ module.exports["identifiers"] = {
             }
         });
 
-        test.deepEqual(context.compile(node), 'M0.foo');
+        test.deepEqual(node.compile(context), 'M0.foo');
         test.done();
     },
 
@@ -64,7 +52,7 @@ module.exports["identifiers"] = {
 
         // should resolve to external, not local def
 
-        var node = {type: 'id', scope: 'HTTP', name: 'foo'};
+        var node = new Lo.identifier('foo', 'HTTP');
 
         var context = new Context({
 
@@ -80,7 +68,7 @@ module.exports["identifiers"] = {
 
         context.define("foo", 42);
 
-        test.deepEqual(context.compile(node), 'M0.foo');
+        test.deepEqual(node.compile(context), 'M0.foo');
         test.done();
     }
 };

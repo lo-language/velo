@@ -4,6 +4,9 @@
 
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+
+
 /**
  * A set pair literal
  *
@@ -35,6 +38,7 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
+    return [this.key.compile(context), this.value.compile(context)];
 };
 
 module.exports = __;
