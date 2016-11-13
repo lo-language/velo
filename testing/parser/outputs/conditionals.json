@@ -117,9 +117,7 @@
                   },
                   "consequent": {
                     "type": "stmt_list",
-                    "head": {
-                      "type": "skip"
-                    },
+                    "head": null,
                     "tail": null
                   }
                 }
@@ -167,16 +165,12 @@
                     },
                     "consequent": {
                       "type": "stmt_list",
-                      "head": {
-                        "type": "skip"
-                      },
+                      "head": null,
                       "tail": null
                     },
                     "alternate": {
                       "type": "stmt_list",
-                      "head": {
-                        "type": "skip"
-                      },
+                      "head": null,
                       "tail": null
                     }
                   }
@@ -199,9 +193,7 @@
                     },
                     "statements": {
                       "type": "stmt_list",
-                      "head": {
-                        "type": "skip"
-                      },
+                      "head": null,
                       "tail": null
                     }
                   },

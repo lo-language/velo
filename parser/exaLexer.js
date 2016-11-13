@@ -1,4 +1,4 @@
-// Generated from /Users/spurcell/dev/exa/parser/exa.g4 by ANTLR 4.5.3
+// Generated from /Users/seth/devel/exa/parser/exa.g4 by ANTLR 4.5.3
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 

@@ -297,7 +297,7 @@ module.exports['iteration'] = function (node) {
  *
  * @param node
  */
-module.exports['future'] = function (node) {
+module.exports['message'] = function (node) {
 
     // compile the parts
 

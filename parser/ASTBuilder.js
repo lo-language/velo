@@ -12,6 +12,42 @@ const Lexer = require('./exaLexer');
 const Parser = require('./exaParser');
 const BaseVisitor = require('./exaVisitor').exaVisitor;
 
+const Literal = require('../constructs/Literal');
+const Identifier = require('../constructs/Identifier');
+const Constant = require('../constructs/Constant');
+
+const Array = require('../constructs/Array');
+const Record = require('../constructs/Record');
+const Set = require('../constructs/Set');
+const MapLiteral = require('../constructs/MapLiteral');
+const Pair = require('../constructs/Pair');
+const Field = require('../constructs/Field');
+
+const Assignment = require('../constructs/Assignment');
+const Destructure = require('../constructs/Destructure');
+
+const IncrDecr = require('../constructs/IncrDecr');
+const Conditional = require('../constructs/Conditional');
+const BinaryOpExpr = require('../constructs/BinaryOpExpr');
+const UnaryOpExpr = require('../constructs/UnaryOpExpr');
+const While = require('../constructs/While');
+const Scan = require('../constructs/Scan');
+const MapExpr = require('../constructs/MapExpr');
+
+const Response = require('../constructs/Response');
+const Procedure = require('../constructs/Procedure');
+const Module = require('../constructs/Module');
+const StmtList = require('../constructs/StmtList');
+const Subscript = require('../constructs/Subscript');
+const Membership = require('../constructs/Membership');
+const Slice = require('../constructs/Slice');
+const Select = require('../constructs/Select');
+const DynaString = require('../constructs/DynaString');
+const Interpolation = require('../constructs/Interpolation');
+const RequestExpr = require('../constructs/RequestExpr');
+const RequestStmt = require('../constructs/RequestStmt');
+const EventDef = require('../constructs/EventDef');
+
 
 var __ = function () {
     BaseVisitor.call(this);
@@ -41,15 +77,11 @@ __.prototype.parse = function (input) {
 // Visit a parse tree produced by exaParser#module.
 __.prototype.visitModule = function(ctx) {
 
-    var visitor = this;
-
-    return {
-        type: 'module',
-        definitions: ctx.definition().map(function (def) {return def.accept(visitor)}),
-        references: ctx.references() ? ctx.references().accept(this) : null // todo make this [] not null
-    };
+    return new Module(
+        ctx.references() ? ctx.references().accept(this) : null, // todo make this [] not null
+        ctx.definition().map(def => def.accept(this))
+    );
 };
-
 
 __.prototype.visitReferences = function(ctx) {
 
@@ -70,13 +102,14 @@ __.prototype.visitReferences = function(ctx) {
     return refs;
 };
 
-
-// Visit a parse tree produced by exaParser#statementList.
 __.prototype.visitStatementList = function(ctx) {
 
     var subList = ctx.statementList();
 
-    return {type: 'stmt_list', head: ctx.statement().accept(this), tail: subList ? subList.accept(this) : null};
+    return new StmtList(
+        ctx.statement().accept(this),
+        subList ? subList.accept(this) : null
+    );
 };
 
 
@@ -89,144 +122,142 @@ __.prototype.visitDefStmt = function(ctx) {
     return ctx.definition().accept(this);
 };
 
+__.prototype.visitConstant = function(ctx) {
 
-// Visit a parse tree produced by exaParser#assignment.
-__.prototype.visitAssignment = function(ctx) {
-
-    return {
-        type: 'assign',
-        op: ctx.assignment_op().getText(),
-        left: ctx.expr(0).accept(this),
-        right: ctx.expr(1).accept(this)
-    };
+    return new Constant(
+        ctx.ID().getText(),
+        ctx.literal().accept(this)
+    );
 };
 
+__.prototype.visitAssignment = function(ctx) {
+
+    return new Assignment(
+        ctx.assignment_op().getText(),
+        ctx.expr(0).accept(this),
+        ctx.expr(1).accept(this)
+    );
+};
 
 __.prototype.visitIncDec = function(ctx) {
 
-    return {
-        type: ctx.op.text == '++' ? 'increment' : 'decrement',
-        operand: ctx.expr().accept(this)
-    };
+    return new IncrDecr(
+        ctx.op.text == '++' ? 'increment' : 'decrement',
+        ctx.expr().accept(this)
+    );
 };
 
+// conditional statement
 
 __.prototype.visitCondStmt = function(ctx) {
 
     return ctx.conditional().accept(this);
 };
 
-
 __.prototype.visitIfOnly = function(ctx) {
 
-    return {
-        type: 'conditional',
-        predicate: ctx.expr().accept(this),
-        consequent: ctx.block().accept(this)
-    };
+    return new Conditional(
+        ctx.expr().accept(this),
+        ctx.block().accept(this)
+    );
 };
-
 
 __.prototype.visitIfElse = function(ctx) {
 
-    return {
-        type: 'conditional',
-        predicate: ctx.expr().accept(this),
-        consequent: ctx.block(0).accept(this),
-        alternate: ctx.block(1).accept(this)
-    };
+    return new Conditional(
+        ctx.expr().accept(this),
+        ctx.block(0).accept(this),
+        ctx.block(1).accept(this)
+    );
 };
-
 
 __.prototype.visitNestedIf = function(ctx) {
 
-    return {
-        type: 'conditional',
-        predicate: ctx.expr().accept(this),
-        consequent: ctx.block().accept(this),
-        alternate: ctx.conditional().accept(this)
-    };
+    return new Conditional(
+        ctx.expr().accept(this),
+        ctx.block().accept(this),
+        ctx.conditional().accept(this)
+    );
 };
-
-
-__.prototype.visitResponse = function(ctx) {
-
-    return {
-        type: 'response',
-        channel: ctx.channel.text,
-        args: ctx.exprList() ? ctx.exprList().accept(this) : []
-    };
-};
-
-
-__.prototype.visitDestructure = function(ctx) {
-
-    return {
-        type: 'destructure',
-        members: ctx.ID().map(function (token) {return token.getText()})
-    };
-};
-
-
-__.prototype.visitSkip = function(ctx) {
-
-    return {type: 'skip'};
-};
-
 
 __.prototype.visitIteration = function(ctx) {
 
-    return {
-        type: 'iteration',
-        condition: ctx.expr().accept(this),
-        statements: ctx.block().accept(this)
-    };
+    return new While(
+        ctx.expr().accept(this),
+        ctx.block().accept(this));
+};
+
+__.prototype.visitScan = function(ctx) {
+
+    return new Scan(
+        ctx.expr(0).accept(this),
+        ctx.expr(1).accept(this)
+    );
+};
+
+__.prototype.visitMap = function(ctx) {
+
+    return new MapExpr(
+        ctx.expr(0).accept(this),
+        ctx.expr(1).accept(this)
+    );
+};
+
+// messages
+
+__.prototype.visitResponse = function(ctx) {
+
+    return new Response(
+        ctx.channel.text,
+        ctx.exprList() ? ctx.exprList().accept(this) : []
+    );
+};
+
+__.prototype.visitDestructure = function(ctx) {
+
+    return new Destructure(
+        ctx.ID().map(token => token.getText())
+    );
 };
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// expressions
+// basic expressions
 
 
 __.prototype.visitMulDiv = function(ctx) {
 
-    return {
-        type: 'op',
-        op: ctx.op.text,
-        left: ctx.expr(0).accept(this),
-        right: ctx.expr(1).accept(this)
-    };
+    return new BinaryOpExpr(
+        ctx.op.text,
+        ctx.expr(0).accept(this),
+        ctx.expr(1).accept(this));
 };
 
 __.prototype.visitAddSub = function(ctx) {
 
-    return {
-        type: 'op',
-        op: ctx.op.text,
-        left: ctx.expr(0).accept(this),
-        right: ctx.expr(1).accept(this)
-    };
+    return new BinaryOpExpr(
+        ctx.op.text,
+        ctx.expr(0).accept(this),
+        ctx.expr(1).accept(this));
 };
 
 __.prototype.visitCompare = function(ctx) {
 
-    return {
-        type: 'op',
-        op: ctx.op.text,
-        left: ctx.expr(0).accept(this),
-        right: ctx.expr(1).accept(this)
-    };
+    return new BinaryOpExpr(
+        ctx.op.text,
+        ctx.expr(0).accept(this),
+        ctx.expr(1).accept(this));
 };
 
 __.prototype.visitLogical = function(ctx) {
 
-    return {
-        type: 'op',
-        op: ctx.op.text,
-        left: ctx.expr(0).accept(this),
-        right: ctx.expr(1).accept(this)
-    };
+    return new BinaryOpExpr(
+        ctx.op.text,
+        ctx.expr(0).accept(this),
+        ctx.expr(1).accept(this));
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 __.prototype.visitWrap = function(ctx) {
 
@@ -243,7 +274,6 @@ __.prototype.visitValExpr = function(ctx) {
     return ctx.lvalue().accept(this);
 };
 
-
 __.prototype.visitExprList = function(ctx) {
 
     var _this = this;
@@ -253,61 +283,18 @@ __.prototype.visitExprList = function(ctx) {
     });
 };
 
-__.prototype.visitExternalId = function(ctx) {
-
-    return {
-        type: "id",
-        scope: ctx.ID(0).getText(),
-        name: ctx.ID(1).getText()
-    };
-};
-
 __.prototype.visitId = function(ctx) {
 
-    return {
-        type: "id",
-        name: ctx.ID().getText()
-    };
+    return new Identifier(ctx.ID().getText());
 };
 
-__.prototype.visitConstant = function(ctx) {
+__.prototype.visitExternalId = function(ctx) {
 
-    return {
-        type: 'constant',
-        name: ctx.ID().getText(),
-        value: ctx.literal().accept(this)
-    };
+    return new Identifier(
+        ctx.ID(1).getText(),
+        ctx.ID(0).getText()
+    );
 };
-
-
-__.prototype.visitDimension = function(ctx) {
-
-    return {type: 'range', variants: ctx.ID().map(function (token) {return token.getText()}) };
-};
-
-
-__.prototype.visitDynastring = function(ctx) {
-
-    return {type: 'interpolation', left: ctx.INTER_BEGIN().getText(), middle: ctx.interpolated().accept(this), right: ctx.INTER_END().getText()};
-};
-
-
-__.prototype.visitInterpolated = function(ctx) {
-
-    var mid = ctx.INTER_MID();
-
-    if (mid) {
-        return {
-            type: 'dynastring', // todo change to interpolated
-            left: ctx.expr().accept(this),
-            middle: mid.getText(),
-            right: ctx.interpolated().accept(this)
-        };
-    }
-
-    return ctx.expr().accept(this);
-};
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // request expressions
@@ -316,22 +303,22 @@ __.prototype.visitSyncCall = function(ctx) {
 
     var args = ctx.exprList();
 
-    return {
-        type: 'application',
-        address: ctx.expr().accept(this),
-        args: args ? args.accept(this) : []
-    };
+    return new RequestExpr(
+        ctx.expr().accept(this),
+        args ? args.accept(this) : [],
+        false
+    );
 };
 
 __.prototype.visitAsyncCall = function(ctx) {
 
     var args = ctx.exprList();
 
-    return {
-        type: 'future',
-        address: ctx.expr().accept(this),
-        args: args ? args.accept(this) : []
-    };
+    return new RequestExpr(
+        ctx.expr().accept(this),
+        args ? args.accept(this) : [],
+        true
+    );
 };
 
 // request statements
@@ -341,24 +328,13 @@ __.prototype.visitSyncRequest = function(ctx) {
     var args = ctx.exprList();
     var handlers = ctx.handlers().accept(this);
 
-    var res = {
-        type: 'application',
-        address: ctx.expr().accept(this),
-        args: args ? args.accept(this) : []
-    };
-
-    if (handlers.subsequent) {
-        res.subsequent = handlers.subsequent;
-    }
-
-    if (handlers.contingency) {
-        res.contingency = handlers.contingency;
-    }
-
-    return {
-        type: 'application_stmt',
-        application: res
-    };
+    return new RequestStmt(
+        ctx.expr().accept(this),
+        args ? args.accept(this) : [],
+        handlers.subsequent,
+        handlers.contingency,
+        false
+    );
 };
 
 __.prototype.visitAsyncRequest = function(ctx) {
@@ -366,21 +342,13 @@ __.prototype.visitAsyncRequest = function(ctx) {
     var args = ctx.exprList();
     var handlers = ctx.handlers().accept(this);
 
-    var res = {
-        type: 'message',
-        address: ctx.expr().accept(this),
-        args: args ? args.accept(this) : []
-    };
-
-    if (handlers.subsequent) {
-        res.subsequent = handlers.subsequent;
-    }
-
-    if (handlers.contingency) {
-        res.contingency = handlers.contingency;
-    }
-
-    return res;
+    return new RequestStmt(
+        ctx.expr().accept(this),
+        args ? args.accept(this) : [],
+        handlers.subsequent,
+        handlers.contingency,
+        false
+    );
 };
 
 __.prototype.visitSink = function (ctx) {
@@ -390,10 +358,7 @@ __.prototype.visitSink = function (ctx) {
 
 __.prototype.visitEvent = function (ctx) {
 
-    return {
-        type: 'event',
-        params: ctx.paramList() ? ctx.paramList().accept(this) : [],
-    };
+    return new EventDef(ctx.paramList() ? ctx.paramList().accept(this) : []);
 };
 
 __.prototype.visitHandler = function (ctx) {
@@ -418,29 +383,13 @@ __.prototype.visitHandlers = function (ctx) {
 
 __.prototype.visitReplyHandler = function(ctx) {
 
-    var procedure = ctx.sink().accept(this);
-
-    // save a little compiler hint here
-    procedure.channel = "reply";
-
-    return procedure;
+    return ctx.sink().accept(this);
 };
 
 
 __.prototype.visitFailHandler = function(ctx) {
 
-    if (ctx.sink()) {
-
-        var procedure = ctx.sink().accept(this);
-
-        // save a little compiler hint here
-        procedure.channel = "fail";
-
-        return procedure;
-    }
-
-    // ignore
-    return {type: 'ignore'};
+    return ctx.sink().accept(this);
 };
 
 
@@ -460,25 +409,42 @@ __.prototype.visitNil = function(ctx) {
 
 __.prototype.visitBool = function(ctx) {
 
-    // ??? might not want to return an actual bool here - number literals are kept as strings
-    return {
-        type: 'boolean',
-        val: ctx.BOOL().getText() == 'true'};
+    return new Literal('boolean', ctx.BOOL().getText() == 'true');
 };
 
 __.prototype.visitNumber = function(ctx) {
 
-    return {
-        type: 'number',
-        val: ctx.NUMBER().getText()};
+    return new Literal('number', ctx.NUMBER().getText());
 };
 
 __.prototype.visitString = function(ctx) {
 
-    return {
-        type: 'string',
-        val: ctx.STRING().getText()
-    };
+    return new Literal('string', ctx.STRING().getText());
+};
+
+__.prototype.visitDynastring = function(ctx) {
+
+    return new Interpolation(
+        ctx.INTER_BEGIN().getText(),
+        ctx.interpolated().accept(this),
+        ctx.INTER_END().getText()
+    );
+};
+
+__.prototype.visitInterpolated = function(ctx) {
+
+    var mid = ctx.INTER_MID();
+
+    if (mid) {
+
+        return new DynaString(
+            ctx.expr().accept(this),
+            mid.getText(),
+            ctx.interpolated().accept(this)
+        );
+    }
+
+    return ctx.expr().accept(this);
 };
 
 __.prototype.visitService = function(ctx) {
@@ -486,87 +452,49 @@ __.prototype.visitService = function(ctx) {
     return ctx.procedure().accept(this);
 };
 
-__.prototype.visitForm = function(ctx) {
-
-    return {
-        type: 'record',
-        labels: true,
-        fields: ctx.fieldList().accept(this)
-    };
-};
-
-
-__.prototype.visitField = function(ctx) {
-
-    return {
-        type: 'field',
-        name: ctx.ID().getText(),
-        value: ctx.expr().accept(this)
-    };
-};
-
-
 __.prototype.visitProcedure = function(ctx) {
 
-    // detect sugar
-
-    if (ctx.block() == null) {
-
-        return {
-            type: 'procedure',
-            params: ctx.ID().map(function (item) {
-                return item.getText();
-            }),
-            body: 'setter'
-        };
-    }
-
-    return {
-        type: 'procedure',
-        params: ctx.paramList() ? ctx.paramList().accept(this) : [],
-        body: ctx.block().accept(this)
-    };
+    return new Procedure(
+        ctx.paramList() ? ctx.paramList().accept(this) : [],
+        ctx.block().accept(this)
+    );
 };
 
-
+// collections
 
 __.prototype.visitArray = function(ctx) {
 
     if (ctx.exprList()) {
 
-        return {
-            type: 'array',
-            elements: ctx.exprList().accept(this)
-        };
+        return new Array(ctx.exprList().accept(this));
     }
 
-    return {type: 'array', elements: []};
+    return new Array([]);
 };
 
+__.prototype.visitRecord = function(ctx) {
+
+    return new Record(ctx.fieldList().accept(this));
+};
 
 __.prototype.visitSet = function (ctx) {
 
     if (ctx.exprList()) {
 
-        return {
-            type: 'set',
-            elements: ctx.exprList().accept(this)
-        };
+        return new Set(ctx.exprList().accept(this));
     }
 
     if (ctx.pairList()) {
 
-        return {
-            type: 'map',
-            elements: ctx.pairList().accept(this)
-        };
+        return new MapLiteral(ctx.pairList().accept(this));
     }
 
     if (ctx.colon) {
-        return {type: 'map', elements: []};
+
+        return new MapLiteral([]);
     }
 
-    return {type: 'set', elements: []};
+    return new Set([]);
 };
 
 
@@ -578,11 +506,10 @@ __.prototype.visitPairList = function(ctx) {
 
     while (ctx.expr(offset)) {
 
-        pairs.push({
-            type: 'pair',
-            key: ctx.expr(offset).accept(this),
-            value: ctx.expr(offset + 1).accept(this)
-        });
+        pairs.push(new Pair(
+            ctx.expr(offset).accept(this),
+            ctx.expr(offset + 1).accept(this)
+        ));
 
         offset += 2;
     }
@@ -598,11 +525,10 @@ __.prototype.visitFieldList = function(ctx) {
 
     while (ctx.ID(offset)) {
 
-        fields.push({
-            type: 'field',
-            label: ctx.ID(offset).getText(),
-            value: ctx.expr(offset).accept(this)
-        });
+        fields.push(new Field(
+            ctx.ID(offset).getText(),
+            ctx.expr(offset).accept(this)
+        ));
 
         offset++;
     }
@@ -610,14 +536,14 @@ __.prototype.visitFieldList = function(ctx) {
     return fields;
 };
 
-__.prototype.visitPair = function(ctx) {
-
-    return {
-        type: 'dyad',
-        key: ctx.expr(0).accept(this),
-        value: ctx.expr(1).accept(this)
-    };
-};
+// __.prototype.visitPair = function(ctx) {
+//
+//     return {
+//         type: 'dyad',
+//         key: ctx.expr(0).accept(this),
+//         value: ctx.expr(1).accept(this)
+//     };
+// };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -628,74 +554,51 @@ __.prototype.visitBlock = function(ctx) {
     if (stmtList) {
         return stmtList.accept(this);
     }
-    else {
-        return {type: 'stmt_list', head: {type: 'skip'}, tail: null};
-    }
-};
 
-__.prototype.visitCardinality = function(ctx) {
-
-    return {
-        type: 'cardinality',
-        operand: ctx.expr().accept(this)
-    };
-};
-
-__.prototype.visitScan = function(ctx) {
-
-    return {
-        type: 'scan',
-        over: ctx.expr(0).accept(this),
-        into: ctx.expr(1).accept(this)
-    };
-};
-
-__.prototype.visitMap = function(ctx) {
-
-    return {
-        type: 'op',
-        op: 'map',
-        over: ctx.expr(0).accept(this),
-        into: ctx.expr(1).accept(this)
-    };
+    return new StmtList(null, null);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+__.prototype.visitCardinality = function(ctx) {
+
+    return new UnaryOpExpr(
+        'cardinality',
+        ctx.expr().accept(this)
+    );
+};
 
 __.prototype.visitConcat = function(ctx) {
 
-    return {
-        type: 'op',
-        op: 'concat',
-        left: ctx.expr(0).accept(this),
-        right: ctx.expr(1).accept(this)
-    };
+    return new BinaryOpExpr(
+        'concat',
+        ctx.expr(0).accept(this),
+        ctx.expr(1).accept(this)
+    );
 };
-
-
-__.prototype.visitField = function(ctx) {
-
-    return { type: 'select', set: ctx.expr().accept(this), member: ctx.ID().getText()};
-};
-
 
 __.prototype.visitMembership = function(ctx) {
 
-    return {
-        type: 'in',
-        left: ctx.expr(0).accept(this),
-        right: ctx.expr(1).accept(this)
-    };
+    return new Membership(
+        ctx.expr(0).accept(this),
+        ctx.expr(1).accept(this)
+    );
 };
 
 __.prototype.visitSubscript = function(ctx) {
 
-    return {
-        type: 'subscript',
-        list: ctx.expr(0).accept(this),
-        index: ctx.expr(1).accept(this)
-    };
+    return new Subscript(
+        ctx.expr(0).accept(this),
+        ctx.expr(1).accept(this)
+    );
+};
+
+__.prototype.visitSelect = function(ctx) {
+
+    return new Select(
+        ctx.expr().accept(this),
+        ctx.ID().getText()
+    );
 };
 
 __.prototype.visitSlice = function(ctx) {
@@ -703,20 +606,11 @@ __.prototype.visitSlice = function(ctx) {
     var start = ctx.expr(1);
     var end = ctx.expr(2);
 
-    var res = {
-        type: 'slice',
-        list: ctx.expr(0).accept(this)
-    };
-
-    if (start) {
-        res.start = start.accept(this);
-    }
-
-    if (end) {
-        res.end = end.accept(this);
-    }
-
-    return res;
+    return new Slice(
+        ctx.expr(0).accept(this),
+        start ? start.accept(this) : null,
+        end ? end.accept(this) : null
+    );
 };
 
 

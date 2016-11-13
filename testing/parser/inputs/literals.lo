@@ -26,8 +26,6 @@ HardyRamanujan is <-> {
     reply 1729;
 };
 
-setX is <-> x;
-
 // a little sugar -- these are like macros
 // setX is set x; // sugar for <-> (newX) { x = newX; }
 // getX is get x; // sugar for <-> { reply x; }

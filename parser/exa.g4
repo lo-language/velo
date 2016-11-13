@@ -133,7 +133,7 @@ expr
     | expr '[' expr ']'                                         # subscript
     | expr '[' expr '..' expr? ']'                              # slice
     | 'map' expr expr                                           # map
-    | expr '.' ID                                               # field
+    | expr '.' ID                                               # select
     | '(' ID (',' ID)+ ')'                                      # destructure
     | INTER_BEGIN interpolated INTER_END                        # dynastring
     | literal                                                   # litExpr
@@ -159,7 +159,7 @@ literal
     | NUMBER                                    # number
     | STRING                                    # string
     | '[' exprList? ']'                         # array
-    | '[' fieldList ']'                         # form // record? compound? composite? frame?
+    | '[' fieldList ']'                         # record // form? compound? composite? frame?
     | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
     | sink                                      # handler
     | '<->' procedure                           # service
@@ -173,7 +173,6 @@ sink
 
 procedure
     : paramList? block
-    | ID (',' ID)*  // I'm not really sure what I was going for here -- maybe direct assignment sugar for setters?
     ;
 
 paramList
@@ -188,8 +187,3 @@ fieldList
 pairList
     : (expr PAIR_SEP expr ','?)+
     ;
-
-//sink
-//    : procedure
-//    | 'into' expr
-//    ;

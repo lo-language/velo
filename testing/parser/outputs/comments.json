@@ -9,9 +9,7 @@
         "params": [],
         "body": {
           "type": "stmt_list",
-          "head": {
-            "type": "skip"
-          },
+          "head": null,
           "tail": null
         }
       }

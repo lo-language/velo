@@ -4,6 +4,7 @@
 
 const JS = require('./JsPrimitives');
 const JsFunction = require('./JsFunction');
+const JsStmt = require('./JsStmt');
 const Response = require('./Response');
 
 /**

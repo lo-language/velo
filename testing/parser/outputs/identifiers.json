@@ -67,11 +67,11 @@
                 },
                 "right": {
                   "type": "select",
-                  "set": {
+                  "record": {
                     "type": "id",
                     "name": "foo"
                   },
-                  "member": "bar"
+                  "field": "bar"
                 }
               },
               "tail": {
@@ -85,15 +85,15 @@
                   },
                   "right": {
                     "type": "select",
-                    "set": {
+                    "record": {
                       "type": "select",
-                      "set": {
+                      "record": {
                         "type": "id",
                         "name": "boo"
                       },
-                      "member": "bar"
+                      "field": "bar"
                     },
-                    "member": "baz"
+                    "field": "baz"
                   }
                 },
                 "tail": {
@@ -107,7 +107,7 @@
                     },
                     "right": {
                       "type": "select",
-                      "set": {
+                      "record": {
                         "type": "subscript",
                         "list": {
                           "type": "id",
@@ -118,7 +118,7 @@
                           "name": "i"
                         }
                       },
-                      "member": "bar"
+                      "field": "bar"
                     }
                   },
                   "tail": {
@@ -134,11 +134,11 @@
                         "type": "subscript",
                         "list": {
                           "type": "select",
-                          "set": {
+                          "record": {
                             "type": "id",
                             "name": "foo"
                           },
-                          "member": "bar"
+                          "field": "bar"
                         },
                         "index": {
                           "type": "id",
@@ -171,8 +171,8 @@
                           },
                           "right": {
                             "type": "id",
-                            "scope": "HTTP",
-                            "name": "GET"
+                            "name": "GET",
+                            "scope": "HTTP"
                           }
                         },
                         "tail": {
@@ -188,8 +188,8 @@
                               "type": "application",
                               "address": {
                                 "type": "id",
-                                "scope": "HTTP",
-                                "name": "createServer"
+                                "name": "createServer",
+                                "scope": "HTTP"
                               },
                               "args": []
                             }

@@ -1,4 +1,4 @@
-// Generated from /Users/spurcell/dev/exa/parser/exa.g4 by ANTLR 4.5.3
+// Generated from /Users/seth/devel/exa/parser/exa.g4 by ANTLR 4.5.3
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 
@@ -137,6 +137,11 @@ exaVisitor.prototype.visitCompare = function(ctx) {
 };
 
 
+// Visit a parse tree produced by exaParser#select.
+exaVisitor.prototype.visitSelect = function(ctx) {
+};
+
+
 // Visit a parse tree produced by exaParser#subscript.
 exaVisitor.prototype.visitSubscript = function(ctx) {
 };
@@ -174,11 +179,6 @@ exaVisitor.prototype.visitMulDiv = function(ctx) {
 
 // Visit a parse tree produced by exaParser#logical.
 exaVisitor.prototype.visitLogical = function(ctx) {
-};
-
-
-// Visit a parse tree produced by exaParser#field.
-exaVisitor.prototype.visitField = function(ctx) {
 };
 
 
@@ -262,8 +262,8 @@ exaVisitor.prototype.visitArray = function(ctx) {
 };
 
 
-// Visit a parse tree produced by exaParser#form.
-exaVisitor.prototype.visitForm = function(ctx) {
+// Visit a parse tree produced by exaParser#record.
+exaVisitor.prototype.visitRecord = function(ctx) {
 };
 
 
