@@ -5,10 +5,10 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
-var Context = require('../../../codegen/Context');
-const JS = require('../../../codegen/JsPrimitives');
-const Lo = require('../../../constructs');
+var Compiler = require('../../codegen/Compiler');
+var Context = require('../../codegen/Context');
+const JS = require('../../codegen/JsPrimitives');
+const Lo = require('../../constructs');
 
 module.exports["complement"] = {
 

@@ -5,10 +5,10 @@
 
 "use strict";
 
-const Context = require('../../../codegen/Context');
-const JS = require('../../../codegen/JsPrimitives');
-const JsStmt = require('../../../codegen/JsStmt');
-const Lo = require('../../../constructs');
+const Context = require('../../codegen/Context');
+const JS = require('../../codegen/JsPrimitives');
+const JsStmt = require('../../codegen/JsStmt');
+const Lo = require('../../constructs');
 
 
 module.exports["subscript"] = {

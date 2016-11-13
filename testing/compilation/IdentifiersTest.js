@@ -5,8 +5,8 @@
 
 "use strict";
 
-const Lo = require('../../../constructs');
-var Context = require('../../../codegen/Context');
+const Lo = require('../../constructs');
+var Context = require('../../codegen/Context');
 
 module.exports["identifiers"] = {
 

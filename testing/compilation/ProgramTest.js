@@ -5,7 +5,7 @@
 
 "use strict";
 
-var Context = require('../../../codegen/Context');
+var Context = require('../../codegen/Context');
 var util = require('util');
 
 var ast = {

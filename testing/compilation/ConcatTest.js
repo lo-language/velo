@@ -5,11 +5,11 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
-var Context = require('../../../codegen/Context');
-const JS = require('../../../codegen/JsPrimitives');
+var Compiler = require('../../codegen/Compiler');
+var Context = require('../../codegen/Context');
+const JS = require('../../codegen/JsPrimitives');
 var util = require('util');
-const Lo = require('../../../constructs');
+const Lo = require('../../constructs');
 
 
 module.exports["basics"] = {

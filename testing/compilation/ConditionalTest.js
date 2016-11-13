@@ -5,12 +5,12 @@
 
 "use strict";
 
-var Compiler = require('../../../codegen/Compiler');
-var Context = require('../../../codegen/Context');
-var JS = require('../../../codegen/JsPrimitives');
-var JsStmt = require('../../../codegen/JsStmt');
+var Compiler = require('../../codegen/Compiler');
+var Context = require('../../codegen/Context');
+var JS = require('../../codegen/JsPrimitives');
+var JsStmt = require('../../codegen/JsStmt');
 var util = require('util');
-const Lo = require('../../../constructs');
+const Lo = require('../../constructs');
 
 
 module.exports["sync"] = {
