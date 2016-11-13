@@ -11,42 +11,7 @@ const antlr4 = require('antlr4');
 const Lexer = require('./exaLexer');
 const Parser = require('./exaParser');
 const BaseVisitor = require('./exaVisitor').exaVisitor;
-
-const Literal = require('../constructs/Literal');
-const Identifier = require('../constructs/Identifier');
-const Constant = require('../constructs/Constant');
-
-const Array = require('../constructs/Array');
-const Record = require('../constructs/Record');
-const Set = require('../constructs/Set');
-const MapLiteral = require('../constructs/MapLiteral');
-const Pair = require('../constructs/Pair');
-const Field = require('../constructs/Field');
-
-const Assignment = require('../constructs/Assignment');
-const Destructure = require('../constructs/Destructure');
-
-const IncrDecr = require('../constructs/IncrDecr');
-const Conditional = require('../constructs/Conditional');
-const BinaryOpExpr = require('../constructs/BinaryOpExpr');
-const UnaryOpExpr = require('../constructs/UnaryOpExpr');
-const While = require('../constructs/While');
-const Scan = require('../constructs/Scan');
-const MapExpr = require('../constructs/MapExpr');
-
-const Response = require('../constructs/Response');
-const Procedure = require('../constructs/Procedure');
-const Module = require('../constructs/Module');
-const StmtList = require('../constructs/StmtList');
-const Subscript = require('../constructs/Subscript');
-const Membership = require('../constructs/Membership');
-const Slice = require('../constructs/Slice');
-const Select = require('../constructs/Select');
-const DynaString = require('../constructs/DynaString');
-const Interpolation = require('../constructs/Interpolation');
-const RequestExpr = require('../constructs/RequestExpr');
-const RequestStmt = require('../constructs/RequestStmt');
-const EventDef = require('../constructs/EventDef');
+const Lo = require('../constructs');
 
 
 var __ = function () {
@@ -77,7 +42,7 @@ __.prototype.parse = function (input) {
 // Visit a parse tree produced by exaParser#module.
 __.prototype.visitModule = function(ctx) {
 
-    return new Module(
+    return new Lo.module(
         ctx.references() ? ctx.references().accept(this) : null, // todo make this [] not null
         ctx.definition().map(def => def.accept(this))
     );
@@ -106,7 +71,7 @@ __.prototype.visitStatementList = function(ctx) {
 
     var subList = ctx.statementList();
 
-    return new StmtList(
+    return new Lo.stmtList(
         ctx.statement().accept(this),
         subList ? subList.accept(this) : null
     );
@@ -124,7 +89,7 @@ __.prototype.visitDefStmt = function(ctx) {
 
 __.prototype.visitConstant = function(ctx) {
 
-    return new Constant(
+    return new Lo.constant(
         ctx.ID().getText(),
         ctx.literal().accept(this)
     );
@@ -132,7 +97,7 @@ __.prototype.visitConstant = function(ctx) {
 
 __.prototype.visitAssignment = function(ctx) {
 
-    return new Assignment(
+    return new Lo.assignment(
         ctx.assignment_op().getText(),
         ctx.expr(0).accept(this),
         ctx.expr(1).accept(this)
@@ -141,7 +106,7 @@ __.prototype.visitAssignment = function(ctx) {
 
 __.prototype.visitIncDec = function(ctx) {
 
-    return new IncrDecr(
+    return new Lo.incrDecr(
         ctx.op.text == '++' ? 'increment' : 'decrement',
         ctx.expr().accept(this)
     );
@@ -156,7 +121,7 @@ __.prototype.visitCondStmt = function(ctx) {
 
 __.prototype.visitIfOnly = function(ctx) {
 
-    return new Conditional(
+    return new Lo.conditional(
         ctx.expr().accept(this),
         ctx.block().accept(this)
     );
@@ -164,7 +129,7 @@ __.prototype.visitIfOnly = function(ctx) {
 
 __.prototype.visitIfElse = function(ctx) {
 
-    return new Conditional(
+    return new Lo.conditional(
         ctx.expr().accept(this),
         ctx.block(0).accept(this),
         ctx.block(1).accept(this)
@@ -173,7 +138,7 @@ __.prototype.visitIfElse = function(ctx) {
 
 __.prototype.visitNestedIf = function(ctx) {
 
-    return new Conditional(
+    return new Lo.conditional(
         ctx.expr().accept(this),
         ctx.block().accept(this),
         ctx.conditional().accept(this)
@@ -182,14 +147,14 @@ __.prototype.visitNestedIf = function(ctx) {
 
 __.prototype.visitIteration = function(ctx) {
 
-    return new While(
+    return new Lo.while(
         ctx.expr().accept(this),
         ctx.block().accept(this));
 };
 
 __.prototype.visitScan = function(ctx) {
 
-    return new Scan(
+    return new Lo.scan(
         ctx.expr(0).accept(this),
         ctx.expr(1).accept(this)
     );
@@ -197,7 +162,7 @@ __.prototype.visitScan = function(ctx) {
 
 __.prototype.visitMap = function(ctx) {
 
-    return new MapExpr(
+    return new Lo.mapExpr(
         ctx.expr(0).accept(this),
         ctx.expr(1).accept(this)
     );
@@ -207,7 +172,7 @@ __.prototype.visitMap = function(ctx) {
 
 __.prototype.visitResponse = function(ctx) {
 
-    return new Response(
+    return new Lo.response(
         ctx.channel.text,
         ctx.exprList() ? ctx.exprList().accept(this) : []
     );
@@ -215,7 +180,7 @@ __.prototype.visitResponse = function(ctx) {
 
 __.prototype.visitDestructure = function(ctx) {
 
-    return new Destructure(
+    return new Lo.destructure(
         ctx.ID().map(token => token.getText())
     );
 };
@@ -227,7 +192,7 @@ __.prototype.visitDestructure = function(ctx) {
 
 __.prototype.visitMulDiv = function(ctx) {
 
-    return new BinaryOpExpr(
+    return new Lo.binaryOpExpr(
         ctx.op.text,
         ctx.expr(0).accept(this),
         ctx.expr(1).accept(this));
@@ -235,7 +200,7 @@ __.prototype.visitMulDiv = function(ctx) {
 
 __.prototype.visitAddSub = function(ctx) {
 
-    return new BinaryOpExpr(
+    return new Lo.binaryOpExpr(
         ctx.op.text,
         ctx.expr(0).accept(this),
         ctx.expr(1).accept(this));
@@ -243,7 +208,7 @@ __.prototype.visitAddSub = function(ctx) {
 
 __.prototype.visitCompare = function(ctx) {
 
-    return new BinaryOpExpr(
+    return new Lo.binaryOpExpr(
         ctx.op.text,
         ctx.expr(0).accept(this),
         ctx.expr(1).accept(this));
@@ -251,7 +216,7 @@ __.prototype.visitCompare = function(ctx) {
 
 __.prototype.visitLogical = function(ctx) {
 
-    return new BinaryOpExpr(
+    return new Lo.binaryOpExpr(
         ctx.op.text,
         ctx.expr(0).accept(this),
         ctx.expr(1).accept(this));
@@ -285,12 +250,12 @@ __.prototype.visitExprList = function(ctx) {
 
 __.prototype.visitId = function(ctx) {
 
-    return new Identifier(ctx.ID().getText());
+    return new Lo.identifier(ctx.ID().getText());
 };
 
 __.prototype.visitExternalId = function(ctx) {
 
-    return new Identifier(
+    return new Lo.identifier(
         ctx.ID(1).getText(),
         ctx.ID(0).getText()
     );
@@ -303,7 +268,7 @@ __.prototype.visitSyncCall = function(ctx) {
 
     var args = ctx.exprList();
 
-    return new RequestExpr(
+    return new Lo.requestExpr(
         ctx.expr().accept(this),
         args ? args.accept(this) : [],
         false
@@ -314,7 +279,7 @@ __.prototype.visitAsyncCall = function(ctx) {
 
     var args = ctx.exprList();
 
-    return new RequestExpr(
+    return new Lo.requestExpr(
         ctx.expr().accept(this),
         args ? args.accept(this) : [],
         true
@@ -328,7 +293,7 @@ __.prototype.visitSyncRequest = function(ctx) {
     var args = ctx.exprList();
     var handlers = ctx.handlers().accept(this);
 
-    return new RequestStmt(
+    return new Lo.requestStmt(
         ctx.expr().accept(this),
         args ? args.accept(this) : [],
         handlers.subsequent,
@@ -342,7 +307,7 @@ __.prototype.visitAsyncRequest = function(ctx) {
     var args = ctx.exprList();
     var handlers = ctx.handlers().accept(this);
 
-    return new RequestStmt(
+    return new Lo.requestStmt(
         ctx.expr().accept(this),
         args ? args.accept(this) : [],
         handlers.subsequent,
@@ -358,7 +323,7 @@ __.prototype.visitSink = function (ctx) {
 
 __.prototype.visitEvent = function (ctx) {
 
-    return new EventDef(ctx.paramList() ? ctx.paramList().accept(this) : []);
+    return new Lo.eventDef(ctx.paramList() ? ctx.paramList().accept(this) : []);
 };
 
 __.prototype.visitHandler = function (ctx) {
@@ -409,22 +374,22 @@ __.prototype.visitNil = function(ctx) {
 
 __.prototype.visitBool = function(ctx) {
 
-    return new Literal('boolean', ctx.BOOL().getText() == 'true');
+    return new Lo.literal('boolean', ctx.BOOL().getText() == 'true');
 };
 
 __.prototype.visitNumber = function(ctx) {
 
-    return new Literal('number', ctx.NUMBER().getText());
+    return new Lo.literal('number', ctx.NUMBER().getText());
 };
 
 __.prototype.visitString = function(ctx) {
 
-    return new Literal('string', ctx.STRING().getText());
+    return new Lo.literal('string', ctx.STRING().getText());
 };
 
 __.prototype.visitDynastring = function(ctx) {
 
-    return new Interpolation(
+    return new Lo.interpolation(
         ctx.INTER_BEGIN().getText(),
         ctx.interpolated().accept(this),
         ctx.INTER_END().getText()
@@ -437,7 +402,7 @@ __.prototype.visitInterpolated = function(ctx) {
 
     if (mid) {
 
-        return new DynaString(
+        return new Lo.dynaString(
             ctx.expr().accept(this),
             mid.getText(),
             ctx.interpolated().accept(this)
@@ -454,7 +419,7 @@ __.prototype.visitService = function(ctx) {
 
 __.prototype.visitProcedure = function(ctx) {
 
-    return new Procedure(
+    return new Lo.procedure(
         ctx.paramList() ? ctx.paramList().accept(this) : [],
         ctx.block().accept(this)
     );
@@ -466,35 +431,35 @@ __.prototype.visitArray = function(ctx) {
 
     if (ctx.exprList()) {
 
-        return new Array(ctx.exprList().accept(this));
+        return new Lo.array(ctx.exprList().accept(this));
     }
 
-    return new Array([]);
+    return new Lo.array([]);
 };
 
 __.prototype.visitRecord = function(ctx) {
 
-    return new Record(ctx.fieldList().accept(this));
+    return new Lo.record(ctx.fieldList().accept(this));
 };
 
 __.prototype.visitSet = function (ctx) {
 
     if (ctx.exprList()) {
 
-        return new Set(ctx.exprList().accept(this));
+        return new Lo.setLiteral(ctx.exprList().accept(this));
     }
 
     if (ctx.pairList()) {
 
-        return new MapLiteral(ctx.pairList().accept(this));
+        return new Lo.mapLiteral(ctx.pairList().accept(this));
     }
 
     if (ctx.colon) {
 
-        return new MapLiteral([]);
+        return new Lo.mapLiteral([]);
     }
 
-    return new Set([]);
+    return new Lo.setLiteral([]);
 };
 
 
@@ -506,7 +471,7 @@ __.prototype.visitPairList = function(ctx) {
 
     while (ctx.expr(offset)) {
 
-        pairs.push(new Pair(
+        pairs.push(new Lo.pair(
             ctx.expr(offset).accept(this),
             ctx.expr(offset + 1).accept(this)
         ));
@@ -525,7 +490,7 @@ __.prototype.visitFieldList = function(ctx) {
 
     while (ctx.ID(offset)) {
 
-        fields.push(new Field(
+        fields.push(new Lo.field(
             ctx.ID(offset).getText(),
             ctx.expr(offset).accept(this)
         ));
@@ -535,15 +500,6 @@ __.prototype.visitFieldList = function(ctx) {
 
     return fields;
 };
-
-// __.prototype.visitPair = function(ctx) {
-//
-//     return {
-//         type: 'dyad',
-//         key: ctx.expr(0).accept(this),
-//         value: ctx.expr(1).accept(this)
-//     };
-// };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -555,14 +511,14 @@ __.prototype.visitBlock = function(ctx) {
         return stmtList.accept(this);
     }
 
-    return new StmtList(null, null);
+    return new Lo.stmtList(null, null);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 __.prototype.visitCardinality = function(ctx) {
 
-    return new UnaryOpExpr(
+    return new Lo.unaryOpExpr(
         'cardinality',
         ctx.expr().accept(this)
     );
@@ -570,7 +526,7 @@ __.prototype.visitCardinality = function(ctx) {
 
 __.prototype.visitConcat = function(ctx) {
 
-    return new BinaryOpExpr(
+    return new Lo.binaryOpExpr(
         'concat',
         ctx.expr(0).accept(this),
         ctx.expr(1).accept(this)
@@ -579,7 +535,7 @@ __.prototype.visitConcat = function(ctx) {
 
 __.prototype.visitMembership = function(ctx) {
 
-    return new Membership(
+    return new Lo.membership(
         ctx.expr(0).accept(this),
         ctx.expr(1).accept(this)
     );
@@ -587,7 +543,7 @@ __.prototype.visitMembership = function(ctx) {
 
 __.prototype.visitSubscript = function(ctx) {
 
-    return new Subscript(
+    return new Lo.subscript(
         ctx.expr(0).accept(this),
         ctx.expr(1).accept(this)
     );
@@ -595,7 +551,7 @@ __.prototype.visitSubscript = function(ctx) {
 
 __.prototype.visitSelect = function(ctx) {
 
-    return new Select(
+    return new Lo.select(
         ctx.expr().accept(this),
         ctx.ID().getText()
     );
@@ -606,7 +562,7 @@ __.prototype.visitSlice = function(ctx) {
     var start = ctx.expr(1);
     var end = ctx.expr(2);
 
-    return new Slice(
+    return new Lo.slice(
         ctx.expr(0).accept(this),
         start ? start.accept(this) : null,
         end ? end.accept(this) : null

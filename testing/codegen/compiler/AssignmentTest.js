@@ -9,24 +9,24 @@ const Compiler = require('../../../codegen/Compiler');
 const Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
 const JsStmt = require('../../../codegen/JsStmt');
+const Assignment = require('../../../constructs/Assignment');
+const Identifier = require('../../../constructs/Identifier');
+const Literal = require('../../../constructs/Literal');
 const util = require('util');
+const lo = require('../../../constructs');
 
 module.exports["assignment"] = {
 
     "assign literal to id": function (test) {
 
-        var node = {
-            type: 'assign',
-            op: '=',
-            left: {type: 'id', name: 'foo'},
-            right: {type: 'number', val: '57'}
-        };
+        var node = new lo.assignment('=',
+            new lo.identifier('foo'), new lo.literal('number', '57'));
 
         var context = new Context().createInner();
 
         test.equal(context.has('foo'), false);
 
-        test.deepEqual(context.compile(node).renderTree(),
+        test.deepEqual(node.compile(context).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
         test.equal(context.has('foo'), true);

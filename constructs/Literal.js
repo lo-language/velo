@@ -4,6 +4,9 @@
 
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+
+
 /**
  * A literal value
  */
@@ -29,10 +32,26 @@ __.prototype.getAst = function () {
 /**
  * Compiles this node to JS in the given context.
  *
+ * todo break these out into their own classes?
+ *
  * @param context
  */
 __.prototype.compile = function (context) {
 
+    switch (this.type) {
+
+        case 'boolean':
+            return JS.bool(this.value ? 'true' : 'false');
+            break;
+
+        case 'number':
+            return JS.num(this.value);
+            break;
+
+        case 'string':
+            return JS.string(this.value);
+            break;
+    }
 };
 
 module.exports = __;
