@@ -4,6 +4,9 @@
 
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+const JsStmt = require('../codegen/JsStmt');
+
 /**
  * An increment/decrement statement.
  *
@@ -34,6 +37,11 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
+    if (this.op == 'increment') {
+        return new JsStmt(JS.exprStmt(JS.inc(this.operand.compile(context))));
+    }
+
+    return new JsStmt(JS.exprStmt(JS.dec(this.operand.compile(context))));
 };
 
 module.exports = __;

@@ -10,6 +10,8 @@ var Context = require('../../../codegen/Context');
 var JS = require('../../../codegen/JsPrimitives');
 var JsStmt = require('../../../codegen/JsStmt');
 var util = require('util');
+const Lo = require('../../../constructs');
+
 
 module.exports["sync"] = {
 
@@ -18,13 +20,17 @@ module.exports["sync"] = {
         // should create a context
         // should call compile on each statement
 
-        var node = {
-            type: 'conditional',
-            predicate: {type: 'id', name: 'foo'},
-            consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null}
-        };
+        var node = new Lo.conditional(
+            new Lo.identifier('foo'),
+            new Lo.stmtList(
+                new Lo.assignment('=',
+                    new Lo.identifier('bar'),
+                    new Lo.literal('number', '42')
+                )
+            )
+        );
 
-        test.deepEqual(new Context().createInner().compile(node).renderTree(),
+        test.deepEqual(node.compile(new Context().createInner()).renderTree(),
             [ 'stmtList',
                 [ 'if',
                     [ 'id', '$foo' ],
@@ -38,14 +44,23 @@ module.exports["sync"] = {
         // should create a context
         // should call compile on each statement
 
-        var node = {
-            type: 'conditional',
-            predicate: {type: 'id', name: 'foo'},
-            consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null},
-            alternate: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '32'}}, tail: null}
-        };
+        var node = new Lo.conditional(
+            new Lo.identifier('foo'),
+            new Lo.stmtList(
+                new Lo.assignment('=',
+                    new Lo.identifier('bar'),
+                    new Lo.literal('number', '42')
+                )
+            ),
+            new Lo.stmtList(
+                new Lo.assignment('=',
+                    new Lo.identifier('bar'),
+                    new Lo.literal('number', '32')
+                )
+            )
+        );
 
-        test.deepEqual(new Context().createInner().compile(node).renderTree(),
+        test.deepEqual(node.compile(new Context().createInner()).renderTree(),
             [ 'stmtList',
                 [ 'if',
                     [ 'id', '$foo' ],
@@ -61,19 +76,32 @@ module.exports["sync"] = {
         // should create a context
         // should call compile on each statement
 
-        var node = {
-            type: 'conditional',
-            predicate: {type: 'id', name: 'foo'},
-            consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '42'}}, tail: null},
-            alternate: {type: 'stmt_list', head: {
-                type: 'conditional',
-                predicate: {type: 'id', name: 'bar'},
-                consequent: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'bar'}, right: {type: 'number', val: '32'}}, tail: null},
-                alternate: {type: 'stmt_list', head: {type: 'assign', op: '=', left: {type: 'id', name: 'baz'}, right: {type: 'number', val: '82'}}, tail: null},
-            }, tail: null}
-        };
+        var node = new Lo.conditional(
+            new Lo.identifier('foo'),
+            new Lo.stmtList(
+                new Lo.assignment('=',
+                    new Lo.identifier('bar'),
+                    new Lo.literal('number', '42')
+                )
+            ),
+            new Lo.conditional(
+                new Lo.identifier('bar'),
+                new Lo.stmtList(
+                    new Lo.assignment('=',
+                        new Lo.identifier('bar'),
+                        new Lo.literal('number', '32')
+                    )
+                ),
+                new Lo.stmtList(
+                    new Lo.assignment('=',
+                        new Lo.identifier('baz'),
+                        new Lo.literal('number', '82')
+                    )
+                )
+            )
+        );
 
-        test.deepEqual(new Context().createInner().compile(node).renderTree(),
+        test.deepEqual(node.compile(new Context().createInner()).renderTree(),
             [ 'stmtList',
                 [ 'if',
                     [ 'id', '$foo' ],

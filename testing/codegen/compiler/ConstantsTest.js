@@ -5,7 +5,7 @@
 
 "use strict";
 
-const Compiler = require('../../../codegen/Compiler');
+const Lo = require('../../../constructs');
 const Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
 const JsStmt = require('../../../codegen/JsStmt');
@@ -15,40 +15,32 @@ module.exports["constants"] = {
 
     "numeric": function (test) {
 
-        var node = {
-            "type":"constant",
-            "name":"port",
-            "value": {type: "number", val: "443"}
-        };
+        var node = new Lo.constant('port', new Lo.literal('number', '443'));
 
         var context = new Context();
 
         test.equal(context.has('port'), false);
         test.equal(context.isConstant('port'), false);
 
-        test.equal(context.compile(node).renderJs(), '');
+        test.equal(node.compile(context).renderJs(), '');
 
         test.equal(context.has('port'), true);
         test.ok(context.isConstant('port'));
-        test.deepEqual(context.resolve('port').renderTree(), JS.num('443').renderTree());
+        test.deepEqual(context.resolve('port').renderTree(), [ 'num', '443' ]);
 
         test.done();
     },
 
     "string": function (test) {
 
-        var node = {
-            "type":"constant",
-            "name":"album",
-            "value": {type: "string", val: "Melon Collie"}
-        };
+        var node = new Lo.constant('album', new Lo.literal('string', "Melon Collie"));
 
         var context = new Context();
 
         test.equal(context.has('album'), false);
         test.equal(context.isConstant('album'), false);
 
-        test.equal(context.compile(node).renderJs(), '');
+        test.equal(node.compile(context).renderJs(), '');
 
         test.equal(context.has('album'), true);
         test.ok(context.isConstant('album'));
@@ -59,27 +51,20 @@ module.exports["constants"] = {
 
     "service": function (test) {
 
-        var node = {
-            type: "constant",
-            name: "main",
-            value: {
-                type: 'procedure',
-                params: ['next'],
-                body: {
-                    type: 'stmt_list',
-                    head:
-                    { type: 'assign',
-                        op: '*=',
-                        left: { type: 'id', name: 'result' },
-                        right: {
-                            type: 'application',
-                            address: {type: 'id', name: 'bar'},
-                            args: [
-                                {type: 'number', val: '42'}
-                            ]} },
-                    tail: null
-                }}
-        };
+        var node = new Lo.constant('main',
+            new Lo.procedure(
+                ['next'],
+                new Lo.stmtList(
+                    new Lo.assignment(
+                        '*=',
+                        new Lo.identifier('result'),
+                        new Lo.requestExpr(
+                            new Lo.identifier('bar'),
+                            [new Lo.literal('number', '42')]
+                        )
+                    )
+                )
+            ));
 
         var context = new Context();
         context.id = 47;
@@ -87,7 +72,7 @@ module.exports["constants"] = {
         test.equal(context.has('main'), false);
         test.equal(context.isConstant('main'), false);
 
-        test.deepEqual(context.compile(node).renderTree(), [ 'stmtList',
+        test.deepEqual(node.compile(context).renderTree(), [ 'stmtList',
             [ 'const',
                 '$main',
                 [ 'function',
@@ -118,20 +103,16 @@ module.exports["constants"] = {
         test.done();
     },
 
-    "prevents JS collisions": function (test) {
+    "avoids JS collisions": function (test) {
 
-        var node = {
-            "type":"constant",
-            "name":"constructor",
-            "value": {type: "string", val: "Melon Collie"}
-        };
+        var node = new Lo.constant('constructor', new Lo.literal('string', "Melon Collie"));
 
         var context = new Context();
 
         test.equal(context.has('constructor'), false);
         test.equal(context.isConstant('constructor'), false);
 
-        test.equal(context.compile(node).renderJs(), '');
+        test.equal(node.compile(context).renderJs(), '');
 
         test.equal(context.has('constructor'), true);
         test.ok(context.isConstant('constructor'));

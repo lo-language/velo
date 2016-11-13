@@ -5,7 +5,7 @@
 
 "use strict";
 
-const Compiler = require('../../../codegen/Compiler');
+const Lo = require('../../../constructs');
 const Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
 const JsStmt = require('../../../codegen/JsStmt');
@@ -15,12 +15,10 @@ module.exports["basics"] = {
 
     "increment ID": function (test) {
 
-        var node = {
-            "type":"increment",
-            "operand":{type: "id", name: "bar"}
-        };
+        var node = new Lo.incrDecr('increment', new Lo.identifier('bar'));
 
-        test.deepEqual(new Context().compile(node).renderTree(), [ 'stmtList', [ 'expr-stmt', [ 'inc', [ 'id', '$bar' ] ] ] ]);
+        test.deepEqual(node.compile(new Context()).renderTree(),
+            [ 'stmtList', [ 'expr-stmt', [ 'inc', [ 'id', '$bar' ] ] ] ]);
         test.done();
     },
 
