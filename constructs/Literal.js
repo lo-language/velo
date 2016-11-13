@@ -17,6 +17,16 @@ var __ = function (type, value) {
 };
 
 /**
+ * Accessor
+ *
+ * @returns {*}
+ */
+__.prototype.getValue = function () {
+
+    return this.value;
+};
+
+/**
  * Returns the Lo AST for this node.
  */
 __.prototype.getAst = function () {

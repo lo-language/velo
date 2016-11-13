@@ -8,21 +8,18 @@
 var Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
 const JsStmt = require('../../../codegen/JsStmt');
-var util = require('util');
+const Lo = require('../../../constructs');
 
 module.exports["cardinality"] = {
 
     "generates js expression": function (test) {
 
-        var node = {
-            type: 'cardinality',
-            operand: {type: 'id', name: 'foo'}
-        };
+        var node = new Lo.unaryOpExpr('cardinality', new Lo.identifier('foo'));
 
         // todo throw runtime error if none match?
         // todo can get rid of function call here with conditional operator
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.fnCall(
+        test.deepEqual(node.compile(new Context()).renderTree(), JS.fnCall(
             JS.select(JS.ID('task'), 'cardinality'),
             [JS.ID('$foo')]).renderTree());
 

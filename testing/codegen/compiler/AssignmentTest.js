@@ -5,22 +5,17 @@
 
 "use strict";
 
-const Compiler = require('../../../codegen/Compiler');
 const Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
 const JsStmt = require('../../../codegen/JsStmt');
-const Assignment = require('../../../constructs/Assignment');
-const Identifier = require('../../../constructs/Identifier');
-const Literal = require('../../../constructs/Literal');
-const util = require('util');
-const lo = require('../../../constructs');
+const Lo = require('../../../constructs');
 
 module.exports["assignment"] = {
 
     "assign literal to id": function (test) {
 
-        var node = new lo.assignment('=',
-            new lo.identifier('foo'), new lo.literal('number', '57'));
+        var node = new Lo.assignment('=',
+            new Lo.identifier('foo'), new Lo.literal('number', '57'));
 
         var context = new Context().createInner();
 
@@ -35,16 +30,13 @@ module.exports["assignment"] = {
 
     "assign literal to lvalue expression": function (test) {
 
-        var node = {
-            type: 'assign',
-            op: '*=',
-            left: {type: 'subscript', list: {type: 'id', name: 'foo'}, index: {type: 'id', name: 'bar'}},
-            right: {type: 'number', val: '57'}
-        };
+        var node = new Lo.assignment('*=',
+            new Lo.subscript(new Lo.identifier('foo'), new Lo.identifier('bar')),
+            new Lo.literal('number', '57'));
 
         var context = new Context().createInner();
 
-        test.deepEqual(context.compile(node).renderTree(),
+        test.deepEqual(node.compile(context).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'assign',
@@ -55,17 +47,13 @@ module.exports["assignment"] = {
 
     "assign id to id": function (test) {
 
-        var node = {
-            type: 'assign',
-            op: '=',
-            left: {type: 'id', name: 'foo'},
-            right: {type: 'id', name: 'bar'}
-        };
+        var node = new Lo.assignment('=',
+            new Lo.identifier('foo'), new Lo.identifier('bar'));
 
         var context = new Context().createInner();
 
         test.equal(context.has('foo'), false);
-        test.deepEqual(context.compile(node).renderTree(),
+        test.deepEqual(node.compile(context).renderTree(),
             [ 'stmtList',
             [ 'expr-stmt',
                 [ 'assign', [ 'id', '$foo' ], [ 'id', '$bar' ] ] ] ]);
@@ -103,12 +91,8 @@ module.exports["assignment"] = {
 
     "doesn't declare if in parent context": function (test) {
 
-        var node = {
-            type: 'assign',
-            op: '=',
-            left: {type: 'id', name: 'foo'},
-            right: {type: 'number', val: '57'}
-        };
+        var node = new Lo.assignment('=',
+            new Lo.identifier('foo'), new Lo.literal('number', '57'));
 
         var parent = new Context().createInner();
 
@@ -118,7 +102,7 @@ module.exports["assignment"] = {
 
         test.equal(context.has('foo'), true);
 
-        test.deepEqual(context.compile(node).renderTree(),
+        test.deepEqual(node.compile(context).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
         test.deepEqual(context.getJsVars(), []);

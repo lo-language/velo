@@ -4,6 +4,9 @@
 
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+
+
 /**
  * A unary operator expression
  *
@@ -34,6 +37,17 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
+    if (this.op == 'cardinality') {
+
+        // offload to the runtime lib
+        return JS.runtimeCall('cardinality', [this.operand.compile(context)]);
+    }
+
+
+    if (this.op == 'complement') {
+
+        return JS.not(this.operand.compile(context));
+    }
 };
 
 module.exports = __;

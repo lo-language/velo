@@ -9,6 +9,8 @@ var Compiler = require('../../../codegen/Compiler');
 var Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
 var util = require('util');
+const Lo = require('../../../constructs');
+
 
 module.exports["basics"] = {
 
@@ -20,20 +22,13 @@ module.exports["basics"] = {
         // item -> item creates list of two items
         // list -> list appends lists
 
-        var node = {
-            "type": "op",
-            "op": "concat",
-            "left": {
-                "type": "id",
-                "name": "foo"
-            },
-            "right": {
-                "type": "id",
-                "name": "bar"
-            }
-        };
+        var node = new Lo.binaryOpExpr('concat',
+            new Lo.identifier('foo'), new Lo.identifier('bar'));
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.fnCall(JS.select(JS.ID('task'), 'concat'), [JS.ID('$foo'), JS.ID('$bar')]).renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(),
+            [ 'call',
+                [ 'select', [ 'id', 'task' ], 'concat' ],
+                [ [ 'id', '$foo' ], [ 'id', '$bar' ] ] ]);
         test.done();
     }
 };
