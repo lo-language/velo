@@ -5,24 +5,21 @@
 
 "use strict";
 
-var Context = require('../../../codegen/Context');
+const Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
-var util = require('util');
+const JsStmt = require('../../../codegen/JsStmt');
+const Lo = require('../../../constructs');
 
 module.exports["select"] = {
 
     "basics": function (test) {
 
-        var node = {
-            "type":"select",
-            "set":{
-                "type":"id",
-                "name":"foo"
-            },
-            "member":"bar"
-        };
+        var node = new Lo.select(
+            new Lo.identifier('foo'),
+            'bar'
+        );
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.select(JS.ID('$foo'), 'bar').renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(), JS.select(JS.ID('$foo'), 'bar').renderTree());
         test.done();
     }
 };

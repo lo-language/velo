@@ -7,19 +7,16 @@
 
 const Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
-const util = require('util');
 const JsStmt = require('../../../codegen/JsStmt');
+const Lo = require('../../../constructs');
 
 module.exports["response"] = {
 
     "reply without args": function (test) {
 
-        var node = {
-            type: 'response',
-            channel: 'reply',
-            args: []};
+        var node = new Lo.response('reply');
 
-        test.deepEqual(new Context().compile(node).renderTree(),
+        test.deepEqual(node.compile(new Context()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -31,14 +28,9 @@ module.exports["response"] = {
 
     "reply with one arg": function (test) {
 
-        var node = {
-            type: 'response',
-            channel: 'reply',
-            args: [
-                {type: 'number', val: '42'}
-            ]};
+        var node = new Lo.response('reply', [new Lo.literal('number', '42')]);
 
-        test.deepEqual(new Context().compile(node).renderTree(),
+        test.deepEqual(node.compile(new Context()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -51,15 +43,12 @@ module.exports["response"] = {
 
     "reply with two args": function (test) {
 
-        var node = {
-            type: 'response',
-            channel: 'reply',
-            args: [
-                {type: 'number', val: '42'},
-                {type: 'string', val: "hot dog!"}
-            ]};
+        var node = new Lo.response('reply', [
+            new Lo.literal('number', '42'),
+            new Lo.literal('string', 'hot dog!')
+        ]);
 
-        test.deepEqual(new Context().compile(node).renderTree(),
+        test.deepEqual(node.compile(new Context()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -73,14 +62,9 @@ module.exports["response"] = {
 
     "fail with one arg": function (test) {
 
-        var node = {
-            type: 'response',
-            channel: 'fail',
-            args: [
-                {type: 'number', val: '42'}
-            ]};
+        var node = new Lo.response('fail', [new Lo.literal('number', '42')]);
 
-        test.deepEqual(new Context().compile(node).renderTree(),
+        test.deepEqual(node.compile(new Context()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',

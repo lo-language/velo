@@ -4,6 +4,9 @@
 
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+
+
 /**
  * A record select (dot operator) expression
  *
@@ -35,6 +38,7 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
+    return JS.select(this.recordExpr.compile(context), this.field);
 };
 
 module.exports = __;

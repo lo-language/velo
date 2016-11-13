@@ -11,7 +11,8 @@
           "type": "stmt_list",
           "head": null,
           "tail": null
-        }
+        },
+        "isService": true
       }
     }
   ],

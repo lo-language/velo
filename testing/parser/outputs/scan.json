@@ -86,13 +86,15 @@
                       ]
                     },
                     "tail": null
-                  }
+                  },
+                  "isService": true
                 }
               }
             },
             "tail": null
           }
-        }
+        },
+        "isService": true
       }
     }
   ],

@@ -5,9 +5,10 @@
 
 "use strict";
 
-var Context = require('../../../codegen/Context');
+const Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
-var util = require('util');
+const JsStmt = require('../../../codegen/JsStmt');
+const Lo = require('../../../constructs');
 
 module.exports["service"] = {
 
@@ -15,23 +16,20 @@ module.exports["service"] = {
 
         // should actually throw an error if result isn't defined in the context
 
-        var node = {
-            type: 'procedure',
-            params: ['next'],
-            body: {
-                type: 'stmt_list',
-                head:
-                    { type: 'assign',
-                        op: '*=',
-                        left: { type: 'id', name: 'result' },
-                        right: {
-                            type: 'application',
-                            address: {type: 'id', name: 'bar'},
-                            args: [
-                                {type: 'number', val: '42'}
-                            ]} },
-                tail: null}
-        };
+        var node = new Lo.procedure(
+            ['next'],
+            new Lo.stmtList(
+                new Lo.assignment(
+                    '*=',
+                    new Lo.identifier('result'),
+                    new Lo.requestExpr(
+                        new Lo.identifier('bar'),
+                        [new Lo.literal('number', '42')]
+                    )
+                )
+            ),
+            true
+        );
 
         var result = [ 'function',
             null,
@@ -57,7 +55,7 @@ module.exports["service"] = {
                                         [ 'stmtList',
                                             [ 'expr-stmt', [ 'assign', [ 'id', '$result' ], [ "subscript", [ 'id', 'res0' ], [ "num", "0" ]], '*=' ] ] ] ] ] ] ] ] ] ] ] ];
 
-        test.deepEqual(new Context().compile(node).renderTree(), result);
+        test.deepEqual(node.compile(new Context()).renderTree(), result);
 
         // test.equal(new Context().compile(node),
         //     'function (task) {var $recur = task.service;\nvar $next, $result;\n\n$next = task.args[0];\n\n' +

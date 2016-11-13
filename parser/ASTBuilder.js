@@ -414,7 +414,11 @@ __.prototype.visitInterpolated = function(ctx) {
 
 __.prototype.visitService = function(ctx) {
 
-    return ctx.procedure().accept(this);
+    var proc = ctx.procedure().accept(this);
+
+    proc.isService = true;
+
+    return proc;
 };
 
 __.prototype.visitProcedure = function(ctx) {

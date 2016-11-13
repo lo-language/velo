@@ -15,7 +15,7 @@ var __ = function (address, args, async) {
 
     this.address = address;
     this.args = args;
-    this.async = async;
+    this.async = async || false;
 };
 
 /**

@@ -187,7 +187,8 @@
             ]
           },
           "tail": null
-        }
+        },
+        "isService": true
       }
     },
     {

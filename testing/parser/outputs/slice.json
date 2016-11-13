@@ -59,7 +59,8 @@
             },
             "tail": null
           }
-        }
+        },
+        "isService": true
       }
     }
   ],
