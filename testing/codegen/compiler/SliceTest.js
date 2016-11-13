@@ -5,54 +5,56 @@
 
 "use strict";
 
-var Context = require('../../../codegen/Context');
+const Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
-var util = require('util');
+const JsStmt = require('../../../codegen/JsStmt');
+const Lo = require('../../../constructs');
+
 
 module.exports["slice"] = {
 
     "basic slice": function (test) {
+        
+        var node = new Lo.slice(
+            new Lo.identifier('foo'),
+            new Lo.literal('number', '1'),
+            new Lo.literal('number', '3')
+        );
 
-        var node = {
-            type: 'slice',
-            list: {type: 'id', name: 'foo'},
-            start: {type: 'number', val: '1'},
-            end: {type: 'number', val: '3'},
-        };
-
-        test.deepEqual(new Context().compile(node).renderTree(), JS.fnCall(
-            JS.select(JS.ID('$foo'), 'slice'),
-            [JS.num('1'), JS.add(JS.num('3'), JS.num('1'))]).renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(),
+            [ 'call',
+                [ 'select', [ 'id', '$foo' ], 'slice' ],
+                [ [ 'num', '1' ], [ 'add', [ 'num', '3' ], [ 'num', '1' ] ] ] ]);
 
         test.done();
     },
 
     "shorthand slice": function (test) {
 
-        var node = {
-            type: 'slice',
-            list: {type: 'id', name: 'foo'},
-        };
+        var node = new Lo.slice(
+            new Lo.identifier('foo')
+        );
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.fnCall(
-            JS.select(JS.ID('$foo'), 'slice'),
-            [JS.num('0')]).renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(),
+            [ 'call',
+                [ 'select', [ 'id', '$foo' ], 'slice' ],
+                [ [ 'num', '0' ] ] ]);
 
         test.done();
     },
 
     "reverse indexing slice": function (test) {
 
-        var node = {
-            type: 'slice',
-            list: {type: 'id', name: 'foo' },
-            start: {type: 'number', val: '-3'},
-            end: {type: 'number', val: '-1'}
-        };
+        var node = new Lo.slice(
+            new Lo.identifier('foo'),
+            new Lo.literal('number', '-3'),
+            new Lo.literal('number', '-1')
+        );
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.fnCall(
-            JS.select(JS.ID('$foo'), 'slice'),
-            [JS.num('-3'), JS.add(JS.num('-1'), JS.num('1'))]).renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(),
+            [ 'call',
+                [ 'select', [ 'id', '$foo' ], 'slice' ],
+                [ [ 'num', '-3' ], [ 'add', [ 'num', '-1' ], [ 'num', '1' ] ] ] ]);
 
         test.done();
     }

@@ -5,37 +5,33 @@
 
 "use strict";
 
-var Context = require('../../../codegen/Context');
+const Context = require('../../../codegen/Context');
 const JS = require('../../../codegen/JsPrimitives');
-var util = require('util');
+const JsStmt = require('../../../codegen/JsStmt');
+const Lo = require('../../../constructs');
+
 
 module.exports["subscript"] = {
 
     "basic": function (test) {
 
-        var node = {
-            type: 'subscript',
-            list: {type: 'id', name: 'foo'},
-            index: {type: 'number', val: '1'}
-        };
+        var node = new Lo.subscript(new Lo.identifier('foo'), new Lo.literal('number', '1'));
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.subscript(JS.ID('$foo'), JS.num('1')).renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(),
+            [ 'subscript', [ 'id', '$foo' ], [ 'num', '1' ] ]);
         test.done();
     },
 
     "reverse indexing": function (test) {
 
-        var node = {
-            type: 'subscript',
-            list: { type: 'id', name: 'foo' },
-            index: {type: 'number', val: '-1'} };
+        var node = new Lo.subscript(new Lo.identifier('foo'), new Lo.literal('number', '-1'));
 
-        test.deepEqual(new Context().compile(node).renderTree(), JS.subscript(
-            JS.ID('$foo'),
-            JS.add(
-                JS.select(JS.ID('$foo'), 'length'),
-                JS.num('-1'))).renderTree()
-        );
+        test.deepEqual(node.compile(new Context()).renderTree(),
+            [ 'subscript',
+                [ 'id', '$foo' ],
+                [ 'add',
+                    [ 'select', [ 'id', '$foo' ], 'length' ],
+                    [ 'num', '-1' ] ] ]);
         test.done();
     }
 };

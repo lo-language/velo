@@ -4,6 +4,9 @@
 
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+
+
 /**
  * A subscript expression
  *
@@ -46,6 +49,16 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
+    // lean on JS slice since it has the same semantics
+
+    var list = this.array.compile(context);
+    var start = this.start ? this.start.compile(context) : JS.num('0');
+    var end = this.end ? this.end.compile(context) : null;
+
+    return JS.fnCall(
+        JS.select(list, 'slice'),
+        end ? [start, JS.add(end, JS.num('1'))] : [start]
+    );
 };
 
 module.exports = __;
