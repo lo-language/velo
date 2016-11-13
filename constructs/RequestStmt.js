@@ -33,14 +33,11 @@ var __ = function (address, args, replyHandler, failHandler, async) {
 __.prototype.getAst = function () {
 
     return {
-        type: 'application_stmt',
-        application: {
-            type: this.async ? 'message' : 'application',
-            address: this.address.getAst(),
-            args: this.args.map(arg => arg.getAst()),
-            subsequent: this.replyHandler ? this.replyHandler.getAst() : undefined,
-            contingency: this.failHandler ? this.failHandler.getAst() : undefined
-        }
+        type: 'request_stmt',
+        address: this.address.getAst(),
+        args: this.args.map(arg => arg.getAst()),
+        subsequent: this.replyHandler ? this.replyHandler.getAst() : undefined,
+        contingency: this.failHandler ? this.failHandler.getAst() : undefined
     };
 };
 

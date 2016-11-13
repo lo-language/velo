@@ -25,20 +25,17 @@
               "body": {
                 "type": "stmt_list",
                 "head": {
-                  "type": "application_stmt",
-                  "application": {
-                    "type": "application",
-                    "address": {
+                  "type": "request_stmt",
+                  "address": {
+                    "type": "id",
+                    "name": "log"
+                  },
+                  "args": [
+                    {
                       "type": "id",
-                      "name": "log"
-                    },
-                    "args": [
-                      {
-                        "type": "id",
-                        "name": "item"
-                      }
-                    ]
-                  }
+                      "name": "item"
+                    }
+                  ]
                 },
                 "tail": null
               }
