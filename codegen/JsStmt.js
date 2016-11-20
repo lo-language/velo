@@ -64,7 +64,7 @@ __.prototype.isFinal = function () {
 };
 
 /**
- * Attaches a statement to this one.
+ * Attaches a statement to this one. This mutates the current statement, which I don't love.
  *
  * @param stmt
  * @returns this    fluent interface

@@ -192,7 +192,7 @@
                                 "scope": "HTTP"
                               },
                               "args": [],
-                              "async": false
+                              "blocking": true
                             }
                           },
                           "tail": null

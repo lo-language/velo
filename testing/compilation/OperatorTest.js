@@ -56,6 +56,15 @@ module.exports["op"] = {
         test.done();
     },
 
+    "complement": function (test) {
+
+        var node = new Lo.unaryOpExpr('complement', new Lo.identifier('foo'));
+
+        test.deepEqual(node.compile(new Context()).renderTree(),
+            [ 'not', [ 'id', '$foo' ] ]);
+        test.done();
+    },
+
     "in operator": function (test) {
 
         var node = new Lo.membership(

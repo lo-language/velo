@@ -1,7 +1,3 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Seth Purcell. All rights reserved.
- *  Licensed under the MIT License. See LICENSE in the project root for license information.
- *-------------------------------------------------------------------------------------------*/
 
 /**
  * Compilation context; handles compile-time symbol tracking.
@@ -12,13 +8,7 @@
 
 "use strict";
 
-const Compiler = require('./Compiler');
-const JS = require('./JsPrimitives');
-const JsStmt = require('./JsStmt');
-const JsFunction = require('./JsFunction');
-const Request = require('./Request');
 const Wrapper = require('./Wrapper');
-const util = require('util');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -78,14 +68,13 @@ __.prototype.define = function (name, value) {
     };
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Define a continuation
- *
- * @param body
+ * Returns a new continuation
  */
-__.prototype.getContName = function () {
+__.prototype.getContinuation = function () {
 
-    return 'cont' + this.cont++;
+    return new Continuation('cont' + this.cont++);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -249,21 +238,6 @@ __.prototype.closeStatement = function (node) {
     this.wrapper = null;
 
     return result;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * @deprecated
- * @return {*}
- */
-__.prototype.compile = function (node) {
-
-    if (Compiler[node.type] === undefined) {
-        throw new Error("don't know how to compile node type '" + node.type + "': " + util.inspect(node));
-    }
-
-    // dispatch to the appropriate AST node handler
-    return Compiler[node.type].call(this, node);
 };
 
 module.exports = __;

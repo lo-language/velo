@@ -271,7 +271,7 @@ __.prototype.visitSyncCall = function(ctx) {
     return new Lo.requestExpr(
         ctx.expr().accept(this),
         args ? args.accept(this) : [],
-        false
+        true
     );
 };
 
@@ -282,7 +282,7 @@ __.prototype.visitAsyncCall = function(ctx) {
     return new Lo.requestExpr(
         ctx.expr().accept(this),
         args ? args.accept(this) : [],
-        true
+        false
     );
 };
 
@@ -298,7 +298,7 @@ __.prototype.visitSyncRequest = function(ctx) {
         args ? args.accept(this) : [],
         handlers.subsequent,
         handlers.contingency,
-        false
+        true
     );
 };
 
@@ -312,7 +312,7 @@ __.prototype.visitAsyncRequest = function(ctx) {
         args ? args.accept(this) : [],
         handlers.subsequent,
         handlers.contingency,
-        true
+        false
     );
 };
 

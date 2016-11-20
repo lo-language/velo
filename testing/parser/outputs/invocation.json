@@ -16,7 +16,7 @@
               "name": "foo"
             },
             "args": [],
-            "async": false
+            "blocking": true
           },
           "tail": {
             "type": "stmt_list",
@@ -31,7 +31,7 @@
                 "field": "bar"
               },
               "args": [],
-              "async": false
+              "blocking": true
             },
             "tail": {
               "type": "stmt_list",
@@ -49,7 +49,7 @@
                     "name": "foo"
                   },
                   "args": [],
-                  "async": false
+                  "blocking": true
                 }
               },
               "tail": {
@@ -71,7 +71,7 @@
                       "name": "foo"
                     },
                     "args": [],
-                    "async": false
+                    "blocking": true
                   }
                 },
                 "tail": {
@@ -88,7 +88,7 @@
                         "val": "18"
                       }
                     ],
-                    "async": true
+                    "blocking": false
                   },
                   "tail": {
                     "type": "stmt_list",
@@ -108,7 +108,7 @@
                           "name": "sessionID"
                         }
                       ],
-                      "async": true
+                      "blocking": false
                     },
                     "tail": {
                       "type": "stmt_list",
@@ -134,7 +134,7 @@
                               "val": "47"
                             }
                           ],
-                          "async": true
+                          "blocking": false
                         }
                       },
                       "tail": {
@@ -169,7 +169,7 @@
                               "tail": null
                             }
                           },
-                          "async": true
+                          "blocking": false
                         },
                         "tail": {
                           "type": "stmt_list",
@@ -216,7 +216,7 @@
                                 "tail": null
                               }
                             },
-                            "async": true
+                            "blocking": false
                           },
                           "tail": {
                             "type": "stmt_list",
@@ -271,7 +271,7 @@
                                   "tail": null
                                 }
                               },
-                              "async": true
+                              "blocking": false
                             },
                             "tail": {
                               "type": "stmt_list",
@@ -328,7 +328,7 @@
                                                   "name": "result"
                                                 }
                                               ],
-                                              "async": true
+                                              "blocking": false
                                             }
                                           },
                                           "tail": null
@@ -352,7 +352,7 @@
                                           "tail": null
                                         }
                                       },
-                                      "async": true
+                                      "blocking": false
                                     },
                                     "tail": null
                                   }
@@ -375,7 +375,7 @@
                                     "tail": null
                                   }
                                 },
-                                "async": true
+                                "blocking": false
                               },
                               "tail": {
                                 "type": "stmt_list",
@@ -393,10 +393,10 @@
                                         "name": "bar"
                                       },
                                       "args": [],
-                                      "async": false
+                                      "blocking": true
                                     }
                                   ],
-                                  "async": false
+                                  "blocking": true
                                 },
                                 "tail": {
                                   "type": "stmt_list",
@@ -417,7 +417,7 @@
                                           "name": "foo"
                                         },
                                         "args": [],
-                                        "async": false
+                                        "blocking": true
                                       },
                                       "right": {
                                         "type": "number",
@@ -454,7 +454,7 @@
                                           "tail": null
                                         }
                                       },
-                                      "async": false
+                                      "blocking": true
                                     },
                                     "tail": {
                                       "type": "stmt_list",
@@ -505,7 +505,7 @@
                                             "tail": null
                                           }
                                         },
-                                        "async": false
+                                        "blocking": true
                                       },
                                       "tail": null
                                     }

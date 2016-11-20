@@ -15,13 +15,13 @@ const Identifier = require('./Identifier');
  *
  * @param address
  * @param args
- * @param async
+ * @param blocking
  */
-var __ = function (address, args, async) {
+var __ = function (address, args, blocking) {
 
     this.address = address;
     this.args = args;
-    this.async = async || false;
+    this.blocking = blocking || false;
 };
 
 /**
@@ -33,7 +33,7 @@ __.prototype.getAst = function () {
         type: 'request_expr',
         address: this.address.getAst(),
         args: this.args.map(arg => arg.getAst()),
-        async: this.async
+        blocking: this.blocking
     };
 };
 

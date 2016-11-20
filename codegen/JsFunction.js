@@ -13,10 +13,11 @@ const JS = require('./JsPrimitives');
  * @param body          a JsStmt
  * @private
  */
-var __ = function (params, body) {
+var __ = function (params, body, name) {
 
     this.params = params;
     this.body = body;
+    this.name = name;
 };
 
 /**
@@ -33,7 +34,7 @@ __.prototype.append = function (stmt) {
 
 __.prototype._getAst = function () {
 
-    return JS.fnDef(this.params, this.body);
+    return JS.fnDef(this.params, this.body, this.name);
 };
 
 __.prototype.renderTree = function () {
