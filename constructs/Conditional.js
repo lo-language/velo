@@ -57,8 +57,6 @@ __.prototype.compile = function (context) {
     // since we're in a stmt here that might have async bits, and then our blocks might have bits?
     // we DO need to support more than one level of stmt nesting
 
-    context.openStatement();
-
     var predicate = this.predicate.compile(context);
     var wrapper = context.wrapper;
 

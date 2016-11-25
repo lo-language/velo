@@ -12,6 +12,19 @@ const Request = require('../../codegen/Request');
 
 module.exports["basics"] = {
 
+    "isRoot": function (test) {
+
+        var root = new Context();
+
+        test.ok(root.isRoot());
+
+        var child = root.createInner();
+
+        test.equal(child.isRoot(), false);
+
+        test.done();
+    },
+
     'declare var': function (test) {
 
         var ctx = new Context().createInner();
@@ -81,7 +94,7 @@ module.exports["basics"] = {
         test.deepEqual(ctx.getJsVars(), []);
         test.equal(ctx.has('port'), true);
         test.equal(ctx.isConstant('port'), true);
-        test.equal(ctx.resolve('port'), 8080);
+        test.equal(ctx.resolve('port'), true);
 
         // declare as var now fails
         test.throws(function () {ctx.declare('port');});
@@ -178,7 +191,7 @@ module.exports["child ctx"] = {
         // should be defined in the child as well
         test.ok(child.has('foo'));
         test.ok(child.isConstant('foo'));
-        test.equal(child.resolve('foo'), 42);
+        test.equal(child.resolve('foo'), true);
 
         // define constant in child with same name as parent constant fails
         test.throws(function () {child.define('foo', 3.14);});
@@ -192,7 +205,7 @@ module.exports["child ctx"] = {
         test.deepEqual(child.getJsVars(), []);
         test.ok(child.has('bar'));
         test.ok(child.isConstant('bar'));
-        test.equal(child.resolve('bar'), "53");
+        test.equal(child.resolve('bar'), true);
 
         // should not be defined in the parent
         test.equal(parent.has('bar'), false);
@@ -267,105 +280,5 @@ module.exports["external constants"] = {
         catch (err) {
             test.done();
         }
-    }
-};
-
-
-module.exports["compileStmt"] = {
-
-    "with no wrappers": function (test) {
-
-        var node = {
-            type: 'assign',
-            op: '*=',
-            left: {type: 'subscript', list: {type: 'id', name: 'foo'}, index: {type: 'id', name: 'bar'}},
-            right: {type: 'number', val: '57'}
-        };
-
-        var context = new Context();
-
-        // spoof a wrapper
-        var s = context.compileStmt(node);
-
-        test.deepEqual(s.renderTree(), [ 'stmtList',
-            [ 'expr-stmt',
-                [ 'assign',
-                    [ 'subscript', [ 'id', '$foo' ], [ 'id', '$bar' ] ],
-                    [ 'num', '57' ], '*=' ] ] ]);
-
-        test.equal(s.async, false);
-
-        test.done();
-    },
-
-    "with one wrapper": function (test) {
-
-        var node = {
-            type: 'application_stmt',
-            application: {
-                type: 'application',
-                address: {type: 'id', name: 'foo'},
-                args: [
-                    {type: 'number', val: '42'}
-                ]}
-        };
-
-        var context = new Context();
-
-        // spoof a wrapper
-        var s = context.compileStmt(node);
-
-        test.deepEqual(s.renderTree(), [ 'stmtList',
-            [ 'expr-stmt',
-                [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                    [ [ 'id', '$foo' ],
-                        [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
-                        [ 'function', null, [ 'res0' ], [ 'stmtList' ] ] ] ] ] ]);
-
-        test.equal(s.async, true);
-
-        test.done();
-    },
-
-    "with two wrappers": function (test) {
-
-        var node = {
-            type: 'application_stmt',
-            application: {
-                type: 'application',
-                address: {type: 'id', name: 'baz'},
-                args: [ {
-                        type: 'application',
-                        address: {type: 'id', name: 'foo'},
-                        args: []
-                    }]}
-        };
-
-        var context = new Context();
-
-        // spoof a wrapper
-        var s = context.compileStmt(node);
-
-        test.deepEqual(s.renderTree(), [ 'stmtList',
-            [ 'expr-stmt',
-                [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                    [ [ 'id', '$foo' ],
-                        [ 'arrayLiteral', [] ],
-                        [ 'function',
-                            null,
-                            [ 'res0' ],
-                            [ 'stmtList',
-                                [ 'expr-stmt',
-                                    [ 'call',
-                                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                                        [ [ 'id', '$baz' ],
-                                            [ 'arrayLiteral', [ [ "subscript", [ 'id', 'res0' ], [ "num", "0" ] ] ] ],
-                                            [ 'function', null, [ 'res1' ], [ 'stmtList' ] ] ] ] ] ] ] ] ] ] ]);
-
-        test.equal(s.async, true);
-
-        test.done();
     }
 };

@@ -1,4 +1,4 @@
-// Generated from /Users/seth/devel/exa/parser/exa.g4 by ANTLR 4.5.3
+// Generated from /Users/seth/devel/exa/parser/lo.g4 by ANTLR 4.5.3
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 
@@ -306,125 +306,124 @@ var atn = new antlr4.atn.ATNDeserializer().deserialize(serializedATN);
 
 var decisionsToDFA = atn.decisionToState.map( function(ds, index) { return new antlr4.dfa.DFA(ds, index); });
 
-function exaLexer(input) {
+function loLexer(input) {
 	antlr4.Lexer.call(this, input);
     this._interp = new antlr4.atn.LexerATNSimulator(this, atn, decisionsToDFA, new antlr4.PredictionContextCache());
     return this;
 }
 
-exaLexer.prototype = Object.create(antlr4.Lexer.prototype);
-exaLexer.prototype.constructor = exaLexer;
+loLexer.prototype = Object.create(antlr4.Lexer.prototype);
+loLexer.prototype.constructor = loLexer;
 
-exaLexer.EOF = antlr4.Token.EOF;
-exaLexer.T__0 = 1;
-exaLexer.T__1 = 2;
-exaLexer.T__2 = 3;
-exaLexer.T__3 = 4;
-exaLexer.T__4 = 5;
-exaLexer.T__5 = 6;
-exaLexer.T__6 = 7;
-exaLexer.T__7 = 8;
-exaLexer.T__8 = 9;
-exaLexer.T__9 = 10;
-exaLexer.T__10 = 11;
-exaLexer.T__11 = 12;
-exaLexer.T__12 = 13;
-exaLexer.T__13 = 14;
-exaLexer.T__14 = 15;
-exaLexer.T__15 = 16;
-exaLexer.T__16 = 17;
-exaLexer.T__17 = 18;
-exaLexer.T__18 = 19;
-exaLexer.T__19 = 20;
-exaLexer.T__20 = 21;
-exaLexer.T__21 = 22;
-exaLexer.T__22 = 23;
-exaLexer.T__23 = 24;
-exaLexer.T__24 = 25;
-exaLexer.T__25 = 26;
-exaLexer.T__26 = 27;
-exaLexer.T__27 = 28;
-exaLexer.T__28 = 29;
-exaLexer.T__29 = 30;
-exaLexer.T__30 = 31;
-exaLexer.T__31 = 32;
-exaLexer.T__32 = 33;
-exaLexer.T__33 = 34;
-exaLexer.T__34 = 35;
-exaLexer.T__35 = 36;
-exaLexer.T__36 = 37;
-exaLexer.T__37 = 38;
-exaLexer.T__38 = 39;
-exaLexer.T__39 = 40;
-exaLexer.T__40 = 41;
-exaLexer.T__41 = 42;
-exaLexer.T__42 = 43;
-exaLexer.T__43 = 44;
-exaLexer.T__44 = 45;
-exaLexer.T__45 = 46;
-exaLexer.T__46 = 47;
-exaLexer.T__47 = 48;
-exaLexer.T__48 = 49;
-exaLexer.WS = 50;
-exaLexer.LINE_COMMENT = 51;
-exaLexer.COMMENT = 52;
-exaLexer.BEGIN = 53;
-exaLexer.END = 54;
-exaLexer.NIL = 55;
-exaLexer.BOOL = 56;
-exaLexer.PAIR_SEP = 57;
-exaLexer.FIELD_SEP = 58;
-exaLexer.NUMBER = 59;
-exaLexer.ID = 60;
-exaLexer.STRING = 61;
-exaLexer.INTER_BEGIN = 62;
-exaLexer.INTER_MID = 63;
-exaLexer.INTER_END = 64;
-exaLexer.MODREF = 65;
-
-
-exaLexer.modeNames = [ "DEFAULT_MODE" ];
-
-exaLexer.literalNames = [ null, "'reply'", "'fail'", "'substitute'", "';'", 
-                          "'++'", "'--'", "'('", "')'", "'@'", "'>>'", "'while'", 
-                          "'scan'", "'is'", "'on'", "'='", "'+='", "'-='", 
-                          "'*='", "'/='", "'%='", "'if'", "'else'", "'#'", 
-                          "'not'", "'bytes'", "'*'", "'/'", "'%'", "'+'", 
-                          "'-'", "'<'", "'>'", "'<='", "'>='", "'=='", "'!='", 
-                          "'and'", "'or'", "'in'", "'><'", "'['", "']'", 
-                          "'..'", "'map'", "'.'", "','", "'<->'", "'-<'", 
-                          "'->'", null, null, null, "'{'", "'}'", "'nil'", 
-                          null, "'=>'", "':'" ];
-
-exaLexer.symbolicNames = [ null, null, null, null, null, null, null, null, 
-                           null, null, null, null, null, null, null, null, 
-                           null, null, null, null, null, null, null, null, 
-                           null, null, null, null, null, null, null, null, 
-                           null, null, null, null, null, null, null, null, 
-                           null, null, null, null, null, null, null, null, 
-                           null, null, "WS", "LINE_COMMENT", "COMMENT", 
-                           "BEGIN", "END", "NIL", "BOOL", "PAIR_SEP", "FIELD_SEP", 
-                           "NUMBER", "ID", "STRING", "INTER_BEGIN", "INTER_MID", 
-                           "INTER_END", "MODREF" ];
-
-exaLexer.ruleNames = [ "T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", 
-                       "T__7", "T__8", "T__9", "T__10", "T__11", "T__12", 
-                       "T__13", "T__14", "T__15", "T__16", "T__17", "T__18", 
-                       "T__19", "T__20", "T__21", "T__22", "T__23", "T__24", 
-                       "T__25", "T__26", "T__27", "T__28", "T__29", "T__30", 
-                       "T__31", "T__32", "T__33", "T__34", "T__35", "T__36", 
-                       "T__37", "T__38", "T__39", "T__40", "T__41", "T__42", 
-                       "T__43", "T__44", "T__45", "T__46", "T__47", "T__48", 
-                       "WS", "LINE_COMMENT", "COMMENT", "BEGIN", "END", 
-                       "DIGIT", "INT", "EXP", "ESC", "ID_LETTER", "NIL", 
-                       "BOOL", "PAIR_SEP", "FIELD_SEP", "NUMBER", "ID", 
-                       "STRING", "INTER_BEGIN", "INTER_MID", "INTER_END", 
-                       "MODREF" ];
-
-exaLexer.grammarFileName = "exa.g4";
+loLexer.EOF = antlr4.Token.EOF;
+loLexer.T__0 = 1;
+loLexer.T__1 = 2;
+loLexer.T__2 = 3;
+loLexer.T__3 = 4;
+loLexer.T__4 = 5;
+loLexer.T__5 = 6;
+loLexer.T__6 = 7;
+loLexer.T__7 = 8;
+loLexer.T__8 = 9;
+loLexer.T__9 = 10;
+loLexer.T__10 = 11;
+loLexer.T__11 = 12;
+loLexer.T__12 = 13;
+loLexer.T__13 = 14;
+loLexer.T__14 = 15;
+loLexer.T__15 = 16;
+loLexer.T__16 = 17;
+loLexer.T__17 = 18;
+loLexer.T__18 = 19;
+loLexer.T__19 = 20;
+loLexer.T__20 = 21;
+loLexer.T__21 = 22;
+loLexer.T__22 = 23;
+loLexer.T__23 = 24;
+loLexer.T__24 = 25;
+loLexer.T__25 = 26;
+loLexer.T__26 = 27;
+loLexer.T__27 = 28;
+loLexer.T__28 = 29;
+loLexer.T__29 = 30;
+loLexer.T__30 = 31;
+loLexer.T__31 = 32;
+loLexer.T__32 = 33;
+loLexer.T__33 = 34;
+loLexer.T__34 = 35;
+loLexer.T__35 = 36;
+loLexer.T__36 = 37;
+loLexer.T__37 = 38;
+loLexer.T__38 = 39;
+loLexer.T__39 = 40;
+loLexer.T__40 = 41;
+loLexer.T__41 = 42;
+loLexer.T__42 = 43;
+loLexer.T__43 = 44;
+loLexer.T__44 = 45;
+loLexer.T__45 = 46;
+loLexer.T__46 = 47;
+loLexer.T__47 = 48;
+loLexer.T__48 = 49;
+loLexer.WS = 50;
+loLexer.LINE_COMMENT = 51;
+loLexer.COMMENT = 52;
+loLexer.BEGIN = 53;
+loLexer.END = 54;
+loLexer.NIL = 55;
+loLexer.BOOL = 56;
+loLexer.PAIR_SEP = 57;
+loLexer.FIELD_SEP = 58;
+loLexer.NUMBER = 59;
+loLexer.ID = 60;
+loLexer.STRING = 61;
+loLexer.INTER_BEGIN = 62;
+loLexer.INTER_MID = 63;
+loLexer.INTER_END = 64;
+loLexer.MODREF = 65;
 
 
-exaLexer.prototype.action = function(localctx, ruleIndex, actionIndex) {
+loLexer.modeNames = [ "DEFAULT_MODE" ];
+
+loLexer.literalNames = [ null, "'reply'", "'fail'", "'substitute'", "';'", 
+                         "'++'", "'--'", "'('", "')'", "'@'", "'>>'", "'while'", 
+                         "'scan'", "'is'", "'on'", "'='", "'+='", "'-='", 
+                         "'*='", "'/='", "'%='", "'if'", "'else'", "'#'", 
+                         "'not'", "'bytes'", "'*'", "'/'", "'%'", "'+'", 
+                         "'-'", "'<'", "'>'", "'<='", "'>='", "'=='", "'!='", 
+                         "'and'", "'or'", "'in'", "'><'", "'['", "']'", 
+                         "'..'", "'map'", "'.'", "','", "'<->'", "'-<'", 
+                         "'->'", null, null, null, "'{'", "'}'", "'nil'", 
+                         null, "'=>'", "':'" ];
+
+loLexer.symbolicNames = [ null, null, null, null, null, null, null, null, 
+                          null, null, null, null, null, null, null, null, 
+                          null, null, null, null, null, null, null, null, 
+                          null, null, null, null, null, null, null, null, 
+                          null, null, null, null, null, null, null, null, 
+                          null, null, null, null, null, null, null, null, 
+                          null, null, "WS", "LINE_COMMENT", "COMMENT", "BEGIN", 
+                          "END", "NIL", "BOOL", "PAIR_SEP", "FIELD_SEP", 
+                          "NUMBER", "ID", "STRING", "INTER_BEGIN", "INTER_MID", 
+                          "INTER_END", "MODREF" ];
+
+loLexer.ruleNames = [ "T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", 
+                      "T__7", "T__8", "T__9", "T__10", "T__11", "T__12", 
+                      "T__13", "T__14", "T__15", "T__16", "T__17", "T__18", 
+                      "T__19", "T__20", "T__21", "T__22", "T__23", "T__24", 
+                      "T__25", "T__26", "T__27", "T__28", "T__29", "T__30", 
+                      "T__31", "T__32", "T__33", "T__34", "T__35", "T__36", 
+                      "T__37", "T__38", "T__39", "T__40", "T__41", "T__42", 
+                      "T__43", "T__44", "T__45", "T__46", "T__47", "T__48", 
+                      "WS", "LINE_COMMENT", "COMMENT", "BEGIN", "END", "DIGIT", 
+                      "INT", "EXP", "ESC", "ID_LETTER", "NIL", "BOOL", "PAIR_SEP", 
+                      "FIELD_SEP", "NUMBER", "ID", "STRING", "INTER_BEGIN", 
+                      "INTER_MID", "INTER_END", "MODREF" ];
+
+loLexer.grammarFileName = "lo.g4";
+
+
+loLexer.prototype.action = function(localctx, ruleIndex, actionIndex) {
 	switch (ruleIndex) {
 	case 65:
 		this.STRING_action(localctx, actionIndex);
@@ -446,7 +445,7 @@ exaLexer.prototype.action = function(localctx, ruleIndex, actionIndex) {
 	}
 };
 
-exaLexer.prototype.STRING_action = function(localctx , actionIndex) {
+loLexer.prototype.STRING_action = function(localctx , actionIndex) {
 	switch (actionIndex) {
 	case 0:
 		this.text = this.text.slice(1, -1);
@@ -456,7 +455,7 @@ exaLexer.prototype.STRING_action = function(localctx , actionIndex) {
 	}
 };
 
-exaLexer.prototype.INTER_BEGIN_action = function(localctx , actionIndex) {
+loLexer.prototype.INTER_BEGIN_action = function(localctx , actionIndex) {
 	switch (actionIndex) {
 	case 1:
 		this.text = this.text.slice(1, -1);
@@ -466,7 +465,7 @@ exaLexer.prototype.INTER_BEGIN_action = function(localctx , actionIndex) {
 	}
 };
 
-exaLexer.prototype.INTER_MID_action = function(localctx , actionIndex) {
+loLexer.prototype.INTER_MID_action = function(localctx , actionIndex) {
 	switch (actionIndex) {
 	case 2:
 		this.text = this.text.slice(1, -1);
@@ -476,7 +475,7 @@ exaLexer.prototype.INTER_MID_action = function(localctx , actionIndex) {
 	}
 };
 
-exaLexer.prototype.INTER_END_action = function(localctx , actionIndex) {
+loLexer.prototype.INTER_END_action = function(localctx , actionIndex) {
 	switch (actionIndex) {
 	case 3:
 		this.text = this.text.slice(1, -1);
@@ -486,7 +485,7 @@ exaLexer.prototype.INTER_END_action = function(localctx , actionIndex) {
 	}
 };
 
-exaLexer.prototype.MODREF_action = function(localctx , actionIndex) {
+loLexer.prototype.MODREF_action = function(localctx , actionIndex) {
 	switch (actionIndex) {
 	case 4:
 		this.text = this.text.slice(1, -1);
@@ -497,5 +496,5 @@ exaLexer.prototype.MODREF_action = function(localctx , actionIndex) {
 };
 
 
-exports.exaLexer = exaLexer;
+exports.loLexer = loLexer;
 

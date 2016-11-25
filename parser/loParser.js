@@ -1,9 +1,9 @@
-// Generated from /Users/seth/devel/exa/parser/exa.g4 by ANTLR 4.5.3
+// Generated from /Users/seth/devel/exa/parser/lo.g4 by ANTLR 4.5.3
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
-var exaVisitor = require('./exaVisitor').exaVisitor;
+var loVisitor = require('./loVisitor').loVisitor;
 
-var grammarFileName = "exa.g4";
+var grammarFileName = "lo.g4";
 
 var serializedATN = ["\u0003\u0430\ud6d1\u8206\uad2d\u4417\uaef1\u8d80\uaadd",
     "\u0003C\u0151\u0004\u0002\t\u0002\u0004\u0003\t\u0003\u0004\u0004\t",
@@ -269,7 +269,7 @@ var ruleNames =  [ "module", "references", "statementList", "statement",
                    "exprList", "literal", "sink", "procedure", "paramList", 
                    "fieldList", "pairList" ];
 
-function exaParser (input) {
+function loParser (input) {
 	antlr4.Parser.call(this, input);
     this._interp = new antlr4.atn.ParserATNSimulator(this, atn, decisionsToDFA, sharedContextCache);
     this.ruleNames = ruleNames;
@@ -278,102 +278,102 @@ function exaParser (input) {
     return this;
 }
 
-exaParser.prototype = Object.create(antlr4.Parser.prototype);
-exaParser.prototype.constructor = exaParser;
+loParser.prototype = Object.create(antlr4.Parser.prototype);
+loParser.prototype.constructor = loParser;
 
-Object.defineProperty(exaParser.prototype, "atn", {
+Object.defineProperty(loParser.prototype, "atn", {
 	get : function() {
 		return atn;
 	}
 });
 
-exaParser.EOF = antlr4.Token.EOF;
-exaParser.T__0 = 1;
-exaParser.T__1 = 2;
-exaParser.T__2 = 3;
-exaParser.T__3 = 4;
-exaParser.T__4 = 5;
-exaParser.T__5 = 6;
-exaParser.T__6 = 7;
-exaParser.T__7 = 8;
-exaParser.T__8 = 9;
-exaParser.T__9 = 10;
-exaParser.T__10 = 11;
-exaParser.T__11 = 12;
-exaParser.T__12 = 13;
-exaParser.T__13 = 14;
-exaParser.T__14 = 15;
-exaParser.T__15 = 16;
-exaParser.T__16 = 17;
-exaParser.T__17 = 18;
-exaParser.T__18 = 19;
-exaParser.T__19 = 20;
-exaParser.T__20 = 21;
-exaParser.T__21 = 22;
-exaParser.T__22 = 23;
-exaParser.T__23 = 24;
-exaParser.T__24 = 25;
-exaParser.T__25 = 26;
-exaParser.T__26 = 27;
-exaParser.T__27 = 28;
-exaParser.T__28 = 29;
-exaParser.T__29 = 30;
-exaParser.T__30 = 31;
-exaParser.T__31 = 32;
-exaParser.T__32 = 33;
-exaParser.T__33 = 34;
-exaParser.T__34 = 35;
-exaParser.T__35 = 36;
-exaParser.T__36 = 37;
-exaParser.T__37 = 38;
-exaParser.T__38 = 39;
-exaParser.T__39 = 40;
-exaParser.T__40 = 41;
-exaParser.T__41 = 42;
-exaParser.T__42 = 43;
-exaParser.T__43 = 44;
-exaParser.T__44 = 45;
-exaParser.T__45 = 46;
-exaParser.T__46 = 47;
-exaParser.T__47 = 48;
-exaParser.T__48 = 49;
-exaParser.WS = 50;
-exaParser.LINE_COMMENT = 51;
-exaParser.COMMENT = 52;
-exaParser.BEGIN = 53;
-exaParser.END = 54;
-exaParser.NIL = 55;
-exaParser.BOOL = 56;
-exaParser.PAIR_SEP = 57;
-exaParser.FIELD_SEP = 58;
-exaParser.NUMBER = 59;
-exaParser.ID = 60;
-exaParser.STRING = 61;
-exaParser.INTER_BEGIN = 62;
-exaParser.INTER_MID = 63;
-exaParser.INTER_END = 64;
-exaParser.MODREF = 65;
+loParser.EOF = antlr4.Token.EOF;
+loParser.T__0 = 1;
+loParser.T__1 = 2;
+loParser.T__2 = 3;
+loParser.T__3 = 4;
+loParser.T__4 = 5;
+loParser.T__5 = 6;
+loParser.T__6 = 7;
+loParser.T__7 = 8;
+loParser.T__8 = 9;
+loParser.T__9 = 10;
+loParser.T__10 = 11;
+loParser.T__11 = 12;
+loParser.T__12 = 13;
+loParser.T__13 = 14;
+loParser.T__14 = 15;
+loParser.T__15 = 16;
+loParser.T__16 = 17;
+loParser.T__17 = 18;
+loParser.T__18 = 19;
+loParser.T__19 = 20;
+loParser.T__20 = 21;
+loParser.T__21 = 22;
+loParser.T__22 = 23;
+loParser.T__23 = 24;
+loParser.T__24 = 25;
+loParser.T__25 = 26;
+loParser.T__26 = 27;
+loParser.T__27 = 28;
+loParser.T__28 = 29;
+loParser.T__29 = 30;
+loParser.T__30 = 31;
+loParser.T__31 = 32;
+loParser.T__32 = 33;
+loParser.T__33 = 34;
+loParser.T__34 = 35;
+loParser.T__35 = 36;
+loParser.T__36 = 37;
+loParser.T__37 = 38;
+loParser.T__38 = 39;
+loParser.T__39 = 40;
+loParser.T__40 = 41;
+loParser.T__41 = 42;
+loParser.T__42 = 43;
+loParser.T__43 = 44;
+loParser.T__44 = 45;
+loParser.T__45 = 46;
+loParser.T__46 = 47;
+loParser.T__47 = 48;
+loParser.T__48 = 49;
+loParser.WS = 50;
+loParser.LINE_COMMENT = 51;
+loParser.COMMENT = 52;
+loParser.BEGIN = 53;
+loParser.END = 54;
+loParser.NIL = 55;
+loParser.BOOL = 56;
+loParser.PAIR_SEP = 57;
+loParser.FIELD_SEP = 58;
+loParser.NUMBER = 59;
+loParser.ID = 60;
+loParser.STRING = 61;
+loParser.INTER_BEGIN = 62;
+loParser.INTER_MID = 63;
+loParser.INTER_END = 64;
+loParser.MODREF = 65;
 
-exaParser.RULE_module = 0;
-exaParser.RULE_references = 1;
-exaParser.RULE_statementList = 2;
-exaParser.RULE_statement = 3;
-exaParser.RULE_definition = 4;
-exaParser.RULE_handlers = 5;
-exaParser.RULE_replyHandler = 6;
-exaParser.RULE_failHandler = 7;
-exaParser.RULE_assignment_op = 8;
-exaParser.RULE_conditional = 9;
-exaParser.RULE_block = 10;
-exaParser.RULE_expr = 11;
-exaParser.RULE_interpolated = 12;
-exaParser.RULE_exprList = 13;
-exaParser.RULE_literal = 14;
-exaParser.RULE_sink = 15;
-exaParser.RULE_procedure = 16;
-exaParser.RULE_paramList = 17;
-exaParser.RULE_fieldList = 18;
-exaParser.RULE_pairList = 19;
+loParser.RULE_module = 0;
+loParser.RULE_references = 1;
+loParser.RULE_statementList = 2;
+loParser.RULE_statement = 3;
+loParser.RULE_definition = 4;
+loParser.RULE_handlers = 5;
+loParser.RULE_replyHandler = 6;
+loParser.RULE_failHandler = 7;
+loParser.RULE_assignment_op = 8;
+loParser.RULE_conditional = 9;
+loParser.RULE_block = 10;
+loParser.RULE_expr = 11;
+loParser.RULE_interpolated = 12;
+loParser.RULE_exprList = 13;
+loParser.RULE_literal = 14;
+loParser.RULE_sink = 15;
+loParser.RULE_procedure = 16;
+loParser.RULE_paramList = 17;
+loParser.RULE_fieldList = 18;
+loParser.RULE_pairList = 19;
 
 function ModuleContext(parser, parent, invokingState) {
 	if(parent===undefined) {
@@ -384,7 +384,7 @@ function ModuleContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_module;
+    this.ruleIndex = loParser.RULE_module;
     return this;
 }
 
@@ -392,7 +392,7 @@ ModuleContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 ModuleContext.prototype.constructor = ModuleContext;
 
 ModuleContext.prototype.EOF = function() {
-    return this.getToken(exaParser.EOF, 0);
+    return this.getToken(loParser.EOF, 0);
 };
 
 ModuleContext.prototype.references = function() {
@@ -411,7 +411,7 @@ ModuleContext.prototype.definition = function(i) {
 };
 
 ModuleContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitModule(this);
     } else {
         return visitor.visitChildren(this);
@@ -421,12 +421,12 @@ ModuleContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.ModuleContext = ModuleContext;
+loParser.ModuleContext = ModuleContext;
 
-exaParser.prototype.module = function() {
+loParser.prototype.module = function() {
 
     var localctx = new ModuleContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 0, exaParser.RULE_module);
+    this.enterRule(localctx, 0, loParser.RULE_module);
     var _la = 0; // Token type
     try {
         this.enterOuterAlt(localctx, 1);
@@ -447,9 +447,9 @@ exaParser.prototype.module = function() {
             this.state = 46; 
             this._errHandler.sync(this);
             _la = this._input.LA(1);
-        } while(_la===exaParser.ID);
+        } while(_la===loParser.ID);
         this.state = 48;
-        this.match(exaParser.EOF);
+        this.match(loParser.EOF);
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
 	        localctx.exception = re;
@@ -473,7 +473,7 @@ function ReferencesContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_references;
+    this.ruleIndex = loParser.RULE_references;
     return this;
 }
 
@@ -485,9 +485,9 @@ ReferencesContext.prototype.ID = function(i) {
 		i = null;
 	}
     if(i===null) {
-        return this.getTokens(exaParser.ID);
+        return this.getTokens(loParser.ID);
     } else {
-        return this.getToken(exaParser.ID, i);
+        return this.getToken(loParser.ID, i);
     }
 };
 
@@ -497,15 +497,15 @@ ReferencesContext.prototype.MODREF = function(i) {
 		i = null;
 	}
     if(i===null) {
-        return this.getTokens(exaParser.MODREF);
+        return this.getTokens(loParser.MODREF);
     } else {
-        return this.getToken(exaParser.MODREF, i);
+        return this.getToken(loParser.MODREF, i);
     }
 };
 
 
 ReferencesContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitReferences(this);
     } else {
         return visitor.visitChildren(this);
@@ -515,12 +515,12 @@ ReferencesContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.ReferencesContext = ReferencesContext;
+loParser.ReferencesContext = ReferencesContext;
 
-exaParser.prototype.references = function() {
+loParser.prototype.references = function() {
 
     var localctx = new ReferencesContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 2, exaParser.RULE_references);
+    this.enterRule(localctx, 2, loParser.RULE_references);
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 52; 
@@ -530,9 +530,9 @@ exaParser.prototype.references = function() {
         	switch (_alt) {
         	case 1:
         		this.state = 50;
-        		this.match(exaParser.ID);
+        		this.match(loParser.ID);
         		this.state = 51;
-        		this.match(exaParser.MODREF);
+        		this.match(loParser.MODREF);
         		break;
         	default:
         		throw new antlr4.error.NoViableAltException(this);
@@ -564,7 +564,7 @@ function StatementListContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_statementList;
+    this.ruleIndex = loParser.RULE_statementList;
     return this;
 }
 
@@ -580,7 +580,7 @@ StatementListContext.prototype.statementList = function() {
 };
 
 StatementListContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitStatementList(this);
     } else {
         return visitor.visitChildren(this);
@@ -590,12 +590,12 @@ StatementListContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.StatementListContext = StatementListContext;
+loParser.StatementListContext = StatementListContext;
 
-exaParser.prototype.statementList = function() {
+loParser.prototype.statementList = function() {
 
     var localctx = new StatementListContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 4, exaParser.RULE_statementList);
+    this.enterRule(localctx, 4, loParser.RULE_statementList);
     try {
         this.state = 60;
         this._errHandler.sync(this);
@@ -639,7 +639,7 @@ function StatementContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_statement;
+    this.ruleIndex = loParser.RULE_statement;
     return this;
 }
 
@@ -662,13 +662,13 @@ function DefStmtContext(parser, ctx) {
 DefStmtContext.prototype = Object.create(StatementContext.prototype);
 DefStmtContext.prototype.constructor = DefStmtContext;
 
-exaParser.DefStmtContext = DefStmtContext;
+loParser.DefStmtContext = DefStmtContext;
 
 DefStmtContext.prototype.definition = function() {
     return this.getTypedRuleContext(DefinitionContext,0);
 };
 DefStmtContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitDefStmt(this);
     } else {
         return visitor.visitChildren(this);
@@ -685,7 +685,7 @@ function SyncRequestContext(parser, ctx) {
 SyncRequestContext.prototype = Object.create(StatementContext.prototype);
 SyncRequestContext.prototype.constructor = SyncRequestContext;
 
-exaParser.SyncRequestContext = SyncRequestContext;
+loParser.SyncRequestContext = SyncRequestContext;
 
 SyncRequestContext.prototype.expr = function() {
     return this.getTypedRuleContext(ExprContext,0);
@@ -699,7 +699,7 @@ SyncRequestContext.prototype.exprList = function() {
     return this.getTypedRuleContext(ExprListContext,0);
 };
 SyncRequestContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitSyncRequest(this);
     } else {
         return visitor.visitChildren(this);
@@ -716,7 +716,7 @@ function AsyncRequestContext(parser, ctx) {
 AsyncRequestContext.prototype = Object.create(StatementContext.prototype);
 AsyncRequestContext.prototype.constructor = AsyncRequestContext;
 
-exaParser.AsyncRequestContext = AsyncRequestContext;
+loParser.AsyncRequestContext = AsyncRequestContext;
 
 AsyncRequestContext.prototype.expr = function() {
     return this.getTypedRuleContext(ExprContext,0);
@@ -730,7 +730,7 @@ AsyncRequestContext.prototype.exprList = function() {
     return this.getTypedRuleContext(ExprListContext,0);
 };
 AsyncRequestContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitAsyncRequest(this);
     } else {
         return visitor.visitChildren(this);
@@ -748,13 +748,13 @@ function ResponseContext(parser, ctx) {
 ResponseContext.prototype = Object.create(StatementContext.prototype);
 ResponseContext.prototype.constructor = ResponseContext;
 
-exaParser.ResponseContext = ResponseContext;
+loParser.ResponseContext = ResponseContext;
 
 ResponseContext.prototype.exprList = function() {
     return this.getTypedRuleContext(ExprListContext,0);
 };
 ResponseContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitResponse(this);
     } else {
         return visitor.visitChildren(this);
@@ -771,7 +771,7 @@ function AssignmentContext(parser, ctx) {
 AssignmentContext.prototype = Object.create(StatementContext.prototype);
 AssignmentContext.prototype.constructor = AssignmentContext;
 
-exaParser.AssignmentContext = AssignmentContext;
+loParser.AssignmentContext = AssignmentContext;
 
 AssignmentContext.prototype.expr = function(i) {
     if(i===undefined) {
@@ -788,7 +788,7 @@ AssignmentContext.prototype.assignment_op = function() {
     return this.getTypedRuleContext(Assignment_opContext,0);
 };
 AssignmentContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitAssignment(this);
     } else {
         return visitor.visitChildren(this);
@@ -805,7 +805,7 @@ function ScanContext(parser, ctx) {
 ScanContext.prototype = Object.create(StatementContext.prototype);
 ScanContext.prototype.constructor = ScanContext;
 
-exaParser.ScanContext = ScanContext;
+loParser.ScanContext = ScanContext;
 
 ScanContext.prototype.expr = function(i) {
     if(i===undefined) {
@@ -818,7 +818,7 @@ ScanContext.prototype.expr = function(i) {
     }
 };
 ScanContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitScan(this);
     } else {
         return visitor.visitChildren(this);
@@ -835,7 +835,7 @@ function IterationContext(parser, ctx) {
 IterationContext.prototype = Object.create(StatementContext.prototype);
 IterationContext.prototype.constructor = IterationContext;
 
-exaParser.IterationContext = IterationContext;
+loParser.IterationContext = IterationContext;
 
 IterationContext.prototype.expr = function() {
     return this.getTypedRuleContext(ExprContext,0);
@@ -845,7 +845,7 @@ IterationContext.prototype.block = function() {
     return this.getTypedRuleContext(BlockContext,0);
 };
 IterationContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitIteration(this);
     } else {
         return visitor.visitChildren(this);
@@ -863,13 +863,13 @@ function IncDecContext(parser, ctx) {
 IncDecContext.prototype = Object.create(StatementContext.prototype);
 IncDecContext.prototype.constructor = IncDecContext;
 
-exaParser.IncDecContext = IncDecContext;
+loParser.IncDecContext = IncDecContext;
 
 IncDecContext.prototype.expr = function() {
     return this.getTypedRuleContext(ExprContext,0);
 };
 IncDecContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitIncDec(this);
     } else {
         return visitor.visitChildren(this);
@@ -886,7 +886,7 @@ function SendContext(parser, ctx) {
 SendContext.prototype = Object.create(StatementContext.prototype);
 SendContext.prototype.constructor = SendContext;
 
-exaParser.SendContext = SendContext;
+loParser.SendContext = SendContext;
 
 SendContext.prototype.expr = function(i) {
     if(i===undefined) {
@@ -899,7 +899,7 @@ SendContext.prototype.expr = function(i) {
     }
 };
 SendContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitSend(this);
     } else {
         return visitor.visitChildren(this);
@@ -916,13 +916,13 @@ function CondStmtContext(parser, ctx) {
 CondStmtContext.prototype = Object.create(StatementContext.prototype);
 CondStmtContext.prototype.constructor = CondStmtContext;
 
-exaParser.CondStmtContext = CondStmtContext;
+loParser.CondStmtContext = CondStmtContext;
 
 CondStmtContext.prototype.conditional = function() {
     return this.getTypedRuleContext(ConditionalContext,0);
 };
 CondStmtContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitCondStmt(this);
     } else {
         return visitor.visitChildren(this);
@@ -931,12 +931,12 @@ CondStmtContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.StatementContext = StatementContext;
+loParser.StatementContext = StatementContext;
 
-exaParser.prototype.statement = function() {
+loParser.prototype.statement = function() {
 
     var localctx = new StatementContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 6, exaParser.RULE_statement);
+    this.enterRule(localctx, 6, loParser.RULE_statement);
     var _la = 0; // Token type
     try {
         this.state = 108;
@@ -956,7 +956,7 @@ exaParser.prototype.statement = function() {
             this.state = 63;
             localctx.channel = this._input.LT(1);
             _la = this._input.LA(1);
-            if(!((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << exaParser.T__0) | (1 << exaParser.T__1) | (1 << exaParser.T__2))) !== 0))) {
+            if(!((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << loParser.T__0) | (1 << loParser.T__1) | (1 << loParser.T__2))) !== 0))) {
                 localctx.channel = this._errHandler.recoverInline(this);
             }
             else {
@@ -964,13 +964,13 @@ exaParser.prototype.statement = function() {
             }
             this.state = 65;
             _la = this._input.LA(1);
-            if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << exaParser.T__6) | (1 << exaParser.T__8) | (1 << exaParser.T__13) | (1 << exaParser.T__22) | (1 << exaParser.T__23) | (1 << exaParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (exaParser.T__40 - 41)) | (1 << (exaParser.T__43 - 41)) | (1 << (exaParser.T__46 - 41)) | (1 << (exaParser.T__47 - 41)) | (1 << (exaParser.T__48 - 41)) | (1 << (exaParser.BEGIN - 41)) | (1 << (exaParser.NIL - 41)) | (1 << (exaParser.BOOL - 41)) | (1 << (exaParser.NUMBER - 41)) | (1 << (exaParser.ID - 41)) | (1 << (exaParser.STRING - 41)) | (1 << (exaParser.INTER_BEGIN - 41)))) !== 0)) {
+            if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << loParser.T__6) | (1 << loParser.T__8) | (1 << loParser.T__13) | (1 << loParser.T__22) | (1 << loParser.T__23) | (1 << loParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (loParser.T__40 - 41)) | (1 << (loParser.T__43 - 41)) | (1 << (loParser.T__46 - 41)) | (1 << (loParser.T__47 - 41)) | (1 << (loParser.T__48 - 41)) | (1 << (loParser.BEGIN - 41)) | (1 << (loParser.NIL - 41)) | (1 << (loParser.BOOL - 41)) | (1 << (loParser.NUMBER - 41)) | (1 << (loParser.ID - 41)) | (1 << (loParser.STRING - 41)) | (1 << (loParser.INTER_BEGIN - 41)))) !== 0)) {
                 this.state = 64;
                 this.exprList();
             }
 
             this.state = 67;
-            this.match(exaParser.T__3);
+            this.match(loParser.T__3);
             break;
 
         case 3:
@@ -983,7 +983,7 @@ exaParser.prototype.statement = function() {
             this.state = 70;
             this.expr(0);
             this.state = 71;
-            this.match(exaParser.T__3);
+            this.match(loParser.T__3);
             break;
 
         case 4:
@@ -994,14 +994,14 @@ exaParser.prototype.statement = function() {
             this.state = 74;
             localctx.op = this._input.LT(1);
             _la = this._input.LA(1);
-            if(!(_la===exaParser.T__4 || _la===exaParser.T__5)) {
+            if(!(_la===loParser.T__4 || _la===loParser.T__5)) {
                 localctx.op = this._errHandler.recoverInline(this);
             }
             else {
                 this.consume();
             }
             this.state = 75;
-            this.match(exaParser.T__3);
+            this.match(loParser.T__3);
             break;
 
         case 5:
@@ -1017,16 +1017,16 @@ exaParser.prototype.statement = function() {
             this.state = 78;
             this.expr(0);
             this.state = 79;
-            this.match(exaParser.T__6);
+            this.match(loParser.T__6);
             this.state = 81;
             _la = this._input.LA(1);
-            if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << exaParser.T__6) | (1 << exaParser.T__8) | (1 << exaParser.T__13) | (1 << exaParser.T__22) | (1 << exaParser.T__23) | (1 << exaParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (exaParser.T__40 - 41)) | (1 << (exaParser.T__43 - 41)) | (1 << (exaParser.T__46 - 41)) | (1 << (exaParser.T__47 - 41)) | (1 << (exaParser.T__48 - 41)) | (1 << (exaParser.BEGIN - 41)) | (1 << (exaParser.NIL - 41)) | (1 << (exaParser.BOOL - 41)) | (1 << (exaParser.NUMBER - 41)) | (1 << (exaParser.ID - 41)) | (1 << (exaParser.STRING - 41)) | (1 << (exaParser.INTER_BEGIN - 41)))) !== 0)) {
+            if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << loParser.T__6) | (1 << loParser.T__8) | (1 << loParser.T__13) | (1 << loParser.T__22) | (1 << loParser.T__23) | (1 << loParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (loParser.T__40 - 41)) | (1 << (loParser.T__43 - 41)) | (1 << (loParser.T__46 - 41)) | (1 << (loParser.T__47 - 41)) | (1 << (loParser.T__48 - 41)) | (1 << (loParser.BEGIN - 41)) | (1 << (loParser.NIL - 41)) | (1 << (loParser.BOOL - 41)) | (1 << (loParser.NUMBER - 41)) | (1 << (loParser.ID - 41)) | (1 << (loParser.STRING - 41)) | (1 << (loParser.INTER_BEGIN - 41)))) !== 0)) {
                 this.state = 80;
                 this.exprList();
             }
 
             this.state = 83;
-            this.match(exaParser.T__7);
+            this.match(loParser.T__7);
             this.state = 84;
             this.handlers();
             break;
@@ -1035,20 +1035,20 @@ exaParser.prototype.statement = function() {
             localctx = new AsyncRequestContext(this, localctx);
             this.enterOuterAlt(localctx, 7);
             this.state = 86;
-            this.match(exaParser.T__8);
+            this.match(loParser.T__8);
             this.state = 87;
             this.expr(0);
             this.state = 88;
-            this.match(exaParser.T__6);
+            this.match(loParser.T__6);
             this.state = 90;
             _la = this._input.LA(1);
-            if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << exaParser.T__6) | (1 << exaParser.T__8) | (1 << exaParser.T__13) | (1 << exaParser.T__22) | (1 << exaParser.T__23) | (1 << exaParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (exaParser.T__40 - 41)) | (1 << (exaParser.T__43 - 41)) | (1 << (exaParser.T__46 - 41)) | (1 << (exaParser.T__47 - 41)) | (1 << (exaParser.T__48 - 41)) | (1 << (exaParser.BEGIN - 41)) | (1 << (exaParser.NIL - 41)) | (1 << (exaParser.BOOL - 41)) | (1 << (exaParser.NUMBER - 41)) | (1 << (exaParser.ID - 41)) | (1 << (exaParser.STRING - 41)) | (1 << (exaParser.INTER_BEGIN - 41)))) !== 0)) {
+            if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << loParser.T__6) | (1 << loParser.T__8) | (1 << loParser.T__13) | (1 << loParser.T__22) | (1 << loParser.T__23) | (1 << loParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (loParser.T__40 - 41)) | (1 << (loParser.T__43 - 41)) | (1 << (loParser.T__46 - 41)) | (1 << (loParser.T__47 - 41)) | (1 << (loParser.T__48 - 41)) | (1 << (loParser.BEGIN - 41)) | (1 << (loParser.NIL - 41)) | (1 << (loParser.BOOL - 41)) | (1 << (loParser.NUMBER - 41)) | (1 << (loParser.ID - 41)) | (1 << (loParser.STRING - 41)) | (1 << (loParser.INTER_BEGIN - 41)))) !== 0)) {
                 this.state = 89;
                 this.exprList();
             }
 
             this.state = 92;
-            this.match(exaParser.T__7);
+            this.match(loParser.T__7);
             this.state = 93;
             this.handlers();
             break;
@@ -1059,18 +1059,18 @@ exaParser.prototype.statement = function() {
             this.state = 95;
             this.expr(0);
             this.state = 96;
-            this.match(exaParser.T__9);
+            this.match(loParser.T__9);
             this.state = 97;
             this.expr(0);
             this.state = 98;
-            this.match(exaParser.T__3);
+            this.match(loParser.T__3);
             break;
 
         case 9:
             localctx = new IterationContext(this, localctx);
             this.enterOuterAlt(localctx, 9);
             this.state = 100;
-            this.match(exaParser.T__10);
+            this.match(loParser.T__10);
             this.state = 101;
             this.expr(0);
             this.state = 102;
@@ -1081,7 +1081,7 @@ exaParser.prototype.statement = function() {
             localctx = new ScanContext(this, localctx);
             this.enterOuterAlt(localctx, 10);
             this.state = 104;
-            this.match(exaParser.T__11);
+            this.match(loParser.T__11);
             this.state = 105;
             this.expr(0);
             this.state = 106;
@@ -1112,7 +1112,7 @@ function DefinitionContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_definition;
+    this.ruleIndex = loParser.RULE_definition;
     return this;
 }
 
@@ -1135,17 +1135,17 @@ function ConstantContext(parser, ctx) {
 ConstantContext.prototype = Object.create(DefinitionContext.prototype);
 ConstantContext.prototype.constructor = ConstantContext;
 
-exaParser.ConstantContext = ConstantContext;
+loParser.ConstantContext = ConstantContext;
 
 ConstantContext.prototype.ID = function() {
-    return this.getToken(exaParser.ID, 0);
+    return this.getToken(loParser.ID, 0);
 };
 
 ConstantContext.prototype.literal = function() {
     return this.getTypedRuleContext(LiteralContext,0);
 };
 ConstantContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitConstant(this);
     } else {
         return visitor.visitChildren(this);
@@ -1154,23 +1154,23 @@ ConstantContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.DefinitionContext = DefinitionContext;
+loParser.DefinitionContext = DefinitionContext;
 
-exaParser.prototype.definition = function() {
+loParser.prototype.definition = function() {
 
     var localctx = new DefinitionContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 8, exaParser.RULE_definition);
+    this.enterRule(localctx, 8, loParser.RULE_definition);
     try {
         localctx = new ConstantContext(this, localctx);
         this.enterOuterAlt(localctx, 1);
         this.state = 110;
-        this.match(exaParser.ID);
+        this.match(loParser.ID);
         this.state = 111;
-        this.match(exaParser.T__12);
+        this.match(loParser.T__12);
         this.state = 112;
         this.literal();
         this.state = 113;
-        this.match(exaParser.T__3);
+        this.match(loParser.T__3);
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
 	        localctx.exception = re;
@@ -1194,7 +1194,7 @@ function HandlersContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_handlers;
+    this.ruleIndex = loParser.RULE_handlers;
     return this;
 }
 
@@ -1210,7 +1210,7 @@ HandlersContext.prototype.failHandler = function() {
 };
 
 HandlersContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitHandlers(this);
     } else {
         return visitor.visitChildren(this);
@@ -1220,12 +1220,12 @@ HandlersContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.HandlersContext = HandlersContext;
+loParser.HandlersContext = HandlersContext;
 
-exaParser.prototype.handlers = function() {
+loParser.prototype.handlers = function() {
 
     var localctx = new HandlersContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 10, exaParser.RULE_handlers);
+    this.enterRule(localctx, 10, loParser.RULE_handlers);
     try {
         this.state = 121;
         this._errHandler.sync(this);
@@ -1234,7 +1234,7 @@ exaParser.prototype.handlers = function() {
         case 1:
             this.enterOuterAlt(localctx, 1);
             this.state = 115;
-            this.match(exaParser.T__3);
+            this.match(loParser.T__3);
             break;
 
         case 2:
@@ -1281,7 +1281,7 @@ function ReplyHandlerContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_replyHandler;
+    this.ruleIndex = loParser.RULE_replyHandler;
     return this;
 }
 
@@ -1293,7 +1293,7 @@ ReplyHandlerContext.prototype.sink = function() {
 };
 
 ReplyHandlerContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitReplyHandler(this);
     } else {
         return visitor.visitChildren(this);
@@ -1303,12 +1303,12 @@ ReplyHandlerContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.ReplyHandlerContext = ReplyHandlerContext;
+loParser.ReplyHandlerContext = ReplyHandlerContext;
 
-exaParser.prototype.replyHandler = function() {
+loParser.prototype.replyHandler = function() {
 
     var localctx = new ReplyHandlerContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 12, exaParser.RULE_replyHandler);
+    this.enterRule(localctx, 12, loParser.RULE_replyHandler);
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 123;
@@ -1336,7 +1336,7 @@ function FailHandlerContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_failHandler;
+    this.ruleIndex = loParser.RULE_failHandler;
     return this;
 }
 
@@ -1348,7 +1348,7 @@ FailHandlerContext.prototype.sink = function() {
 };
 
 FailHandlerContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitFailHandler(this);
     } else {
         return visitor.visitChildren(this);
@@ -1358,18 +1358,18 @@ FailHandlerContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.FailHandlerContext = FailHandlerContext;
+loParser.FailHandlerContext = FailHandlerContext;
 
-exaParser.prototype.failHandler = function() {
+loParser.prototype.failHandler = function() {
 
     var localctx = new FailHandlerContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 14, exaParser.RULE_failHandler);
+    this.enterRule(localctx, 14, loParser.RULE_failHandler);
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 125;
-        this.match(exaParser.T__13);
+        this.match(loParser.T__13);
         this.state = 126;
-        this.match(exaParser.T__1);
+        this.match(loParser.T__1);
         this.state = 127;
         this.sink();
     } catch (re) {
@@ -1395,7 +1395,7 @@ function Assignment_opContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_assignment_op;
+    this.ruleIndex = loParser.RULE_assignment_op;
     return this;
 }
 
@@ -1404,7 +1404,7 @@ Assignment_opContext.prototype.constructor = Assignment_opContext;
 
 
 Assignment_opContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitAssignment_op(this);
     } else {
         return visitor.visitChildren(this);
@@ -1414,18 +1414,18 @@ Assignment_opContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.Assignment_opContext = Assignment_opContext;
+loParser.Assignment_opContext = Assignment_opContext;
 
-exaParser.prototype.assignment_op = function() {
+loParser.prototype.assignment_op = function() {
 
     var localctx = new Assignment_opContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 16, exaParser.RULE_assignment_op);
+    this.enterRule(localctx, 16, loParser.RULE_assignment_op);
     var _la = 0; // Token type
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 129;
         _la = this._input.LA(1);
-        if(!((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << exaParser.T__14) | (1 << exaParser.T__15) | (1 << exaParser.T__16) | (1 << exaParser.T__17) | (1 << exaParser.T__18) | (1 << exaParser.T__19))) !== 0))) {
+        if(!((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << loParser.T__14) | (1 << loParser.T__15) | (1 << loParser.T__16) | (1 << loParser.T__17) | (1 << loParser.T__18) | (1 << loParser.T__19))) !== 0))) {
         this._errHandler.recoverInline(this);
         }
         else {
@@ -1454,7 +1454,7 @@ function ConditionalContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_conditional;
+    this.ruleIndex = loParser.RULE_conditional;
     return this;
 }
 
@@ -1477,7 +1477,7 @@ function NestedIfContext(parser, ctx) {
 NestedIfContext.prototype = Object.create(ConditionalContext.prototype);
 NestedIfContext.prototype.constructor = NestedIfContext;
 
-exaParser.NestedIfContext = NestedIfContext;
+loParser.NestedIfContext = NestedIfContext;
 
 NestedIfContext.prototype.expr = function() {
     return this.getTypedRuleContext(ExprContext,0);
@@ -1491,7 +1491,7 @@ NestedIfContext.prototype.conditional = function() {
     return this.getTypedRuleContext(ConditionalContext,0);
 };
 NestedIfContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitNestedIf(this);
     } else {
         return visitor.visitChildren(this);
@@ -1508,7 +1508,7 @@ function IfOnlyContext(parser, ctx) {
 IfOnlyContext.prototype = Object.create(ConditionalContext.prototype);
 IfOnlyContext.prototype.constructor = IfOnlyContext;
 
-exaParser.IfOnlyContext = IfOnlyContext;
+loParser.IfOnlyContext = IfOnlyContext;
 
 IfOnlyContext.prototype.expr = function() {
     return this.getTypedRuleContext(ExprContext,0);
@@ -1518,7 +1518,7 @@ IfOnlyContext.prototype.block = function() {
     return this.getTypedRuleContext(BlockContext,0);
 };
 IfOnlyContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitIfOnly(this);
     } else {
         return visitor.visitChildren(this);
@@ -1535,7 +1535,7 @@ function IfElseContext(parser, ctx) {
 IfElseContext.prototype = Object.create(ConditionalContext.prototype);
 IfElseContext.prototype.constructor = IfElseContext;
 
-exaParser.IfElseContext = IfElseContext;
+loParser.IfElseContext = IfElseContext;
 
 IfElseContext.prototype.expr = function() {
     return this.getTypedRuleContext(ExprContext,0);
@@ -1552,7 +1552,7 @@ IfElseContext.prototype.block = function(i) {
     }
 };
 IfElseContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitIfElse(this);
     } else {
         return visitor.visitChildren(this);
@@ -1561,12 +1561,12 @@ IfElseContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.ConditionalContext = ConditionalContext;
+loParser.ConditionalContext = ConditionalContext;
 
-exaParser.prototype.conditional = function() {
+loParser.prototype.conditional = function() {
 
     var localctx = new ConditionalContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 18, exaParser.RULE_conditional);
+    this.enterRule(localctx, 18, loParser.RULE_conditional);
     try {
         this.state = 147;
         this._errHandler.sync(this);
@@ -1576,7 +1576,7 @@ exaParser.prototype.conditional = function() {
             localctx = new IfOnlyContext(this, localctx);
             this.enterOuterAlt(localctx, 1);
             this.state = 131;
-            this.match(exaParser.T__20);
+            this.match(loParser.T__20);
             this.state = 132;
             this.expr(0);
             this.state = 133;
@@ -1587,13 +1587,13 @@ exaParser.prototype.conditional = function() {
             localctx = new IfElseContext(this, localctx);
             this.enterOuterAlt(localctx, 2);
             this.state = 135;
-            this.match(exaParser.T__20);
+            this.match(loParser.T__20);
             this.state = 136;
             this.expr(0);
             this.state = 137;
             this.block();
             this.state = 138;
-            this.match(exaParser.T__21);
+            this.match(loParser.T__21);
             this.state = 139;
             this.block();
             break;
@@ -1602,13 +1602,13 @@ exaParser.prototype.conditional = function() {
             localctx = new NestedIfContext(this, localctx);
             this.enterOuterAlt(localctx, 3);
             this.state = 141;
-            this.match(exaParser.T__20);
+            this.match(loParser.T__20);
             this.state = 142;
             this.expr(0);
             this.state = 143;
             this.block();
             this.state = 144;
-            this.match(exaParser.T__21);
+            this.match(loParser.T__21);
             this.state = 145;
             this.conditional();
             break;
@@ -1637,7 +1637,7 @@ function BlockContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_block;
+    this.ruleIndex = loParser.RULE_block;
     return this;
 }
 
@@ -1645,11 +1645,11 @@ BlockContext.prototype = Object.create(antlr4.ParserRuleContext.prototype);
 BlockContext.prototype.constructor = BlockContext;
 
 BlockContext.prototype.BEGIN = function() {
-    return this.getToken(exaParser.BEGIN, 0);
+    return this.getToken(loParser.BEGIN, 0);
 };
 
 BlockContext.prototype.END = function() {
-    return this.getToken(exaParser.END, 0);
+    return this.getToken(loParser.END, 0);
 };
 
 BlockContext.prototype.statementList = function() {
@@ -1657,7 +1657,7 @@ BlockContext.prototype.statementList = function() {
 };
 
 BlockContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitBlock(this);
     } else {
         return visitor.visitChildren(this);
@@ -1667,26 +1667,26 @@ BlockContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.BlockContext = BlockContext;
+loParser.BlockContext = BlockContext;
 
-exaParser.prototype.block = function() {
+loParser.prototype.block = function() {
 
     var localctx = new BlockContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 20, exaParser.RULE_block);
+    this.enterRule(localctx, 20, loParser.RULE_block);
     var _la = 0; // Token type
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 149;
-        this.match(exaParser.BEGIN);
+        this.match(loParser.BEGIN);
         this.state = 151;
         _la = this._input.LA(1);
-        if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << exaParser.T__0) | (1 << exaParser.T__1) | (1 << exaParser.T__2) | (1 << exaParser.T__6) | (1 << exaParser.T__8) | (1 << exaParser.T__10) | (1 << exaParser.T__11) | (1 << exaParser.T__13) | (1 << exaParser.T__20) | (1 << exaParser.T__22) | (1 << exaParser.T__23) | (1 << exaParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (exaParser.T__40 - 41)) | (1 << (exaParser.T__43 - 41)) | (1 << (exaParser.T__46 - 41)) | (1 << (exaParser.T__47 - 41)) | (1 << (exaParser.T__48 - 41)) | (1 << (exaParser.BEGIN - 41)) | (1 << (exaParser.NIL - 41)) | (1 << (exaParser.BOOL - 41)) | (1 << (exaParser.NUMBER - 41)) | (1 << (exaParser.ID - 41)) | (1 << (exaParser.STRING - 41)) | (1 << (exaParser.INTER_BEGIN - 41)))) !== 0)) {
+        if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << loParser.T__0) | (1 << loParser.T__1) | (1 << loParser.T__2) | (1 << loParser.T__6) | (1 << loParser.T__8) | (1 << loParser.T__10) | (1 << loParser.T__11) | (1 << loParser.T__13) | (1 << loParser.T__20) | (1 << loParser.T__22) | (1 << loParser.T__23) | (1 << loParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (loParser.T__40 - 41)) | (1 << (loParser.T__43 - 41)) | (1 << (loParser.T__46 - 41)) | (1 << (loParser.T__47 - 41)) | (1 << (loParser.T__48 - 41)) | (1 << (loParser.BEGIN - 41)) | (1 << (loParser.NIL - 41)) | (1 << (loParser.BOOL - 41)) | (1 << (loParser.NUMBER - 41)) | (1 << (loParser.ID - 41)) | (1 << (loParser.STRING - 41)) | (1 << (loParser.INTER_BEGIN - 41)))) !== 0)) {
             this.state = 150;
             this.statementList();
         }
 
         this.state = 153;
-        this.match(exaParser.END);
+        this.match(loParser.END);
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
 	        localctx.exception = re;
@@ -1710,7 +1710,7 @@ function ExprContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_expr;
+    this.ruleIndex = loParser.RULE_expr;
     return this;
 }
 
@@ -1732,13 +1732,13 @@ function NegationContext(parser, ctx) {
 NegationContext.prototype = Object.create(ExprContext.prototype);
 NegationContext.prototype.constructor = NegationContext;
 
-exaParser.NegationContext = NegationContext;
+loParser.NegationContext = NegationContext;
 
 NegationContext.prototype.expr = function() {
     return this.getTypedRuleContext(ExprContext,0);
 };
 NegationContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitNegation(this);
     } else {
         return visitor.visitChildren(this);
@@ -1755,10 +1755,10 @@ function DynastringContext(parser, ctx) {
 DynastringContext.prototype = Object.create(ExprContext.prototype);
 DynastringContext.prototype.constructor = DynastringContext;
 
-exaParser.DynastringContext = DynastringContext;
+loParser.DynastringContext = DynastringContext;
 
 DynastringContext.prototype.INTER_BEGIN = function() {
-    return this.getToken(exaParser.INTER_BEGIN, 0);
+    return this.getToken(loParser.INTER_BEGIN, 0);
 };
 
 DynastringContext.prototype.interpolated = function() {
@@ -1766,10 +1766,10 @@ DynastringContext.prototype.interpolated = function() {
 };
 
 DynastringContext.prototype.INTER_END = function() {
-    return this.getToken(exaParser.INTER_END, 0);
+    return this.getToken(loParser.INTER_END, 0);
 };
 DynastringContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitDynastring(this);
     } else {
         return visitor.visitChildren(this);
@@ -1787,7 +1787,7 @@ function CompareContext(parser, ctx) {
 CompareContext.prototype = Object.create(ExprContext.prototype);
 CompareContext.prototype.constructor = CompareContext;
 
-exaParser.CompareContext = CompareContext;
+loParser.CompareContext = CompareContext;
 
 CompareContext.prototype.expr = function(i) {
     if(i===undefined) {
@@ -1800,7 +1800,7 @@ CompareContext.prototype.expr = function(i) {
     }
 };
 CompareContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitCompare(this);
     } else {
         return visitor.visitChildren(this);
@@ -1817,17 +1817,17 @@ function SelectContext(parser, ctx) {
 SelectContext.prototype = Object.create(ExprContext.prototype);
 SelectContext.prototype.constructor = SelectContext;
 
-exaParser.SelectContext = SelectContext;
+loParser.SelectContext = SelectContext;
 
 SelectContext.prototype.expr = function() {
     return this.getTypedRuleContext(ExprContext,0);
 };
 
 SelectContext.prototype.ID = function() {
-    return this.getToken(exaParser.ID, 0);
+    return this.getToken(loParser.ID, 0);
 };
 SelectContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitSelect(this);
     } else {
         return visitor.visitChildren(this);
@@ -1844,7 +1844,7 @@ function SubscriptContext(parser, ctx) {
 SubscriptContext.prototype = Object.create(ExprContext.prototype);
 SubscriptContext.prototype.constructor = SubscriptContext;
 
-exaParser.SubscriptContext = SubscriptContext;
+loParser.SubscriptContext = SubscriptContext;
 
 SubscriptContext.prototype.expr = function(i) {
     if(i===undefined) {
@@ -1857,7 +1857,7 @@ SubscriptContext.prototype.expr = function(i) {
     }
 };
 SubscriptContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitSubscript(this);
     } else {
         return visitor.visitChildren(this);
@@ -1874,21 +1874,21 @@ function ExternalIdContext(parser, ctx) {
 ExternalIdContext.prototype = Object.create(ExprContext.prototype);
 ExternalIdContext.prototype.constructor = ExternalIdContext;
 
-exaParser.ExternalIdContext = ExternalIdContext;
+loParser.ExternalIdContext = ExternalIdContext;
 
 ExternalIdContext.prototype.ID = function(i) {
 	if(i===undefined) {
 		i = null;
 	}
     if(i===null) {
-        return this.getTokens(exaParser.ID);
+        return this.getTokens(loParser.ID);
     } else {
-        return this.getToken(exaParser.ID, i);
+        return this.getToken(loParser.ID, i);
     }
 };
 
 ExternalIdContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitExternalId(this);
     } else {
         return visitor.visitChildren(this);
@@ -1906,7 +1906,7 @@ function AddSubContext(parser, ctx) {
 AddSubContext.prototype = Object.create(ExprContext.prototype);
 AddSubContext.prototype.constructor = AddSubContext;
 
-exaParser.AddSubContext = AddSubContext;
+loParser.AddSubContext = AddSubContext;
 
 AddSubContext.prototype.expr = function(i) {
     if(i===undefined) {
@@ -1919,7 +1919,7 @@ AddSubContext.prototype.expr = function(i) {
     }
 };
 AddSubContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitAddSub(this);
     } else {
         return visitor.visitChildren(this);
@@ -1936,7 +1936,7 @@ function MembershipContext(parser, ctx) {
 MembershipContext.prototype = Object.create(ExprContext.prototype);
 MembershipContext.prototype.constructor = MembershipContext;
 
-exaParser.MembershipContext = MembershipContext;
+loParser.MembershipContext = MembershipContext;
 
 MembershipContext.prototype.expr = function(i) {
     if(i===undefined) {
@@ -1949,7 +1949,7 @@ MembershipContext.prototype.expr = function(i) {
     }
 };
 MembershipContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitMembership(this);
     } else {
         return visitor.visitChildren(this);
@@ -1966,7 +1966,7 @@ function ConcatContext(parser, ctx) {
 ConcatContext.prototype = Object.create(ExprContext.prototype);
 ConcatContext.prototype.constructor = ConcatContext;
 
-exaParser.ConcatContext = ConcatContext;
+loParser.ConcatContext = ConcatContext;
 
 ConcatContext.prototype.expr = function(i) {
     if(i===undefined) {
@@ -1979,7 +1979,7 @@ ConcatContext.prototype.expr = function(i) {
     }
 };
 ConcatContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitConcat(this);
     } else {
         return visitor.visitChildren(this);
@@ -1996,13 +1996,13 @@ function CardinalityContext(parser, ctx) {
 CardinalityContext.prototype = Object.create(ExprContext.prototype);
 CardinalityContext.prototype.constructor = CardinalityContext;
 
-exaParser.CardinalityContext = CardinalityContext;
+loParser.CardinalityContext = CardinalityContext;
 
 CardinalityContext.prototype.expr = function() {
     return this.getTypedRuleContext(ExprContext,0);
 };
 CardinalityContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitCardinality(this);
     } else {
         return visitor.visitChildren(this);
@@ -2020,7 +2020,7 @@ function MulDivContext(parser, ctx) {
 MulDivContext.prototype = Object.create(ExprContext.prototype);
 MulDivContext.prototype.constructor = MulDivContext;
 
-exaParser.MulDivContext = MulDivContext;
+loParser.MulDivContext = MulDivContext;
 
 MulDivContext.prototype.expr = function(i) {
     if(i===undefined) {
@@ -2033,7 +2033,7 @@ MulDivContext.prototype.expr = function(i) {
     }
 };
 MulDivContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitMulDiv(this);
     } else {
         return visitor.visitChildren(this);
@@ -2051,7 +2051,7 @@ function LogicalContext(parser, ctx) {
 LogicalContext.prototype = Object.create(ExprContext.prototype);
 LogicalContext.prototype.constructor = LogicalContext;
 
-exaParser.LogicalContext = LogicalContext;
+loParser.LogicalContext = LogicalContext;
 
 LogicalContext.prototype.expr = function(i) {
     if(i===undefined) {
@@ -2064,7 +2064,7 @@ LogicalContext.prototype.expr = function(i) {
     }
 };
 LogicalContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitLogical(this);
     } else {
         return visitor.visitChildren(this);
@@ -2081,7 +2081,7 @@ function AsyncCallContext(parser, ctx) {
 AsyncCallContext.prototype = Object.create(ExprContext.prototype);
 AsyncCallContext.prototype.constructor = AsyncCallContext;
 
-exaParser.AsyncCallContext = AsyncCallContext;
+loParser.AsyncCallContext = AsyncCallContext;
 
 AsyncCallContext.prototype.expr = function() {
     return this.getTypedRuleContext(ExprContext,0);
@@ -2091,7 +2091,7 @@ AsyncCallContext.prototype.exprList = function() {
     return this.getTypedRuleContext(ExprListContext,0);
 };
 AsyncCallContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitAsyncCall(this);
     } else {
         return visitor.visitChildren(this);
@@ -2108,7 +2108,7 @@ function SliceContext(parser, ctx) {
 SliceContext.prototype = Object.create(ExprContext.prototype);
 SliceContext.prototype.constructor = SliceContext;
 
-exaParser.SliceContext = SliceContext;
+loParser.SliceContext = SliceContext;
 
 SliceContext.prototype.expr = function(i) {
     if(i===undefined) {
@@ -2121,7 +2121,7 @@ SliceContext.prototype.expr = function(i) {
     }
 };
 SliceContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitSlice(this);
     } else {
         return visitor.visitChildren(this);
@@ -2138,13 +2138,13 @@ function BytesContext(parser, ctx) {
 BytesContext.prototype = Object.create(ExprContext.prototype);
 BytesContext.prototype.constructor = BytesContext;
 
-exaParser.BytesContext = BytesContext;
+loParser.BytesContext = BytesContext;
 
 BytesContext.prototype.expr = function() {
     return this.getTypedRuleContext(ExprContext,0);
 };
 BytesContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitBytes(this);
     } else {
         return visitor.visitChildren(this);
@@ -2161,7 +2161,7 @@ function SyncCallContext(parser, ctx) {
 SyncCallContext.prototype = Object.create(ExprContext.prototype);
 SyncCallContext.prototype.constructor = SyncCallContext;
 
-exaParser.SyncCallContext = SyncCallContext;
+loParser.SyncCallContext = SyncCallContext;
 
 SyncCallContext.prototype.expr = function() {
     return this.getTypedRuleContext(ExprContext,0);
@@ -2171,7 +2171,7 @@ SyncCallContext.prototype.exprList = function() {
     return this.getTypedRuleContext(ExprListContext,0);
 };
 SyncCallContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitSyncCall(this);
     } else {
         return visitor.visitChildren(this);
@@ -2188,13 +2188,13 @@ function IdContext(parser, ctx) {
 IdContext.prototype = Object.create(ExprContext.prototype);
 IdContext.prototype.constructor = IdContext;
 
-exaParser.IdContext = IdContext;
+loParser.IdContext = IdContext;
 
 IdContext.prototype.ID = function() {
-    return this.getToken(exaParser.ID, 0);
+    return this.getToken(loParser.ID, 0);
 };
 IdContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitId(this);
     } else {
         return visitor.visitChildren(this);
@@ -2211,13 +2211,13 @@ function WrapContext(parser, ctx) {
 WrapContext.prototype = Object.create(ExprContext.prototype);
 WrapContext.prototype.constructor = WrapContext;
 
-exaParser.WrapContext = WrapContext;
+loParser.WrapContext = WrapContext;
 
 WrapContext.prototype.expr = function() {
     return this.getTypedRuleContext(ExprContext,0);
 };
 WrapContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitWrap(this);
     } else {
         return visitor.visitChildren(this);
@@ -2234,7 +2234,7 @@ function MapContext(parser, ctx) {
 MapContext.prototype = Object.create(ExprContext.prototype);
 MapContext.prototype.constructor = MapContext;
 
-exaParser.MapContext = MapContext;
+loParser.MapContext = MapContext;
 
 MapContext.prototype.expr = function(i) {
     if(i===undefined) {
@@ -2247,7 +2247,7 @@ MapContext.prototype.expr = function(i) {
     }
 };
 MapContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitMap(this);
     } else {
         return visitor.visitChildren(this);
@@ -2264,13 +2264,13 @@ function LitExprContext(parser, ctx) {
 LitExprContext.prototype = Object.create(ExprContext.prototype);
 LitExprContext.prototype.constructor = LitExprContext;
 
-exaParser.LitExprContext = LitExprContext;
+loParser.LitExprContext = LitExprContext;
 
 LitExprContext.prototype.literal = function() {
     return this.getTypedRuleContext(LiteralContext,0);
 };
 LitExprContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitLitExpr(this);
     } else {
         return visitor.visitChildren(this);
@@ -2287,21 +2287,21 @@ function DestructureContext(parser, ctx) {
 DestructureContext.prototype = Object.create(ExprContext.prototype);
 DestructureContext.prototype.constructor = DestructureContext;
 
-exaParser.DestructureContext = DestructureContext;
+loParser.DestructureContext = DestructureContext;
 
 DestructureContext.prototype.ID = function(i) {
 	if(i===undefined) {
 		i = null;
 	}
     if(i===null) {
-        return this.getTokens(exaParser.ID);
+        return this.getTokens(loParser.ID);
     } else {
-        return this.getToken(exaParser.ID, i);
+        return this.getToken(loParser.ID, i);
     }
 };
 
 DestructureContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitDestructure(this);
     } else {
         return visitor.visitChildren(this);
@@ -2310,7 +2310,7 @@ DestructureContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.prototype.expr = function(_p) {
+loParser.prototype.expr = function(_p) {
 	if(_p===undefined) {
 	    _p = 0;
 	}
@@ -2319,7 +2319,7 @@ exaParser.prototype.expr = function(_p) {
     var localctx = new ExprContext(this, this._ctx, _parentState);
     var _prevctx = localctx;
     var _startState = 22;
-    this.enterRecursionRule(localctx, 22, exaParser.RULE_expr, _p);
+    this.enterRecursionRule(localctx, 22, loParser.RULE_expr, _p);
     var _la = 0; // Token type
     try {
         this.enterOuterAlt(localctx, 1);
@@ -2333,20 +2333,20 @@ exaParser.prototype.expr = function(_p) {
             _prevctx = localctx;
 
             this.state = 156;
-            this.match(exaParser.T__8);
+            this.match(loParser.T__8);
             this.state = 157;
             this.expr(0);
             this.state = 158;
-            this.match(exaParser.T__6);
+            this.match(loParser.T__6);
             this.state = 160;
             _la = this._input.LA(1);
-            if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << exaParser.T__6) | (1 << exaParser.T__8) | (1 << exaParser.T__13) | (1 << exaParser.T__22) | (1 << exaParser.T__23) | (1 << exaParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (exaParser.T__40 - 41)) | (1 << (exaParser.T__43 - 41)) | (1 << (exaParser.T__46 - 41)) | (1 << (exaParser.T__47 - 41)) | (1 << (exaParser.T__48 - 41)) | (1 << (exaParser.BEGIN - 41)) | (1 << (exaParser.NIL - 41)) | (1 << (exaParser.BOOL - 41)) | (1 << (exaParser.NUMBER - 41)) | (1 << (exaParser.ID - 41)) | (1 << (exaParser.STRING - 41)) | (1 << (exaParser.INTER_BEGIN - 41)))) !== 0)) {
+            if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << loParser.T__6) | (1 << loParser.T__8) | (1 << loParser.T__13) | (1 << loParser.T__22) | (1 << loParser.T__23) | (1 << loParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (loParser.T__40 - 41)) | (1 << (loParser.T__43 - 41)) | (1 << (loParser.T__46 - 41)) | (1 << (loParser.T__47 - 41)) | (1 << (loParser.T__48 - 41)) | (1 << (loParser.BEGIN - 41)) | (1 << (loParser.NIL - 41)) | (1 << (loParser.BOOL - 41)) | (1 << (loParser.NUMBER - 41)) | (1 << (loParser.ID - 41)) | (1 << (loParser.STRING - 41)) | (1 << (loParser.INTER_BEGIN - 41)))) !== 0)) {
                 this.state = 159;
                 this.exprList();
             }
 
             this.state = 162;
-            this.match(exaParser.T__7);
+            this.match(loParser.T__7);
             break;
 
         case 2:
@@ -2354,7 +2354,7 @@ exaParser.prototype.expr = function(_p) {
             this._ctx = localctx;
             _prevctx = localctx;
             this.state = 164;
-            this.match(exaParser.T__22);
+            this.match(loParser.T__22);
             this.state = 165;
             this.expr(19);
             break;
@@ -2364,7 +2364,7 @@ exaParser.prototype.expr = function(_p) {
             this._ctx = localctx;
             _prevctx = localctx;
             this.state = 166;
-            this.match(exaParser.T__23);
+            this.match(loParser.T__23);
             this.state = 167;
             this.expr(18);
             break;
@@ -2374,7 +2374,7 @@ exaParser.prototype.expr = function(_p) {
             this._ctx = localctx;
             _prevctx = localctx;
             this.state = 168;
-            this.match(exaParser.T__24);
+            this.match(loParser.T__24);
             this.state = 169;
             this.expr(17);
             break;
@@ -2384,11 +2384,11 @@ exaParser.prototype.expr = function(_p) {
             this._ctx = localctx;
             _prevctx = localctx;
             this.state = 170;
-            this.match(exaParser.T__6);
+            this.match(loParser.T__6);
             this.state = 171;
             this.expr(0);
             this.state = 172;
-            this.match(exaParser.T__7);
+            this.match(loParser.T__7);
             break;
 
         case 6:
@@ -2396,7 +2396,7 @@ exaParser.prototype.expr = function(_p) {
             this._ctx = localctx;
             _prevctx = localctx;
             this.state = 174;
-            this.match(exaParser.T__43);
+            this.match(loParser.T__43);
             this.state = 175;
             this.expr(0);
             this.state = 176;
@@ -2408,23 +2408,23 @@ exaParser.prototype.expr = function(_p) {
             this._ctx = localctx;
             _prevctx = localctx;
             this.state = 178;
-            this.match(exaParser.T__6);
+            this.match(loParser.T__6);
             this.state = 179;
-            this.match(exaParser.ID);
+            this.match(loParser.ID);
             this.state = 182; 
             this._errHandler.sync(this);
             _la = this._input.LA(1);
             do {
                 this.state = 180;
-                this.match(exaParser.T__45);
+                this.match(loParser.T__45);
                 this.state = 181;
-                this.match(exaParser.ID);
+                this.match(loParser.ID);
                 this.state = 184; 
                 this._errHandler.sync(this);
                 _la = this._input.LA(1);
-            } while(_la===exaParser.T__45);
+            } while(_la===loParser.T__45);
             this.state = 186;
-            this.match(exaParser.T__7);
+            this.match(loParser.T__7);
             break;
 
         case 8:
@@ -2432,11 +2432,11 @@ exaParser.prototype.expr = function(_p) {
             this._ctx = localctx;
             _prevctx = localctx;
             this.state = 187;
-            this.match(exaParser.INTER_BEGIN);
+            this.match(loParser.INTER_BEGIN);
             this.state = 188;
             this.interpolated();
             this.state = 189;
-            this.match(exaParser.INTER_END);
+            this.match(loParser.INTER_END);
             break;
 
         case 9:
@@ -2452,11 +2452,11 @@ exaParser.prototype.expr = function(_p) {
             this._ctx = localctx;
             _prevctx = localctx;
             this.state = 192;
-            this.match(exaParser.ID);
+            this.match(loParser.ID);
             this.state = 193;
-            this.match(exaParser.FIELD_SEP);
+            this.match(loParser.FIELD_SEP);
             this.state = 194;
-            this.match(exaParser.ID);
+            this.match(loParser.ID);
             break;
 
         case 11:
@@ -2464,7 +2464,7 @@ exaParser.prototype.expr = function(_p) {
             this._ctx = localctx;
             _prevctx = localctx;
             this.state = 195;
-            this.match(exaParser.ID);
+            this.match(loParser.ID);
             break;
 
         }
@@ -2484,7 +2484,7 @@ exaParser.prototype.expr = function(_p) {
                 switch(la_) {
                 case 1:
                     localctx = new MulDivContext(this, new ExprContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, exaParser.RULE_expr);
+                    this.pushNewRecursionContext(localctx, _startState, loParser.RULE_expr);
                     this.state = 198;
                     if (!( this.precpred(this._ctx, 16))) {
                         throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 16)");
@@ -2492,7 +2492,7 @@ exaParser.prototype.expr = function(_p) {
                     this.state = 199;
                     localctx.op = this._input.LT(1);
                     _la = this._input.LA(1);
-                    if(!((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << exaParser.T__25) | (1 << exaParser.T__26) | (1 << exaParser.T__27))) !== 0))) {
+                    if(!((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << loParser.T__25) | (1 << loParser.T__26) | (1 << loParser.T__27))) !== 0))) {
                         localctx.op = this._errHandler.recoverInline(this);
                     }
                     else {
@@ -2504,7 +2504,7 @@ exaParser.prototype.expr = function(_p) {
 
                 case 2:
                     localctx = new AddSubContext(this, new ExprContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, exaParser.RULE_expr);
+                    this.pushNewRecursionContext(localctx, _startState, loParser.RULE_expr);
                     this.state = 201;
                     if (!( this.precpred(this._ctx, 15))) {
                         throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 15)");
@@ -2512,7 +2512,7 @@ exaParser.prototype.expr = function(_p) {
                     this.state = 202;
                     localctx.op = this._input.LT(1);
                     _la = this._input.LA(1);
-                    if(!(_la===exaParser.T__28 || _la===exaParser.T__29)) {
+                    if(!(_la===loParser.T__28 || _la===loParser.T__29)) {
                         localctx.op = this._errHandler.recoverInline(this);
                     }
                     else {
@@ -2524,7 +2524,7 @@ exaParser.prototype.expr = function(_p) {
 
                 case 3:
                     localctx = new CompareContext(this, new ExprContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, exaParser.RULE_expr);
+                    this.pushNewRecursionContext(localctx, _startState, loParser.RULE_expr);
                     this.state = 204;
                     if (!( this.precpred(this._ctx, 14))) {
                         throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 14)");
@@ -2532,7 +2532,7 @@ exaParser.prototype.expr = function(_p) {
                     this.state = 205;
                     localctx.op = this._input.LT(1);
                     _la = this._input.LA(1);
-                    if(!(((((_la - 31)) & ~0x1f) == 0 && ((1 << (_la - 31)) & ((1 << (exaParser.T__30 - 31)) | (1 << (exaParser.T__31 - 31)) | (1 << (exaParser.T__32 - 31)) | (1 << (exaParser.T__33 - 31)) | (1 << (exaParser.T__34 - 31)) | (1 << (exaParser.T__35 - 31)))) !== 0))) {
+                    if(!(((((_la - 31)) & ~0x1f) == 0 && ((1 << (_la - 31)) & ((1 << (loParser.T__30 - 31)) | (1 << (loParser.T__31 - 31)) | (1 << (loParser.T__32 - 31)) | (1 << (loParser.T__33 - 31)) | (1 << (loParser.T__34 - 31)) | (1 << (loParser.T__35 - 31)))) !== 0))) {
                         localctx.op = this._errHandler.recoverInline(this);
                     }
                     else {
@@ -2544,7 +2544,7 @@ exaParser.prototype.expr = function(_p) {
 
                 case 4:
                     localctx = new LogicalContext(this, new ExprContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, exaParser.RULE_expr);
+                    this.pushNewRecursionContext(localctx, _startState, loParser.RULE_expr);
                     this.state = 207;
                     if (!( this.precpred(this._ctx, 13))) {
                         throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 13)");
@@ -2552,7 +2552,7 @@ exaParser.prototype.expr = function(_p) {
                     this.state = 208;
                     localctx.op = this._input.LT(1);
                     _la = this._input.LA(1);
-                    if(!(_la===exaParser.T__36 || _la===exaParser.T__37)) {
+                    if(!(_la===loParser.T__36 || _la===loParser.T__37)) {
                         localctx.op = this._errHandler.recoverInline(this);
                     }
                     else {
@@ -2564,100 +2564,100 @@ exaParser.prototype.expr = function(_p) {
 
                 case 5:
                     localctx = new MembershipContext(this, new ExprContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, exaParser.RULE_expr);
+                    this.pushNewRecursionContext(localctx, _startState, loParser.RULE_expr);
                     this.state = 210;
                     if (!( this.precpred(this._ctx, 12))) {
                         throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 12)");
                     }
                     this.state = 211;
-                    this.match(exaParser.T__38);
+                    this.match(loParser.T__38);
                     this.state = 212;
                     this.expr(13);
                     break;
 
                 case 6:
                     localctx = new ConcatContext(this, new ExprContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, exaParser.RULE_expr);
+                    this.pushNewRecursionContext(localctx, _startState, loParser.RULE_expr);
                     this.state = 213;
                     if (!( this.precpred(this._ctx, 11))) {
                         throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 11)");
                     }
                     this.state = 214;
-                    this.match(exaParser.T__39);
+                    this.match(loParser.T__39);
                     this.state = 215;
                     this.expr(12);
                     break;
 
                 case 7:
                     localctx = new SyncCallContext(this, new ExprContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, exaParser.RULE_expr);
+                    this.pushNewRecursionContext(localctx, _startState, loParser.RULE_expr);
                     this.state = 216;
                     if (!( this.precpred(this._ctx, 21))) {
                         throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 21)");
                     }
                     this.state = 217;
-                    this.match(exaParser.T__6);
+                    this.match(loParser.T__6);
                     this.state = 219;
                     _la = this._input.LA(1);
-                    if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << exaParser.T__6) | (1 << exaParser.T__8) | (1 << exaParser.T__13) | (1 << exaParser.T__22) | (1 << exaParser.T__23) | (1 << exaParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (exaParser.T__40 - 41)) | (1 << (exaParser.T__43 - 41)) | (1 << (exaParser.T__46 - 41)) | (1 << (exaParser.T__47 - 41)) | (1 << (exaParser.T__48 - 41)) | (1 << (exaParser.BEGIN - 41)) | (1 << (exaParser.NIL - 41)) | (1 << (exaParser.BOOL - 41)) | (1 << (exaParser.NUMBER - 41)) | (1 << (exaParser.ID - 41)) | (1 << (exaParser.STRING - 41)) | (1 << (exaParser.INTER_BEGIN - 41)))) !== 0)) {
+                    if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << loParser.T__6) | (1 << loParser.T__8) | (1 << loParser.T__13) | (1 << loParser.T__22) | (1 << loParser.T__23) | (1 << loParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (loParser.T__40 - 41)) | (1 << (loParser.T__43 - 41)) | (1 << (loParser.T__46 - 41)) | (1 << (loParser.T__47 - 41)) | (1 << (loParser.T__48 - 41)) | (1 << (loParser.BEGIN - 41)) | (1 << (loParser.NIL - 41)) | (1 << (loParser.BOOL - 41)) | (1 << (loParser.NUMBER - 41)) | (1 << (loParser.ID - 41)) | (1 << (loParser.STRING - 41)) | (1 << (loParser.INTER_BEGIN - 41)))) !== 0)) {
                         this.state = 218;
                         this.exprList();
                     }
 
                     this.state = 221;
-                    this.match(exaParser.T__7);
+                    this.match(loParser.T__7);
                     break;
 
                 case 8:
                     localctx = new SubscriptContext(this, new ExprContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, exaParser.RULE_expr);
+                    this.pushNewRecursionContext(localctx, _startState, loParser.RULE_expr);
                     this.state = 222;
                     if (!( this.precpred(this._ctx, 9))) {
                         throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 9)");
                     }
                     this.state = 223;
-                    this.match(exaParser.T__40);
+                    this.match(loParser.T__40);
                     this.state = 224;
                     this.expr(0);
                     this.state = 225;
-                    this.match(exaParser.T__41);
+                    this.match(loParser.T__41);
                     break;
 
                 case 9:
                     localctx = new SliceContext(this, new ExprContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, exaParser.RULE_expr);
+                    this.pushNewRecursionContext(localctx, _startState, loParser.RULE_expr);
                     this.state = 227;
                     if (!( this.precpred(this._ctx, 8))) {
                         throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 8)");
                     }
                     this.state = 228;
-                    this.match(exaParser.T__40);
+                    this.match(loParser.T__40);
                     this.state = 229;
                     this.expr(0);
                     this.state = 230;
-                    this.match(exaParser.T__42);
+                    this.match(loParser.T__42);
                     this.state = 232;
                     _la = this._input.LA(1);
-                    if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << exaParser.T__6) | (1 << exaParser.T__8) | (1 << exaParser.T__13) | (1 << exaParser.T__22) | (1 << exaParser.T__23) | (1 << exaParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (exaParser.T__40 - 41)) | (1 << (exaParser.T__43 - 41)) | (1 << (exaParser.T__46 - 41)) | (1 << (exaParser.T__47 - 41)) | (1 << (exaParser.T__48 - 41)) | (1 << (exaParser.BEGIN - 41)) | (1 << (exaParser.NIL - 41)) | (1 << (exaParser.BOOL - 41)) | (1 << (exaParser.NUMBER - 41)) | (1 << (exaParser.ID - 41)) | (1 << (exaParser.STRING - 41)) | (1 << (exaParser.INTER_BEGIN - 41)))) !== 0)) {
+                    if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << loParser.T__6) | (1 << loParser.T__8) | (1 << loParser.T__13) | (1 << loParser.T__22) | (1 << loParser.T__23) | (1 << loParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (loParser.T__40 - 41)) | (1 << (loParser.T__43 - 41)) | (1 << (loParser.T__46 - 41)) | (1 << (loParser.T__47 - 41)) | (1 << (loParser.T__48 - 41)) | (1 << (loParser.BEGIN - 41)) | (1 << (loParser.NIL - 41)) | (1 << (loParser.BOOL - 41)) | (1 << (loParser.NUMBER - 41)) | (1 << (loParser.ID - 41)) | (1 << (loParser.STRING - 41)) | (1 << (loParser.INTER_BEGIN - 41)))) !== 0)) {
                         this.state = 231;
                         this.expr(0);
                     }
 
                     this.state = 234;
-                    this.match(exaParser.T__41);
+                    this.match(loParser.T__41);
                     break;
 
                 case 10:
                     localctx = new SelectContext(this, new ExprContext(this, _parentctx, _parentState));
-                    this.pushNewRecursionContext(localctx, _startState, exaParser.RULE_expr);
+                    this.pushNewRecursionContext(localctx, _startState, loParser.RULE_expr);
                     this.state = 236;
                     if (!( this.precpred(this._ctx, 6))) {
                         throw new antlr4.error.FailedPredicateException(this, "this.precpred(this._ctx, 6)");
                     }
                     this.state = 237;
-                    this.match(exaParser.T__44);
+                    this.match(loParser.T__44);
                     this.state = 238;
-                    this.match(exaParser.ID);
+                    this.match(loParser.ID);
                     break;
 
                 } 
@@ -2690,7 +2690,7 @@ function InterpolatedContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_interpolated;
+    this.ruleIndex = loParser.RULE_interpolated;
     return this;
 }
 
@@ -2702,7 +2702,7 @@ InterpolatedContext.prototype.expr = function() {
 };
 
 InterpolatedContext.prototype.INTER_MID = function() {
-    return this.getToken(exaParser.INTER_MID, 0);
+    return this.getToken(loParser.INTER_MID, 0);
 };
 
 InterpolatedContext.prototype.interpolated = function() {
@@ -2710,7 +2710,7 @@ InterpolatedContext.prototype.interpolated = function() {
 };
 
 InterpolatedContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitInterpolated(this);
     } else {
         return visitor.visitChildren(this);
@@ -2720,12 +2720,12 @@ InterpolatedContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.InterpolatedContext = InterpolatedContext;
+loParser.InterpolatedContext = InterpolatedContext;
 
-exaParser.prototype.interpolated = function() {
+loParser.prototype.interpolated = function() {
 
     var localctx = new InterpolatedContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 24, exaParser.RULE_interpolated);
+    this.enterRule(localctx, 24, loParser.RULE_interpolated);
     try {
         this.state = 249;
         this._errHandler.sync(this);
@@ -2742,7 +2742,7 @@ exaParser.prototype.interpolated = function() {
             this.state = 245;
             this.expr(0);
             this.state = 246;
-            this.match(exaParser.INTER_MID);
+            this.match(loParser.INTER_MID);
             this.state = 247;
             this.interpolated();
             break;
@@ -2771,7 +2771,7 @@ function ExprListContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_exprList;
+    this.ruleIndex = loParser.RULE_exprList;
     return this;
 }
 
@@ -2790,7 +2790,7 @@ ExprListContext.prototype.expr = function(i) {
 };
 
 ExprListContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitExprList(this);
     } else {
         return visitor.visitChildren(this);
@@ -2800,12 +2800,12 @@ ExprListContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.ExprListContext = ExprListContext;
+loParser.ExprListContext = ExprListContext;
 
-exaParser.prototype.exprList = function() {
+loParser.prototype.exprList = function() {
 
     var localctx = new ExprListContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 26, exaParser.RULE_exprList);
+    this.enterRule(localctx, 26, loParser.RULE_exprList);
     var _la = 0; // Token type
     try {
         this.enterOuterAlt(localctx, 1);
@@ -2817,7 +2817,7 @@ exaParser.prototype.exprList = function() {
         while(_alt!=2 && _alt!=antlr4.atn.ATN.INVALID_ALT_NUMBER) {
             if(_alt===1) {
                 this.state = 252;
-                this.match(exaParser.T__45);
+                this.match(loParser.T__45);
                 this.state = 253;
                 this.expr(0); 
             }
@@ -2828,9 +2828,9 @@ exaParser.prototype.exprList = function() {
 
         this.state = 260;
         _la = this._input.LA(1);
-        if(_la===exaParser.T__45) {
+        if(_la===loParser.T__45) {
             this.state = 259;
-            this.match(exaParser.T__45);
+            this.match(loParser.T__45);
         }
 
     } catch (re) {
@@ -2856,7 +2856,7 @@ function LiteralContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_literal;
+    this.ruleIndex = loParser.RULE_literal;
     return this;
 }
 
@@ -2879,10 +2879,10 @@ function NilContext(parser, ctx) {
 NilContext.prototype = Object.create(LiteralContext.prototype);
 NilContext.prototype.constructor = NilContext;
 
-exaParser.NilContext = NilContext;
+loParser.NilContext = NilContext;
 
 NilContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitNil(this);
     } else {
         return visitor.visitChildren(this);
@@ -2899,13 +2899,13 @@ function NumberContext(parser, ctx) {
 NumberContext.prototype = Object.create(LiteralContext.prototype);
 NumberContext.prototype.constructor = NumberContext;
 
-exaParser.NumberContext = NumberContext;
+loParser.NumberContext = NumberContext;
 
 NumberContext.prototype.NUMBER = function() {
-    return this.getToken(exaParser.NUMBER, 0);
+    return this.getToken(loParser.NUMBER, 0);
 };
 NumberContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitNumber(this);
     } else {
         return visitor.visitChildren(this);
@@ -2922,13 +2922,13 @@ function HandlerContext(parser, ctx) {
 HandlerContext.prototype = Object.create(LiteralContext.prototype);
 HandlerContext.prototype.constructor = HandlerContext;
 
-exaParser.HandlerContext = HandlerContext;
+loParser.HandlerContext = HandlerContext;
 
 HandlerContext.prototype.sink = function() {
     return this.getTypedRuleContext(SinkContext,0);
 };
 HandlerContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitHandler(this);
     } else {
         return visitor.visitChildren(this);
@@ -2946,7 +2946,7 @@ function SetContext(parser, ctx) {
 SetContext.prototype = Object.create(LiteralContext.prototype);
 SetContext.prototype.constructor = SetContext;
 
-exaParser.SetContext = SetContext;
+loParser.SetContext = SetContext;
 
 SetContext.prototype.exprList = function() {
     return this.getTypedRuleContext(ExprListContext,0);
@@ -2957,10 +2957,10 @@ SetContext.prototype.pairList = function() {
 };
 
 SetContext.prototype.PAIR_SEP = function() {
-    return this.getToken(exaParser.PAIR_SEP, 0);
+    return this.getToken(loParser.PAIR_SEP, 0);
 };
 SetContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitSet(this);
     } else {
         return visitor.visitChildren(this);
@@ -2977,13 +2977,13 @@ function BoolContext(parser, ctx) {
 BoolContext.prototype = Object.create(LiteralContext.prototype);
 BoolContext.prototype.constructor = BoolContext;
 
-exaParser.BoolContext = BoolContext;
+loParser.BoolContext = BoolContext;
 
 BoolContext.prototype.BOOL = function() {
-    return this.getToken(exaParser.BOOL, 0);
+    return this.getToken(loParser.BOOL, 0);
 };
 BoolContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitBool(this);
     } else {
         return visitor.visitChildren(this);
@@ -3000,13 +3000,13 @@ function StringContext(parser, ctx) {
 StringContext.prototype = Object.create(LiteralContext.prototype);
 StringContext.prototype.constructor = StringContext;
 
-exaParser.StringContext = StringContext;
+loParser.StringContext = StringContext;
 
 StringContext.prototype.STRING = function() {
-    return this.getToken(exaParser.STRING, 0);
+    return this.getToken(loParser.STRING, 0);
 };
 StringContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitString(this);
     } else {
         return visitor.visitChildren(this);
@@ -3023,13 +3023,13 @@ function ArrayContext(parser, ctx) {
 ArrayContext.prototype = Object.create(LiteralContext.prototype);
 ArrayContext.prototype.constructor = ArrayContext;
 
-exaParser.ArrayContext = ArrayContext;
+loParser.ArrayContext = ArrayContext;
 
 ArrayContext.prototype.exprList = function() {
     return this.getTypedRuleContext(ExprListContext,0);
 };
 ArrayContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitArray(this);
     } else {
         return visitor.visitChildren(this);
@@ -3046,7 +3046,7 @@ function SubscribeContext(parser, ctx) {
 SubscribeContext.prototype = Object.create(LiteralContext.prototype);
 SubscribeContext.prototype.constructor = SubscribeContext;
 
-exaParser.SubscribeContext = SubscribeContext;
+loParser.SubscribeContext = SubscribeContext;
 
 SubscribeContext.prototype.expr = function() {
     return this.getTypedRuleContext(ExprContext,0);
@@ -3056,7 +3056,7 @@ SubscribeContext.prototype.sink = function() {
     return this.getTypedRuleContext(SinkContext,0);
 };
 SubscribeContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitSubscribe(this);
     } else {
         return visitor.visitChildren(this);
@@ -3073,13 +3073,13 @@ function ServiceContext(parser, ctx) {
 ServiceContext.prototype = Object.create(LiteralContext.prototype);
 ServiceContext.prototype.constructor = ServiceContext;
 
-exaParser.ServiceContext = ServiceContext;
+loParser.ServiceContext = ServiceContext;
 
 ServiceContext.prototype.procedure = function() {
     return this.getTypedRuleContext(ProcedureContext,0);
 };
 ServiceContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitService(this);
     } else {
         return visitor.visitChildren(this);
@@ -3096,13 +3096,13 @@ function RecordContext(parser, ctx) {
 RecordContext.prototype = Object.create(LiteralContext.prototype);
 RecordContext.prototype.constructor = RecordContext;
 
-exaParser.RecordContext = RecordContext;
+loParser.RecordContext = RecordContext;
 
 RecordContext.prototype.fieldList = function() {
     return this.getTypedRuleContext(FieldListContext,0);
 };
 RecordContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitRecord(this);
     } else {
         return visitor.visitChildren(this);
@@ -3119,13 +3119,13 @@ function EventContext(parser, ctx) {
 EventContext.prototype = Object.create(LiteralContext.prototype);
 EventContext.prototype.constructor = EventContext;
 
-exaParser.EventContext = EventContext;
+loParser.EventContext = EventContext;
 
 EventContext.prototype.paramList = function() {
     return this.getTypedRuleContext(ParamListContext,0);
 };
 EventContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitEvent(this);
     } else {
         return visitor.visitChildren(this);
@@ -3134,12 +3134,12 @@ EventContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.LiteralContext = LiteralContext;
+loParser.LiteralContext = LiteralContext;
 
-exaParser.prototype.literal = function() {
+loParser.prototype.literal = function() {
 
     var localctx = new LiteralContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 28, exaParser.RULE_literal);
+    this.enterRule(localctx, 28, loParser.RULE_literal);
     var _la = 0; // Token type
     try {
         this.state = 293;
@@ -3150,68 +3150,68 @@ exaParser.prototype.literal = function() {
             localctx = new NilContext(this, localctx);
             this.enterOuterAlt(localctx, 1);
             this.state = 262;
-            this.match(exaParser.NIL);
+            this.match(loParser.NIL);
             break;
 
         case 2:
             localctx = new BoolContext(this, localctx);
             this.enterOuterAlt(localctx, 2);
             this.state = 263;
-            this.match(exaParser.BOOL);
+            this.match(loParser.BOOL);
             break;
 
         case 3:
             localctx = new NumberContext(this, localctx);
             this.enterOuterAlt(localctx, 3);
             this.state = 264;
-            this.match(exaParser.NUMBER);
+            this.match(loParser.NUMBER);
             break;
 
         case 4:
             localctx = new StringContext(this, localctx);
             this.enterOuterAlt(localctx, 4);
             this.state = 265;
-            this.match(exaParser.STRING);
+            this.match(loParser.STRING);
             break;
 
         case 5:
             localctx = new ArrayContext(this, localctx);
             this.enterOuterAlt(localctx, 5);
             this.state = 266;
-            this.match(exaParser.T__40);
+            this.match(loParser.T__40);
             this.state = 268;
             _la = this._input.LA(1);
-            if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << exaParser.T__6) | (1 << exaParser.T__8) | (1 << exaParser.T__13) | (1 << exaParser.T__22) | (1 << exaParser.T__23) | (1 << exaParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (exaParser.T__40 - 41)) | (1 << (exaParser.T__43 - 41)) | (1 << (exaParser.T__46 - 41)) | (1 << (exaParser.T__47 - 41)) | (1 << (exaParser.T__48 - 41)) | (1 << (exaParser.BEGIN - 41)) | (1 << (exaParser.NIL - 41)) | (1 << (exaParser.BOOL - 41)) | (1 << (exaParser.NUMBER - 41)) | (1 << (exaParser.ID - 41)) | (1 << (exaParser.STRING - 41)) | (1 << (exaParser.INTER_BEGIN - 41)))) !== 0)) {
+            if((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << loParser.T__6) | (1 << loParser.T__8) | (1 << loParser.T__13) | (1 << loParser.T__22) | (1 << loParser.T__23) | (1 << loParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (loParser.T__40 - 41)) | (1 << (loParser.T__43 - 41)) | (1 << (loParser.T__46 - 41)) | (1 << (loParser.T__47 - 41)) | (1 << (loParser.T__48 - 41)) | (1 << (loParser.BEGIN - 41)) | (1 << (loParser.NIL - 41)) | (1 << (loParser.BOOL - 41)) | (1 << (loParser.NUMBER - 41)) | (1 << (loParser.ID - 41)) | (1 << (loParser.STRING - 41)) | (1 << (loParser.INTER_BEGIN - 41)))) !== 0)) {
                 this.state = 267;
                 this.exprList();
             }
 
             this.state = 270;
-            this.match(exaParser.T__41);
+            this.match(loParser.T__41);
             break;
 
         case 6:
             localctx = new RecordContext(this, localctx);
             this.enterOuterAlt(localctx, 6);
             this.state = 271;
-            this.match(exaParser.T__40);
+            this.match(loParser.T__40);
             this.state = 272;
             this.fieldList();
             this.state = 273;
-            this.match(exaParser.T__41);
+            this.match(loParser.T__41);
             break;
 
         case 7:
             localctx = new SetContext(this, localctx);
             this.enterOuterAlt(localctx, 7);
             this.state = 275;
-            this.match(exaParser.BEGIN);
+            this.match(loParser.BEGIN);
             this.state = 279;
             this._errHandler.sync(this);
             var la_ = this._interp.adaptivePredict(this._input,22,this._ctx);
             if(la_===1) {
                 this.state = 276;
-                localctx.sep = this.match(exaParser.PAIR_SEP);
+                localctx.sep = this.match(loParser.PAIR_SEP);
 
             } else if(la_===2) {
                 this.state = 277;
@@ -3223,7 +3223,7 @@ exaParser.prototype.literal = function() {
 
             }
             this.state = 281;
-            this.match(exaParser.END);
+            this.match(loParser.END);
             break;
 
         case 8:
@@ -3237,7 +3237,7 @@ exaParser.prototype.literal = function() {
             localctx = new ServiceContext(this, localctx);
             this.enterOuterAlt(localctx, 9);
             this.state = 283;
-            this.match(exaParser.T__46);
+            this.match(loParser.T__46);
             this.state = 284;
             this.procedure();
             break;
@@ -3246,7 +3246,7 @@ exaParser.prototype.literal = function() {
             localctx = new EventContext(this, localctx);
             this.enterOuterAlt(localctx, 10);
             this.state = 285;
-            this.match(exaParser.T__47);
+            this.match(loParser.T__47);
             this.state = 287;
             this._errHandler.sync(this);
             var la_ = this._interp.adaptivePredict(this._input,23,this._ctx);
@@ -3261,7 +3261,7 @@ exaParser.prototype.literal = function() {
             localctx = new SubscribeContext(this, localctx);
             this.enterOuterAlt(localctx, 11);
             this.state = 289;
-            this.match(exaParser.T__13);
+            this.match(loParser.T__13);
             this.state = 290;
             this.expr(0);
             this.state = 291;
@@ -3292,7 +3292,7 @@ function SinkContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_sink;
+    this.ruleIndex = loParser.RULE_sink;
     return this;
 }
 
@@ -3304,7 +3304,7 @@ SinkContext.prototype.procedure = function() {
 };
 
 SinkContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitSink(this);
     } else {
         return visitor.visitChildren(this);
@@ -3314,16 +3314,16 @@ SinkContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.SinkContext = SinkContext;
+loParser.SinkContext = SinkContext;
 
-exaParser.prototype.sink = function() {
+loParser.prototype.sink = function() {
 
     var localctx = new SinkContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 30, exaParser.RULE_sink);
+    this.enterRule(localctx, 30, loParser.RULE_sink);
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 295;
-        this.match(exaParser.T__48);
+        this.match(loParser.T__48);
         this.state = 296;
         this.procedure();
     } catch (re) {
@@ -3349,7 +3349,7 @@ function ProcedureContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_procedure;
+    this.ruleIndex = loParser.RULE_procedure;
     return this;
 }
 
@@ -3365,7 +3365,7 @@ ProcedureContext.prototype.paramList = function() {
 };
 
 ProcedureContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitProcedure(this);
     } else {
         return visitor.visitChildren(this);
@@ -3375,18 +3375,18 @@ ProcedureContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.ProcedureContext = ProcedureContext;
+loParser.ProcedureContext = ProcedureContext;
 
-exaParser.prototype.procedure = function() {
+loParser.prototype.procedure = function() {
 
     var localctx = new ProcedureContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 32, exaParser.RULE_procedure);
+    this.enterRule(localctx, 32, loParser.RULE_procedure);
     var _la = 0; // Token type
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 299;
         _la = this._input.LA(1);
-        if(_la===exaParser.T__6) {
+        if(_la===loParser.T__6) {
             this.state = 298;
             this.paramList();
         }
@@ -3416,7 +3416,7 @@ function ParamListContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_paramList;
+    this.ruleIndex = loParser.RULE_paramList;
     return this;
 }
 
@@ -3428,15 +3428,15 @@ ParamListContext.prototype.ID = function(i) {
 		i = null;
 	}
     if(i===null) {
-        return this.getTokens(exaParser.ID);
+        return this.getTokens(loParser.ID);
     } else {
-        return this.getToken(exaParser.ID, i);
+        return this.getToken(loParser.ID, i);
     }
 };
 
 
 ParamListContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitParamList(this);
     } else {
         return visitor.visitChildren(this);
@@ -3446,33 +3446,33 @@ ParamListContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.ParamListContext = ParamListContext;
+loParser.ParamListContext = ParamListContext;
 
-exaParser.prototype.paramList = function() {
+loParser.prototype.paramList = function() {
 
     var localctx = new ParamListContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 34, exaParser.RULE_paramList);
+    this.enterRule(localctx, 34, loParser.RULE_paramList);
     var _la = 0; // Token type
     try {
         this.enterOuterAlt(localctx, 1);
         this.state = 303;
-        this.match(exaParser.T__6);
+        this.match(loParser.T__6);
         this.state = 304;
-        this.match(exaParser.ID);
+        this.match(loParser.ID);
         this.state = 309;
         this._errHandler.sync(this);
         _la = this._input.LA(1);
-        while(_la===exaParser.T__45) {
+        while(_la===loParser.T__45) {
             this.state = 305;
-            this.match(exaParser.T__45);
+            this.match(loParser.T__45);
             this.state = 306;
-            this.match(exaParser.ID);
+            this.match(loParser.ID);
             this.state = 311;
             this._errHandler.sync(this);
             _la = this._input.LA(1);
         }
         this.state = 312;
-        this.match(exaParser.T__7);
+        this.match(loParser.T__7);
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
 	        localctx.exception = re;
@@ -3496,7 +3496,7 @@ function FieldListContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_fieldList;
+    this.ruleIndex = loParser.RULE_fieldList;
     return this;
 }
 
@@ -3508,9 +3508,9 @@ FieldListContext.prototype.ID = function(i) {
 		i = null;
 	}
     if(i===null) {
-        return this.getTokens(exaParser.ID);
+        return this.getTokens(loParser.ID);
     } else {
-        return this.getToken(exaParser.ID, i);
+        return this.getToken(loParser.ID, i);
     }
 };
 
@@ -3520,9 +3520,9 @@ FieldListContext.prototype.FIELD_SEP = function(i) {
 		i = null;
 	}
     if(i===null) {
-        return this.getTokens(exaParser.FIELD_SEP);
+        return this.getTokens(loParser.FIELD_SEP);
     } else {
-        return this.getToken(exaParser.FIELD_SEP, i);
+        return this.getToken(loParser.FIELD_SEP, i);
     }
 };
 
@@ -3539,7 +3539,7 @@ FieldListContext.prototype.expr = function(i) {
 };
 
 FieldListContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitFieldList(this);
     } else {
         return visitor.visitChildren(this);
@@ -3549,12 +3549,12 @@ FieldListContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.FieldListContext = FieldListContext;
+loParser.FieldListContext = FieldListContext;
 
-exaParser.prototype.fieldList = function() {
+loParser.prototype.fieldList = function() {
 
     var localctx = new FieldListContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 36, exaParser.RULE_fieldList);
+    this.enterRule(localctx, 36, loParser.RULE_fieldList);
     var _la = 0; // Token type
     try {
         this.enterOuterAlt(localctx, 1);
@@ -3563,22 +3563,22 @@ exaParser.prototype.fieldList = function() {
         _la = this._input.LA(1);
         do {
             this.state = 314;
-            this.match(exaParser.ID);
+            this.match(loParser.ID);
             this.state = 315;
-            this.match(exaParser.FIELD_SEP);
+            this.match(loParser.FIELD_SEP);
             this.state = 316;
             this.expr(0);
             this.state = 318;
             _la = this._input.LA(1);
-            if(_la===exaParser.T__45) {
+            if(_la===loParser.T__45) {
                 this.state = 317;
-                this.match(exaParser.T__45);
+                this.match(loParser.T__45);
             }
 
             this.state = 322; 
             this._errHandler.sync(this);
             _la = this._input.LA(1);
-        } while(_la===exaParser.ID);
+        } while(_la===loParser.ID);
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
 	        localctx.exception = re;
@@ -3602,7 +3602,7 @@ function PairListContext(parser, parent, invokingState) {
 	}
 	antlr4.ParserRuleContext.call(this, parent, invokingState);
     this.parser = parser;
-    this.ruleIndex = exaParser.RULE_pairList;
+    this.ruleIndex = loParser.RULE_pairList;
     return this;
 }
 
@@ -3625,15 +3625,15 @@ PairListContext.prototype.PAIR_SEP = function(i) {
 		i = null;
 	}
     if(i===null) {
-        return this.getTokens(exaParser.PAIR_SEP);
+        return this.getTokens(loParser.PAIR_SEP);
     } else {
-        return this.getToken(exaParser.PAIR_SEP, i);
+        return this.getToken(loParser.PAIR_SEP, i);
     }
 };
 
 
 PairListContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof exaVisitor ) {
+    if ( visitor instanceof loVisitor ) {
         return visitor.visitPairList(this);
     } else {
         return visitor.visitChildren(this);
@@ -3643,12 +3643,12 @@ PairListContext.prototype.accept = function(visitor) {
 
 
 
-exaParser.PairListContext = PairListContext;
+loParser.PairListContext = PairListContext;
 
-exaParser.prototype.pairList = function() {
+loParser.prototype.pairList = function() {
 
     var localctx = new PairListContext(this, this._ctx, this.state);
-    this.enterRule(localctx, 38, exaParser.RULE_pairList);
+    this.enterRule(localctx, 38, loParser.RULE_pairList);
     var _la = 0; // Token type
     try {
         this.enterOuterAlt(localctx, 1);
@@ -3659,20 +3659,20 @@ exaParser.prototype.pairList = function() {
             this.state = 324;
             this.expr(0);
             this.state = 325;
-            this.match(exaParser.PAIR_SEP);
+            this.match(loParser.PAIR_SEP);
             this.state = 326;
             this.expr(0);
             this.state = 328;
             _la = this._input.LA(1);
-            if(_la===exaParser.T__45) {
+            if(_la===loParser.T__45) {
                 this.state = 327;
-                this.match(exaParser.T__45);
+                this.match(loParser.T__45);
             }
 
             this.state = 332; 
             this._errHandler.sync(this);
             _la = this._input.LA(1);
-        } while((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << exaParser.T__6) | (1 << exaParser.T__8) | (1 << exaParser.T__13) | (1 << exaParser.T__22) | (1 << exaParser.T__23) | (1 << exaParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (exaParser.T__40 - 41)) | (1 << (exaParser.T__43 - 41)) | (1 << (exaParser.T__46 - 41)) | (1 << (exaParser.T__47 - 41)) | (1 << (exaParser.T__48 - 41)) | (1 << (exaParser.BEGIN - 41)) | (1 << (exaParser.NIL - 41)) | (1 << (exaParser.BOOL - 41)) | (1 << (exaParser.NUMBER - 41)) | (1 << (exaParser.ID - 41)) | (1 << (exaParser.STRING - 41)) | (1 << (exaParser.INTER_BEGIN - 41)))) !== 0));
+        } while((((_la) & ~0x1f) == 0 && ((1 << _la) & ((1 << loParser.T__6) | (1 << loParser.T__8) | (1 << loParser.T__13) | (1 << loParser.T__22) | (1 << loParser.T__23) | (1 << loParser.T__24))) !== 0) || ((((_la - 41)) & ~0x1f) == 0 && ((1 << (_la - 41)) & ((1 << (loParser.T__40 - 41)) | (1 << (loParser.T__43 - 41)) | (1 << (loParser.T__46 - 41)) | (1 << (loParser.T__47 - 41)) | (1 << (loParser.T__48 - 41)) | (1 << (loParser.BEGIN - 41)) | (1 << (loParser.NIL - 41)) | (1 << (loParser.BOOL - 41)) | (1 << (loParser.NUMBER - 41)) | (1 << (loParser.ID - 41)) | (1 << (loParser.STRING - 41)) | (1 << (loParser.INTER_BEGIN - 41)))) !== 0));
     } catch (re) {
     	if(re instanceof antlr4.error.RecognitionException) {
 	        localctx.exception = re;
@@ -3688,7 +3688,7 @@ exaParser.prototype.pairList = function() {
 };
 
 
-exaParser.prototype.sempred = function(localctx, ruleIndex, predIndex) {
+loParser.prototype.sempred = function(localctx, ruleIndex, predIndex) {
 	switch(ruleIndex) {
 	case 11:
 			return this.expr_sempred(localctx, predIndex);
@@ -3697,7 +3697,7 @@ exaParser.prototype.sempred = function(localctx, ruleIndex, predIndex) {
    }
 };
 
-exaParser.prototype.expr_sempred = function(localctx, predIndex) {
+loParser.prototype.expr_sempred = function(localctx, predIndex) {
 	switch(predIndex) {
 		case 0:
 			return this.precpred(this._ctx, 16);
@@ -3725,4 +3725,4 @@ exaParser.prototype.expr_sempred = function(localctx, predIndex) {
 };
 
 
-exports.exaParser = exaParser;
+exports.loParser = loParser;

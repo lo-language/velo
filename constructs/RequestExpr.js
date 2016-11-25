@@ -6,7 +6,6 @@
 
 const JS = require('../codegen/JsPrimitives');
 const JsStmt = require('../codegen/JsStmt');
-const Request = require('../codegen/Request');
 const Identifier = require('./Identifier');
 
 
@@ -53,7 +52,7 @@ __.prototype.compile = function (context) {
 
     // get a placeholder
     // we push a request into the context whether sync or async
-    return context.pushBlockingCall(new Request(target, args, null, null, this.async));
+    return context.pushRequest(target, args, this.async);
 };
 
 module.exports = __;

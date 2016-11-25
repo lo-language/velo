@@ -86,7 +86,9 @@ module.exports["assignment"] = {
                             null,
                             [ 'res0' ],
                             [ 'stmtList',
-                                [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ "subscript", [ 'id', 'res0' ], [ "num", "0" ]] ] ] ] ] ] ] ] ]);
+                                [ 'expr-stmt',
+                                    [ 'assign', [ 'id', '$foo' ], [ 'id', 'res0' ] ] ] ] ],
+                        [ 'null' ] ] ] ] ]);
         test.equal(context.has('foo'), true);
 
         test.done();

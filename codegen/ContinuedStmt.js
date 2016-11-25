@@ -55,7 +55,6 @@ __.prototype.attach = function (stmt) {
 
 /**
  *
- * @private
  */
 __.prototype._getAst = function () {
 

@@ -8,9 +8,9 @@
  */
 
 const antlr4 = require('antlr4');
-const Lexer = require('./exaLexer');
-const Parser = require('./exaParser');
-const BaseVisitor = require('./exaVisitor').exaVisitor;
+const Lexer = require('./loLexer');
+const Parser = require('./loParser');
+const BaseVisitor = require('./loVisitor').loVisitor;
 const Lo = require('../constructs');
 
 
@@ -26,10 +26,10 @@ __.prototype.constructor = __;
 __.prototype.parse = function (input) {
 
     var chars = new antlr4.InputStream(input);
-    var lexer = new Lexer.exaLexer(chars);
+    var lexer = new Lexer.loLexer(chars);
     var tokens  = new antlr4.CommonTokenStream(lexer);
 
-    var parser = new Parser.exaParser(tokens);
+    var parser = new Parser.loParser(tokens);
     parser.buildParseTrees = true;
 
     var tree = parser.module();

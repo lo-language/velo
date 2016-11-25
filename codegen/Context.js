@@ -9,6 +9,8 @@
 "use strict";
 
 const Wrapper = require('./Wrapper');
+const JS = require('./JsPrimitives');
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -23,7 +25,17 @@ var __ = function (parent) {
     this.symbols = {};
 
     this.wrapper = null;
+    this.placeHolders = 0;
     this.cont = 0;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns true if this is a root context.
+ */
+__.prototype.isRoot = function () {
+
+    return this.parent ? false : true;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,13 +50,7 @@ __.prototype.declare = function (name) {
         throw new Error(name + " is a constant in this context");
     }
 
-    // can only declare variables in non-root contexts
-    if (this.parent) {
-        this.symbols['@' + name] = {type: 'var', name: name};
-    }
-    else {
-        throw new Error("can't declare a variable in a root context; constants only!");
-    }
+    this.symbols['@' + name] = {type: 'var', name: name};
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -52,10 +58,8 @@ __.prototype.declare = function (name) {
  * Defines a constant in this context.
  *
  * @param name
- * @param value
- * @param isService
  */
-__.prototype.define = function (name, value) {
+__.prototype.define = function (name) {
 
     if (this.has(name)) {
         throw new Error(name + " is a constant or variable in this context");
@@ -63,8 +67,7 @@ __.prototype.define = function (name, value) {
 
     this.symbols['@' + name] = {
         type: 'const',
-        name: name,
-        value: value
+        name: name
     };
 };
 
@@ -74,7 +77,6 @@ __.prototype.define = function (name, value) {
  */
 __.prototype.getContinuation = function () {
 
-    return new Continuation('cont' + this.cont++);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -178,7 +180,8 @@ __.prototype.resolve = function (name) {
 
     if (this.symbols['@' + name] !== undefined
         && this.symbols['@' + name].type == 'const') {
-        return this.symbols['@' + name].value;
+        return true;
+        // return this.symbols['@' + name].value;
     }
 
     if (this.parent) {
@@ -201,28 +204,26 @@ __.prototype.createInner = function () { // push? nest? inner? derive? pushDown?
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Creates and returns a new child statement context.
- *
- * @return {*}
- */
-__.prototype.openStatement = function () {
-
-    this.wrapper = new Wrapper();
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
  * Pushes a request onto the stack and returns a placeholder.
  *
- * @param request
+ * @param target
+ * @param args
+ * @param blocking
  */
-__.prototype.pushBlockingCall = function (request) {
+__.prototype.pushRequest = function (target, args, blocking) {
 
-    if (this.wrapper == null) {
-        throw new Error("trying to push a blocking call outside of stmt context");
+    var placeholderName = 'res' + this.placeHolders++;
+
+    var newWrapper = new Wrapper(target, args, placeholderName);
+
+    if (this.wrapper) {
+        this.wrapper.attach(newWrapper);
+    }
+    else {
+        this.wrapper = newWrapper;
     }
 
-    return this.wrapper.pushRequest(request);
+    return JS.ID(placeholderName);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,13 +232,15 @@ __.prototype.pushBlockingCall = function (request) {
  *
  * @return {*}
  */
-__.prototype.closeStatement = function (node) {
+__.prototype.wrapStatement = function (stmt) {
 
-    var result = this.wrapper.wrap(node);
+    if (this.wrapper) {
+        var result = this.wrapper.attach(stmt);
+        this.wrapper = null;
+        return result;
+    }
 
-    this.wrapper = null;
-
-    return result;
+    return stmt;
 };
 
 module.exports = __;

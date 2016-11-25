@@ -5,9 +5,11 @@
  */
 
 const Program = require('../../codegen/Program');
-const Module = require('../../codegen/Module');
+const Module = require('../../constructs/Module');
 const Q = require('q');
 const util = require('util');
+const ASTBuilder = require('../../parser/ASTBuilder');
+
 
 module.exports['basics'] = {
 
@@ -18,8 +20,12 @@ module.exports['basics'] = {
         var sourcer = {
 
             acquire: function (modRef) {
+
                 test.equal(modRef, 'foo');
-                return Q(new Module('main is -> {reply "hullo!";};'));
+
+                var source = 'main is -> {reply "hullo!";};';
+
+                return Q(new ASTBuilder().parse(source));
             }
         };
 

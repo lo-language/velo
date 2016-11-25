@@ -36,19 +36,29 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
-    // procedures are *run-time* constants -- we just can't know their values (addresses) at compile-time
+    // insert into the symbol table
+    context.define(this.name);
 
-    if (this.value instanceof Procedure) {
+    const jsID = '$' + this.name;
 
-        var id = '$' + this.name;
-        context.define(this.name, JS.ID(id), true);
-        return new JsStmt.constDecl(id, this.value.compile(context));
+    var value = this.value.compile(context);
+    var result = new JsStmt(JS.constDecl(jsID, value));
+
+    if (context.isRoot()) {
+
+        // we're defining a module-level constant, so export it
+
+        result.attach(new JsStmt(JS.exprStmt(
+            JS.assign(
+                JS.select(
+                    JS.select(JS.ID("module"), "exports"),
+                    jsID
+                ),
+                JS.ID(jsID)
+            ))));
     }
 
-    context.define(this.name, this.value.compile(context));
-
-    // return an empty statement to allow attachment
-    return new JsStmt();
+    return result;
 };
 
 module.exports = __;

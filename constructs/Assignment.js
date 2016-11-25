@@ -42,8 +42,6 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
-    context.openStatement();
-
     // if the left node is a bare ID, then we compile it as an lvalue
     // otherwise all IDs are compiled as rvalues
 
@@ -67,12 +65,12 @@ __.prototype.compile = function (context) {
         }
 
         // see if the RHS is a dispatch
-        if (this.right.type == 'message') {
-            context.setFuture(name);
-        }
+        // if (this.right.type == 'message') {
+        //     context.setFuture(name);
+        // }
     }
 
-    return context.closeStatement(new JsStmt(JS.exprStmt(JS.assign(left, right, this.op == '=' ? null : this.op))));
+    return context.wrapStatement(new JsStmt(JS.exprStmt(JS.assign(left, right, this.op == '=' ? null : this.op))));
 
     // this was genius
     // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP

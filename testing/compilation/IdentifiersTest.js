@@ -19,19 +19,6 @@ module.exports["identifiers"] = {
         test.done();
     },
 
-    "constant": function (test) {
-
-        var node = new Lo.identifier('foo');
-
-        var context = new Context();
-
-        // define the constant
-        new Lo.constant('foo', new Lo.literal('number', '42')).compile(context);
-
-        test.deepEqual(node.compile(context).renderTree(), [ 'num', '42' ]);
-        test.done();
-    },
-
     "external ID": function (test) {
 
         var node = new Lo.identifier('foo', 'HTTP');

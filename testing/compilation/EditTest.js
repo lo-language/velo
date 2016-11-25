@@ -24,27 +24,19 @@ module.exports["basics"] = {
 
     "decrement ID": function (test) {
 
-        var node = {
-            "type":"decrement",
-            "operand":{type: "id", name: "bar"}
-        };
+        var node = new Lo.incrDecr('decrement', new Lo.identifier('bar'));
 
-        test.deepEqual(new Context().compile(node).renderTree(), [ 'stmtList', [ 'expr-stmt', [ 'dec', [ 'id', '$bar' ] ] ] ]);
+        test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList', [ 'expr-stmt', [ 'dec', [ 'id', '$bar' ] ] ] ]);
         test.done();
     },
 
     "increment subscript": function (test) {
 
-        var node = {
-            "type":"increment",
-            "operand": {
-                type: 'subscript',
-                list: {type: 'id', name: 'bar'},
-                index: {type: 'number', val: '1'}
-            }
-        };
+        var node = new Lo.incrDecr('increment',
+            new Lo.subscript(
+                new Lo.identifier('bar'), new Lo.literal('number', "1")));
 
-        test.deepEqual(new Context().compile(node).renderTree(), [ 'stmtList',
+        test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
                 [ 'inc', [ 'subscript', [ 'id', '$bar' ], [ 'num', '1' ] ] ] ] ]);
         test.done();

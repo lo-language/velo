@@ -4,7 +4,7 @@
  *-------------------------------------------------------------------------------------------*/
 
 /**
- * Models an Exa program, which is mostly a collection of modules and an address space for services.
+ * Models a Lo program, which is mostly a collection of modules and an address space for services.
  * Also supplies our load-and-go behavior by loading compiled code into the current JS sourcerironment.
  *
  * Author: Seth Purcell
@@ -15,6 +15,7 @@
 
 const Task = require('../runtime/Task');
 const Q = require('q');
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -44,7 +45,9 @@ __.prototype.include = function (modRef) {
         // module ID is its index in our list
         module.id = 'M' + this.nextModule++;
 
-        return module.compileSelf(this).then(result => {
+        console.log(module);
+
+        return module.compile().then(result => {
 
             // stash the module in our cache
             this.modules[module.id] = result;

@@ -9,60 +9,54 @@ const JsFunction = require('./JsFunction');
 const JsStmt = require('./JsStmt');
 
 /**
- * Constructor
- *
- * todo should Wrapper just extend context??
- *
- * or should a wrapper be a statement we attach other stmts to?
+ * A statement that wraps following statements in a blocking call/resolve.
  */
-var __ = function () {
+var __ = function (target, args, placeholderName) {
 
-    this.placeHolders = 0;
-    this.requests = null;
-};
-
-__.prototype.isEmpty = function () {
-
-    return this.placeHolders == 0;
+    this.target = target;
+    this.args = args;
+    this.replyHandler = new JsFunction([placeholderName], new JsStmt());
 };
 
 /**
- * Pushes a request onto the stack and returns a placeholder.
- **
- * @param request
- */
-__.prototype.pushRequest = function (request) {
-
-    if (request.getReplyHandler() == null) {
-
-        // create a reply handler taking the placeholder as its param and with an empty body
-
-        var placeholderName = 'res' + this.placeHolders++;
-        request.setReplyHandler(new JsFunction([placeholderName], new JsStmt()));
-    }
-
-    if (this.requests) {
-        this.requests.attach(request);
-    }
-    else {
-        this.requests = request;
-    }
-
-    return JS.subscript(JS.ID(placeholderName), JS.num('0'));
-};
-
-/**
- * Returns the given statement wrapped.
+ * Attaches a JS statement to this wrapper by appending to its replyHandler body.
  *
  * @param stmt
  */
-__.prototype.wrap = function (stmt) {
+__.prototype.attach = function (stmt) {
 
-    if (this.requests) {
-        return this.requests.attach(stmt);
-    }
+    this.replyHandler.append(stmt);
 
-    return stmt;
+    return this;
+};
+
+/**
+ *
+ */
+__.prototype._getAst = function () {
+
+    return new JsStmt(
+        JS.exprStmt(
+            JS.runtimeCall('sendMessage',
+                [
+                    this.target,
+                    JS.arrayLiteral(this.args),
+                    this.replyHandler,
+                    JS.NULL
+                ]
+            )));
+};
+
+__.prototype.renderTree = function () {
+
+    return this._getAst().renderTree();
+};
+
+__.prototype.renderJs = function () {
+
+    var ast = this._getAst();
+
+    return ast ? ast.renderJs() : '';
 };
 
 module.exports = __;

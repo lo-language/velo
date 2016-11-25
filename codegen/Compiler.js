@@ -28,7 +28,6 @@ const JsFunction = require('./JsFunction');
 const AsyncWhile = require('./AsyncWhile');
 const AsyncCond = require('./AsyncCond');
 const Future = require('./Future');
-const Request = require('./Request');
 const ReqExpr = require('./ReqExpr');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

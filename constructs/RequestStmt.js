@@ -84,18 +84,19 @@ __.prototype.compile = function (context) {
 
         cs.setStmt(stmt);
 
-        return cs;
+        return context.wrapStatement(cs);
     }
 
     // no continuation is required for non-blocking calls
 
-    return new JsStmt(
-        JS.exprStmt(
-            JS.runtimeCall('sendMessage', [
-                this.address.compile(context), JS.arrayLiteral(args),
-                this.replyHandler ? this.replyHandler.compile(context) : JS.NULL,
-                this.failHandler ? this.failHandler.compile(context) : JS.NULL
-            ])));
+    return context.wrapStatement(
+         new JsStmt(
+            JS.exprStmt(
+                JS.runtimeCall('sendMessage', [
+                    this.address.compile(context), JS.arrayLiteral(args),
+                    this.replyHandler ? this.replyHandler.compile(context) : JS.NULL,
+                    this.failHandler ? this.failHandler.compile(context) : JS.NULL
+                ]))));
 };
 
 module.exports = __;

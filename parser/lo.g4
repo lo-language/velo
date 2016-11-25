@@ -1,4 +1,4 @@
-grammar exa;
+grammar lo;
 
 // could *start* in newline mode
 // when we find indent in newline mode
@@ -42,6 +42,8 @@ INTER_END   : '`' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1);} ;
 
 MODREF  : '<' ~[ \t\r\n]+ '>' {this.text = this.text.slice(1, -1);} ;
 
+// should a module just be a record def?
+// but records normally can't refer to their own parts...
 module
     : references? definition+ EOF
     ;

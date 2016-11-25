@@ -9,7 +9,8 @@
 
 const fs = require('fs');
 const Q = require('q');
-const Module = require('../codegen/Module');
+const ASTBuilder = require('./../parser/ASTBuilder');
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -23,7 +24,7 @@ var __ = function (basePath) {
  * Acquires the specified module.
  *
  * @param modRef
- * @return {String}
+ * @return {Module}
  */
 __.prototype.acquire = function (modRef) {
 
@@ -31,7 +32,13 @@ __.prototype.acquire = function (modRef) {
 
     // read the file
     return Q.denodeify(fs.readFile)(path, 'utf8').then(source => {
-        return new Module(source, modRef);
+
+        process.stderr.write("PARSING   " + this.name);
+        var start = new Date();
+        var module = new ASTBuilder().parse(source);
+        process.stderr.write(" [" + (new Date().getTime() - start.getTime()) + "ms]\n");
+
+        return module;
     },
 
     function () {
