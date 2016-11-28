@@ -70,7 +70,7 @@ __.prototype.compile = function (context) {
         // }
     }
 
-    return context.wrapStatement(new JsStmt(JS.exprStmt(JS.assign(left, right, this.op == '=' ? null : this.op))));
+    return new JsStmt(JS.exprStmt(JS.assign(left, right, this.op == '=' ? null : this.op)));
 
     // this was genius
     // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP

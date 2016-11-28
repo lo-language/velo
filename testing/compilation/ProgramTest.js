@@ -5,55 +5,34 @@
 
 "use strict";
 
-var Context = require('../../codegen/Context');
-var util = require('util');
+const Program = require('../../codegen/Program2');
+const Lo = require('../../constructs');
+const Sourcer = require('../../pipeline/Sourcer');
+const util = require('util');
 
-var ast = {
-    type: 'procedure',
-    params: [],
-    body:
-    { type: 'stmt_list',
-        head:
-        { type: 'assign',
-            op: '=',
-            left: { type: 'id', name: 'foo' },
-            right:
-            { type: 'procedure',
-                params: [],
-                body:
-                { type: 'stmt_list',
-                    head:
-                    { type: 'response',
-                        channel: 'reply',
-                        args: [ { type: 'number', val: '14' } ] },
-                    tail: null } } },
-        tail:
-        { type: 'stmt_list',
-            head:
-            { type: 'assign',
-                op: '=',
-                left: { type: 'id', name: 'x' },
-                right:
-                { type: 'application',
-                    address: { type: 'id', name: 'foo' },
-                    args: [] } },
-            tail:
-            { type: 'stmt_list',
-                head: {
-                    type: 'response',
-                    channel: 'reply',
-                    args: [ { type: 'id', name: 'x' } ] },
-                tail: null } } } };
 
 module.exports["basics"] = {
 
-    "full": function (test) {
+    "load": function (test) {
 
-        var js = new Context().compile(ast);
+        var sourcer = new Sourcer('testing/programs');
 
-//        console.log(require('util').inspect(js, {depth: null, colors: true}), '\n\n');
-//        console.log(js.render());
+        sourcer.acquire("factorial").then(
+            function (main) {
 
-        test.done();
+                // console.log(util.inspect(main.getAst(), {depth: null}));
+
+                var program = new Program(main);
+
+                return program.run([10]);
+            }
+        ).then(
+            function (res) {
+
+                console.log(res);
+
+                test.done();
+            }
+        ).done();
     }
 };

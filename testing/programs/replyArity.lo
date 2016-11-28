@@ -1,5 +1,7 @@
 
-main is -> (test) {
+// optimization opportunity here to not write unnecessary continuations
+
+main is <-> (test) {
 
     foo() -> (result) {
 
@@ -7,7 +9,7 @@ main is -> (test) {
     }
 };
 
-foo is -> {
+foo is <-> {
 
     reply ["Voigt", "Kampff", "machine"];
 };

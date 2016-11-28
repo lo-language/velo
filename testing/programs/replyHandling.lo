@@ -1,6 +1,6 @@
 // exercises the spec around processing sync messages vs. async replies
 
-main is -> (foo, bar) {
+main is <-> (foo, bar) {
 
     value = 0;
 

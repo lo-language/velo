@@ -64,7 +64,7 @@ __.prototype.compile = function () {
     // wrap our service constant definitions in a scope to prevent collisions with other modules
     // export our constants via a return statement
 
-    return new JsFunction([], body);
+    return body;
 };
 
 module.exports = __;

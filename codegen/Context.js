@@ -2,40 +2,69 @@
 /**
  * Compilation context; handles compile-time symbol tracking.
  *
+ * A context can be a module (root) context, a service context, or a sink context
+ *
  * Created by: spurcell
  * 12/25/14
  */
 
 "use strict";
 
-const Wrapper = require('./Wrapper');
 const JS = require('./JsPrimitives');
+const Wrapper = require('./Wrapper');
+const ContStmt = require('./ContinuedStmt');
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
  * @param parent    the parent context, if any
+ * @param isService
  */
-var __ = function (parent) {
+var __ = function (parent, isService) {
 
     this.parent = parent;
+
+    if (parent) {
+        this.type = isService ? 'service' : 'sink';
+    }
+    else {
+        this.type = 'module';
+        this.contNum = 0;
+    }
 
     // our local symbol table, containing params, locals, constants, futures, etc.
     this.symbols = {};
 
     this.wrapper = null;
     this.placeHolders = 0;
-    this.cont = 0;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Returns true if this is a root context.
+ * Returns true if this is a root (module) context.
  */
 __.prototype.isRoot = function () {
 
-    return this.parent ? false : true;
+    return this.type == 'module';
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns true if this is a service context.
+ */
+__.prototype.isService = function () {
+
+    return this.type == 'service';
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns true if this is a sink context.
+ */
+__.prototype.isSink = function () {
+
+    return this.type == 'sink';
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,11 +224,12 @@ __.prototype.resolve = function (name) {
 /**
  * Creates and returns a new inner context.
  *
+ * @param isService
  * @return {*}
  */
-__.prototype.createInner = function () { // push? nest? inner? derive? pushDown?
+__.prototype.createInner = function (isService) { // push? nest? inner? derive? pushDown?
 
-    return new __(this);
+    return new __(this, isService);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -232,15 +262,64 @@ __.prototype.pushRequest = function (target, args, blocking) {
  *
  * @return {*}
  */
-__.prototype.wrapStatement = function (stmt) {
+__.prototype.compileStmt = function (stmt) {
+
+    // have to compile first to load up wrappers
+    var result = stmt.compile(this);
 
     if (this.wrapper) {
-        var result = this.wrapper.attach(stmt);
+        result = this.wrapper.attach(result);
+
+        // reset the wrapper
         this.wrapper = null;
-        return result;
     }
 
-    return stmt;
+    return result;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns true if this context is currently preparing to wrap a statement.
+ *
+ * @return {*}
+ */
+__.prototype.isWrapping = function () {
+
+    return this.wrapper ? true : false;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Creates a new continued statement.
+ *
+ * @return {*}
+ */
+__.prototype.newContStmt = function () {
+
+    if (this.parent) {
+        return this.parent.newContStmt();
+    }
+
+    return new ContStmt('c' + this.contNum++);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Returns true if a response can be issued in this context (for it or a parent).
+ *
+ * @return {*}
+ */
+__.prototype.canRespond = function () {
+
+    if (this.type == 'service') {
+        return true;
+    }
+
+    if (this.parent) {
+        return this.parent.canRespond();
+    }
+
+    return false;
 };
 
 module.exports = __;

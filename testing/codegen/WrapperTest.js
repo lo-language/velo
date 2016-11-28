@@ -5,7 +5,6 @@
 "use strict";
 
 const Wrapper = require('../../codegen/Wrapper');
-const Request = require('../../codegen/Request');
 const JS = require('../../codegen/JsPrimitives');
 const JsStmt = require('../../codegen/JsStmt');
 const util = require('util');

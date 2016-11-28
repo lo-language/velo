@@ -20,12 +20,18 @@ const Q = require('q');
 /**
  * Constructor
  */
-var __ = function (mainModule) {
+var __ = function (rootModule) {
 
-    this.main = mainModule;
+    this.root = rootModule;
     this.modules = {};
 
-    this.main = this.load(mainModule);
+    var rootMod = this.load(rootModule);
+
+    if (rootMod.exports.$main == null) {
+        throw new Error("root module doesn't define a main() service")
+    }
+
+    this.main = rootMod.exports.$main;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,20 +42,28 @@ __.prototype.load = function (module) {
 
     // linking works as follows:
 
-    module.getRef();
+    // module.getRef();
 
 
     // incorporate the module's dependencies in our link table
-    module.getDeps();
+    // module.getDeps();
 
-    var body =
+    var body = module.compile().renderJs();
+
+    // console.log(body);
+
+    var fn = new Function("module",
         "'use strict';\n\n" +
-        module.getJs() +
-        '\n\nM0["main"](rootTask);\n\n';
+        body + '\n\n');
 
-    var fn = new Function("rootTask", body);
+    var mod = {
+        exports: {}
+    };
 
-    fn();
+    // load that bad boy
+    fn(mod);
+
+    return mod;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

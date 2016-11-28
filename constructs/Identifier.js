@@ -54,17 +54,18 @@ __.prototype.compile = function (context) {
         return context.resolveExternal(this.name, this.nameSpace);
     }
 
-    if (context.isConstant(this.name)) {
-        return context.resolve(this.name);
-    }
+    // commented out because resolve is now a misnomer (it just tests existence)
+    // if (context.isConstant(this.name)) {
+    //     return context.resolve(this.name);
+    // }
 
     // see if the name is a local constant
-    try {
-        return context.resolve(this.name);
-    }
-    catch (err) {
-        // ignore
-    }
+    // try {
+    //     return context.resolve(this.name);
+    // }
+    // catch (err) {
+    //     // ignore
+    // }
 
     // todo just return whatever the ID resolves to in this nameSpace?
     // make resolve able to return a Future or a $ name?

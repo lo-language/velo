@@ -44,7 +44,7 @@ __.prototype.getAst = function () {
 __.prototype.compile = function (context) {
 
     // push a new scope onto the scope stack
-    var local = context.createInner();
+    var local = context.createInner(this.isService);
 
     // -- we're already discriminating between handler and service below!
     // maybe split these up?

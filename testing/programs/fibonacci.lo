@@ -2,7 +2,7 @@
  * Calculates the nth fibonacci number using näive binary recursion
  */
 
-main is -> (n) {
+main is <-> (n) {
 
     if n < 0 {
         fail "Whatsamatta, you?";

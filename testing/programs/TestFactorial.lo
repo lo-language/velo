@@ -16,9 +16,6 @@ main is -> (args, io) {
 
     io.out.write("`test.toString()`\n");
 
-
-
-
     test = suite.addTest("fibonacci");
 
     test.assert(Fib:main(10) == 55);
@@ -36,7 +33,7 @@ createSuite is -> (name) {
 
     reply [
 
-        addTest: -> (name) {
+        addTest: <-> (name) {
 
             test = Test:create(name);
 

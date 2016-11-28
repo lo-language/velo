@@ -8,7 +8,6 @@
 const Context = require('../../codegen/Context');
 const JS = require('../../codegen/JsPrimitives');
 const JsStmt = require('../../codegen/JsStmt');
-const Request = require('../../codegen/Request');
 
 module.exports["basics"] = {
 
@@ -22,6 +21,18 @@ module.exports["basics"] = {
 
         test.equal(child.isRoot(), false);
 
+        test.done();
+    },
+
+    "isWrapping": function (test) {
+
+        var root = new Context();
+
+        test.equal(root.isWrapping(), false);
+
+        root.pushRequest({}, [], true);
+
+        test.equal(root.isWrapping(), true);
         test.done();
     },
 
@@ -47,20 +58,20 @@ module.exports["basics"] = {
         test.done();
     },
 
-    'declare var in root ctx should fail': function (test) {
+    'context type': function (test) {
 
         var ctx = new Context();
 
-        test.equal(ctx.has('foo'), false);
-        test.deepEqual(ctx.getJsVars(), []);
+        test.equal(ctx.isService(), false);
+        test.equal(ctx.isSink(), false);
 
-        try {
-            ctx.declare('foo');
-            test.fail();
-        }
-        catch (err) {
-            test.done();
-        }
+        test.equal(ctx.createInner(false).isService(), false);
+        test.equal(ctx.createInner(false).isSink(), true);
+
+        test.equal(ctx.createInner(true).isService(), true);
+        test.equal(ctx.createInner(true).isSink(), false);
+
+        test.done();
     },
 
     'declare var that collides with JS': function (test) {
@@ -280,5 +291,45 @@ module.exports["external constants"] = {
         catch (err) {
             test.done();
         }
+    }
+};
+
+
+module.exports["can respond"] = {
+
+    'in various contexts': function (test) {
+
+        var root = new Context();
+        test.equal(root.canRespond(), false);
+
+        var sink = root.createInner(false);
+        test.equal(sink.canRespond(), false);
+
+        var service = root.createInner(true);
+        test.equal(service.canRespond(), true);
+
+        var innerSink = service.createInner(false);
+        test.equal(innerSink.canRespond(), true);
+
+        test.done();
+    }
+};
+
+
+module.exports["continued stmts"] = {
+
+    'get several': function (test) {
+
+        var ctx = new Context();
+
+        var cs0 = ctx.newContStmt();
+
+        test.deepEqual(cs0.getCall().renderTree(), [ 'call', [ 'id', 'c0' ], [] ]);
+
+        var cs1 = ctx.newContStmt();
+
+        test.deepEqual(cs1.getCall().renderTree(), [ 'call', [ 'id', 'c1' ], [] ]);
+
+        test.done();
     }
 };

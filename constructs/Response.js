@@ -39,6 +39,10 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
+    if (context.canRespond() == false) {
+        throw new Error("can't respond from this context");
+    }
+
     var args = JS.arrayLiteral(this.args.map(arg => arg.compile(context)));
 
     // todo - only render the return if there are following statements? but then shouldn't we throw a compiler warning?

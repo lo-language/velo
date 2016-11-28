@@ -10,6 +10,11 @@ const JsStmt = require('./JsStmt');
 
 /**
  * A statement that wraps following statements in a blocking call/resolve.
+ *
+ * @param target
+ * @param args
+ * @param placeholderName
+ * @private
  */
 var __ = function (target, args, placeholderName) {
 
@@ -41,7 +46,7 @@ __.prototype._getAst = function () {
                 [
                     this.target,
                     JS.arrayLiteral(this.args),
-                    this.replyHandler,
+                    this.replyHandler._getAst(),
                     JS.NULL
                 ]
             )));

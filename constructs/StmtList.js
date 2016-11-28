@@ -35,8 +35,6 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
-    // todo could we put move this into the parser somehow?
-
     if (this.head == null) {
         return new JsStmt();
     }
@@ -44,8 +42,8 @@ __.prototype.compile = function (context) {
     // hooray for Lisp!
 
     return this.tail ?
-        this.head.compile(context).attach(this.tail.compile(context)) :
-        this.head.compile(context);
+        context.compileStmt(this.head).attach(context.compileStmt(this.tail)) :
+        context.compileStmt(this.head);
 };
 
 module.exports = __;

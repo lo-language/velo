@@ -4,7 +4,7 @@
  * Created by spurcell on 12/5/15.
  */
 
-const Program = require('../../codegen/Program');
+const Program = require('../../codegen/Program2');
 const Module = require('../../constructs/Module');
 const Q = require('q');
 const util = require('util');
@@ -15,25 +15,13 @@ module.exports['basics'] = {
 
     "baseline": function (test) {
 
-        test.expect(2);
+        test.expect(1);
 
-        var sourcer = {
+        var source = 'main is <-> {reply "hullo!";};';
 
-            acquire: function (modRef) {
+        var program = new Program(new ASTBuilder().parse(source));
 
-                test.equal(modRef, 'foo');
-
-                var source = 'main is -> {reply "hullo!";};';
-
-                return Q(new ASTBuilder().parse(source));
-            }
-        };
-
-        var program = new Program(sourcer);
-
-        program.include('foo').then(function () {
-            return program.run();
-        }).then(
+        program.run().then(
             function (res) {
                 test.equal(res, "hullo!");
                 test.done();
@@ -45,22 +33,15 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var sourcer = {
-
-            acquire: function (modRef) {
-                return Q(new Module(
-                    'sayHello is -> {\n' +
+        var root = new ASTBuilder().parse(
+                    'sayHello is <-> {\n' +
                     '    reply "hullo!";\n};\n' +
-                    'main is -> {\n' +
-                    '    reply sayHello();\n};\n'));
-            }
-        };
+                    'main is <-> {\n' +
+                    '    reply sayHello();\n};\n');
 
-        var p = new Program(sourcer);
+        var p = new Program(root);
 
-        p.include("foo").then(function () {
-            return p.run();
-        }).then(
+        p.run().then(
             function (res) {
                 test.equal(res, "hullo!");
                 test.done();
@@ -71,22 +52,15 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var sourcer = {
-
-            acquire: function (modRef) {
-                return Q(new Module(
-                    'sayHello is -> {\n' +
+        var root = new ASTBuilder().parse(
+                    'sayHello is <-> {\n' +
                     '    reply "hullo!";\n};\n' +
-                    'main is -> {\n' +
-                    '    sayHello();\n};\n'));
-            }
-        };
+                    'main is <-> {\n' +
+                    '    sayHello();\n};\n');
 
-        var p = new Program(sourcer);
+        var p = new Program(root);
 
-        p.include("foo").then(function () {
-            return p.run();
-        }).then(
+        p.run().then(
             function (res) {
                 test.equal(res, undefined);
                 test.done();
@@ -97,23 +71,16 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var sourcer = {
-
-            acquire: function (modRef) {
-                return Q(new Module(
-                    'sayHello is -> {\n' +
+        var root =new ASTBuilder().parse(
+                    'sayHello is <-> {\n' +
                     '    reply "hullo!";\n};\n' +
-                    'main is -> {\n' +
+                    'main is <-> {\n' +
                     '    sayHello();\n' +
-                    '    reply "howdy!";\n};\n'));
-            }
-        };
+                    '    reply "howdy!";\n};\n');
 
-        var p = new Program(sourcer);
+        var p = new Program(root);
 
-        p.include("foo").then(function () {
-            return p.run();
-        }).then(
+        p.run().then(
             function (res) {
                 test.equal(res, "howdy!");
                 test.done();
@@ -132,20 +99,13 @@ module.exports['basics'] = {
             task.respond("reply");
         };
 
-        var sourcer = {
-
-            acquire: function (modRef) {
-                return Q(new Module(
+        var root = new ASTBuilder().parse(
                     'main is <-> (write) {\n' +
-                    '@write("hi there!");\n};\n'));
-            }
-        };
+                    '@write("hi there!");\n};\n');
 
-        var p = new Program(sourcer);
+        var p = new Program(root);
 
-        p.include("foo").then(function () {
-            return p.run([write]);
-        }).then(
+        p.run([write]).then(
             function (res) {
                 setImmediate(test.done.bind(test));
             }).done();

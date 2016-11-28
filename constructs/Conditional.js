@@ -5,7 +5,6 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const AsyncCond = require('../codegen/AsyncCond');
 const JsStmt = require('../codegen/JsStmt');
 
 
@@ -58,8 +57,6 @@ __.prototype.compile = function (context) {
     // we DO need to support more than one level of stmt nesting
 
     var predicate = this.predicate.compile(context);
-    var wrapper = context.wrapper;
-
     var consequent = this.consequent.compile(context);
     var alternate = this.alternate ? this.alternate.compile(context) : null;
 
@@ -70,12 +67,23 @@ __.prototype.compile = function (context) {
     }
 
     // shortcut if none of the bits are async
-    if (async == false && wrapper.isEmpty()) {
+    if (async == false && context.isWrapping() == false) {
         return new JsStmt.cond(predicate, consequent, alternate);
     }
 
-    // todo collapse asynccond into this class
-    return new AsyncCond(predicate, consequent, alternate, context.wrapper, this);
+    // add continuation to both branches
+
+    var cs = context.newContStmt();
+
+    consequent.attach(new JsStmt(JS.exprStmt(cs.getCall())));
+    consequent.attach(new JsStmt(JS.exprStmt(cs.getCall())));
+
+    var stmt = new JsStmt(
+            JS.cond(predicate, consequent, alternate));
+
+    cs.setStmt(stmt);
+
+    return cs;
 };
 
 module.exports = __;

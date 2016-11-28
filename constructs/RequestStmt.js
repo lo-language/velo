@@ -6,7 +6,6 @@
 
 const JS = require('../codegen/JsPrimitives');
 const JsStmt = require('../codegen/JsStmt');
-const ContStmt = require('../codegen/ContinuedStmt');
 
 /**
  * A "function call" (request) expression
@@ -54,7 +53,7 @@ __.prototype.compile = function (context) {
 
     if (this.blocking) {
 
-        var cs = new ContStmt("cont");
+        var cs = context.newContStmt();
 
         // add the continuation to each handler or if there's no
         // handler, just use the continuation as the branch
@@ -84,19 +83,18 @@ __.prototype.compile = function (context) {
 
         cs.setStmt(stmt);
 
-        return context.wrapStatement(cs);
+        return cs;
     }
 
     // no continuation is required for non-blocking calls
 
-    return context.wrapStatement(
-         new JsStmt(
+    return new JsStmt(
             JS.exprStmt(
                 JS.runtimeCall('sendMessage', [
                     this.address.compile(context), JS.arrayLiteral(args),
                     this.replyHandler ? this.replyHandler.compile(context) : JS.NULL,
                     this.failHandler ? this.failHandler.compile(context) : JS.NULL
-                ]))));
+                ])));
 };
 
 module.exports = __;
