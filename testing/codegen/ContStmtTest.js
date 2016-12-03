@@ -59,5 +59,21 @@ module.exports["basics"] = {
                         [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'id', '42' ] ] ] ] ] ] ]);
 
         test.done();
+    },
+
+    "attach returns stmt": function (test) {
+
+        var cs = new ContStmt('test');
+
+        var stmt = new JsStmt(JS.cond(JS.ID('foo'), JS.exprStmt(cs.getCall()), JS.exprStmt(cs.getCall())));
+
+        cs.setStmt(stmt);
+
+        // attach to it
+        var result = cs.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.ID('42')))));
+
+        test.equal(cs, result);
+
+        test.done();
     }
 };

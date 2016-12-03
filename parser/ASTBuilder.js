@@ -1,11 +1,11 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Seth Purcell. All rights reserved.
- *  Licensed under the MIT License. See LICENSE in the project root for license information.
- *-------------------------------------------------------------------------------------------*/
-
-/**
- * Created by spurcell on 1/10/16.
- */
+/**=============================================================================
+ *
+ * Copyright (c) 2013 - 2017 Seth Purcell
+ * Licensed under Apache License v2.0 with Runtime Library Exception
+ *
+ * See LICENSE.txt in the project root for license information.
+ *
+ =============================================================================*/
 
 const antlr4 = require('antlr4');
 const Lexer = require('./loLexer');

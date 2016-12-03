@@ -8,6 +8,7 @@
 const Context = require('../../codegen/Context');
 const JS = require('../../codegen/JsPrimitives');
 const JsStmt = require('../../codegen/JsStmt');
+const Lo = require('../../constructs');
 
 module.exports["basics"] = {
 
@@ -294,7 +295,6 @@ module.exports["external constants"] = {
     }
 };
 
-
 module.exports["can respond"] = {
 
     'in various contexts': function (test) {
@@ -315,7 +315,6 @@ module.exports["can respond"] = {
     }
 };
 
-
 module.exports["continued stmts"] = {
 
     'get several': function (test) {
@@ -329,6 +328,14 @@ module.exports["continued stmts"] = {
         var cs1 = ctx.newContStmt();
 
         test.deepEqual(cs1.getCall().renderTree(), [ 'call', [ 'id', 'c1' ], [] ]);
+
+        test.done();
+    }
+};
+
+module.exports["compile statements"] = {
+
+    'basic': function (test) {
 
         test.done();
     }

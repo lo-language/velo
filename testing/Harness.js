@@ -8,14 +8,14 @@
 "use strict";
 
 const Sourcer = require('../pipeline/Sourcer');
-const Program = require('../codegen/Program');
+const Program = require('../codegen/Program2');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var __ = function (sourceDir, mainMod) {
+var __ = function (sourceDir, mainModName) {
 
-    this.program = new Program(new Sourcer(sourceDir), mainMod);
-    this.mainMod = mainMod;
+    this.sourcer = new Sourcer(sourceDir);
+    this.mainModName = mainModName;
     this.dump = false;
 };
 
@@ -32,16 +32,26 @@ __.prototype.enableDump = function () {
  */
 __.prototype.run = function (args) {
 
-    return this.program.compile().then(
-        () => {
+    return this.sourcer.acquire(this.mainModName).then(
+        main => {
 
-            if (this.dump) {
-                console.log(this.program.render());
-            }
+            var program = new Program(main);
 
-            return this.program.run(args);
+            return program.run(args);
         }
     );
+
+
+    // return this.program.compile().then(
+    //     () => {
+    //
+    //         if (this.dump) {
+    //             console.log(this.program.render());
+    //         }
+    //
+    //         return this.program.run(args);
+    //     }
+    // );
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,11 +80,9 @@ __.prototype.testSuccess = function (test, args, expected) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-__.prototype.testFailure = function (test, input, expected) {
+__.prototype.testFailure = function (test, args, expected) {
 
-    return this.program.include(this.mainMod).then(() => {
-        return this.program.run(input);
-    }).then(
+    return this.run(args).then(
         function () {
             test.fail();
         },

@@ -1,3 +1,11 @@
+/**=============================================================================
+ *
+ * Copyright (c) 2013 - 2017 Seth Purcell
+ * Licensed under Apache License v2.0 with Runtime Library Exception
+ *
+ * See LICENSE.txt in the project root for license information.
+ *
+ =============================================================================*/
 
 /**
  * Models a statement that's continued. This entails defining a continuation.
@@ -51,6 +59,8 @@ __.prototype.setStmt = function (stmt) {
 __.prototype.attach = function (stmt) {
 
     this.cont.append(stmt);
+
+    return this;
 };
 
 /**

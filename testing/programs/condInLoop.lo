@@ -1,4 +1,4 @@
-main is -> (log) {
+main is <-> (log) {
 
     num = 0;
     val = 0;

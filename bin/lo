@@ -1,12 +1,14 @@
 #!/usr/bin/env node
-
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Seth Purcell. All rights reserved.
- *  Licensed under the MIT License. See LICENSE in the project root for license information.
- *-------------------------------------------------------------------------------------------*/
+/**=============================================================================
+ *
+ * Copyright (c) 2013 - 2017 Seth Purcell
+ * Licensed under Apache License v2.0 with Runtime Library Exception
+ *
+ * See LICENSE.txt in the project root for license information.
+ *
+ =============================================================================*/
 
 /*
- * Author: Seth Purcell
  * Date: 12/24/14
  */
 
@@ -24,8 +26,8 @@ const IO = require('../runtime/IO');
 const System = require('../runtime/System');
 
 const Sourcer = require('../pipeline/Sourcer');
-const Program = require('../codegen/Program');
-const NodeBuilder = require('../pipeline/NodeBuilder');
+const Program = require('../codegen/Program2');
+// const NodeBuilder = require('../pipeline/NodeBuilder');
 
 var sourceFile = argv._.shift();
 
@@ -34,20 +36,18 @@ if (sourceFile == null) {
     process.exit();
 }
 
-// get the path of the module
-var modulePath = path.dirname(sourceFile);
-var moduleName = path.basename(sourceFile, '.lo');
+var sourcer = new Sourcer(path.dirname(sourceFile));
 
-var program = new Program(new Sourcer(modulePath), moduleName);
+sourcer.acquire(path.basename(sourceFile, '.lo')).then(
+    function (main) {
 
-program.compile().then(
-    function () {
+        var program = new Program(main);
 
         // see if we should build
 
-        if (argv.build != null) {
-            return new NodeBuilder().build(program, argv.build);
-        }
+        // if (argv.build != null) {
+        //     return new NodeBuilder().build(program, argv.build);
+        // }
 
         IO.args = argv;
         return program.run([argv._, IO, System]);

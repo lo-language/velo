@@ -24,17 +24,16 @@ module.exports['fail'] = {
 
     'success': function (test) {
 
-        test.expect(2);
+        test.expect(4);
 
         this.harness.run([{
             ok: function (task) {
-
                 test.ok(task.args[0]);
             }
         }]).then(
             function (res) {
                 test.done();
-            });
+            }).done();
     }
 };
 
@@ -118,22 +117,22 @@ module.exports['helloWorld'] = {
     }
 };
 
-module.exports['fibonacci'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(__dirname, 'fibonacci');
-        cb();
-    },
-
-    'success': function (test) {
-        this.harness.testSuccess(test, [10], 55);
-    },
-
-    'failure': function (test) {
-        this.harness.testFailure(test, [-1], 'Whatsamatta, you?');
-    }
-};
+// module.exports['fibonacci'] = {
+//
+//     "setUp": function (cb) {
+//
+//         this.harness = new Harness(__dirname, 'fibonacci');
+//         cb();
+//     },
+//
+//     'success': function (test) {
+//         this.harness.testSuccess(test, [10], 55);
+//     },
+//
+//     'failure': function (test) {
+//         this.harness.testFailure(test, [-1], 'Whatsamatta, you?');
+//     }
+// };
 
 module.exports['conditionals'] = {
 
@@ -156,175 +155,175 @@ module.exports['conditionals'] = {
     }
 };
 
-module.exports['iteration'] = {
-
-    // test that uncaught errors are properly escalated out of the program
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(__dirname, 'iteration');
-        cb();
-    },
-
-    "stack doesn't overflow": function (test) {
-
-        this.harness.testSuccess(test, [100000], 100000).done();
-    }
-};
-
-module.exports['procedure'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(__dirname, 'procedure');
-        cb();
-    },
-
-    'success': function (test) {
-
-        this.harness.testSuccess(test, [], 60);
-    }
-};
-
-module.exports['conditional in loop'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(__dirname, 'condInLoop');
-        cb();
-    },
-
-    'success': function (test) {
-
-        var logMessages = [];
-
-        this.harness.testSuccess(test, [
-            function (task) {
-
-                logMessages.push(task.args[0]);
-                task.respond("reply");
-            }
-        ], 5).then(function () {
-
-            test.deepEqual(logMessages, [ 'howdy!\n', 'howdy!\n', 'hello hello!\n', 'ok.\n', 'ok.\n' ]);
-        });
-    }
-};
-
-// module.exports['futures2'] = {
+// module.exports['iteration'] = {
 //
 //     // test that uncaught errors are properly escalated out of the program
 //
 //     "setUp": function (cb) {
 //
-//         this.harness = new Harness(__dirname, 'futures2');
+//         this.harness = new Harness(__dirname, 'iteration');
 //         cb();
 //     },
 //
-//     "run in parallel": function (test) {
+//     "stack doesn't overflow": function (test) {
 //
-//         //test.expect(5);
-//
-//         var httpGet = function (task) {
-//             test.ok(true);
-//             setTimeout(task.doAsync(function () {
-//                 task.respond("reply", [{statusCode: 200}, "this is a response"]);
-//             }), 50);
-//         };
-//
-//         var writeLine = function (task) {
-//             test.ok(true);
-//             //console.log('write:', task.args);
-//             task.respond("reply"); // todo this is now superfluous
-//         };
-//
-//         this.harness.testSuccess(test, [httpGet, writeLine], 18);
+//         this.harness.testSuccess(test, [100000], 100000).done();
 //     }
 // };
 //
-// module.exports['futures'] = {
-//
-//     // test that uncaught errors are properly escalated out of the program
+// module.exports['procedure'] = {
 //
 //     "setUp": function (cb) {
 //
-//         this.harness = new Harness(__dirname, 'futures');
+//         this.harness = new Harness(__dirname, 'procedure');
 //         cb();
 //     },
 //
-//     "run in parallel": function (test) {
+//     'success': function (test) {
 //
-//         var foo = function (task) {
-//             test.ok(true);
-//             task.respond("reply", 21);
-//         };
-//
-//         var bar = function (task) {
-//             test.ok(true);
-//             task.respond("reply", 42);
-//         };
-//
-//         this.harness.testSuccess(test, [foo, bar], "bar wins");
+//         this.harness.testSuccess(test, [], 60);
 //     }
 // };
-
-
-module.exports['reply arity'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(__dirname, 'replyArity');
-        cb();
-    },
-
-    'success': function (test) {
-
-        test.expect(1);
-
-        // both functions just reply immediately
-        // todo add a test that does this experiment within a reply handler
-
-        this.harness.run([{
-            equal: function (task) {
-
-                test.deepEqual(task.args[0], task.args[1]);
-            }
-        }]).then(
-            function (res) {
-                test.done();
-            }).done();
-    }
-};
-
-module.exports['reply handling'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(__dirname, 'replyHandling');
-        cb();
-    },
-
-    'success': function (test) {
-
-        test.expect(1);
-
-        // both functions just reply immediately
-        // todo add a test that does this experiment within a reply handler
-
-        this.harness.run([
-            function (task) {
-                task.respond("reply", []);
-            },
-            function (task) {
-                task.respond("reply", [33]);
-            }
-        ]).then(
-            function (res) {
-                test.equal(res, 42);
-                test.done();
-            });
-    }
-};
+//
+// module.exports['conditional in loop'] = {
+//
+//     "setUp": function (cb) {
+//
+//         this.harness = new Harness(__dirname, 'condInLoop');
+//         cb();
+//     },
+//
+//     'success': function (test) {
+//
+//         var logMessages = [];
+//
+//         this.harness.testSuccess(test, [
+//             function (task) {
+//
+//                 logMessages.push(task.args[0]);
+//                 task.respond("reply");
+//             }
+//         ], 5).then(function () {
+//
+//             test.deepEqual(logMessages, [ 'howdy!\n', 'howdy!\n', 'hello hello!\n', 'ok.\n', 'ok.\n' ]);
+//         });
+//     }
+// };
+//
+// // module.exports['futures2'] = {
+// //
+// //     // test that uncaught errors are properly escalated out of the program
+// //
+// //     "setUp": function (cb) {
+// //
+// //         this.harness = new Harness(__dirname, 'futures2');
+// //         cb();
+// //     },
+// //
+// //     "run in parallel": function (test) {
+// //
+// //         //test.expect(5);
+// //
+// //         var httpGet = function (task) {
+// //             test.ok(true);
+// //             setTimeout(task.doAsync(function () {
+// //                 task.respond("reply", [{statusCode: 200}, "this is a response"]);
+// //             }), 50);
+// //         };
+// //
+// //         var writeLine = function (task) {
+// //             test.ok(true);
+// //             //console.log('write:', task.args);
+// //             task.respond("reply"); // todo this is now superfluous
+// //         };
+// //
+// //         this.harness.testSuccess(test, [httpGet, writeLine], 18);
+// //     }
+// // };
+// //
+// // module.exports['futures'] = {
+// //
+// //     // test that uncaught errors are properly escalated out of the program
+// //
+// //     "setUp": function (cb) {
+// //
+// //         this.harness = new Harness(__dirname, 'futures');
+// //         cb();
+// //     },
+// //
+// //     "run in parallel": function (test) {
+// //
+// //         var foo = function (task) {
+// //             test.ok(true);
+// //             task.respond("reply", 21);
+// //         };
+// //
+// //         var bar = function (task) {
+// //             test.ok(true);
+// //             task.respond("reply", 42);
+// //         };
+// //
+// //         this.harness.testSuccess(test, [foo, bar], "bar wins");
+// //     }
+// // };
+//
+//
+// module.exports['reply arity'] = {
+//
+//     "setUp": function (cb) {
+//
+//         this.harness = new Harness(__dirname, 'replyArity');
+//         cb();
+//     },
+//
+//     'success': function (test) {
+//
+//         test.expect(1);
+//
+//         // both functions just reply immediately
+//         // todo add a test that does this experiment within a reply handler
+//
+//         this.harness.run([{
+//             equal: function (task) {
+//
+//                 test.deepEqual(task.args[0], task.args[1]);
+//             }
+//         }]).then(
+//             function (res) {
+//                 test.done();
+//             }).done();
+//     }
+// };
+//
+// module.exports['reply handling'] = {
+//
+//     "setUp": function (cb) {
+//
+//         this.harness = new Harness(__dirname, 'replyHandling');
+//         cb();
+//     },
+//
+//     'success': function (test) {
+//
+//         test.expect(1);
+//
+//         // both functions just reply immediately
+//         // todo add a test that does this experiment within a reply handler
+//
+//         this.harness.run([
+//             function (task) {
+//                 task.respond("reply", []);
+//             },
+//             function (task) {
+//                 task.respond("reply", [33]);
+//             }
+//         ]).then(
+//             function (res) {
+//                 test.equal(res, 42);
+//                 test.done();
+//             });
+//     }
+// };
 
 
 // //module.exports['recovery'] = {

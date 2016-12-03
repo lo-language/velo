@@ -1,6 +1,11 @@
-/**
- * Created by spurcell on 1/2/16.
- */
+/**=============================================================================
+ *
+ * Copyright (c) 2013 - 2017 Seth Purcell
+ * Licensed under Apache License v2.0 with Runtime Library Exception
+ *
+ * See LICENSE.txt in the project root for license information.
+ *
+ =============================================================================*/
 
 const Task = require('../runtime/Task');
 const http = require('http');

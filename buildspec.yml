@@ -14,4 +14,4 @@ phases:
 artifacts:
   type: zip
   files:
-    - HelloWorld.js
+    - LICENSE.txt

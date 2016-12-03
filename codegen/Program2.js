@@ -1,7 +1,11 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Seth Purcell. All rights reserved.
- *  Licensed under the MIT License. See LICENSE in the project root for license information.
- *-------------------------------------------------------------------------------------------*/
+/**=============================================================================
+ *
+ * Copyright (c) 2013 - 2017 Seth Purcell
+ * Licensed under Apache License v2.0 with Runtime Library Exception
+ *
+ * See LICENSE.txt in the project root for license information.
+ *
+ =============================================================================*/
 
 /**
  * Models a Lo program, which is mostly a collection of modules and an address space for services.

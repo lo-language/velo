@@ -66,6 +66,8 @@ module.exports["assignment"] = {
 
     "assign application to id": function (test) {
 
+        // this is more of an integration test
+
         var node = new Lo.assignment(
             '=',
             new Lo.identifier('foo'),
@@ -78,17 +80,7 @@ module.exports["assignment"] = {
 
         test.deepEqual(node.compile(context).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
-                [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                    [ [ 'id', '$bar' ],
-                        [ 'arrayLiteral', [] ],
-                        [ 'function',
-                            null,
-                            [ 'res0' ],
-                            [ 'stmtList',
-                                [ 'expr-stmt',
-                                    [ 'assign', [ 'id', '$foo' ], [ 'id', 'res0' ] ] ] ] ],
-                        [ 'null' ] ] ] ] ]);
+                [ 'assign', [ 'id', '$foo' ], [ 'id', 'res0' ] ] ] ]);
         test.equal(context.has('foo'), true);
 
         test.done();
