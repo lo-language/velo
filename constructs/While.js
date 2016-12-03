@@ -37,8 +37,6 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
-    context.openStatement();
-
     var condition = this.cond.compile(context);
     var wrapper = context.wrapper;
 

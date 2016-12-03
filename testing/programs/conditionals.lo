@@ -3,7 +3,7 @@
  * 12/25/14
  */
 
-main is -> (x) {
+main is <-> (x) {
 
     if x < 0 {
         reply "negative";

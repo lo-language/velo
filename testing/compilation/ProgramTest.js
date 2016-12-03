@@ -17,14 +17,14 @@ module.exports["basics"] = {
 
         var sourcer = new Sourcer('testing/programs');
 
-        sourcer.acquire("factorial").then(
+        sourcer.acquire("fail").then(
             function (main) {
 
                 // console.log(util.inspect(main.getAst(), {depth: null}));
 
                 var program = new Program(main);
 
-                return program.run([10]);
+                return program.run(test);
             }
         ).then(
             function (res) {

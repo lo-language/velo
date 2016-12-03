@@ -1,0 +1,17 @@
+version: 0.1
+
+phases:
+  pre_build:
+    commands:
+      - echo Installing source NPM dependencies...
+      - npm install
+  build:
+    commands:
+      - npm test
+  post_build:
+    commands:
+      - echo Build completed on `date`
+artifacts:
+  type: zip
+  files:
+    - HelloWorld.js

@@ -1,6 +1,6 @@
-main is -> (args, io) {
+main is <-> (args, io) {
 
-    factorial = -> (num) {
+    factorial is <-> (num) {
 
         if num < 0 {
             fail "I pity the fool!";
