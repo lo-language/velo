@@ -48,7 +48,7 @@ module.exports["blocking"] = {
                                     [ 'expr-stmt', [ 'assign', [ 'id', '$baz' ], [ 'num', '42' ] ] ],
                                     [ 'stmtList',
                                         [ 'expr-stmt', [ 'call', [ 'id', 'c0' ], [] ] ] ] ] ] ],
-                        [ 'call', [ 'id', 'c0' ], [] ] ] ] ],
+                        [ 'id', 'c0' ] ] ] ],
             [ 'stmtList', [ 'function', 'c0', [], [ 'stmtList' ] ] ] ]);
 
         result.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('$bazball'), JS.num('42')))));
@@ -68,7 +68,7 @@ module.exports["blocking"] = {
                                     [ 'expr-stmt', [ 'assign', [ 'id', '$baz' ], [ 'num', '42' ] ] ],
                                     [ 'stmtList',
                                         [ 'expr-stmt', [ 'call', [ 'id', 'c0' ], [] ] ] ] ] ] ],
-                        [ 'call', [ 'id', 'c0' ], [] ] ] ] ],
+                        [ 'id', 'c0' ] ] ] ],
             [ 'stmtList',
                 [ 'function',
                     'c0',
@@ -105,7 +105,7 @@ module.exports["blocking"] = {
                     [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                     [ [ 'id', '$foo' ],
                         [ 'arrayLiteral', [] ],
-                        [ 'call', [ 'id', 'c0' ], [] ],
+                        [ 'id', 'c0' ],
                         [ 'function',
                             null,
                             [ 'args' ],
@@ -229,8 +229,8 @@ module.exports["blocking"] = {
                     [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                     [ [ 'id', '$foo' ],
                         [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
-                        [ 'call', [ 'id', 'c0' ], [] ],
-                        [ 'call', [ 'id', 'c0' ], [] ] ] ] ],
+                        [ 'id', 'c0' ],
+                        [ 'id', 'c0' ] ] ] ],
             [ 'stmtList', [ 'function', 'c0', [], [ 'stmtList' ] ] ] ]);
 
         // attach a statement - should be tucked inside the replyhandler
@@ -242,8 +242,8 @@ module.exports["blocking"] = {
                     [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                     [ [ 'id', '$foo' ],
                         [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
-                        [ 'call', [ 'id', 'c0' ], [] ],
-                        [ 'call', [ 'id', 'c0' ], [] ] ] ] ],
+                        [ 'id', 'c0' ],
+                        [ 'id', 'c0' ] ] ] ],
             [ 'stmtList',
                 [ 'function',
                     'c0',
@@ -253,7 +253,6 @@ module.exports["blocking"] = {
 
         test.done();
     },
-
     "with embedded blocking expr": function (test) {
 
         var node = new Lo.requestStmt(
@@ -296,8 +295,8 @@ module.exports["blocking"] = {
                                                         [
                                                             [ "id", "$baz" ],
                                                             [ "arrayLiteral", [ [ "sub", [ "id", "res0" ], [ "id", "res1" ] ] ] ],
-                                                            [ "call", [ "id", "c0" ], [] ],
-                                                            [ "call", [ "id", "c0" ], [] ]
+                                                            [ "id", "c0" ],
+                                                            [ "id", "c0" ]
                                                         ]
                                                     ]
                                                 ], [ "stmtList",

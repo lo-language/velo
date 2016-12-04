@@ -70,7 +70,7 @@ __.prototype.compile = function (context) {
             replyHandler.append(new JsStmt(JS.exprStmt(cs.getCall())));
         }
         else {
-            replyHandler = cs.getCall();
+            replyHandler = cs.getRef();
         }
 
         if (this.failHandler) {
@@ -78,7 +78,7 @@ __.prototype.compile = function (context) {
             failHandler.append(new JsStmt(JS.exprStmt(cs.getCall())));
         }
         else {
-            failHandler = cs.getCall();
+            failHandler = cs.getRef();
         }
 
         var stmt = new JsStmt(

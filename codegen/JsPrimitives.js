@@ -278,7 +278,7 @@ JS.fnDef = (params, body, name) => {
 
     return {
         renderTree: () => ['function', name || null, params, body.renderTree()],
-        renderJs: () => 'function ' + (name ? name : '') + '(' + params.join(', ') + ') {\n\n' + body.renderJs() + '\n}'
+        renderJs: () => 'function ' + (name ? name + ' ' : '') + '(' + params.join(', ') + ') {\n\n' + body.renderJs() + '\n}'
     };
 };
 

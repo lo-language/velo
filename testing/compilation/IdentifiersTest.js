@@ -31,7 +31,11 @@ module.exports["identifiers"] = {
             }
         });
 
-        test.deepEqual(node.compile(context), 'M0.foo');
+        test.deepEqual(node.compile(context).renderTree(), [ 'subscript',
+            [ 'subscript',
+                [ 'select', [ 'id', 'module' ], 'deps' ],
+                [ 'string', 'HTTP' ] ],
+            [ 'string', '$foo' ] ]);
         test.done();
     },
 
@@ -55,7 +59,11 @@ module.exports["identifiers"] = {
 
         context.define("foo", 42);
 
-        test.deepEqual(node.compile(context), 'M0.foo');
+        test.deepEqual(node.compile(context).renderTree(), [ 'subscript',
+            [ 'subscript',
+                [ 'select', [ 'id', 'module' ], 'deps' ],
+                [ 'string', 'HTTP' ] ],
+            [ 'string', '$foo' ] ]);
         test.done();
     }
 };

@@ -4,7 +4,6 @@
 
 const JsStmt = require('../../codegen/JsStmt');
 const JsFunction = require('../../codegen/JsFunction');
-const Request = require('../../codegen/Request');
 const JS = require('../../codegen/JsPrimitives');
 
 module.exports["render"] = {

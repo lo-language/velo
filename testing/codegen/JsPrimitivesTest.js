@@ -359,7 +359,8 @@ module.exports["fn defs"] = {
         test.deepEqual(n.renderTree(), [ 'function', 'foo',
             [ 'bar', 'baz' ],
             [ 'stmtList', [ 'expr-stmt', [ 'assign', [ 'id', 'bar' ], [ 'id', 'baz' ] ] ] ] ]);
-        test.equal(n.renderJs(), "function (bar, baz) {\n\nbar = baz;\n}");
+        
+        test.equal(n.renderJs(), "function foo (bar, baz) {\n\nbar = baz;\n}");
 
         test.done();
     }

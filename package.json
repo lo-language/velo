@@ -18,7 +18,7 @@
     "jison": "0.4.x"
   },
   "scripts": {
-    "test": "nodeunit testing/parser testing/codegen/* testing/runtime testing/programs"
+    "test": "nodeunit testing/codegen testing/compilation testing/parser testing/pipeline testing/programs testing/runtime"
   },
   "bin": {
     "lo": "./bin/lo"

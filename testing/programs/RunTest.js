@@ -24,7 +24,7 @@ module.exports['fail'] = {
 
     'success': function (test) {
 
-        test.expect(4);
+        test.expect(2);
 
         this.harness.run([{
             ok: function (task) {

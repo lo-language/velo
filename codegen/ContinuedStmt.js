@@ -33,6 +33,16 @@ var __ = function (name) {
 };
 
 /**
+ * Returns JS for a reference to the continuation for this unit.
+ *
+ * @returns {*}
+ */
+__.prototype.getRef = function () {
+
+    return JS.ID(this.name);
+};
+
+/**
  * Returns JS for a call to the continuation for this unit.
  *
  * @returns {*}

@@ -48,7 +48,7 @@ module.exports["blocking calls"] = {
                                     [ 'call',
                                         [ 'select', [ 'id', 'task' ], 'respond' ],
                                         [ [ 'string', 'reply' ], [ 'arrayLiteral', [ ["mul",
-                                            [ "id", "$num" ], [ "id", "res0" ] ] ] ] ] ] ],
+                                            [ "id", "$num" ], [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ] ] ] ] ] ] ],
                                 [ 'stmtList', [ 'return' ] ] ] ],
                         [ 'null' ] ] ] ] ]);
 
@@ -78,7 +78,9 @@ module.exports["blocking calls"] = {
                                 [ 'res0' ],
                                 [ 'stmtList',
                                     [ 'expr-stmt',
-                                        [ 'assign', [ 'id', '$baz' ], [ 'id', 'res0' ] ] ] ] ],
+                                        [ 'assign',
+                                            [ 'id', '$baz' ],
+                                            [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ] ] ] ] ],
                             [ 'null' ] ] ] ] ]
             );
 
@@ -108,7 +110,7 @@ module.exports["blocking calls"] = {
                             [ 'res0' ],
                             [ 'stmtList',
                                 [ 'expr-stmt',
-                                    [ 'assign', [ 'id', '$baz' ], [ 'id', 'res0' ] ] ] ] ],
+                                    [ 'assign', [ 'id', '$baz' ], [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ] ] ] ] ],
                         [ 'null' ] ] ] ] ]);
         test.done();
     },
@@ -140,7 +142,7 @@ module.exports["blocking calls"] = {
                             [ 'res0' ],
                             [ 'stmtList',
                                 [ 'expr-stmt',
-                                    [ 'assign', [ 'id', '$baz' ], [ 'id', 'res0' ] ] ] ] ],
+                                    [ 'assign', [ 'id', '$baz' ], [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ] ] ] ] ],
                         [ 'null' ] ] ] ] ]);
         test.done();
     },
@@ -206,13 +208,13 @@ module.exports["blocking calls"] = {
                                                         [ "id", "task" ], "sendMessage" ],
                                                     [
                                                         [ "id", "$baz" ],
-                                                        [ "arrayLiteral", [ [ "id", "res0" ], [ "id", "res1" ] ] ],
+                                                        [ "arrayLiteral", [ [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ], [ 'subscript', [ 'id', 'res1' ], [ 'num', '0' ] ] ] ],
                                                         [ "function",
                                                             null,
                                                             [ "res2" ],
                                                             [ "stmtList",
                                                                 [ "expr-stmt",
-                                                                    [ "assign", [ "id", "$baz" ], [ "id", "res2" ] ]
+                                                                    [ "assign", [ "id", "$baz" ], [ 'subscript', [ 'id', 'res2' ], [ 'num', '0' ] ] ]
                                                                 ] ] ],
                                                         [ "null" ] ] ] ] ] ],
                                             [ 'null' ] ] ] ] ] ],

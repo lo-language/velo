@@ -78,8 +78,6 @@ __.prototype.load = function () {
 
     var body = this.compile().renderJs();
 
-    // console.log(body);
-
     var loadMod = new Function("module",
         "'use strict';\n\n" +
         body + '\n\n');

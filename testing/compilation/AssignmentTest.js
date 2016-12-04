@@ -80,7 +80,9 @@ module.exports["assignment"] = {
 
         test.deepEqual(node.compile(context).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
-                [ 'assign', [ 'id', '$foo' ], [ 'id', 'res0' ] ] ] ]);
+                [ 'assign',
+                    [ 'id', '$foo' ],
+                    [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ] ] ] ]);
         test.equal(context.has('foo'), true);
 
         test.done();
