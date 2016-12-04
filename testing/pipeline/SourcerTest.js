@@ -10,13 +10,15 @@ module.exports['basics'] = {
 
     "file success": function (test) {
 
-        test.expect(1);
+        test.expect(3);
 
         var sourcer = new Sourcer(__dirname + '/../programs');
 
         sourcer.acquire("factorial").then(mod => {
 
-            console.log(mod);
+            test.deepEqual(mod.refs, []);
+            test.equal(mod.defs[0].name, 'main');
+            test.equal(mod.name, 'factorial');
             test.done();
         });
     },
