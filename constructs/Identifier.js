@@ -60,7 +60,7 @@ __.prototype.compile = function (context) {
     if (this.nameSpace) {
 
         // having a qualifier implies a constant
-        return context.resolveExternal(this.name, this.nameSpace);
+        return JS.subscript(JS.subscript(JS.select(JS.ID('module'), 'deps'), JS.string(this.nameSpace)), JS.string('$' + this.name));
     }
 
     // commented out because resolve is now a misnomer (it just tests existence)

@@ -3,18 +3,18 @@
  * 2/7/15
  */
 
-main is -> {
+main is <-> {
     reply foo(5);
 };
 
 
-foo is -> (x) {
+foo is <-> (x) {
 
     reply factorial(x) / 2;
 };
 
 
-factorial is -> (num) {
+factorial is <-> (num) {
 
     again = factorial;
 

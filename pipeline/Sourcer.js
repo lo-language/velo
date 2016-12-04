@@ -35,9 +35,13 @@ __.prototype.acquire = function (modRef) {
     // read the file
     return Q.denodeify(fs.readFile)(path, 'utf8').then(source => {
 
-        process.stderr.write("PARSING   " + this.name);
+        process.stderr.write("PARSING   " + modRef);
+
         var start = new Date();
         var module = new ASTBuilder().parse(source);
+
+        module.setName(modRef);
+
         process.stderr.write(" [" + (new Date().getTime() - start.getTime()) + "ms]\n");
 
         return module;

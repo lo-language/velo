@@ -5,69 +5,128 @@
 
 "use strict";
 
-const Program = require('../../codegen/Program2');
+const Program = require('../../codegen/Program');
 const Lo = require('../../constructs');
-const Sourcer = require('../../pipeline/Sourcer');
 const util = require('util');
-
+const Q = require('q');
 
 module.exports["basics"] = {
 
-    "load": function (test) {
+    "constructor": function (test) {
 
-        var sourcer = new Sourcer('testing/programs');
+        test.expect(1);
 
-        sourcer.acquire("fail").then(
-            function (main) {
+        var mod = {
+            load: function () {
 
-                // console.log(util.inspect(main.getAst(), {depth: null}));
+                test.ok(true);
 
-                var program = new Program(main);
-
-                console.log(main.compile().renderJs());
-
-                return program.run([{
-                    ok: function (task) {
-
-                    }
-                }]);
+                return {
+                    $main: "snarf"
+                };
             }
-        ).then(
-            function (res) {
+        };
 
-                console.log(res);
+        var program = new Program(mod, {});
 
+        test.done();
+    },
+
+    "loadModule hits cache first": function (test) {
+
+        var exports = {
+            $main: "snarf"
+        };
+
+        var mod = {
+            load: function () {
+
+                return exports;
+            }
+        };
+
+        var program = new Program(mod, {
+            acquire: function () {
+
+                // shouldn't get here!
+                test.fail();
+                return Q();
+            }
+        });
+
+        program.exports["math"] = exports;
+
+        program.loadModule("math").then(
+            function (exported) {
+                test.equal(exported, exports);
                 test.done();
             }
         ).done();
-    }
+    },
+
+    "loadModule loads and caches": function (test) {
+
+        test.expect(3);
+
+        var exports = {
+            $main: "snarf"
+        };
+
+        var mod = {
+
+            load: function () {
+                return exports;
+            },
+
+            loadDeps: function () {
+                return Q();
+            }
+        };
+
+        var program = new Program(mod, {
+            acquire: function (ref) {
+
+                test.equal(ref, 'math');
+                return Q(mod);
+            }
+        });
+
+        program.loadModule("math").then(
+            function (exported) {
+
+                test.equal(exported, exports);
+                test.equal(program.exports["math"], exports);
+                test.done();
+            }
+        ).done();
+    },
+
+    // "load": function (test) {
+    //
+    //     var sourcer = new Sourcer('testing/programs');
+    //
+    //     sourcer.acquire("fail").then(
+    //         function (main) {
+    //
+    //             // console.log(util.inspect(main.getAst(), {depth: null}));
+    //
+    //             var program = new Program(main);
+    //
+    //             console.log(main.compile().renderJs());
+    //
+    //             return program.run([{
+    //                 ok: function (task) {
+    //
+    //                 }
+    //             }]);
+    //         }
+    //     ).then(
+    //         function (res) {
+    //
+    //             console.log(res);
+    //
+    //             test.done();
+    //         }
+    //     ).done();
+    // }
 };
-
-
-
-// const $main = function (task) {
-//
-//     var $n;
-//     $n = task.args[0];
-//
-//     if ($n < 0) {
-//         task.respond('fail', ['Whatsamatta, you?']);
-//         return;
-//     }
-//
-//     if ($n <= 1) {
-//         task.respond('reply', [$n]);
-//         return;
-//     }
-//
-//     task.sendMessage($main, [($n - 1)], function (res0) {
-//
-//         task.sendMessage($main, [($n - 2)], function (res1) {
-//
-//             task.respond('reply', [(res0 + res1)]);
-//             return;
-//         }, null);
-//     }, null);
-// };
-//
-// module.exports.$main = $main;

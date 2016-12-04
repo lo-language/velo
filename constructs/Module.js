@@ -13,16 +13,30 @@ const JS = require('../codegen/JsPrimitives');
 const JsStmt = require('../codegen/JsStmt');
 const JsFunction = require('../codegen/JsFunction');
 const Context = require('../codegen/Context');
-
+const Q = require('q');
 
 /**
  * A module definition; the root of an AST. Called by the ASTBuilder
  */
-var __ = function (refs, defs) {
+var __ = function (deps, defs) {
 
-    this.refs = refs;
+    this.refs = deps || [];
     this.defs = defs;
     this.exports = {};
+    this.deps = {};
+
+    this.refs.forEach(dep => {
+
+        this.deps[dep.id] = dep.ref;
+    });
+};
+
+/**
+ * Sets the name of this module
+ */
+__.prototype.setName = function (name) {
+
+    this.name = name;
 };
 
 /**
@@ -39,37 +53,68 @@ __.prototype.getAst = function () {
 
 /**
  * Compiles this module to JS.
- *
  */
 __.prototype.compile = function () {
 
-
     // should module definitions be captured as a linked list like statements?
 
-    // how do we handle attaching empty stmts (what you get from a const def) here???
-
+    // create a root context
     var context = new Context();
 
-    var body = JsStmt.strictMode();
+    var body = new JsStmt();
 
     // a bunch of constants
     this.defs.forEach(def => {
         body.attach(def.compile(context));
     });
 
-    // var exports = this.getExports();
-
-    // attach all the export statements
-
-    // var pairs = Object.keys(this.getExports()).map(
-    //     name => [JS.string(name), exports[name]]);
-    //
-    // body.attach(JsStmt.return(JS.objLiteral(pairs)));
-
-    // wrap our service constant definitions in a scope to prevent collisions with other modules
-    // export our constants via a return statement
-
     return body;
+};
+
+/**
+ * Loads this module into our env in preparation for running.
+ */
+__.prototype.load = function () {
+
+    var body = this.compile().renderJs();
+
+    // console.log(body);
+
+    var loadMod = new Function("module",
+        "'use strict';\n\n" +
+        body + '\n\n');
+
+    // load that bad boy
+    loadMod(this);
+
+    return this.exports;
+};
+
+/**
+ *
+ * @param program
+ * @return promise completion promise
+ */
+__.prototype.loadDeps = function (program) {
+
+    // resolve all unresolved deps
+
+    // scan our dependencies and load any that are missing
+
+    return Q.all(Object.keys(this.deps).map(depName => {
+
+        // see if we've already loaded the dep
+
+        if (typeof this.deps[depName] == 'string') {
+
+            return program.loadModule(this.deps[depName]).then(exports => {
+
+                return this.deps[depName] = exports;
+            });
+        }
+
+        return this.deps[depName];
+    }));
 };
 
 module.exports = __;

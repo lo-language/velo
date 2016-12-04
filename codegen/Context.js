@@ -196,18 +196,6 @@ __.prototype.isConstant = function (name, qualifier) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
- * Resolves an external constant (by delegating to the parent).
- *
- * @param name
- * @param qualifier
- */
-__.prototype.resolveExternal = function (name, qualifier) {
-
-    return this.parent.resolveExternal(name, qualifier);
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
  * Returns the value of the specified constant.
  *
  * @param name
@@ -261,7 +249,7 @@ __.prototype.pushRequest = function (target, args, blocking) {
         this.wrapper = newWrapper;
     }
 
-    return JS.ID(placeholderName);
+    return JS.subscript(JS.ID(placeholderName), JS.num('0'));
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

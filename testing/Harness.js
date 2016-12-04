@@ -8,7 +8,7 @@
 "use strict";
 
 const Sourcer = require('../pipeline/Sourcer');
-const Program = require('../codegen/Program2');
+const Program = require('../codegen/Program');
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -35,7 +35,11 @@ __.prototype.run = function (args) {
     return this.sourcer.acquire(this.mainModName).then(
         main => {
 
-            var program = new Program(main);
+            var program = new Program(main, this.sourcer);
+
+            if (this.dump) {
+                console.log(main.compile().renderJs());
+            }
 
             return program.run(args);
         }
