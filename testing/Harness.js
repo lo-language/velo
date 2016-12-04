@@ -1,5 +1,5 @@
 /**
- * Test harness for loading in Exa programs, compiling and running them with assertions on their output.
+ * Test harness for loading in programs, compiling and running them with assertions on their output.
  *
  * Created by: spurcell
  * 4/5/15
@@ -71,15 +71,15 @@ __.prototype.testSuccess = function (test, args, expected) {
             }
 
             test.done();
-
-            // this was in here to let us wait on tests that end with a dispatch
-            // setImmediate(test.done.bind(test));
         },
         err => {
-                console.error("error running " + this.mainMod + ".exa: " + err);
-                console.error(err.stack);
-            }
-        );
+
+            console.error("error running test", err);
+            console.error(err.stack);
+
+            test.fail();
+        }
+    );
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

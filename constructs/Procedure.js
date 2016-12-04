@@ -99,7 +99,7 @@ __.prototype.compile = function (context) {
         body = preamble.attach(body);
     }
 
-    // implements an exa service as a JS function that takes a task
+    // implements a service as a JS function that takes a task
     // if a service, squash the construct?
     return new JsFunction([(this.isService ? 'task' : 'args')], body);
 };

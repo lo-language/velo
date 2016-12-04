@@ -1,6 +1,6 @@
 ## A [Lo](http://lolang.org)-to-JavaScript compiler, written in JavaScript.
 
-Can operate as a load-and-go compiler to seamlessly compile, load, and run a Lo program, or used to build statically-linked JavaScript files for execution in Node.js or browser contexts.
+Can operate as a load-and-go compiler to seamlessly compile, load, and run a Lo program, or be used to build statically-linked JavaScript files for execution in Node.js or browser contexts.
 
 ## Installation
 
@@ -45,4 +45,5 @@ The runtime consists of Task.js, which models the Lo task tree.
 Copyright (c) Seth Purcell
 
 Licensed under Apache License v2.0 with Runtime Library Exception
+
 See LICENSE.txt in the project root for license information.
