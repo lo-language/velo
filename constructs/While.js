@@ -10,9 +10,7 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const AsyncWhile = require('../codegen/AsyncWhile');
 const JsStmt = require('../codegen/JsStmt');
-
 
 /**
  * A while statement.
@@ -43,17 +41,32 @@ __.prototype.getAst = function () {
 __.prototype.compile = function (context) {
 
     var condition = this.cond.compile(context);
-    var wrapper = context.wrapper;
-
     var body = this.body.compile(context);
 
-    if (wrapper.isEmpty() && body.isAsync() == false) {
-        return JsStmt.while(condition, body);
+    if (body.isAsync() || context.isWrapping()) {
+
+        // does body.isAsync do anything?
+        console.log("here");
+
+        // join the body to the wrapper function via setImmediate to form a loop in a way that won't break the stack
+        // (this is me trying to emulate tail-recursion)
+
+        body.attach(new JsStmt(JS.exprStmt(
+            JS.fnCall(JS.ID("setImmediate"), [JS.runtimeCall('doAsync', [JS.ID('loop')])]))));
+
+        // see if there's a next statement
+        // var cond = this.next ? JS.cond(this.cond, this.body, this.next) : JS.cond(condition, body);
+
+        var loopDecl = new JsStmt(JS.letDecl('loop', JS.fnDef([], new JsStmt(JS.cond(condition, body)))));
+
+        return loopDecl.attach(new JsStmt(JS.exprStmt(JS.fnCall(JS.ID('loop'), []))));
     }
 
-    // i think it's kinda weird to pass the wrapper in like this...
-    // but we can't apply the wrapper till after we've attached a next stmt...
-    return new AsyncWhile(condition, body, wrapper);
+    return JsStmt.while(condition, body);
 };
+
+// let the conditional create the extra cont?
+// cont = context.createContStmt();
+// loop = context.createContStmt();
 
 module.exports = __;

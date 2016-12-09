@@ -76,23 +76,24 @@ __.prototype.compile = function (context) {
     }
 
     // shortcut if none of the bits are async
-    if (async == false && context.isWrapping() == false) {
-        return new JsStmt.cond(predicate, consequent, alternate);
-    }
+    if (async || context.isWrapping()) {
 
-    // add continuation to both branches
+        // add continuation to both branches
 
-    var cs = context.newContStmt();
+        var cs = context.newContStmt();
 
-    consequent.attach(new JsStmt(JS.exprStmt(cs.getCall())));
-    consequent.attach(new JsStmt(JS.exprStmt(cs.getCall())));
+        consequent.attach(new JsStmt(JS.exprStmt(cs.getCall())));
+        consequent.attach(new JsStmt(JS.exprStmt(cs.getCall())));
 
-    var stmt = new JsStmt(
+        var stmt = new JsStmt(
             JS.cond(predicate, consequent, alternate));
 
-    cs.setStmt(stmt);
+        cs.setStmt(stmt);
 
-    return cs;
+        return cs;
+    }
+
+    return new JsStmt.cond(predicate, consequent, alternate);
 };
 
 module.exports = __;

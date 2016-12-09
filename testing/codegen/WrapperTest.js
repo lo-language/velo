@@ -11,33 +11,11 @@ const util = require('util');
 
 module.exports["basics"] = {
 
-    "no requests": function (test) {
-
-        var wrapper = new Wrapper();
-
-        test.equal(wrapper.isEmpty(), true);
-
-        // should pass through
-        var stmt = wrapper.wrap(new JsStmt(JS.exprStmt(JS.assign(JS.ID('bazball'), JS.num('11')))));
-
-        test.deepEqual(stmt.renderTree(),
-                        [ 'stmtList',
-                            [ 'expr-stmt',
-                                [ 'assign', [ 'id', 'bazball' ], [ 'num', '11' ] ] ] ]);
-
-        test.done();
-    },
-
     "one request": function (test) {
 
-        var wrapper = new Wrapper();
+        var wrapper = new Wrapper(JS.ID('foo'), [JS.num('57'), JS.string('hello')], "res0");
 
-        var placeholder = wrapper.pushRequest(new Request(JS.ID('foo'), [JS.num('57'), JS.string('hello')], null, null, true));
-        test.equal(wrapper.isEmpty(), false);
-
-        test.deepEqual(placeholder.renderTree(), ["subscript", [ 'id', 'res0' ], [ "num", "0" ]]);
-
-        var stmt = wrapper.wrap(new JsStmt(JS.exprStmt(JS.assign(JS.ID('bazball'), JS.num('11')))));
+        var stmt = wrapper.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('bazball'), JS.num('11')))));
 
         test.deepEqual(stmt.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -50,25 +28,18 @@ module.exports["basics"] = {
                             [ 'res0' ],
                             [ 'stmtList',
                                 [ 'expr-stmt',
-                                    [ 'assign', [ 'id', 'bazball' ], [ 'num', '11' ] ] ] ] ] ] ] ] ]);
+                                    [ 'assign', [ 'id', 'bazball' ], [ 'num', '11' ] ] ] ] ], [ "null" ] ] ] ] ]);
 
         test.done();
     },
 
     "two requests": function (test) {
 
-        var wrapper = new Wrapper();
+        var wrapper = new Wrapper(JS.ID('foo'), [JS.num('57')], "res0");
 
-        var ph1 = wrapper.pushRequest(new Request(JS.ID('foo'), [JS.num('57')], null, null, true));
-        test.equal(wrapper.isEmpty(), false);
+        wrapper.attach(new Wrapper(JS.ID('bar'), [JS.string('hello')], "res1"));
 
-        var ph2 = wrapper.pushRequest(new Request(JS.ID('bar'), [JS.string('hello')], null, null, true));
-        test.equal(wrapper.isEmpty(), false);
-
-        test.deepEqual(ph1.renderTree(), [ "subscript", [ 'id', 'res0' ], [ "num", "0" ]]);
-        test.deepEqual(ph2.renderTree(), [ "subscript", [ 'id', 'res1' ], [ "num", "0" ]]);
-
-        var stmt = wrapper.wrap(new JsStmt(JS.exprStmt(JS.assign(JS.ID('bazball'), JS.num('11')))));
+        var stmt = wrapper.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('bazball'), JS.num('11')))));
 
         test.deepEqual(stmt.renderTree(), [ 'stmtList', [ 'expr-stmt',
             [ 'call',
@@ -87,7 +58,7 @@ module.exports["basics"] = {
                                         null,
                                         [ 'res1' ],
                                         [ 'stmtList',
-                                            [ 'expr-stmt', [ 'assign', [ 'id', 'bazball' ], [ 'num', '11' ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
+                                            [ 'expr-stmt', [ 'assign', [ 'id', 'bazball' ], [ 'num', '11' ] ] ] ] ], [ "null" ] ] ] ] ] ], [ "null" ] ] ] ] ]);
 
         test.done();
     }

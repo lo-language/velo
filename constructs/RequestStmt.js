@@ -86,6 +86,8 @@ __.prototype.compile = function (context) {
                 JS.runtimeCall('sendMessage', [
                     this.address.compile(context), JS.arrayLiteral(args), replyHandler, failHandler])));
 
+        stmt.async = true;
+
         cs.setStmt(stmt);
 
         return cs;

@@ -46,6 +46,8 @@ __.prototype.compile = function (context) {
 
     // hooray for Lisp!
 
+    // we compile the tail first so earlier statements can see what comes after them
+
     return this.tail ?
         context.compileStmt(this.head).attach(context.compileStmt(this.tail)) :
         context.compileStmt(this.head);

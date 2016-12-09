@@ -255,6 +255,8 @@ module.exports["blocking"] = {
     },
     "with embedded blocking expr": function (test) {
 
+        // baz(foo() - bar());
+
         var node = new Lo.requestStmt(
             new Lo.identifier('baz'),
             [
@@ -267,7 +269,7 @@ module.exports["blocking"] = {
             true
         );
 
-        var result = node.compile(new Context());
+        var result = new Context().compileStmt(node);
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -294,7 +296,7 @@ module.exports["blocking"] = {
                                                         [ "select", [ "id", "task" ], "sendMessage" ],
                                                         [
                                                             [ "id", "$baz" ],
-                                                            [ "arrayLiteral", [ [ "sub", [ "id", "res0" ], [ "id", "res1" ] ] ] ],
+                                                            [ "arrayLiteral", [ [ "sub", [ "subscript", [ "id", "res0" ], [ "num", "0" ] ], [ "subscript", [ "id", "res1" ], [ "num", "0" ] ] ] ] ],
                                                             [ "id", "c0" ],
                                                             [ "id", "c0" ]
                                                         ]
@@ -327,7 +329,7 @@ module.exports["blocking"] = {
             true
         );
 
-        test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList', [ 'expr-stmt',
+        test.deepEqual(new Context().compileStmt(node).renderTree(), [ 'stmtList', [ 'expr-stmt',
             [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                 [ [ 'id', '$foo' ],
@@ -347,19 +349,16 @@ module.exports["blocking"] = {
                                             [ 'call',
                                                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                                                 [ [ 'id', '$baz' ], [ "arrayLiteral",
-                                                    [ [ "sub", [
-                                                        "id",
-                                                        "res0"
-                                                    ], [ "id", "res1" ] ] ] ], [
+                                                    [ [ "sub", [ "subscript", [ "id", "res0" ], [ "num", "0" ] ], [ "subscript", [ "id", "res1" ], [ "num", "0" ] ] ] ] ], [
                                                     "function",
                                                     null,
                                                     [ "res2" ],
                                                     [ "stmtList", [ 'expr-stmt', [ "call", [ "select", [ "id", "task" ], "sendMessage" ],
                                                         [
                                                             [ "id", "$quux" ],
-                                                            [ "arrayLiteral", [ [ "id", "res2" ] ] ],
-                                                            [ "call", [ "id", "c0" ], [] ],
-                                                            [ "call", [ "id", "c0" ], [] ] ] ] ], [ "stmtList",
+                                                            [ "arrayLiteral", [ [ "subscript", [ "id", "res2" ], [ "num", "0" ] ] ] ],
+                                                            [ "id", "c0" ] ,
+                                                            [ "id", "c0" ] ] ] ], [ "stmtList",
                                                             [
                                                                 "function",
                                                                 "c0",
@@ -372,64 +371,6 @@ module.exports["blocking"] = {
                                         ]
                                     ], [ "null" ] ] ] ] ] ], [ "null" ] ] ] ]
         ]);
-
-        test.done();
-    },
-
-    "application in async message": function (test) {
-
-        var node = {
-            type: 'application_stmt',
-            application: {
-                type: 'message',
-                address: {
-                    type: 'select',
-                    set: {
-                        type: 'select',
-                        set: {type: 'id', name: 'io'},
-                        member: 'stdout'
-                    },
-                    member: 'write'
-                },
-                args: [{
-                    type: 'interpolation',
-                    left: '',
-                    middle: {
-                        type: 'application',
-                        address: {type: 'id', name: 'factorial'},
-                        args: [{
-                            type: 'subscript',
-                            list: {type: 'id', name: 'args'},
-                            index: {type: 'number', val: '0'}
-                        }]
-                    },
-                    right: '\\n'
-                }]
-            }
-        };
-
-        test.deepEqual(node.compile(new Context()).renderTree(),
-            [ 'stmtList',
-                [ 'expr-stmt',
-                    [ 'call',
-                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                        [ [ 'id', '$factorial' ],
-                            [ 'arrayLiteral',
-                                [ [ 'subscript', [ 'id', '$args' ], [ 'num', '0' ] ] ] ],
-                            [ 'function',
-                                null,
-                                [ 'res0' ],
-                                [ 'stmtList',
-                                    [ 'expr-stmt',
-                                        [ 'stmtList',
-                                            [ 'call',
-                                                [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                                                [ [ 'select', ['select', [ 'id', '$io' ], 'stdout'], 'write' ],
-                                                    [ 'arrayLiteral', [[
-                                                        "add", [
-                                                            "add",
-                                                            [ "string", "" ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ], [ "string", "\\n" ]
-                                                    ] ] ], [ 'null' ] ] ] ] ] ] ] ] ] ] ]);
 
         test.done();
     }
@@ -582,6 +523,38 @@ module.exports["non-blocking"] = {
                                 [ 'var', '$bar' ],
                                 [ 'stmtList',
                                     [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '57' ] ] ] ] ] ] ] ] ] ]);
+
+        test.done();
+    },
+
+    "application in async message": function (test) {
+
+        // @io.stdout.write("`factorial(args[0])`\n");
+
+        // var node = new Lo.requestStmt();
+
+        // test.deepEqual(node.compile(new Context()).renderTree(),
+        //     [ 'stmtList',
+        //         [ 'expr-stmt',
+        //             [ 'call',
+        //                 [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+        //                 [ [ 'id', '$factorial' ],
+        //                     [ 'arrayLiteral',
+        //                         [ [ 'subscript', [ 'id', '$args' ], [ 'num', '0' ] ] ] ],
+        //                     [ 'function',
+        //                         null,
+        //                         [ 'res0' ],
+        //                         [ 'stmtList',
+        //                             [ 'expr-stmt',
+        //                                 [ 'stmtList',
+        //                                     [ 'call',
+        //                                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+        //                                         [ [ 'select', ['select', [ 'id', '$io' ], 'stdout'], 'write' ],
+        //                                             [ 'arrayLiteral', [[
+        //                                                 "add", [
+        //                                                     "add",
+        //                                                     [ "string", "" ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ], [ "string", "\\n" ]
+        //                                             ] ] ], [ 'null' ] ] ] ] ] ] ] ] ] ] ]);
 
         test.done();
     }

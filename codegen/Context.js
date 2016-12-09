@@ -46,6 +46,9 @@ var __ = function (parent, isService) {
 
     this.wrapper = null;
     this.placeHolders = 0;
+
+    // stack for collecting statements
+    this.stmts = [];
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -260,10 +263,21 @@ __.prototype.pushRequest = function (target, args, blocking) {
  */
 __.prototype.compileStmt = function (stmt) {
 
+    // // compile the stmt
+    // var result = stmt.compile(this);
+    //
+    // // push the stmt onto the stack
+    // this.stmts.push(result);
+    //
+    // // compile any pending wrappers in reverse order they were added
+    // this.wrappers.forEach(this.compileStmt.bind(this));
+
+
     // have to compile first to load up wrappers
     var result = stmt.compile(this);
 
     if (this.wrapper) {
+
         result = this.wrapper.attach(result);
 
         // reset the wrapper

@@ -166,24 +166,5 @@ module.exports["attach"] = {
         test.equal(stmt.isAsync(), true);
 
         test.done();
-    },
-
-    "attach request": function (test) {
-
-        var stmt = new JsStmt(JS.exprStmt(JS.assign(JS.ID('$foo'), JS.num('57'))));
-
-        test.deepEqual(stmt.renderTree(), [ 'stmtList',
-            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
-
-        stmt = stmt.attach(new Request(JS.ID('$foo'), [JS.num('42')], null, null));
-
-        test.deepEqual(stmt.renderTree(), [ 'stmtList',
-            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ],
-            [ 'stmtList',
-                [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                    [ [ 'id', '$foo' ], [ 'arrayLiteral', [ [ 'num', '42' ] ] ], [ 'null' ] ] ] ] ]);
-
-        test.done();
     }
 };
