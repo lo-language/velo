@@ -7,7 +7,6 @@
 
 var Context = require('../../codegen/Context');
 var JS = require('../../codegen/JsPrimitives');
-var JsStmt = require('../../codegen/JsStmt');
 var util = require('util');
 const Lo = require('../../constructs');
 
@@ -30,11 +29,10 @@ module.exports["sync"] = {
         );
 
         test.deepEqual(node.compile(new Context().createInner()).renderTree(),
-            [ 'stmtList',
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
-                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ] ]);
+                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ]);
         test.done();
     },
 
@@ -60,13 +58,12 @@ module.exports["sync"] = {
         );
 
         test.deepEqual(node.compile(new Context().createInner()).renderTree(),
-            [ 'stmtList',
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
                         [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ],
                     [ 'stmtList',
-                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '32' ] ] ] ] ] ]);
+                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '32' ] ] ] ] ]);
         test.done();
     },
 
@@ -101,18 +98,16 @@ module.exports["sync"] = {
         );
 
         test.deepEqual(node.compile(new Context().createInner()).renderTree(),
-            [ 'stmtList',
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
                         [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ],
-                    [ 'stmtList',
-                        [ 'if',
-                            [ 'id', '$bar' ],
-                            [ 'stmtList',
-                                [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '32' ] ] ] ],
-                            [ 'stmtList',
-                                [ 'expr-stmt', [ 'assign', [ 'id', '$baz' ], [ 'num', '82' ] ] ] ] ] ] ] ]);
+                    [ 'if',
+                        [ 'id', '$bar' ],
+                        [ 'stmtList',
+                            [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '32' ] ] ] ],
+                        [ 'stmtList',
+                            [ 'expr-stmt', [ 'assign', [ 'id', '$baz' ], [ 'num', '82' ] ] ] ] ] ]);
         test.done();
     }
 };

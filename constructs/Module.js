@@ -5,12 +5,13 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
+ * The machine does not isolate us from the great problems of nature but
+ * plunges us more deeply into them.
  =============================================================================*/
 
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const JsStmt = require('../codegen/JsStmt');
 const JsFunction = require('../codegen/JsFunction');
 const Context = require('../codegen/Context');
 const Q = require('q');
@@ -61,11 +62,12 @@ __.prototype.compile = function () {
     // create a root context
     var context = new Context();
 
-    var body = new JsStmt();
-
     // a bunch of constants
-    this.defs.forEach(def => {
-        body.attach(def.compile(context));
+
+    var body = null;
+
+    this.defs.reverse().forEach(def => {
+        body = JS.stmtList(def.compile(context), body);
     });
 
     return body;

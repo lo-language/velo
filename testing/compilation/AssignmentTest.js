@@ -7,7 +7,6 @@
 
 const Context = require('../../codegen/Context');
 const JS = require('../../codegen/JsPrimitives');
-const JsStmt = require('../../codegen/JsStmt');
 const Lo = require('../../constructs');
 
 module.exports["assignment"] = {
@@ -22,8 +21,7 @@ module.exports["assignment"] = {
         test.equal(context.has('foo'), false);
 
         test.deepEqual(node.compile(context).renderTree(),
-            [ 'stmtList',
-                [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
+            [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ]);
 
         test.equal(context.has('foo'), true);
         test.done();
@@ -38,11 +36,10 @@ module.exports["assignment"] = {
         var context = new Context().createInner();
 
         test.deepEqual(node.compile(context).renderTree(),
-            [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'assign',
                         [ 'subscript', [ 'id', '$foo' ], [ 'id', '$bar' ] ],
-                        [ 'num', '57' ], '*=' ] ] ]);
+                        [ 'num', '57' ], '*=' ] ]);
         test.done();
     },
 
@@ -57,9 +54,8 @@ module.exports["assignment"] = {
 
         test.equal(context.has('foo'), false);
         test.deepEqual(node.compile(context).renderTree(),
-            [ 'stmtList',
             [ 'expr-stmt',
-                [ 'assign', [ 'id', '$foo' ], [ 'id', '$bar' ] ] ] ]);
+                [ 'assign', [ 'id', '$foo' ], [ 'id', '$bar' ] ] ]);
         test.equal(context.has('foo'), true);
         test.done();
     },
@@ -78,11 +74,11 @@ module.exports["assignment"] = {
 
         test.equal(context.has('foo'), false);
 
-        test.deepEqual(node.compile(context).renderTree(), [ 'stmtList',
+        test.deepEqual(node.compile(context).renderTree(),
             [ 'expr-stmt',
                 [ 'assign',
                     [ 'id', '$foo' ],
-                    [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ] ] ] ]);
+                    [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ] ] ]);
         test.equal(context.has('foo'), true);
 
         test.done();
@@ -102,8 +98,7 @@ module.exports["assignment"] = {
         test.equal(context.has('foo'), true);
 
         test.deepEqual(node.compile(context).renderTree(),
-            [ 'stmtList',
-                [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
+                [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ]);
         test.deepEqual(context.getJsVars(), []);
         test.done();
     },

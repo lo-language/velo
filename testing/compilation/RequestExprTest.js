@@ -8,11 +8,9 @@
 const Lo = require('../../constructs');
 const Context = require('../../codegen/Context');
 const JS = require('../../codegen/JsPrimitives');
-const JsStmt = require('../../codegen/JsStmt');
 const util = require('util');
 
 module.exports["blocking calls"] = {
-
 
     "expr args": function (test) {
 
@@ -26,14 +24,10 @@ module.exports["blocking calls"] = {
                 true))]);
 
         // compile with a nice service context
+        var result = new Lo.stmtList(node).compile(new Context().createInner(true));
 
-        var ctx = new Context().createInner(true);
-
-        var result = ctx.compileStmt(node);
-
-        console.log(result.renderJs());
-
-        test.deepEqual(result.renderTree(), [ 'stmtList',
+        test.deepEqual(result.renderTree(),
+            [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendMessage' ],
@@ -47,10 +41,13 @@ module.exports["blocking calls"] = {
                                 [ 'expr-stmt',
                                     [ 'call',
                                         [ 'select', [ 'id', 'task' ], 'respond' ],
-                                        [ [ 'string', 'reply' ], [ 'arrayLiteral', [ ["mul",
-                                            [ "id", "$num" ], [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ] ] ] ] ] ] ],
-                                [ 'stmtList', [ 'return' ] ] ] ],
-                        [ 'null' ] ] ] ] ]);
+                                        [ [ 'string', 'reply' ],
+                                            [ 'arrayLiteral', [ [ 'mul', [
+                                                "id",
+                                                "$num"
+                                            ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ] ] ] ] ] ],
+                                    [ 'stmtList', [ 'return' ] ] ] ],
+                            [ 'null' ] ] ] ] ]);
 
         test.done();
     },
@@ -65,9 +62,8 @@ module.exports["blocking calls"] = {
             )
         );
 
-        var result = new Context().compileStmt(node);
-
-        test.deepEqual(result.renderTree(), [ 'stmtList',
+        test.deepEqual(new Lo.stmtList(node).compile(new Context()).renderTree(),
+            [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
@@ -81,8 +77,7 @@ module.exports["blocking calls"] = {
                                         [ 'assign',
                                             [ 'id', '$baz' ],
                                             [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ] ] ] ] ],
-                            [ 'null' ] ] ] ] ]
-            );
+                            [ 'null' ] ] ] ] ]);
 
         test.done();
     },
@@ -97,21 +92,22 @@ module.exports["blocking calls"] = {
             )
         );
 
-        var result = new Context().compileStmt(node);
-
-        test.deepEqual(result.renderTree(), [ 'stmtList',
-            [ 'expr-stmt',
-                [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                    [ [ 'id', '$foo' ],
-                        [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
-                        [ 'function',
-                            null,
-                            [ 'res0' ],
-                            [ 'stmtList',
-                                [ 'expr-stmt',
-                                    [ 'assign', [ 'id', '$baz' ], [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ] ] ] ] ],
-                        [ 'null' ] ] ] ] ]);
+        test.deepEqual(new Lo.stmtList(node).compile(new Context()).renderTree(),
+            [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                        [ [ 'id', '$foo' ],
+                            [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
+                            [ 'function',
+                                null,
+                                [ 'res0' ],
+                                [ 'stmtList',
+                                    [ 'expr-stmt',
+                                        [ 'assign',
+                                            [ 'id', '$baz' ],
+                                            [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ] ] ] ] ],
+                            [ 'null' ] ] ] ] ]);
         test.done();
     },
 
@@ -128,22 +124,23 @@ module.exports["blocking calls"] = {
             )
         );
 
-        var result = new Context().compileStmt(node);
-
-        test.deepEqual(result.renderTree(), [ 'stmtList',
-            [ 'expr-stmt',
-                [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                    [ [ 'id', '$foo' ],
-                        [ 'arrayLiteral',
-                            [ [ 'num', '42' ], [ 'string', 'hi there' ] ] ],
-                        [ 'function',
-                            null,
-                            [ 'res0' ],
-                            [ 'stmtList',
-                                [ 'expr-stmt',
-                                    [ 'assign', [ 'id', '$baz' ], [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ] ] ] ] ],
-                        [ 'null' ] ] ] ] ]);
+        test.deepEqual(new Lo.stmtList(node).compile(new Context()).renderTree(),
+            [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                        [ [ 'id', '$foo' ],
+                            [ 'arrayLiteral',
+                                [ [ 'num', '42' ], [ 'string', 'hi there' ] ] ],
+                            [ 'function',
+                                null,
+                                [ 'res0' ],
+                                [ 'stmtList',
+                                    [ 'expr-stmt',
+                                        [ 'assign',
+                                            [ 'id', '$baz' ],
+                                            [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ] ] ] ] ],
+                            [ 'null' ] ] ] ] ]);
         test.done();
     },
 
@@ -166,28 +163,27 @@ module.exports["blocking calls"] = {
         );
 
         var swaps = [
-            ['res0', [ 'stmtList',
+            ['res0',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                         [ [ 'id', '$foo' ],
-                            [ 'arrayLiteral', [ ] ], [ 'null' ] ] ] ] ] ],
-            ['res1', [ 'stmtList',
+                            [ 'arrayLiteral', [ ] ], [ 'null' ] ] ] ] ],
+            ['res1',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-                        [ [ 'id', '$bar' ], [ 'arrayLiteral', [] ], [ 'null' ] ] ] ] ] ],
-            ['res2', [ 'stmtList',
+                        [ [ 'id', '$bar' ], [ 'arrayLiteral', [] ], [ 'null' ] ] ] ] ],
+            ['res2',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                         [ [ 'id', '$baz' ],
-                            [ 'arrayLiteral', [ [ 'id', 'res0' ], [ 'id', 'res1' ] ] ], [ 'null' ] ] ] ] ] ],
+                            [ 'arrayLiteral', [ [ 'id', 'res0' ], [ 'id', 'res1' ] ] ], [ 'null' ] ] ] ] ],
         ];
 
-        var result = new Context().compileStmt(node);
-
-        test.deepEqual(result.renderTree(), [ 'stmtList',
+        test.deepEqual(new Lo.stmtList(node).compile(new Context()).renderTree(),
+            [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendMessage' ],
@@ -202,21 +198,22 @@ module.exports["blocking calls"] = {
                                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                                         [ [ 'id', '$bar' ],
                                             [ 'arrayLiteral', [] ],
-                                            [ 'function', null, [ 'res1' ], [ 'stmtList', [ "expr-stmt",
-                                                [ "call",
-                                                    [ "select",
-                                                        [ "id", "task" ], "sendMessage" ],
-                                                    [
-                                                        [ "id", "$baz" ],
-                                                        [ "arrayLiteral", [ [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ], [ 'subscript', [ 'id', 'res1' ], [ 'num', '0' ] ] ] ],
-                                                        [ "function",
+                                            [ 'function',
+                                                null,
+                                                [ 'res1' ],
+                                                [ 'stmtList', [ 'expr-stmt', ["call",
+                                                    [ "select", [ "id", "task" ], "sendMessage" ],
+                                                    [ [ "id", "$baz" ],
+                                                        [ "arrayLiteral", [
+                                                                [ "subscript", [ "id", "res0" ], [ "num", "0" ] ],
+                                                                [ "subscript", [ "id", "res1" ], [ "num", "0" ] ] ]
+                                                        ],
+                                                        [
+                                                            "function",
                                                             null,
                                                             [ "res2" ],
-                                                            [ "stmtList",
-                                                                [ "expr-stmt",
-                                                                    [ "assign", [ "id", "$baz" ], [ 'subscript', [ 'id', 'res2' ], [ 'num', '0' ] ] ]
-                                                                ] ] ],
-                                                        [ "null" ] ] ] ] ] ],
+                                                            [ "stmtList", [ "expr-stmt", [ "assign", [ "id", "$baz" ], [ "subscript", [ "id", "res2" ], [ "num", "0" ] ] ] ] ]
+                                                        ], [ "null" ] ] ] ] ] ],
                                             [ 'null' ] ] ] ] ] ],
                         [ 'null' ] ] ] ] ]);
         test.done();

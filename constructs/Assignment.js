@@ -14,7 +14,6 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const JsStmt = require('../codegen/JsStmt');
 const Identifier = require('./Identifier');
 
 /**
@@ -79,7 +78,7 @@ __.prototype.compile = function (context) {
         // }
     }
 
-    return new JsStmt(JS.exprStmt(JS.assign(left, right, this.op == '=' ? null : this.op)));
+    return JS.exprStmt(JS.assign(left, right, this.op == '=' ? null : this.op));
 
     // this was genius
     // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP

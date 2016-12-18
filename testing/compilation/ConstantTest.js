@@ -8,7 +8,6 @@
 const Lo = require('../../constructs');
 const Context = require('../../codegen/Context');
 const JS = require('../../codegen/JsPrimitives');
-const JsStmt = require('../../codegen/JsStmt');
 const util = require('util');
 const rootContext = new Context();
 
@@ -109,7 +108,7 @@ module.exports["non-root constants"] = {
         test.equal(context.has('main'), false);
         test.equal(context.isConstant('main'), false);
 
-        test.deepEqual(node.compile(context).renderTree(), [ 'stmtList',
+        test.deepEqual(node.compile(context).renderTree(),
             [ 'const',
                 '$main',
                 [ 'function',
@@ -128,7 +127,7 @@ module.exports["non-root constants"] = {
                                             [ 'num', '0' ] ] ] ],
                                 [ 'stmtList',
                                     [ 'expr-stmt',
-                                        [ 'assign', [ 'id', '$result' ], [ 'num', '10' ], '*=' ] ] ] ] ] ] ] ] ]);
+                                        [ 'assign', [ 'id', '$result' ], [ 'num', '10' ], '*=' ] ] ] ] ] ] ] ]);
 
         test.equal(context.has('main'), true);
         test.ok(context.isConstant('main'));

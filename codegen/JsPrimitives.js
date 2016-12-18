@@ -302,6 +302,26 @@ JS.stmtList = (head, tail) => {
             }
 
             return head.renderJs() + (tail ? '\n' + tail.renderJs() : '');
+        },
+        
+        append: function (stmtList) {
+
+            if (tail) {
+                tail.append(stmtList);
+                return;
+            }
+
+            tail = stmtList;
+        },
+
+        appendStmt: function (stmt) {
+
+            if (tail) {
+                tail.appendStmt(stmt);
+                return;
+            }
+
+            tail = JS.stmtList(stmt);
         }
     };
 };
@@ -331,7 +351,7 @@ JS.while = (condition, body) => {
     }
 };
 
-// not-quite-primitives - do we need these here?
+// not-quite-primitives
 
 JS.runtimeCall = (fnName, args) => {
 
@@ -339,5 +359,6 @@ JS.runtimeCall = (fnName, args) => {
         JS.select(JS.ID('task'), fnName),
         args);
 };
+
 
 module.exports = JS;

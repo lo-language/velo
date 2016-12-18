@@ -7,7 +7,6 @@
 
 const Context = require('../../codegen/Context');
 const JS = require('../../codegen/JsPrimitives');
-const JsStmt = require('../../codegen/JsStmt');
 const Lo = require('../../constructs');
 
 module.exports["basics"] = {
@@ -25,9 +24,9 @@ module.exports["basics"] = {
             )
         );
 
-        var a = node.compile(new Context().createInner());
+        var result = node.compile(new Context().createInner());
 
-        test.deepEqual(a.renderTree(),
+        test.deepEqual(result.renderTree(),
             [ 'stmtList',
                 [ 'while',
                     [ 'id', '$foo' ],
@@ -35,9 +34,12 @@ module.exports["basics"] = {
                         [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ] ]);
 
         // try attaching a statement – should get stuck on the end
-        a.attach(new JsStmt(JS.assign(JS.ID('$z'), JS.num('57'))));
+        node = new Lo.stmtList(node,
+            new Lo.stmtList(new Lo.assignment('=', new Lo.identifier('z'), new Lo.literal('number', '57'))));
 
-        test.deepEqual(a.renderTree(),
+        result = node.compile(new Context().createInner());
+
+        test.deepEqual(result.renderTree(),
             [ 'stmtList',
                 [ 'while',
                     [ 'id', '$foo' ],
@@ -46,9 +48,12 @@ module.exports["basics"] = {
                 [ 'stmtList', [ 'assign', [ 'id', '$z' ], [ 'num', '57' ] ] ] ]);
 
         // try attaching another statement
-        a.attach(JsStmt.varDecl('bee'));
+        node = new Lo.stmtList(node,
+            new Lo.stmtList(new Lo.constant('bee', new Lo.literal('number', '42'))));
 
-        test.deepEqual(a.renderTree(),
+        result = node.compile(new Context().createInner());
+
+        test.deepEqual(result.renderTree(),
             [ 'stmtList',
                 [ 'while',
                     [ 'id', '$foo' ],
@@ -215,29 +220,29 @@ module.exports["basics"] = {
         test.done();
     },
 
-    "indirectly async body": function (test) {
-
-        var node = {
-            type: 'iteration',
-            condition: {
-                type: 'application',
-                address: {type: 'id', name: 'foo'},
-                args: []
-            },
-            statements: {type: 'stmt_list',
-                head: {
-                    type: 'application_stmt',
-                    application: {
-                        type: 'application',
-                        address: {type: 'id', name: 'bar'},
-                        args: [{type: 'number', val: '57'}]
-                    }
-                },
-                tail: null}
-        };
-
-        var a = new Context().createInner().compileStmt(node);
-
-        test.done();
-    }
+    // "indirectly async body": function (test) {
+    //
+    //     var node = {
+    //         type: 'iteration',
+    //         condition: {
+    //             type: 'application',
+    //             address: {type: 'id', name: 'foo'},
+    //             args: []
+    //         },
+    //         statements: {type: 'stmt_list',
+    //             head: {
+    //                 type: 'application_stmt',
+    //                 application: {
+    //                     type: 'application',
+    //                     address: {type: 'id', name: 'bar'},
+    //                     args: [{type: 'number', val: '57'}]
+    //                 }
+    //             },
+    //             tail: null}
+    //     };
+    //
+    //     var a = new Context().createInner().compileStmt(node);
+    //
+    //     test.done();
+    // }
 };

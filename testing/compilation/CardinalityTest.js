@@ -7,7 +7,6 @@
 
 var Context = require('../../codegen/Context');
 const JS = require('../../codegen/JsPrimitives');
-const JsStmt = require('../../codegen/JsStmt');
 const Lo = require('../../constructs');
 
 module.exports["cardinality"] = {

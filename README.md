@@ -18,12 +18,12 @@ In the project root folder:
 
 #### To compile and run a program
 
-    $ lo <root module>
+    $ velo <root module>
 
 
 #### To build a Node executable
 
-    $ lo --build <root module>
+    $ velo --build <root module>
 
 
 ## Implementation

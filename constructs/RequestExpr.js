@@ -5,12 +5,13 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
+ * Il semble que la perfection soit atteinte non quand il n'y a plus rien
+ * à ajouter, mais quand il n'y a plus rien à retrancher.
  =============================================================================*/
 
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const JsStmt = require('../codegen/JsStmt');
 const Identifier = require('./Identifier');
 
 
@@ -42,8 +43,7 @@ __.prototype.getAst = function () {
 };
 
 /**
- * Compiles this node to JS in the given context.
- * The context needs to be a statement context in this case.
+ * Compiles this node to JS in the given context, injecting a wrapper into the context.
  *
  * @param context
  */
@@ -57,7 +57,7 @@ __.prototype.compile = function (context) {
 
     // get a placeholder
     // we push a request into the context whether sync or async
-    return context.pushRequest(target, args, this.async);
+    return context.pushRequest(target, args, this.blocking);
 };
 
 module.exports = __;

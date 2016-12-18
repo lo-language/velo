@@ -5,6 +5,8 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
+ * Success is finding something you really like to do and caring enough about it
+ * to do it well.
  =============================================================================*/
 
 /**
@@ -19,11 +21,9 @@
 "use strict";
 
 const JS = require('./JsPrimitives');
-const Wrapper = require('./Wrapper');
-const ContStmt = require('./ContinuedStmt');
+const JsFunction = require('./JsFunction');
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *
  * @param parent    the parent context, if any
@@ -38,20 +38,17 @@ var __ = function (parent, isService) {
     }
     else {
         this.type = 'module';
-        this.contNum = 0;
     }
 
     // our local symbol table, containing params, locals, constants, futures, etc.
     this.symbols = {};
 
-    this.wrapper = null;
+    this.wrappers = [];
     this.placeHolders = 0;
-
-    // stack for collecting statements
-    this.stmts = [];
+    this.contNum = 0;
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Returns true if this is a root (module) context.
  */
@@ -60,7 +57,7 @@ __.prototype.isRoot = function () {
     return this.type == 'module';
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Returns true if this is a service context.
  */
@@ -69,7 +66,7 @@ __.prototype.isService = function () {
     return this.type == 'service';
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Returns true if this is a sink context.
  */
@@ -78,7 +75,7 @@ __.prototype.isSink = function () {
     return this.type == 'sink';
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Declares a variable in this context.
  *
@@ -93,7 +90,7 @@ __.prototype.declare = function (name) {
     this.symbols['@' + name] = {type: 'var', name: name};
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Defines a constant in this context.
  *
@@ -111,15 +108,7 @@ __.prototype.define = function (name) {
     };
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Returns a new continuation
- */
-__.prototype.getContinuation = function () {
 
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Defines a future.
  *
@@ -130,7 +119,7 @@ __.prototype.setFuture = function (name) {
     this.symbols['@' + name] = {type: 'future', name: name};
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Returns true if the given name refers to a future.
  *
@@ -144,7 +133,7 @@ __.prototype.isFuture = function (name) {
     }
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Returns true if the given name is defined in this context.
  */
@@ -161,7 +150,7 @@ __.prototype.has = function (name) {
     return false;
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 __.prototype.getJsVars = function () {
 
@@ -178,7 +167,7 @@ __.prototype.getJsVars = function () {
     }, []);
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Returns true if the specified name is a defined constant.
  *
@@ -197,7 +186,7 @@ __.prototype.isConstant = function (name, qualifier) {
     }
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Returns the value of the specified constant.
  *
@@ -219,7 +208,7 @@ __.prototype.resolve = function (name) {
     throw new Error(name + " is not a defined constant");
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Creates and returns a new inner context.
  *
@@ -231,9 +220,9 @@ __.prototype.createInner = function (isService) { // push? nest? inner? derive? 
     return new __(this, isService);
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
- * Pushes a request onto the stack and returns a placeholder.
+ * Pushes a wrapper onto the list.
  *
  * @param target
  * @param args
@@ -243,51 +232,12 @@ __.prototype.pushRequest = function (target, args, blocking) {
 
     var placeholderName = 'res' + this.placeHolders++;
 
-    var newWrapper = new Wrapper(target, args, placeholderName);
-
-    if (this.wrapper) {
-        this.wrapper.attach(newWrapper);
-    }
-    else {
-        this.wrapper = newWrapper;
-    }
+    this.wrappers.push({target: target, args: args, blocking: blocking, paramName: placeholderName});
 
     return JS.subscript(JS.ID(placeholderName), JS.num('0'));
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**
- * Closes the current statement context, wrapping the given JS AST node as necessary
- *
- * @return {*}
- */
-__.prototype.compileStmt = function (stmt) {
 
-    // // compile the stmt
-    // var result = stmt.compile(this);
-    //
-    // // push the stmt onto the stack
-    // this.stmts.push(result);
-    //
-    // // compile any pending wrappers in reverse order they were added
-    // this.wrappers.forEach(this.compileStmt.bind(this));
-
-
-    // have to compile first to load up wrappers
-    var result = stmt.compile(this);
-
-    if (this.wrapper) {
-
-        result = this.wrapper.attach(result);
-
-        // reset the wrapper
-        this.wrapper = null;
-    }
-
-    return result;
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Returns true if this context is currently preparing to wrap a statement.
  *
@@ -295,25 +245,21 @@ __.prototype.compileStmt = function (stmt) {
  */
 __.prototype.isWrapping = function () {
 
-    return this.wrapper ? true : false;
+    return this.wrappers.length > 0;
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Creates a new continued statement.
  *
  * @return {*}
  */
-__.prototype.newContStmt = function () {
+__.prototype.wrapTail = function () {
 
-    if (this.parent) {
-        return this.parent.newContStmt();
-    }
-
-    return new ContStmt('c' + this.contNum++);
+    return 'c' + this.contNum++;
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Returns true if a response can be issued in this context (for it or a parent).
  *

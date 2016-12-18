@@ -10,7 +10,6 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const JsStmt = require('../codegen/JsStmt');
 
 
 /**
@@ -49,10 +48,11 @@ __.prototype.compile = function (context) {
     }
 
     var args = JS.arrayLiteral(this.args.map(arg => arg.compile(context)));
+    var response = JS.exprStmt(JS.runtimeCall('respond', [JS.string(this.type), args]));
 
-    // todo - only render the return if there are following statements? but then shouldn't we throw a compiler warning?
+    // a response should compile to a non-appendable JS stmt list
 
-    return new JsStmt(JS.exprStmt(JS.runtimeCall('respond', [JS.string(this.type), args]))).attach(JsStmt.return());
+    return JS.stmtList(response, JS.stmtList(JS.return()));
 };
 
 module.exports = __;

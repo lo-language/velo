@@ -14,7 +14,6 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const JsStmt = require('../codegen/JsStmt');
 const Procedure = require('./Procedure');
 
 /**
@@ -51,20 +50,20 @@ __.prototype.compile = function (context) {
     const jsID = '$' + this.name;
 
     var value = this.value.compile(context);
-    var result = new JsStmt(JS.constDecl(jsID, value));
+    var result = JS.constDecl(jsID, value);
 
     if (context.isRoot()) {
 
         // we're defining a module-level constant, so export it
 
-        result.attach(new JsStmt(JS.exprStmt(
+        result = JS.stmtList(result, JS.exprStmt(
             JS.assign(
                 JS.select(
                     JS.select(JS.ID("module"), "exports"),
                     jsID
                 ),
                 JS.ID(jsID)
-            ))));
+            )));
     }
 
     return result;

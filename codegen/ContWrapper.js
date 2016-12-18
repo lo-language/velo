@@ -5,11 +5,12 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
+ * Your task is not to foresee the future, but to enable it.
  =============================================================================*/
 
 /**
- * A special kind of statement list that wraps its following statements in a
- * callback.
+ * A dynamic statement list that if it has a tail, wraps its tail in a
+ * continuation that can be called from callbacks, otherwise renders a simple form.
  *
  * Created by seth on 12/17/16.
  */
@@ -19,25 +20,34 @@
 const JS = require('../codegen/JsPrimitives');
 
 
-var __ = function (req, tail) {
+/**
+ *
+ * @param name
+ * @param headA     head to use with no tail
+ * @param headB     head to use with a tail
+ * @private
+ */
+var __ = function (name, headA, headB) {
 
-    this.req = req;
-    this.tail = tail;
+    this.name = name;
+    this.headA = headA;
+    this.headB = headB;
+    this.tail = null;
 };
 
 
 __.prototype._render = function () {
 
-    // renders to a stmtlist of a single statement
+    // renders to a stmtlist of the head followed by a tail
+    // of a continuation wrapping the tail
 
-    return JS.stmtList(
-        JS.exprStmt(
-            JS.runtimeCall('sendMessage', [
-                this.req.target, JS.arrayLiteral(this.req.args),
-                JS.fnDef([this.req.paramName], this.tail),
-                JS.NULL
-            ])),
-        null);
+    if (this.tail) {
+
+        return JS.stmtList(this.headB,
+            JS.stmtList(JS.fnDef([], this.tail, this.name)));
+    }
+
+    return JS.stmtList(this.headA, null);
 };
 
 

@@ -19,8 +19,8 @@ const JS = require('./JsPrimitives');
  * todo support providing a name for functions
  *
  * @param params    array of param names
- * @param body          a JsStmt
- * @private
+ * @param body      a stmt list
+ * @param name      the function name
  */
 var __ = function (params, body, name) {
 
@@ -30,14 +30,13 @@ var __ = function (params, body, name) {
 };
 
 /**
- * Like attach, but adds to the body of this function.
+ * Appends the given stmt to the body of this function.
  *
- * @param stmt
- * @returns {*}
+ * @param stmtList
  */
-__.prototype.append = function (stmt) {
+__.prototype.append = function (stmtList) {
 
-    this.body.attach(stmt);
+    this.body.append(stmtList);
 };
 
 

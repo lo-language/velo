@@ -7,7 +7,6 @@
 
 const Context = require('../../codegen/Context');
 const JS = require('../../codegen/JsPrimitives');
-const JsStmt = require('../../codegen/JsStmt');
 const Lo = require('../../constructs');
 
 module.exports["service"] = {
@@ -15,6 +14,7 @@ module.exports["service"] = {
     "basic": function (test) {
 
         // should actually throw an error if result isn't defined in the context
+        // proc is <-> (next) { result *= bar(42); }
 
         var node = new Lo.procedure(
             ['next'],

@@ -10,7 +10,8 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const JsStmt = require('../codegen/JsStmt');
+const ContWrapper = require('../codegen/ContWrapper');
+
 
 /**
  * A "function call" (request) expression
@@ -56,52 +57,49 @@ __.prototype.compile = function (context) {
         return arg.compile(context);
     });
 
-    if (this.blocking) {
+    var nonBlocking = JS.exprStmt(
+        JS.runtimeCall('sendMessage', [
+            this.address.compile(context), JS.arrayLiteral(args),
+            this.replyHandler ? this.replyHandler.compile(context) : JS.NULL,
+            this.failHandler ? this.failHandler.compile(context) : JS.NULL
+        ]));
 
-        var cs = context.newContStmt();
-
-        // add the continuation to each handler or if there's no
-        // handler, just use the continuation as the branch
-
-        var replyHandler, failHandler;
-
-        if (this.replyHandler) {
-            replyHandler = this.replyHandler.compile(context);
-            replyHandler.append(new JsStmt(JS.exprStmt(cs.getCall())));
-        }
-        else {
-            replyHandler = cs.getRef();
-        }
-
-        if (this.failHandler) {
-            failHandler = this.failHandler.compile(context);
-            failHandler.append(new JsStmt(JS.exprStmt(cs.getCall())));
-        }
-        else {
-            failHandler = cs.getRef();
-        }
-
-        var stmt = new JsStmt(
-            JS.exprStmt(
-                JS.runtimeCall('sendMessage', [
-                    this.address.compile(context), JS.arrayLiteral(args), replyHandler, failHandler])));
-
-        stmt.async = true;
-
-        cs.setStmt(stmt);
-
-        return cs;
+    if (this.blocking == false) {
+        return nonBlocking;
     }
 
-    // no continuation is required for non-blocking calls
+    // return a variant stmt list
 
-    return new JsStmt(
-            JS.exprStmt(
-                JS.runtimeCall('sendMessage', [
-                    this.address.compile(context), JS.arrayLiteral(args),
-                    this.replyHandler ? this.replyHandler.compile(context) : JS.NULL,
-                    this.failHandler ? this.failHandler.compile(context) : JS.NULL
-                ])));
+    var contName = context.wrapTail();
+
+    // add the continuation to each handler or if there's no
+    // handler, just use the continuation as the branch
+
+    var replyHandler, failHandler;
+
+    if (this.replyHandler) {
+        replyHandler = this.replyHandler.compile(context);
+        replyHandler.append(JS.stmtList(JS.exprStmt(JS.fnCall(JS.ID(contName), []))));
+    }
+    else {
+        replyHandler = JS.ID(contName);
+    }
+
+    if (this.failHandler) {
+        failHandler = this.failHandler.compile(context);
+        failHandler.append(JS.stmtList(JS.exprStmt(JS.fnCall(JS.ID(contName), []))));
+    }
+    else {
+        failHandler = JS.ID(contName);
+    }
+
+    var blocking = JS.exprStmt(
+            JS.runtimeCall('sendMessage', [
+                this.address.compile(context), JS.arrayLiteral(args), replyHandler, failHandler]));
+
+    blocking.async = true;
+
+    return new ContWrapper(contName, nonBlocking, blocking);
 };
 
 module.exports = __;

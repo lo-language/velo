@@ -10,7 +10,6 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const JsStmt = require('../codegen/JsStmt');
 
 /**
  * A while statement.
@@ -43,10 +42,7 @@ __.prototype.compile = function (context) {
     var condition = this.cond.compile(context);
     var body = this.body.compile(context);
 
-    if (body.isAsync() || context.isWrapping()) {
-
-        // does body.isAsync do anything?
-        console.log("here");
+    if (body.async || context.isWrapping()) {
 
         // join the body to the wrapper function via setImmediate to form a loop in a way that won't break the stack
         // (this is me trying to emulate tail-recursion)
@@ -62,7 +58,7 @@ __.prototype.compile = function (context) {
         return loopDecl.attach(new JsStmt(JS.exprStmt(JS.fnCall(JS.ID('loop'), []))));
     }
 
-    return JsStmt.while(condition, body);
+    return JS.while(condition, body);
 };
 
 // let the conditional create the extra cont?

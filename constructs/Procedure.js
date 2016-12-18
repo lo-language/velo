@@ -5,12 +5,14 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
+ * To be a man is to be responsible: to be ashamed of miseries you did not cause;
+ * to be proud of your comrades' victories; to be aware, when setting one stone,
+ * that you are building a world.
  =============================================================================*/
 
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const JsStmt = require('../codegen/JsStmt');
 const JsFunction = require('../codegen/JsFunction');
 
 
@@ -67,37 +69,16 @@ __.prototype.compile = function (context) {
     // after compilation we can get our declared vars
     var localVars = local.getJsVars();
 
-    // declare our local vars
-    var preamble = null;
-
-    localVars.forEach(varName => {
-
-        var decl = new JsStmt.varDecl(varName);
-
-        if (preamble) {
-            preamble.attach(decl);
-        }
-        else {
-            preamble = decl;
-        }
-    });
-
     // bind values to our params
-    this.params.forEach((paramName, index) => {
-
-        var assignment = new JsStmt(JS.exprStmt(JS.assign(JS.ID('$' + paramName), JS.subscript(argList, JS.num(String(index))))));
-
-        if (preamble) {
-            preamble.attach(assignment);
-        }
-        else {
-            preamble = assignment;
-        }
+    this.params.reverse().forEach((paramName, index) => {
+        body = JS.stmtList(JS.exprStmt(JS.assign(JS.ID('$' + paramName), JS.subscript(argList, JS.num(String(index))))), body);
     });
 
-    if (preamble) {
-        body = preamble.attach(body);
-    }
+    // declare our local vars
+
+    localVars.reverse().forEach(varName => {
+        body = JS.stmtList(JS.varDecl(varName), body);
+    });
 
     // implements a service as a JS function that takes a task
     // if a service, squash the construct?

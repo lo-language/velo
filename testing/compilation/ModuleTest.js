@@ -8,7 +8,6 @@
 const Module = require('../../constructs/Module');
 const Context = require('../../codegen/Context');
 const JS = require('../../codegen/JsPrimitives');
-const JsStmt = require('../../codegen/JsStmt');
 const util = require('util');
 var Q = require('q');
 

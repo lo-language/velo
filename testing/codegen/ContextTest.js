@@ -7,7 +7,6 @@
 
 const Context = require('../../codegen/Context');
 const JS = require('../../codegen/JsPrimitives');
-const JsStmt = require('../../codegen/JsStmt');
 const Lo = require('../../constructs');
 
 module.exports["basics"] = {
@@ -246,19 +245,11 @@ module.exports["can respond"] = {
     }
 };
 
-module.exports["continued stmts"] = {
+module.exports["continuations"] = {
 
-    'get several': function (test) {
+    'wrapTail': function (test) {
 
-        var ctx = new Context();
-
-        var cs0 = ctx.newContStmt();
-
-        test.deepEqual(cs0.getCall().renderTree(), [ 'call', [ 'id', 'c0' ], [] ]);
-
-        var cs1 = ctx.newContStmt();
-
-        test.deepEqual(cs1.getCall().renderTree(), [ 'call', [ 'id', 'c1' ], [] ]);
+        // todo
 
         test.done();
     }

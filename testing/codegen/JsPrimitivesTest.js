@@ -3,7 +3,6 @@
  */
 
 const JS = require('../../codegen/JsPrimitives');
-const JsStmt = require('../../codegen/JsStmt');
 
 module.exports['basics'] = {
 
@@ -342,7 +341,7 @@ module.exports["fn defs"] = {
 
     "anonymous fn def": function (test) {
 
-        var n = JS.fnDef(['bar', 'baz'], new JsStmt(JS.exprStmt(JS.assign(JS.ID('bar'), JS.ID('baz')))));
+        var n = JS.fnDef(['bar', 'baz'], JS.stmtList(JS.exprStmt(JS.assign(JS.ID('bar'), JS.ID('baz')))));
 
         test.deepEqual(n.renderTree(), [ 'function', null,
             [ 'bar', 'baz' ],
@@ -354,7 +353,7 @@ module.exports["fn defs"] = {
 
     "named fn def": function (test) {
 
-        var n = JS.fnDef(['bar', 'baz'], new JsStmt(JS.exprStmt(JS.assign(JS.ID('bar'), JS.ID('baz')))), 'foo');
+        var n = JS.fnDef(['bar', 'baz'], JS.stmtList(JS.exprStmt(JS.assign(JS.ID('bar'), JS.ID('baz')))), 'foo');
 
         test.deepEqual(n.renderTree(), [ 'function', 'foo',
             [ 'bar', 'baz' ],
@@ -452,7 +451,7 @@ module.exports["statements"] = {
 
         // consequent only - no else
 
-        var n = JS.cond(JS.bool('true'), new JsStmt(JS.exprStmt(JS.assign(JS.ID('baz'), JS.num('48')))));
+        var n = JS.cond(JS.bool('true'), JS.stmtList(JS.exprStmt(JS.assign(JS.ID('baz'), JS.num('48')))));
 
         test.deepEqual(n.renderTree(), [ 'if',
             [ 'bool', 'true' ],
@@ -463,8 +462,8 @@ module.exports["statements"] = {
         // now with alt branch
 
         n = JS.cond(JS.bool('true'),
-            new JsStmt(JS.exprStmt(JS.assign(JS.ID('bazball'), JS.num('48')))),
-                new JsStmt(JS.exprStmt(JS.assign(JS.ID('frobozz'), JS.num('64')))));
+            JS.stmtList(JS.exprStmt(JS.assign(JS.ID('bazball'), JS.num('48')))),
+                JS.stmtList(JS.exprStmt(JS.assign(JS.ID('frobozz'), JS.num('64')))));
 
         test.deepEqual(n.renderTree(), [ 'if',
             [ 'bool', 'true' ], [ 'stmtList',

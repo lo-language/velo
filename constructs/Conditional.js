@@ -14,8 +14,6 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const JsStmt = require('../codegen/JsStmt');
-
 
 /**
  * A conditional statement.
@@ -69,9 +67,9 @@ __.prototype.compile = function (context) {
     var consequent = this.consequent.compile(context);
     var alternate = this.alternate ? this.alternate.compile(context) : null;
 
-    var async = consequent.isAsync();
+    var async = consequent.async;
 
-    if (alternate && alternate.isAsync()) {
+    if (alternate && alternate.async) {
         async = true;
     }
 
@@ -80,20 +78,19 @@ __.prototype.compile = function (context) {
 
         // add continuation to both branches
 
-        var cs = context.newContStmt();
+        var contName = context.wrapTail();
 
-        consequent.attach(new JsStmt(JS.exprStmt(cs.getCall())));
-        consequent.attach(new JsStmt(JS.exprStmt(cs.getCall())));
+        consequent.appendStmt(JS.exprStmt(JS.fnCall(JS.ID(contName), [])));
+        consequent.appendStmt(JS.exprStmt(JS.fnCall(JS.ID(contName), [])));
 
-        var stmt = new JsStmt(
-            JS.cond(predicate, consequent, alternate));
+        var stmt = JS.cond(predicate, consequent, alternate);
 
-        cs.setStmt(stmt);
+        stmt.async = true;
 
-        return cs;
+        return stmt;
     }
 
-    return new JsStmt.cond(predicate, consequent, alternate);
+    return JS.cond(predicate, consequent, alternate);
 };
 
 module.exports = __;

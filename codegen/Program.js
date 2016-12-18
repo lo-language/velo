@@ -5,6 +5,8 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
+ * A rock pile ceases to be a rock pile the moment a single man contemplates it,
+ * bearing within him the image of a cathedral.
  =============================================================================*/
 
 /**
@@ -20,7 +22,6 @@ const Task = require('../runtime/Task');
 const Q = require('q');
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Constructor
  *
@@ -44,7 +45,7 @@ var __ = function (rootModule, resolver) {
     }
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Recursively resolves the specified module (checking the cache first) and loads it.
  *
@@ -72,7 +73,7 @@ __.prototype.loadModule = function (modRef) {
     );
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Builds this program to its environment.
  */
@@ -80,7 +81,7 @@ __.prototype.build = function () {
 
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Loads and runs this program. Async of course because the program itself may be async.
  */

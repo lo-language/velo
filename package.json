@@ -1,5 +1,5 @@
 {
-  "name": "lojs",
+  "name": "velo",
   "private": true,
   "description": "A JavaScript transpiler implementation of the Lo programming language",
   "version": "0.4.0",
@@ -21,7 +21,7 @@
     "test": "nodeunit testing/codegen testing/compilation testing/parser testing/pipeline testing/programs testing/runtime"
   },
   "bin": {
-    "lo": "./bin/lo"
+    "velo": "./bin/velo"
   },
   "license": "Apache-2.0"
 }
