@@ -92,11 +92,9 @@ __.prototype.compile = function (context) {
         failHandler = bc.contRef;
     }
 
-    var blocking = JS.exprStmt(
+    return JS.exprStmt(
             JS.runtimeCall('sendMessage', [
                 this.address.compile(context), JS.arrayLiteral(args), replyHandler, failHandler]));
-
-    return blocking;
 };
 
 module.exports = __;

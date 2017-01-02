@@ -118,7 +118,7 @@ module.exports["blocking"] = {
                 true
             );
 
-        test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList',
+        test.deepEqual(node.compile(new Context()).renderTree(),
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendMessage' ],
@@ -131,7 +131,7 @@ module.exports["blocking"] = {
                             [ 'stmtList',
                                 [ 'var', '$foo' ],
                                 [ 'stmtList',
-                                    [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '42' ] ] ] ] ] ] ] ] ] ]);
+                                    [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '42' ] ] ] ] ] ] ] ] ]);
 
         test.done();
     },
@@ -214,7 +214,6 @@ module.exports["blocking"] = {
             );
 
         test.deepEqual(reqStmt.compile(new Context()).renderTree(),
-            [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
@@ -233,7 +232,7 @@ module.exports["blocking"] = {
                                 [ 'stmtList',
                                     [ 'var', '$bar' ],
                                     [ 'stmtList',
-                                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '57' ] ] ] ] ] ] ] ] ] ]);
+                                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '57' ] ] ] ] ] ] ] ] ]);
 
 
         var node = new Lo.stmtList(reqStmt,
@@ -285,14 +284,13 @@ module.exports["blocking"] = {
         var result = reqStmt.compile(new Context());
 
         test.deepEqual(result.renderTree(),
-            [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
                         [ [ 'id', '$foo' ],
                             [ 'arrayLiteral', [ [ 'num', '42' ] ] ],
                             [ 'null' ],
-                            [ 'null' ] ] ] ] ]);
+                            [ 'null' ] ] ] ]);
 
         // attach a statement - should be tucked inside the replyhandler
         result = new Lo.stmtList(reqStmt,

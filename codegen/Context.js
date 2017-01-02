@@ -44,6 +44,7 @@ var __ = function (parent, isService) {
 
     this.envs = [];
     this.envId = 0;
+    this.contId = 0;
 };
 
 
@@ -297,7 +298,7 @@ __.prototype.wrapFollowing = function () {
 
     if (this.following) {
 
-        var contName = 'c' + this.envId++;
+        var contName = 'c' + this.contId++;
 
         var contDef = JS.fnDef([], this.following, contName);
 
@@ -306,7 +307,18 @@ __.prototype.wrapFollowing = function () {
         return JS.ID(contName);
     }
 
-    return JS.NULL;
+    return null;
 };
+
+
+__.prototype.getBranchContext = function () {
+
+    if (this.parent) {
+        return this.parent.getBranchContext();
+    }
+
+    return null;
+};
+
 
 module.exports = __;

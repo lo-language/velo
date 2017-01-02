@@ -48,7 +48,12 @@ __.prototype.flagDiscontinuity = function () {
     // grab the parent's tail and make a continuation out of it
     this.contRef = this.parent.wrapFollowing();
 
-    this.connector.setContinuation(this.contRef);
+    if (this.contRef) {
+        this.connector.setContinuation(this.contRef);
+    }
+    else {
+        this.contRef = JS.NULL;
+    }
 };
 
 
@@ -56,5 +61,12 @@ __.prototype.isDiscontinuous = function () {
 
     return this.discontinuous;
 };
+
+
+__.prototype.getBranchContext = function () {
+
+    return this;
+};
+
 
 module.exports = __;

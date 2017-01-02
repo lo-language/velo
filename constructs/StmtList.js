@@ -59,19 +59,19 @@ __.prototype.compile = function (context) {
     // hooray for Lisp!
 
     var tail = null;
+    var branch = context.getBranchContext();
 
     // if there's a tail, compile it first
     if (this.tail) {
         tail = this.tail.compile(context);
     }
-    else if (context instanceof BranchContext) {
+    else if (branch) {
 
-        // todo bug where the direct context isn't a branch context because we're in a handler!
-
-        console.log('boy howdy!');
+        // todo there's a bug here: compiling a procedure in a branch is indistinguishable
+        // from compiling a handler, but only the latter case should get a connector
 
         // a connector acts like a stmt list so it doesn't need to be wrapped in one
-        tail = context.getConnector();
+        tail = branch.getConnector();
     }
 
     // tell the context about the following statements, in case the head statement wants to wrap them in a continuation
@@ -102,8 +102,8 @@ __.prototype.compile = function (context) {
         }
 
         // tell the context there's a discontinuity here
-        if (context instanceof BranchContext) {
-            context.flagDiscontinuity();
+        if (branch) {
+            branch.flagDiscontinuity();
         }
 
         return popEnv(context.envs.pop().wrap(stmtList));

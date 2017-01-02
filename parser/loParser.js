@@ -1,4 +1,4 @@
-// Generated from /Users/seth/devel/lojs/parser/lo.g4 by ANTLR 4.5.3
+// Generated from /Users/seth/devel/velo/parser/lo.g4 by ANTLR 4.5.3
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 var loVisitor = require('./loVisitor').loVisitor;
