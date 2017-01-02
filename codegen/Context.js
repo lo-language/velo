@@ -21,7 +21,6 @@
 "use strict";
 
 const JS = require('./JsPrimitives');
-const JsFunction = require('./JsFunction');
 
 
 /**
@@ -43,9 +42,8 @@ var __ = function (parent, isService) {
     // our local symbol table, containing params, locals, constants, futures, etc.
     this.symbols = {};
 
-    this.wrappers = [];
-    this.placeHolders = 0;
-    this.contNum = 0;
+    this.envs = [];
+    this.envId = 0;
 };
 
 
@@ -222,41 +220,12 @@ __.prototype.createInner = function (isService) { // push? nest? inner? derive? 
 
 
 /**
- * Pushes a wrapper onto the list.
- *
- * @param target
- * @param args
- * @param blocking
+ * Pushes an environment and sets an ID.
  */
-__.prototype.pushRequest = function (target, args, blocking) {
+__.prototype.pushEnv = function (env) {
 
-    var placeholderName = 'res' + this.placeHolders++;
-
-    this.wrappers.push({target: target, args: args, blocking: blocking, paramName: placeholderName});
-
-    return JS.subscript(JS.ID(placeholderName), JS.num('0'));
-};
-
-
-/**
- * Returns true if this context is currently preparing to wrap a statement.
- *
- * @return {*}
- */
-__.prototype.isWrapping = function () {
-
-    return this.wrappers.length > 0;
-};
-
-
-/**
- * Creates a new continued statement.
- *
- * @return {*}
- */
-__.prototype.wrapTail = function () {
-
-    return 'c' + this.contNum++;
+    env.setId(this.envId++);
+    this.envs.push(env);
 };
 
 
@@ -276,6 +245,68 @@ __.prototype.canRespond = function () {
     }
 
     return false;
+};
+
+
+/**
+ * Returns a statement list terminator for this context.
+ */
+__.prototype.hasDiscontinuities = function () {
+
+    return this.envs.length > 0;
+};
+
+
+/**
+ * Sets the following statements property.
+ *
+ * @param stmtList
+ */
+__.prototype.setFollowing = function (stmtList) {
+
+    this.following = stmtList;
+};
+
+
+/**
+ * Gets the following statements.
+ *
+ * @param stmtList
+ */
+__.prototype.getFollowing = function (stmtList) {
+
+    return this.following;
+};
+
+
+/**
+ * Returns true if there are currently following statements.
+ */
+__.prototype.hasFollowing = function () {
+
+    return this.following ? true : false;
+};
+
+
+/**
+ * Wraps the following statements in a continuation.
+ *
+ * @return {*} a JS AST for a ref to the continuation
+ */
+__.prototype.wrapFollowing = function () {
+
+    if (this.following) {
+
+        var contName = 'c' + this.envId++;
+
+        var contDef = JS.fnDef([], this.following, contName);
+
+        this.following = JS.stmtList(contDef);
+
+        return JS.ID(contName);
+    }
+
+    return JS.NULL;
 };
 
 module.exports = __;

@@ -42,7 +42,7 @@ __.prototype.compile = function (context) {
     var condition = this.cond.compile(context);
     var body = this.body.compile(context);
 
-    if (body.async || context.isWrapping()) {
+    if (body.async) {
 
         // join the body to the wrapper function via setImmediate to form a loop in a way that won't break the stack
         // (this is me trying to emulate tail-recursion)

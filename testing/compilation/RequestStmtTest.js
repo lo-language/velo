@@ -33,7 +33,6 @@ module.exports["blocking"] = {
         var result = node.compile(new Context());
 
         test.deepEqual(result.renderTree(),
-            [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendMessage' ],
@@ -46,7 +45,7 @@ module.exports["blocking"] = {
                                     [ 'var', '$baz' ],
                                     [ 'stmtList',
                                         [ 'expr-stmt', [ 'assign', [ 'id', '$baz' ], [ 'num', '42' ] ] ] ] ] ],
-                            [ 'null' ] ] ] ] ]);
+                            [ 'null' ] ] ] ]);
 
         test.done();
     },

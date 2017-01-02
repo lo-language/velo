@@ -14,6 +14,8 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const BranchContext = require('../codegen/BranchContext');
+
 
 /**
  * A conditional statement.
@@ -54,40 +56,23 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
-    // if the predicate is sync that's easy because we always want to resolve it
-    // the trick is sync logic in the branches because we only want to resolve if
-    // necessary
-
-    // todo - is there a bug where we're compiling statements within statements?
-    // todo same bug in iterations!?
-    // since we're in a stmt here that might have async bits, and then our blocks might have bits?
-    // we DO need to support more than one level of stmt nesting
+    // if one branch is async we need to make a continuation and call it from both branches
 
     var predicate = this.predicate.compile(context);
-    var consequent = this.consequent.compile(context);
-    var alternate = this.alternate ? this.alternate.compile(context) : null;
 
-    var async = consequent.async;
+    var bc = new BranchContext(context);
 
-    if (alternate && alternate.async) {
-        async = true;
+    var consequent = this.consequent.compile(bc);
+
+    if (this.alternate) {
+        var alternate = this.alternate.compile(bc);
     }
+    else if (bc.isDiscontinuous()) {
 
-    // shortcut if none of the bits are async
-    if (async || context.isWrapping()) {
+        // we've apparently wrapped our tail in a continuation so
+        // it needs to be called in the alternate branch as well
 
-        // add continuation to both branches
-
-        var contName = context.wrapTail();
-
-        consequent.appendStmt(JS.exprStmt(JS.fnCall(JS.ID(contName), [])));
-        consequent.appendStmt(JS.exprStmt(JS.fnCall(JS.ID(contName), [])));
-
-        var stmt = JS.cond(predicate, consequent, alternate);
-
-        stmt.async = true;
-
-        return stmt;
+        alternate = bc.getConnector();
     }
 
     return JS.cond(predicate, consequent, alternate);

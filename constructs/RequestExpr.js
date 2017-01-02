@@ -13,6 +13,7 @@
 
 const JS = require('../codegen/JsPrimitives');
 const Identifier = require('./Identifier');
+const RequestEnv = require('../codegen/RequestEnv');
 
 
 /**
@@ -57,7 +58,11 @@ __.prototype.compile = function (context) {
 
     // get a placeholder
     // we push a request into the context whether sync or async
-    return context.pushRequest(target, args, this.blocking);
+    var reqEnv = new RequestEnv(target, args, this.blocking);
+
+    context.pushEnv(reqEnv);
+
+    return reqEnv.getRef();
 };
 
 module.exports = __;

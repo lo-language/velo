@@ -10,7 +10,7 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const ContWrapper = require('../codegen/ContWrapper');
+const BranchContext = require('../codegen/BranchContext');
 
 
 /**
@@ -68,38 +68,35 @@ __.prototype.compile = function (context) {
         return nonBlocking;
     }
 
-    // return a variant stmt list
-
-    var contName = context.wrapTail();
-
     // add the continuation to each handler or if there's no
     // handler, just use the continuation as the branch
 
     var replyHandler, failHandler;
 
+    var bc = new BranchContext(context);
+
+    // in this instance, we know a priori that both branches are discontinuous
+    bc.flagDiscontinuity();
+
     if (this.replyHandler) {
-        replyHandler = this.replyHandler.compile(context);
-        replyHandler.append(JS.stmtList(JS.exprStmt(JS.fnCall(JS.ID(contName), []))));
+        replyHandler = this.replyHandler.compile(bc);
     }
     else {
-        replyHandler = JS.ID(contName);
+        replyHandler = bc.contRef;
     }
 
     if (this.failHandler) {
-        failHandler = this.failHandler.compile(context);
-        failHandler.append(JS.stmtList(JS.exprStmt(JS.fnCall(JS.ID(contName), []))));
+        failHandler = this.failHandler.compile(bc);
     }
     else {
-        failHandler = JS.ID(contName);
+        failHandler = bc.contRef;
     }
 
     var blocking = JS.exprStmt(
             JS.runtimeCall('sendMessage', [
                 this.address.compile(context), JS.arrayLiteral(args), replyHandler, failHandler]));
 
-    blocking.async = true;
-
-    return new ContWrapper(contName, nonBlocking, blocking);
+    return blocking;
 };
 
 module.exports = __;

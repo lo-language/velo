@@ -12,8 +12,7 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const Wrapper = require('../codegen/Wrapper');
-const ContWrapper = require('../codegen/ContWrapper');
+const BranchContext = require('../codegen/BranchContext');
 
 
 /**
@@ -59,33 +58,58 @@ __.prototype.compile = function (context) {
 
     // hooray for Lisp!
 
-    var tail = this.tail ? this.tail.compile(context) : null;
+    var tail = null;
+
+    // if there's a tail, compile it first
+    if (this.tail) {
+        tail = this.tail.compile(context);
+    }
+    else if (context instanceof BranchContext) {
+
+        // todo bug where the direct context isn't a branch context because we're in a handler!
+
+        console.log('boy howdy!');
+
+        // a connector acts like a stmt list so it doesn't need to be wrapped in one
+        tail = context.getConnector();
+    }
+
+    // tell the context about the following statements, in case the head statement wants to wrap them in a continuation
+    context.setFollowing(tail);
+
     var head = this.head.compile(context);
+
     var result = null;
 
     // some Lo statements compile to >1 JS statement, so in the general case we have to allow for a stmtlist
     // if head compiled to a stmt list, just use that and ignore the tail
 
+    // fixme
     if (typeof head.append == 'function') {
         head.append(tail);
         result = head;
     }
     else {
-        result = JS.stmtList(head, tail);
+        result = JS.stmtList(head, context.getFollowing());
     }
 
-    context.contWrapper = null;
+    // pop any wrapping environments off
 
-    var wrap = function (stmtList) {
+    var popEnv = function (stmtList) {
 
-        if (context.wrappers.length == 0) {
+        if (context.envs.length == 0) {
             return stmtList;
         }
 
-        return wrap(new Wrapper(context.wrappers.pop(), stmtList));
+        // tell the context there's a discontinuity here
+        if (context instanceof BranchContext) {
+            context.flagDiscontinuity();
+        }
+
+        return popEnv(context.envs.pop().wrap(stmtList));
     };
 
-    return wrap(result);
+    return popEnv(result);
 };
 
 

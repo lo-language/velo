@@ -292,7 +292,9 @@ JS.stmtList = (head, tail) => {
                 return [ 'stmtList' ];
             }
 
-            return tail ? ['stmtList', head.renderTree(), tail.renderTree()] : ['stmtList', head.renderTree()];
+            var tailTree = tail ? tail.renderTree() : null;
+
+            return tailTree ? ['stmtList', head.renderTree(), tailTree] : ['stmtList', head.renderTree()];
         },
 
         renderJs: function () {

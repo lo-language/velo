@@ -112,29 +112,59 @@ module.exports["sync"] = {
     }
 };
 
-// module.exports["async"] = {
-//
-//     "positive with async body creates else": function (test) {
-//
-//         // should create a context
-//         // should call compile on each statement
-//
-//         var node = {
-//             type: 'conditional',
-//             predicate: {type: 'id', name: 'foo'},
-//             consequent: {
-//                 type: 'stmt_list',
-//                 head: {type: 'assign', op: '=',
-//                     left: {type: 'id', name: 'bar'},
-//                     right: {type: 'application', address: {type: 'id', name: 'foo'}, args: []}},
-//                 tail: null}
-//         };
-//
-//         test.equal(new Context().createInner().compile(node).renderTree(),
-//             "var cont0 = function () {};if ($foo) {task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\n$bar = P0;\ncont0();}, null);\n\n}\n\nelse {cont0();}\n\n");
-//         test.done();
-//     },
-//
+module.exports["async"] = {
+
+    "true-block-only with async body creates else and cond": function (test) {
+
+        // todo test we don't create conts when not necessary
+
+        // should create a context
+        // should call compile on each statement
+
+        var node = new Lo.stmtList(
+            new Lo.conditional(
+                new Lo.identifier('foo'),
+                new Lo.stmtList(
+                    new Lo.assignment('=', new Lo.identifier('bar'), new Lo.requestExpr(new Lo.identifier('foo'), []))
+                )
+            ),
+        new Lo.stmtList(
+            new Lo.assignment('=', new Lo.identifier('baz'), new Lo.identifier('ball'))
+        ));
+
+        test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList',
+            [ 'if',
+                [ 'id', '$foo' ],
+                [ 'stmtList',
+                    [ 'expr-stmt',
+                        [ 'call',
+                            [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                            [ [ 'id', '$foo' ],
+                                [ 'arrayLiteral', [] ],
+                                [ 'function',
+                                    null,
+                                    [ 'res0' ],
+                                    [ 'stmtList',
+                                        [ 'expr-stmt',
+                                            [ 'assign',
+                                                [ 'id', '$bar' ],
+                                                [ 'subscript', [ "id", "res0" ], [ "num", "0" ] ] ] ],
+                                        [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'c0' ], [] ] ] ] ] ],
+                                [ 'null' ] ] ] ] ],
+                [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'c0' ], [] ] ] ] ],
+            [ 'stmtList',
+                [ 'function',
+                    'c0',
+                    [],
+                    [ 'stmtList',
+                        [ 'expr-stmt',
+                            [ 'assign', [ 'id', '$baz' ], [ 'id', '$ball' ] ] ] ] ] ] ]);
+
+        // test.equal(new Context().createInner().compile(node).renderTree(),
+        //     "var cont0 = function () {};if ($foo) {task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\n$bar = P0;\ncont0();}, null);\n\n}\n\nelse {cont0();}\n\n");
+        test.done();
+    },
+
 //     "nested ifs create separate continuations": function (test) {
 //         // todo
 //         test.done();
@@ -227,4 +257,4 @@ module.exports["sync"] = {
 //
 //         test.done();
 //     }
-// };
+};
