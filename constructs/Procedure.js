@@ -13,7 +13,6 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const JsFunction = require('../codegen/JsFunction');
 
 
 /**
@@ -80,9 +79,7 @@ __.prototype.compile = function (context) {
         body = JS.stmtList(JS.varDecl(varName), body);
     });
 
-    // implements a service as a JS function that takes a task
-    // if a service, squash the construct?
-    return new JsFunction([(this.isService ? 'task' : 'args')], body);
+    return JS.fnDef([(this.isService ? 'task' : 'args')], body);
 };
 
 module.exports = __;

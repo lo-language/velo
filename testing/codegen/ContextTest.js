@@ -6,8 +6,7 @@
 "use strict";
 
 const Context = require('../../codegen/Context');
-const JS = require('../../codegen/JsPrimitives');
-const Lo = require('../../constructs');
+const RequestEnv = require('../../codegen/RequestEnv');
 
 module.exports["basics"] = {
 
@@ -24,15 +23,17 @@ module.exports["basics"] = {
         test.done();
     },
 
-    "isWrapping": function (test) {
+    "isContinuous": function (test) {
 
         var root = new Context();
 
-        test.equal(root.isWrapping(), false);
+        test.equal(root.isDiscontinuous(), false);
+        test.equal(root.isContinuous(), true);
 
-        root.pushRequest({}, [], true);
+        root.pushEnv(new RequestEnv());
 
-        test.equal(root.isWrapping(), true);
+        test.equal(root.isDiscontinuous(), true);
+        test.equal(root.isContinuous(), false);
         test.done();
     },
 

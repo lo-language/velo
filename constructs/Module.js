@@ -12,7 +12,6 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const JsFunction = require('../codegen/JsFunction');
 const Context = require('../codegen/Context');
 const Q = require('q');
 

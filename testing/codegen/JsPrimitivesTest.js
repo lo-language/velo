@@ -444,44 +444,6 @@ module.exports["statements"] = {
 
         test.equal(n.renderJs(), "foo = bar;\nbar = baz;");
 
-        test.equal(n.isAsync(), false);
-
-        test.done();
-    },
-
-    "direct async stmt list": function (test) {
-
-        var n = JS.stmtList(
-            JS.exprStmt(JS.assign(JS.ID('foo'), JS.ID('bar'))),
-            JS.stmtList(JS.exprStmt(JS.assign(JS.ID('bar'), JS.ID('baz')))), true);
-
-        test.equal(n.isAsync(), true);
-
-        test.done();
-    },
-
-    "indirect async stmt list": function (test) {
-
-        var n = JS.stmtList(
-            JS.exprStmt(JS.assign(JS.ID('foo'), JS.ID('bar'))),
-            JS.stmtList(JS.exprStmt(JS.assign(JS.ID('bar'), JS.ID('baz'))), null, true));
-
-        test.equal(n.isAsync(), true);
-
-        test.done();
-    },
-
-    "appended async stmt list": function (test) {
-
-        var n = JS.stmtList(
-            JS.exprStmt(JS.assign(JS.ID('foo'), JS.ID('bar'))));
-
-        test.equal(n.isAsync(), false);
-
-        n.append(JS.stmtList(JS.exprStmt(JS.assign(JS.ID('bar'), JS.ID('baz'))), null, true));
-
-        test.equal(n.isAsync(), true);
-
         test.done();
     },
 
