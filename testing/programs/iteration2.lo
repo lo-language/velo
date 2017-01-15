@@ -1,4 +1,4 @@
-main is -> (max) {
+main is <-> (max) {
 
     num = 0;
 

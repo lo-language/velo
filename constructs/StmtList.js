@@ -92,13 +92,13 @@ __.prototype.compile = function (context) {
     // tell the context about the following statements, in case the head statement wants to wrap them in a continuation
     context.setFollowing(tail);
 
-    var head = this.head.compile(context);
+    var head = this.head ? this.head.compile(context) : null;
     var result;
 
     // some Lo statements compile to multiple JS stmts;
     // we assume they'll grab the tail and attach it to themselves
 
-    if (head.isStmtList) {
+    if (head && head.isStmtList) {
         result = head;
     }
     else {

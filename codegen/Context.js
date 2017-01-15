@@ -309,6 +309,8 @@ __.prototype.hasFollowing = function () {
 /**
  * Wraps the following statements in a continuation.
  *
+ * todo detect if this.following is a connector!
+ *
  * @return {*} a JS AST for a ref to the continuation
  */
 __.prototype.wrapFollowing = function () {
@@ -317,7 +319,7 @@ __.prototype.wrapFollowing = function () {
 
     if (this.following) {
 
-        var contName = 'c' + this.contId++;
+        var contName = 'c' + this.getNextLabel();
 
         var contDef = JS.fnDef([], this.following, contName);
 
@@ -330,13 +332,13 @@ __.prototype.wrapFollowing = function () {
 };
 
 
-__.prototype.getBranchContext = function () {
+__.prototype.getNextLabel = function () {
 
     if (this.parent) {
-        return this.parent.getBranchContext();
+        return this.parent.getNextLabel();
     }
 
-    return null;
+    return this.contId++;
 };
 
 
