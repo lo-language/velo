@@ -14,9 +14,6 @@ module.exports["basics"] = {
 
         var bc = new BranchContext();
 
-        // we want to only check parents up to the service context
-        test.ok(bc.inBranch());
-
         test.done();
     }
 };

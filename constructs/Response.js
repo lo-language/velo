@@ -52,7 +52,10 @@ __.prototype.compile = function (context) {
 
     // a response should compile to a non-appendable JS stmt list
 
-    return JS.stmtList(response, JS.stmtList(JS.return()));
+    var following = context.getFollowing();
+    context.setFollowing(null);
+
+    return JS.stmtList(response, JS.stmtList(JS.return(), following));
 };
 
 module.exports = __;

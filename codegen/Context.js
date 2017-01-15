@@ -44,6 +44,9 @@ var __ = function (parent, isService) {
 
     this.envs = [];
     this.envId = 0;
+
+    this.connector = null;
+    this.continuous = true; // continuous until proven async
     this.contId = 0;
 };
 
@@ -225,6 +228,11 @@ __.prototype.createInner = function (isService) { // push? nest? inner? derive? 
  */
 __.prototype.pushEnv = function (env) {
 
+    this.continuous = false;
+
+    // ok, this context just became discontinuous!
+    // we need to reach up to our parent and see if there are any following statements (if this is a branch context)
+
     env.setId(this.envId++);
     this.envs.push(env);
 };
@@ -252,9 +260,18 @@ __.prototype.canRespond = function () {
 /**
  * Returns a statement list terminator for this context.
  */
-__.prototype.hasDiscontinuities = function () {
+__.prototype.isContinuous = function () {
 
-    return this.envs.length > 0;
+    return this.continuous;
+};
+
+
+/**
+ * Returns a statement list terminator for this context.
+ */
+__.prototype.isDiscontinuous = function () {
+
+    return this.continuous == false;
 };
 
 
@@ -296,6 +313,8 @@ __.prototype.hasFollowing = function () {
  */
 __.prototype.wrapFollowing = function () {
 
+    this.continuous = false;
+
     if (this.following) {
 
         var contName = 'c' + this.contId++;
@@ -318,6 +337,17 @@ __.prototype.getBranchContext = function () {
     }
 
     return null;
+};
+
+
+__.prototype.getConnector = function () {
+
+    if (this.connector) {
+        return this.connector;
+    }
+    else if (this.parent) {
+        return this.parent.getConnector();
+    }
 };
 
 

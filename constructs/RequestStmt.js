@@ -73,23 +73,24 @@ __.prototype.compile = function (context) {
 
     var replyHandler, failHandler;
 
-    var bc = new BranchContext(context);
+    var contRef = context.wrapFollowing();
+    var contCall = contRef ? JS.stmtList(JS.exprStmt(JS.fnCall(contRef, []))) : null;
 
-    // in this instance, we know a priori that both branches are discontinuous
-    bc.flagDiscontinuity();
+    // we just drop in the call as the connector since we know the branches are async
+    var bc = new BranchContext(context, contCall);
 
     if (this.replyHandler) {
         replyHandler = this.replyHandler.compile(bc);
     }
     else {
-        replyHandler = bc.contRef;
+        replyHandler = contRef || JS.NULL;
     }
 
     if (this.failHandler) {
         failHandler = this.failHandler.compile(bc);
     }
     else {
-        failHandler = bc.contRef;
+        failHandler = contRef || JS.NULL;
     }
 
     return JS.exprStmt(

@@ -32,6 +32,23 @@ var __ = function (head, tail) {
     this.tail = tail;
 };
 
+
+/**
+ * Attaches a statement list to this one.
+ *
+ * @param stmtList  a StmtList
+ */
+__.prototype.attach = function (stmtList) {
+
+    if (this.tail == null) {
+        this.tail = stmtList;
+    }
+    else {
+        this.tail.attach(stmtList);
+    }
+};
+
+
 /**
  * Returns the Lo AST for this node.
  */
@@ -51,42 +68,37 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
-    // this is a recursive iteration on a recursive data structure: stmtlist isa (stmt, stmtlist)
-    // so we compiling the tail is recursive iteration and compiling the head is the base case
-
-    // should we allow the head to compile to a stmtlist?
-
+    // this is a recursive iteration on a recursive data structure: stmtlist -> (stmt, stmtlist)
+    // so compiling the tail is recursive iteration and compiling the head is the base case
     // hooray for Lisp!
 
     var tail = null;
-    var branch = context.getBranchContext();
+    // var branch = context.getBranchContext();
+    var connector = context.getConnector();
 
     // if there's a tail, compile it first
     if (this.tail) {
         tail = this.tail.compile(context);
     }
-    else if (branch) {
+    else if (connector) {
 
-        // todo there's a bug here: compiling a procedure in a branch is indistinguishable
-        // from compiling a handler, but only the latter case should get a connector
+        // a connector is a chunk of code that carries control flow from one stack to another
+        // it can be a function call or a no-op to just let statements flow naturally
 
-        // a connector acts like a stmt list so it doesn't need to be wrapped in one
-        tail = branch.getConnector();
+        // a connector is already a stmt list so it doesn't need to be wrapped in one
+        tail = connector;
     }
 
     // tell the context about the following statements, in case the head statement wants to wrap them in a continuation
     context.setFollowing(tail);
 
     var head = this.head.compile(context);
+    var result;
 
-    var result = null;
+    // some Lo statements compile to multiple JS stmts;
+    // we assume they'll grab the tail and attach it to themselves
 
-    // some Lo statements compile to >1 JS statement, so in the general case we have to allow for a stmtlist
-    // if head compiled to a stmt list, just use that and ignore the tail
-
-    // fixme
-    if (typeof head.append == 'function') {
-        head.append(tail);
+    if (head.isStmtList) {
         result = head;
     }
     else {
@@ -101,12 +113,7 @@ __.prototype.compile = function (context) {
             return stmtList;
         }
 
-        // tell the context there's a discontinuity here
-        if (branch) {
-            branch.flagDiscontinuity();
-        }
-
-        return popEnv(context.envs.pop().wrap(stmtList));
+        return popEnv(JS.stmtList(context.envs.pop().wrap(stmtList)));
     };
 
     return popEnv(result);

@@ -61,18 +61,23 @@ __.prototype.compile = function (context) {
     var predicate = this.predicate.compile(context);
 
     var bc = new BranchContext(context);
-
     var consequent = this.consequent.compile(bc);
 
+    // we can use the same branch context for both branches
     if (this.alternate) {
         var alternate = this.alternate.compile(bc);
     }
     else if (bc.isDiscontinuous()) {
 
-        // we've apparently wrapped our tail in a continuation so
+        // we've wrapped our tail in a continuation so
         // it needs to be called in the alternate branch as well
 
         alternate = bc.getConnector();
+    }
+
+    // todo - push into BC?
+    if (bc.isDiscontinuous()) {
+        bc.connect();
     }
 
     return JS.cond(predicate, consequent, alternate);

@@ -43,16 +43,15 @@ __.prototype.getRef = function () {
 
 __.prototype.wrap = function (stmtList) {
 
-    var paramName = 'res' + this.id;
+    // todo should this return a SL or a stmt?
+    // todo we need access to the context here so we can grab the following stmts
 
-    return JS.stmtList(
-        JS.exprStmt(
+    return JS.exprStmt(
             JS.runtimeCall('sendMessage', [
                 this.target, JS.arrayLiteral(this.args),
                 JS.fnDef([this.placeholderName], stmtList),
                 JS.NULL
-            ])),
-        null);
+            ]));
 };
 
 module.exports = __;

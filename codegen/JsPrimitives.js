@@ -292,9 +292,21 @@ JS.stmtList = (head, tail) => {
                 return [ 'stmtList' ];
             }
 
-            var tailTree = tail ? tail.renderTree() : null;
+            try {
+                var tailTree = tail ? tail.renderTree() : null;
+            }
+            catch (e) {
+                tailTree = ['EXCEPTION'];
+            }
 
-            return tailTree ? ['stmtList', head.renderTree(), tailTree] : ['stmtList', head.renderTree()];
+            try {
+                var headTree = head.renderTree();
+            }
+            catch (e) {
+                headTree = ['EXCEPTION'];
+            }
+
+            return tailTree ? ['stmtList', headTree, tailTree] : ['stmtList', headTree];
         },
 
         renderJs: function () {
@@ -303,27 +315,33 @@ JS.stmtList = (head, tail) => {
                 return '';
             }
 
-            return head.renderJs() + (tail ? '\n' + tail.renderJs() : '');
+            try {
+                var tailJs = tail ? tail.renderJs() : null;
+            }
+            catch (e) {
+                tailJs = 'EXCEPTION';
+            }
+
+            try {
+                var headJs = head.renderJs();
+            }
+            catch (e) {
+                headJs = 'EXCEPTION';
+            }
+
+            return headJs + (tail ? '\n' + tailJs : '');
         },
+
+        isStmtList: true,
         
-        append: function (stmtList) {
+        attach: function (stmtList) {
 
             if (tail) {
-                tail.append(stmtList);
+                tail.attach(stmtList);
                 return;
             }
 
             tail = stmtList;
-        },
-
-        appendStmt: function (stmt) {
-
-            if (tail) {
-                tail.appendStmt(stmt);
-                return;
-            }
-
-            tail = JS.stmtList(stmt);
         }
     };
 };
@@ -358,8 +376,7 @@ JS.while = (condition, body) => {
 JS.runtimeCall = (fnName, args) => {
 
     return JS.fnCall(
-        JS.select(JS.ID('task'), fnName),
-        args);
+        JS.select(JS.ID('task'), fnName), args);
 };
 
 

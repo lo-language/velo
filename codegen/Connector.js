@@ -8,7 +8,13 @@
  =============================================================================*/
 
 /**
- * A connector to rejoin discontinuous branches.
+ * A connector is a chunk of JS that carries control flow from one location to another either
+ * actively as a function call or passively, as a no-op to just let statements flow naturally.
+ *
+ * A connector renders its call if and only if
+ *
+ * - its context is discontinous
+ * - there's a logically following statement
  *
  * Created by seth on 1/2/17.
  */
@@ -18,15 +24,14 @@
 const JS = require('./JsPrimitives');
 
 
-var __ = function () {
+var __ = function (context) {
 
     this.call = null;
 };
 
 
-__.prototype.setContinuation = function (contRef) {
-
-    this.call = JS.stmtList(JS.exprStmt(JS.fnCall(contRef, [])));
+__.prototype.setCall = function (call) {
+    this.call = call;
 };
 
 

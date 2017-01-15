@@ -20,52 +20,31 @@ const Context = require('./Context');
 const Connector = require('./Connector');
 
 
-var __ = function (parent) {
+var __ = function (parent, connector) {
 
     Context.call(this, parent);
 
-    this.connector = new Connector();
-
-    this.discontinuous = false;
+    this.connector = connector || new Connector();
 };
 
+// inheritance
 __.prototype = Object.create(Context.prototype);
 __.prototype.constructor = Context;
 
 
 /**
+ * Connects the control flow in this context to the parent context.
  */
-__.prototype.getConnector = function () {
+__.prototype.connect = function (call) {
 
-    return this.connector;
-};
-
-
-__.prototype.flagDiscontinuity = function () {
-
-    this.discontinuous = true;
-
-    // grab the parent's tail and make a continuation out of it
-    this.contRef = this.parent.wrapFollowing();
-
-    if (this.contRef) {
-        this.connector.setContinuation(this.contRef);
+    if (call) {
+        this.connector.setCall(call);
     }
     else {
-        this.contRef = JS.NULL;
+
+        var contRef = this.parent.wrapFollowing();
+        this.connector.setCall(JS.stmtList(JS.exprStmt(JS.fnCall(contRef, []))));
     }
-};
-
-
-__.prototype.isDiscontinuous = function () {
-
-    return this.discontinuous;
-};
-
-
-__.prototype.getBranchContext = function () {
-
-    return this;
 };
 
 

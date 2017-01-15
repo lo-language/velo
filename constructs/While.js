@@ -10,6 +10,8 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const BranchContext = require('../codegen/BranchContext');
+
 
 /**
  * A while statement.
@@ -40,29 +42,37 @@ __.prototype.getAst = function () {
 __.prototype.compile = function (context) {
 
     var condition = this.cond.compile(context);
-    var body = this.body.compile(context);
+    var loopName = 'l0';
 
-    if (body.async) {
+    // push a connector into context to wire up the loop
+    // can we make this somehow contingent on async behavior in the loop body or cond?
 
-        // join the body to the wrapper function via setImmediate to form a loop in a way that won't break the stack
-        // (this is me trying to emulate tail-recursion)
+    // we need to create a new context here for the loop body
 
-        body.attach(new JsStmt(JS.exprStmt(
-            JS.fnCall(JS.ID("setImmediate"), [JS.runtimeCall('doAsync', [JS.ID('loop')])]))));
+    var bc = new BranchContext(context);
+    var body = this.body.compile(bc);
 
-        // see if there's a next statement
-        // var cond = this.next ? JS.cond(this.cond, this.body, this.next) : JS.cond(condition, body);
+    if (context.isContinuous() && bc.isContinuous()) {
 
-        var loopDecl = new JsStmt(JS.letDecl('loop', JS.fnDef([], new JsStmt(JS.cond(condition, body)))));
-
-        return loopDecl.attach(new JsStmt(JS.exprStmt(JS.fnCall(JS.ID('loop'), []))));
+        // no discontinuities in the loop at all, compile to a target language loop
+        return JS.while(condition, body);
     }
 
-    return JS.while(condition, body);
+    // gotta do it the hard way
+
+    var loopCall = JS.stmtList(JS.exprStmt(
+        JS.fnCall(JS.ID("setImmediate"), [JS.runtimeCall('doAsync', [JS.ID(loopName)])])));
+
+    // connect the body to the loop entry point to create the loop
+    bc.connect(loopCall);
+
+    var loopDef = JS.letDecl(loopName, JS.fnDef([], JS.stmtList(JS.cond(condition, body, context.getFollowing()))));
+
+    // since we've already wrapped the following stmts in the loop def
+    context.setFollowing(null);
+
+    return JS.stmtList(loopDef, JS.stmtList(JS.exprStmt(JS.fnCall(JS.ID(loopName), []))));
 };
 
-// let the conditional create the extra cont?
-// cont = context.createContStmt();
-// loop = context.createContStmt();
 
 module.exports = __;
