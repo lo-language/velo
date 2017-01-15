@@ -1,6 +1,6 @@
 ## A [Lo](http://lolang.org)-to-JavaScript compiler, written in Node.js.
 
-This is a proof-of-concept compiler for the Lo programming langauge. It can operate as a load-and-go compiler to seamlessly compile, load, and run a Lo program within a Node environment, or be used to build statically-linked JavaScript files for execution in Node or browser contexts.
+This is a proof-of-concept compiler for the Lo programming language. It can operate as a load-and-go compiler to seamlessly compile, load, and run a Lo program within a Node environment, or be used to build statically-linked JavaScript files for execution in Node or a browser.
 
 ## Installation
 
@@ -20,10 +20,6 @@ In the project root folder:
 
     $ velo <root module>
 
-
-#### To build a Node executable
-
-    $ velo --build <root module>
 
 
 ## Implementation

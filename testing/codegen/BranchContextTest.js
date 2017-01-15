@@ -6,13 +6,19 @@
 "use strict";
 
 const BranchContext = require('../../codegen/BranchContext');
+const Context = require('../../codegen/Context');
 
 
 module.exports["basics"] = {
 
-    "isBranch": function (test) {
+    "passes declarations through": function (test) {
 
-        var bc = new BranchContext();
+        var parent = new Context();
+        var bc = new BranchContext(parent);
+
+        bc.declare('herzog');
+
+        test.ok(parent.has('herzog'));
 
         test.done();
     }

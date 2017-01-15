@@ -33,7 +33,10 @@ __.prototype.constructor = Context;
 
 
 /**
- * Connects the control flow in this context to the parent context.
+ * Connects the control flow in this context to the given call
+ * or to a continuation in the parent context if none specified.
+ *
+ * @param call  optional call to use as the connector
  */
 __.prototype.connect = function (call) {
 
@@ -45,6 +48,17 @@ __.prototype.connect = function (call) {
         var contRef = this.parent.wrapFollowing();
         this.connector.setCall(JS.stmtList(JS.exprStmt(JS.fnCall(contRef, []))));
     }
+};
+
+
+/**
+ * Passes through to the parent context, looking for a procedure context.
+ *
+ * @param name
+ */
+__.prototype.declare = function (name) {
+
+    this.parent.declare(name);
 };
 
 

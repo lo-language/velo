@@ -16,7 +16,7 @@
 
 'use strict';
 
-process.title = 'lo';
+process.title = 'velo';
 
 const util = require('util');
 const path = require('path');
@@ -42,6 +42,10 @@ sourcer.acquire(path.basename(sourceFile, '.lo')).then(
     function (main) {
 
         var program = new Program(main, sourcer);
+
+        if (argv.dump != null) {
+            return program.dump();
+        }
 
         // see if we should build
 

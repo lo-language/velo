@@ -54,28 +54,28 @@ module.exports['factorial'] = {
     }
 };
 
-// module.exports['factorial2'] = {
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'factorial2');
-//         cb();
-//     },
-//
-//     'success': function (test) {
-//
-//         var io = {
-//             stdout: {
-//                 write: function (task) {
-//                     test.equal(task.args[0], '3628800\n');
-//                     task.respond("reply");
-//                 }
-//             }
-//         };
-//
-//         this.harness.testSuccess(test, [[10], io]);
-//     }
-// };
+module.exports['factorial2'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'factorial2');
+        cb();
+    },
+
+    'success': function (test) {
+
+        var io = {
+            stdout: {
+                write: function (task) {
+                    test.equal(task.args[0], '3628800\n');
+                    task.respond("reply");
+                }
+            }
+        };
+
+        this.harness.testSuccess(test, [[10], io]);
+    }
+};
 
 module.exports['collections'] = {
 

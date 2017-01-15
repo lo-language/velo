@@ -111,4 +111,35 @@ __.prototype.run = function (args) {
     });
 };
 
+
+/**
+ */
+__.prototype.dump = function () {
+
+    var p = Q();
+
+    if (this.ready == false) {
+        p = this.root.loadDeps(this);
+    }
+
+    return p.then(() => {
+
+        try {
+
+            for (var mod in this.exports) {
+
+                console.log(mod);
+
+                for (var c in this.exports[mod]) {
+                    console.log(c, ':', this.exports[mod][c].toString());
+                }
+            }
+        }
+        catch (err) {
+            console.log(err);
+            throw err;
+        }
+    });
+};
+
 module.exports = __;
