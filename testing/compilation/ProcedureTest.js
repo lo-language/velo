@@ -59,10 +59,56 @@ module.exports["service"] = {
                                         [ 'null' ] ] ] ] ] ] ] ] ];
 
         test.deepEqual(node.compile(new Context()).renderTree(), result);
+        test.done();
+    },
 
-        // test.equal(new Context().compile(node),
-        //     'function (task) {var $recur = task.service;\nvar $next, $result;\n\n$next = task.args[0];\n\n' +
-        //     'task.sendMessage($bar, [42], function (res) {\nvar P0 = res ? res[0] : null;\n$result *= P0;\n}, null);\n\n}');
+    "args ordering": function (test) {
+
+        // should actually throw an error if result isn't defined in the context
+        // proc is <-> (args, io) { @write("hello"); }
+
+        var node = new Lo.procedure(
+            ['args', 'io'],
+            new Lo.stmtList(
+                new Lo.requestStmt(
+                    new Lo.identifier('write'),
+                    [new Lo.literal('string', 'hello')],
+                    false
+                )
+            ),
+            true);
+
+        var result = [ 'function',
+            null,
+            [ 'task' ],
+            [ 'stmtList',
+                [ 'var', '$args' ],
+                [ 'stmtList',
+                    [ 'var', '$io' ],
+                    [ 'stmtList',
+                        [ 'expr-stmt',
+                            [ 'assign',
+                                [ 'id', '$args' ],
+                                [ 'subscript',
+                                    [ 'select', [ 'id', 'task' ], 'args' ],
+                                    [ 'num', '0' ] ] ] ],
+                        [ 'stmtList',
+                            [ 'expr-stmt',
+                                [ 'assign',
+                                    [ 'id', '$io' ],
+                                    [ 'subscript',
+                                        [ 'select', [ 'id', 'task' ], 'args' ],
+                                        [ 'num', '1' ] ] ] ],
+                            [ 'stmtList',
+                                [ 'expr-stmt',
+                                    [ 'call',
+                                        [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                                        [ [ 'id', '$write' ],
+                                            [ 'arrayLiteral', [ [ "string", "hello" ] ] ],
+                                            [ 'null' ],
+                                            [ 'null' ] ] ] ] ] ] ] ] ] ];
+
+        test.deepEqual(node.compile(new Context()).renderTree(), result);
         test.done();
     }
 };

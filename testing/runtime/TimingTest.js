@@ -4,7 +4,7 @@
  * Created by spurcell on 12/5/15.
  */
 
-const Program = require('../../codegen/Program');
+const Program = require('../../pipeline/Program');
 const Module = require('../../constructs/Module');
 const Q = require('q');
 const util = require('util');

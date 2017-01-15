@@ -5,7 +5,7 @@
 
 "use strict";
 
-const Program = require('../../codegen/Program');
+const Program = require('../../pipeline/Program');
 const Lo = require('../../constructs');
 const util = require('util');
 const Q = require('q');

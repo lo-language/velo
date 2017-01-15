@@ -8,7 +8,7 @@
 "use strict";
 
 const Sourcer = require('../pipeline/Sourcer');
-const Program = require('../codegen/Program');
+const Program = require('../pipeline/Program');
 
 
 

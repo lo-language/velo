@@ -91,33 +91,33 @@ module.exports['collections'] = {
     }
 };
 
-// module.exports['helloWorld'] = {
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'helloWorld');
-//         cb();
-//     },
-//
-//     'success': function (test) {
-//
-//         test.expect(2);
-//
-//         this.harness.enableDump();
-//
-//         var io = {
-//             out: {
-//                 write: function (task) {
-//                     console.log(task.args);
-//                     test.equal(task.args[0], "hello, world!");
-//                     task.respond("reply");
-//                 }
-//             }
-//         };
-//
-//         this.harness.testSuccess(test, [[], io, {}]);
-//     }
-// };
+module.exports['helloWorld'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'helloWorld');
+        cb();
+    },
+
+    'success': function (test) {
+
+        test.expect(2);
+
+        // this.harness.enableDump();
+
+        var io = {
+            out: {
+                write: function (task) {
+                    console.log(task.args);
+                    test.equal(task.args[0], "hello, world!");
+                    task.respond("reply");
+                }
+            }
+        };
+
+        this.harness.testSuccess(test, [[], io, {}]);
+    }
+};
 
 module.exports['fibonacci'] = {
 

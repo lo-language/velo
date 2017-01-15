@@ -14,8 +14,6 @@ const Q = require('q');
 const ASTBuilder = require('./../parser/ASTBuilder');
 
 
-
-
 var __ = function (basePath) {
 
     this.basePath = basePath;
@@ -23,7 +21,7 @@ var __ = function (basePath) {
 
 
 /**
- * Acquires the specified module.
+ * Acquires the specified module as an AST, ready to compile.
  *
  * @param modRef
  * @return {Module}

@@ -63,13 +63,13 @@ __.prototype.compile = function () {
 
     // a bunch of constants
 
-    var body = null;
+    var js = null;
 
-    this.defs.reverse().forEach(def => {
-        body = JS.stmtList(def.compile(context), body);
+    this.defs.forEach(def => {
+        js = JS.stmtList(def.compile(context), js);
     });
 
-    return body;
+    return js;
 };
 
 /**

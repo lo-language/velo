@@ -26,7 +26,7 @@ const IO = require('../runtime/IO');
 const System = require('../runtime/System');
 
 const Sourcer = require('../pipeline/Sourcer');
-const Program = require('../codegen/Program');
+const Program = require('../pipeline/Program');
 // const NodeBuilder = require('../pipeline/NodeBuilder');
 
 var sourceFile = argv._.shift();
@@ -41,8 +41,6 @@ var sourcer = new Sourcer(path.dirname(sourceFile));
 sourcer.acquire(path.basename(sourceFile, '.lo')).then(
     function (main) {
 
-        // console.log(main.compile().renderJs());
-
         var program = new Program(main, sourcer);
 
         // see if we should build
@@ -51,7 +49,6 @@ sourcer.acquire(path.basename(sourceFile, '.lo')).then(
         //     return new NodeBuilder().build(program, argv.build);
         // }
 
-        IO.args = argv;
         return program.run([argv._, IO, System]);
 
     }).catch(
