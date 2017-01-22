@@ -16,41 +16,41 @@ module.exports["basics"] = {
         var node = new Lo.response('reply');
 
         test.deepEqual(node.compile(new Context().createInner(true)).renderTree(),
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'respond' ],
+                        [ [ 'string', 'reply' ], [ 'arrayLiteral', [] ] ] ] ]);
+        test.done();
+    },
+
+    "reply with following stmts": function (test) {
+
+        var node = new Lo.stmtList(new Lo.response('reply'),
+            new Lo.stmtList(new Lo.assignment('=', new Lo.identifier('x'), new Lo.literal('number', '47'))));
+
+        test.deepEqual(node.compile(new Context().createInner(true), JS.stmtList()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'respond' ],
                         [ [ 'string', 'reply' ], [ 'arrayLiteral', [] ] ] ] ],
-                [ 'stmtList', [ 'return' ] ] ]);
+                [ 'stmtList',
+                    [ 'return' ],
+                    [ 'stmtList',
+                        [ 'expr-stmt', [ 'assign', [ 'id', '$x' ], [ 'num', '47' ] ] ] ] ] ]);
         test.done();
     },
-
-    // "reply with following stmts": function (test) {
-    //
-    //     var node = new Lo.response('reply');
-    //
-    //     test.deepEqual(node.compile(new Context().createInner(true), JS.stmtList()).renderTree(),
-    //         [ 'stmtList',
-    //             [ 'expr-stmt',
-    //                 [ 'call',
-    //                     [ 'select', [ 'id', 'task' ], 'respond' ],
-    //                     [ [ 'string', 'reply' ], [ 'arrayLiteral', [] ] ] ] ],
-    //             [ 'stmtList', [ 'return' ] ] ]);
-    //     test.done();
-    // },
 
     "reply with one arg": function (test) {
 
         var node = new Lo.response('reply', [new Lo.literal('number', '42')]);
 
         test.deepEqual(node.compile(new Context().createInner(true)).renderTree(),
-            [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'respond' ],
                         [ [ 'string', 'reply' ],
-                            [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ],
-                [ 'stmtList', [ 'return' ] ] ]);
+                            [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ]);
         test.done();
     },
 
@@ -62,14 +62,12 @@ module.exports["basics"] = {
         ]);
 
         test.deepEqual(node.compile(new Context().createInner(true)).renderTree(),
-            [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'respond' ],
                         [ [ 'string', 'reply' ],
                             [ 'arrayLiteral',
-                                [ [ 'num', '42' ], [ 'string', 'hot dog!' ] ] ] ] ] ],
-                [ 'stmtList', [ 'return' ] ] ]);
+                                [ [ 'num', '42' ], [ 'string', 'hot dog!' ] ] ] ] ] ]);
         test.done();
     },
 
@@ -78,13 +76,11 @@ module.exports["basics"] = {
         var node = new Lo.response('fail', [new Lo.literal('number', '42')]);
 
         test.deepEqual(node.compile(new Context().createInner(true)).renderTree(),
-            [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'respond' ],
                         [ [ 'string', 'fail' ],
-                            [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ],
-                [ 'stmtList', [ 'return' ] ] ]);
+                            [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ]);
         test.done();
     }
 };
