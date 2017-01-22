@@ -45,8 +45,7 @@ module.exports["blocking calls"] = {
                                             [ 'arrayLiteral', [ [ 'mul', [
                                                 "id",
                                                 "$num"
-                                            ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ] ] ] ] ] ],
-                                    [ 'stmtList', [ 'return' ] ] ] ],
+                                            ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ] ] ] ] ] ] ] ],
                             [ 'null' ] ] ] ] ]);
 
         test.done();

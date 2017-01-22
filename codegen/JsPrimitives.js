@@ -278,7 +278,7 @@ JS.fnDef = (params, body, name) => {
 
     return {
         renderTree: () => ['function', name || null, params, body.renderTree()],
-        renderJs: () => 'function ' + (name ? name + ' ' : '') + '(' + params.join(', ') + ') {\n\n' + body.renderJs() + '\n}'
+        renderJs: () => 'function ' + (name ? name + ' ' : '') + '(' + params.join(', ') + ') {\n\n' + body.renderJs() + '}'
     };
 };
 
@@ -329,7 +329,7 @@ JS.stmtList = (head, tail) => {
                 headJs = 'EXCEPTION';
             }
 
-            return headJs + (tail ? '\n' + tailJs : '');
+            return headJs + '\n' + (tailJs || '');
         },
 
         isStmtList: true,
@@ -358,8 +358,8 @@ JS.cond = (predicate, consequent, alt) => {
 
     return {
         renderTree: () => ['if', predicate.renderTree(), consequent.renderTree()].concat(alt ? [alt.renderTree()] : []),
-        renderJs: () => 'if (' + predicate.renderJs() + ') {\n' + consequent.renderJs() + '\n}' +
-        (alt ? ' else {\n' + alt.renderJs() + '\n}' : '')
+        renderJs: () => 'if (' + predicate.renderJs() + ') {\n' + consequent.renderJs() + '}' +
+        (alt ? ' else {\n' + alt.renderJs() + '}' : '')
     }
 };
 

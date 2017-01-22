@@ -53,7 +53,13 @@ __.prototype.compile = function (context) {
     // a response should compile to a non-appendable JS stmt list
 
     var following = context.getFollowing();
+
+    // if the following is a connector, include it, otherwise we can drop it
     context.setFollowing(null);
+
+    if (following == null) {
+        return response;
+    }
 
     return JS.stmtList(response, JS.stmtList(JS.return(), following));
 };

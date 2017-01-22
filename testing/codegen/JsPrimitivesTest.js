@@ -442,7 +442,7 @@ module.exports["statements"] = {
             [ 'stmtList',
                 [ 'expr-stmt', [ 'assign', [ 'id', 'bar' ], [ 'id', 'baz' ] ] ] ] ]);
 
-        test.equal(n.renderJs(), "foo = bar;\nbar = baz;");
+        test.equal(n.renderJs(), "foo = bar;\nbar = baz;\n");
 
         test.done();
     },
