@@ -7,6 +7,9 @@ test is <-> {
     _qux = foo[i].bar;
     quux = foo.bar[i];
     moi = __;
-    method = HTTP:GET;
-    server = HTTP:createServer();
+
+    method = HTTP::GET;
+    server = HTTP::createServer();
+
+    PI is JS:Math::PI;
 };

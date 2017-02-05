@@ -1,5 +1,6 @@
 {
   "type": "module",
+  "aliases": {},
   "definitions": [
     {
       "type": "constant",
@@ -42,59 +43,10 @@
               }
             }
           },
-          "tail": {
-            "type": "stmt_list",
-            "head": {
-              "type": "assign",
-              "op": "=",
-              "left": {
-                "type": "id",
-                "name": "x"
-              },
-              "right": {
-                "type": "op",
-                "op": "map",
-                "over": {
-                  "type": "id",
-                  "name": "foo"
-                },
-                "into": {
-                  "type": "procedure",
-                  "params": [
-                    "item"
-                  ],
-                  "body": {
-                    "type": "stmt_list",
-                    "head": {
-                      "type": "response",
-                      "channel": "reply",
-                      "args": [
-                        {
-                          "type": "op",
-                          "op": "*",
-                          "left": {
-                            "type": "id",
-                            "name": "item"
-                          },
-                          "right": {
-                            "type": "number",
-                            "val": "2"
-                          }
-                        }
-                      ]
-                    },
-                    "tail": null
-                  },
-                  "isService": true
-                }
-              }
-            },
-            "tail": null
-          }
+          "tail": null
         },
         "isService": true
       }
     }
-  ],
-  "references": []
+  ]
 }

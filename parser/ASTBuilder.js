@@ -43,7 +43,7 @@ __.prototype.parse = function (input) {
 __.prototype.visitModule = function(ctx) {
 
     return new Lo.module(
-        ctx.references() ? ctx.references().accept(this) : null, // todo make this [] not null
+        ctx.alias().map(alias => alias.accept(this)),
         ctx.definition().map(def => def.accept(this))
     );
 };
@@ -87,12 +87,26 @@ __.prototype.visitDefStmt = function(ctx) {
     return ctx.definition().accept(this);
 };
 
-__.prototype.visitConstant = function(ctx) {
+__.prototype.visitDefinition = function(ctx) {
 
     return new Lo.constant(
         ctx.ID().getText(),
-        ctx.literal().accept(this)
+        ctx.constant().accept(this)
     );
+};
+
+
+__.prototype.visitExternalRef = function(ctx) {
+
+    return new Lo.identifier(
+        ctx.ID().getText(),
+        ctx.modref().getText()
+    );
+};
+
+__.prototype.visitLocalConst = function(ctx) {
+
+    return ctx.literal().accept(this);
 };
 
 __.prototype.visitAssignment = function(ctx) {
@@ -229,9 +243,9 @@ __.prototype.visitWrap = function(ctx) {
     return ctx.expr().accept(this);
 };
 
-__.prototype.visitLitExpr = function(ctx) {
+__.prototype.visitConstExpr = function(ctx) {
 
-    return ctx.literal().accept(this);
+    return ctx.constant().accept(this);
 };
 
 __.prototype.visitValExpr = function(ctx) {
@@ -251,14 +265,6 @@ __.prototype.visitExprList = function(ctx) {
 __.prototype.visitId = function(ctx) {
 
     return new Lo.identifier(ctx.ID().getText());
-};
-
-__.prototype.visitExternalId = function(ctx) {
-
-    return new Lo.identifier(
-        ctx.ID(1).getText(),
-        ctx.ID(0).getText()
-    );
 };
 
 
@@ -443,7 +449,11 @@ __.prototype.visitArray = function(ctx) {
 
 __.prototype.visitRecord = function(ctx) {
 
-    return new Lo.record(ctx.fieldList().accept(this));
+    if (ctx.fieldList()) {
+        return new Lo.record(ctx.fieldList().accept(this));
+    }
+
+    return new Lo.record(ctx.exprList().accept(this));
 };
 
 __.prototype.visitSet = function (ctx) {

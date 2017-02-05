@@ -40,18 +40,21 @@ INTER_BEGIN : '"' (ESC|~[`"])* '`' {this.text = this.text.slice(1, -1);} ;
 INTER_MID   : '`' (ESC|~[`"])* '`' {this.text = this.text.slice(1, -1);} ;
 INTER_END   : '`' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1);} ;
 
-MODREF  : '<' ~[ \t\r\n]+ '>' {this.text = this.text.slice(1, -1);} ;
-
 // should a module just be a record def?
 // but records normally can't refer to their own parts...
+
 module
-    : references? definition+ EOF
+    : alias* definition+ EOF
     ;
 
-// would a colon after references improve readability?
-// or should there be a colon between the ID and the modref?
-references
-    : (ID MODREF)+ // should this not be an ID? maybe a 'label' instead?
+// declarative, not imperative
+alias
+    : 'alias' modref 'to' ID ';'
+    ;
+
+modref
+    : ID
+    | modref ':' ID
     ;
 
 // we do this the old-fashioned way because that's what the compiler wants
@@ -74,7 +77,7 @@ statement
     ;
 
 definition
-    : ID 'is' literal ';'                                   # constant
+    : ID 'is' constant ';'
     ;
 
 handlers
@@ -134,13 +137,16 @@ expr
     | '(' expr ')'                                              # wrap
     | expr '[' expr ']'                                         # subscript
     | expr '[' expr '..' expr? ']'                              # slice
-    | 'map' expr expr                                           # map
     | expr '.' ID                                               # select
     | '(' ID (',' ID)+ ')'                                      # destructure
     | INTER_BEGIN interpolated INTER_END                        # dynastring
-    | literal                                                   # litExpr
-    | ID ':' ID                                                 # externalId
+    | constant                                                  # constExpr
     | ID                                                        # id
+    ;
+
+constant
+    : modref '::' ID        #externalRef
+    | literal               #localConst
     ;
 
 interpolated
@@ -161,7 +167,7 @@ literal
     | NUMBER                                    # number
     | STRING                                    # string
     | '[' exprList? ']'                         # array
-    | '[' fieldList ']'                         # record // form? compound? composite? frame?
+    | '(' (fieldList|exprList) ')'              # record // form? compound? composite? frame?
     | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
     | sink                                      # handler
     | '<->' procedure                           # service

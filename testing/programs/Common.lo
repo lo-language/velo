@@ -1,5 +1,6 @@
-PI is 3.14159;
-E is 2.71828;
+PI  is 3.14159;
+E   is 2.71828;
+
 GREETING is "hello, world!";
 
 createGreeter is <-> (name) {

@@ -1,7 +1,7 @@
 
 ![Wright brothers bicycle](vancleve.png "Wright brothers bicycle")
 
-## A Lo-to-JavaScript compiler, written in Node.js. ![https://travis-ci.org/lo-language/velo](https://travis-ci.org/lo-language/velo.svg?branch=master)
+## A Lo-to-JavaScript compiler, written in Node.js ![https://travis-ci.org/lo-language/velo](https://travis-ci.org/lo-language/velo.svg?branch=master)
 
 This is a proof-of-concept compiler for the [Lo programming language](http://lolang.org). It can operate as a load-and-go compiler to seamlessly compile, load, and run a Lo program within a Node environment, or be used to build statically-linked JavaScript files for execution in Node or a browser.
 

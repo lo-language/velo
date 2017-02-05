@@ -18,17 +18,19 @@ const Q = require('q');
 /**
  * A module definition; the root of an AST. Called by the ASTBuilder
  */
-var __ = function (deps, defs) {
+var __ = function (aliases, defs) {
 
-    this.refs = deps || [];
+    this.aliases = aliases || [];
     this.defs = defs;
     this.exports = {};
-    this.deps = {};
+    this.aliases = {};
 
-    this.refs.forEach(dep => {
+    // todo -- set up aliases
 
-        this.deps[dep.id] = dep.ref;
-    });
+    // this.refs.forEach(dep => {
+    //
+    //     this.deps[dep.id] = dep.ref;
+    // });
 };
 
 /**
@@ -46,8 +48,8 @@ __.prototype.getAst = function () {
 
     return {
         type: 'module',
+        aliases: this.aliases,
         definitions: this.defs.map(def => def.getAst()),
-        references: this.refs
     };
 };
 

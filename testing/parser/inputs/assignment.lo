@@ -1,8 +1,16 @@
 test is <-> {
 
-    bar *= baz;
-    binky += 64;
     message = "hi there";
+
     foo = true;
+
     baz = #someList;
+
+    foo++;
+    foo--;
+
+    foo += 12;
+    foo -= 7;
+    foo *= 10;
+    foo /= 4;
 };
