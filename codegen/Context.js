@@ -14,6 +14,8 @@
  *
  * A context can be a module (root) context, a service context, or a sink context
  *
+ * ??? should we maintain separate contexts for the source language and the target language? kind of conflating them here
+ *
  * Created by: spurcell
  * 12/25/14
  */
@@ -21,6 +23,7 @@
 "use strict";
 
 const JS = require('./JsPrimitives');
+const Connector = require('./Connector');
 
 
 /**
@@ -308,8 +311,6 @@ __.prototype.hasFollowing = function () {
 
 /**
  * Wraps the following statements in a continuation.
- *
- * todo detect if this.following is a connector!
  *
  * @return {*} a JS AST for a ref to the continuation
  */

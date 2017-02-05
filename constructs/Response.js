@@ -10,6 +10,7 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const Connector = require('../Codegen/Connector');
 
 
 /**
@@ -61,7 +62,10 @@ __.prototype.compile = function (context) {
         return response;
     }
 
-    return JS.stmtList(response, JS.stmtList(JS.return(), following));
+    // only if we're in a non-async branch context do we need the return
+    // if the following is an async connector, we don't need the return
+
+    return JS.stmtList(response, JS.stmtList(JS.return()));
 };
 
 module.exports = __;

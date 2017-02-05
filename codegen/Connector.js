@@ -27,6 +27,7 @@ const JS = require('./JsPrimitives');
 var __ = function (context) {
 
     this.call = null;
+    this.parent = null;
 };
 
 
@@ -37,6 +38,10 @@ __.prototype.setCall = function (call) {
 
 __.prototype.renderTree = function () {
 
+    if (this.parent) {
+        return this.parent.renderTree();
+    }
+
     if (this.call) {
         return this.call.renderTree();
     }
@@ -45,11 +50,25 @@ __.prototype.renderTree = function () {
 
 __.prototype.renderJs = function () {
 
+    if (this.parent) {
+        return this.parent.renderJs();
+    }
+
     if (this.call) {
         return this.call.renderJs();
     }
 
     return '';
+};
+
+
+/**
+ * Makes this connector proxy to the given one.
+ *
+ * @param connector
+ */
+__.prototype.proxyTo = function (connector) {
+    this.parent = connector;
 };
 
 module.exports = __;

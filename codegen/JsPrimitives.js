@@ -296,14 +296,14 @@ JS.stmtList = (head, tail) => {
                 var tailTree = tail ? tail.renderTree() : null;
             }
             catch (e) {
-                tailTree = ['EXCEPTION'];
+                tailTree = ['EXCEPTION', e.stack];
             }
 
             try {
                 var headTree = head.renderTree();
             }
             catch (e) {
-                headTree = ['EXCEPTION'];
+                headTree = ['EXCEPTION', e.stack];
             }
 
             return tailTree ? ['stmtList', headTree, tailTree] : ['stmtList', headTree];
