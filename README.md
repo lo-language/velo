@@ -1,5 +1,5 @@
 
-![](vancleve.png)
+![Wright brothers bicycle](vancleve.png "Wright brothers bicycle")
 
 ## A Lo-to-JavaScript compiler, written in Node.js. ![https://travis-ci.org/lo-language/velo](https://travis-ci.org/lo-language/velo.svg?branch=master)
 

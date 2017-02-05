@@ -10,7 +10,7 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const Connector = require('../Codegen/Connector');
+const Connector = require('../codegen/Connector');
 
 
 /**
