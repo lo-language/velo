@@ -45,8 +45,16 @@ __.prototype.connect = function (call) {
     }
     else {
 
-        var contRef = this.parent.wrapFollowing();
-        this.connector.setCall(JS.stmtList(JS.exprStmt(JS.fnCall(contRef, []))));
+        // code improvement -- mmmm... hacky
+        if (this.parent.getFollowing() instanceof Connector) {
+            this.connector.proxyTo(this.parent.getFollowing());
+            this.parent.continuous = false;
+            this.parent.setFollowing(null);
+        }
+        else {
+            var contRef = this.parent.wrapFollowing();
+            this.connector.setCall(JS.stmtList(JS.exprStmt(JS.fnCall(contRef, []))));
+        }
     }
 };
 

@@ -23,21 +23,21 @@ module.exports["basics"] = {
         test.done();
     },
 
-    "reply with following stmts": function (test) {
+    "reply with following stmts should omit them": function (test) {
 
         var node = new Lo.stmtList(new Lo.response('reply'),
             new Lo.stmtList(new Lo.assignment('=', new Lo.identifier('x'), new Lo.literal('number', '47'))));
 
-        test.deepEqual(node.compile(new Context().createInner(true), JS.stmtList()).renderTree(),
+        var result = node.compile(new Context().createInner(true));
+
+        test.deepEqual(result.renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'respond' ],
                         [ [ 'string', 'reply' ], [ 'arrayLiteral', [] ] ] ] ],
                 [ 'stmtList',
-                    [ 'return' ],
-                    [ 'stmtList',
-                        [ 'expr-stmt', [ 'assign', [ 'id', '$x' ], [ 'num', '47' ] ] ] ] ] ]);
+                    [ 'return' ] ] ]);
         test.done();
     },
 

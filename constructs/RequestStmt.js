@@ -14,7 +14,7 @@ const BranchContext = require('../codegen/BranchContext');
 
 
 /**
- * A "function call" (request) expression
+ * A "function call" (request) statement
  *
  * @param address
  * @param args
@@ -64,7 +64,7 @@ __.prototype.compile = function (context) {
             this.failHandler ? this.failHandler.compile(context) : JS.NULL
         ]));
 
-    if (this.blocking == false) {
+    if (this.blocking == false || context.getFollowing() == null) {
         return nonBlocking;
     }
 
@@ -74,6 +74,7 @@ __.prototype.compile = function (context) {
     var replyHandler, failHandler;
 
     var contRef = context.wrapFollowing();
+
     var contCall = contRef ? JS.stmtList(JS.exprStmt(JS.fnCall(contRef, []))) : null;
 
     // we just drop in the call as the connector since we know the branches are async

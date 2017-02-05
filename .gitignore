@@ -5,3 +5,4 @@ docs/output
 .DS_store
 /testing/coverage/
 .istanbul.yml
+scratch*
