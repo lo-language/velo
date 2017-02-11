@@ -77,7 +77,7 @@ statement
     ;
 
 definition
-    : ID 'is' constant ';'
+    : ID 'is' expr ';'
     ;
 
 handlers
@@ -140,13 +140,9 @@ expr
     | expr '.' ID                                               # select
     | '(' ID (',' ID)+ ')'                                      # destructure
     | INTER_BEGIN interpolated INTER_END                        # dynastring
-    | constant                                                  # constExpr
+    | literal                                                   # literalExpr
+    | modref '::' ID                                            # externalRef
     | ID                                                        # id
-    ;
-
-constant
-    : modref '::' ID        #externalRef
-    | literal               #localConst
     ;
 
 interpolated

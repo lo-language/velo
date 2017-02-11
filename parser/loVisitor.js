@@ -167,6 +167,11 @@ loVisitor.prototype.visitConcat = function(ctx) {
 };
 
 
+// Visit a parse tree produced by loParser#externalRef.
+loVisitor.prototype.visitExternalRef = function(ctx) {
+};
+
+
 // Visit a parse tree produced by loParser#cardinality.
 loVisitor.prototype.visitCardinality = function(ctx) {
 };
@@ -197,6 +202,11 @@ loVisitor.prototype.visitBytes = function(ctx) {
 };
 
 
+// Visit a parse tree produced by loParser#literalExpr.
+loVisitor.prototype.visitLiteralExpr = function(ctx) {
+};
+
+
 // Visit a parse tree produced by loParser#syncCall.
 loVisitor.prototype.visitSyncCall = function(ctx) {
 };
@@ -214,21 +224,6 @@ loVisitor.prototype.visitWrap = function(ctx) {
 
 // Visit a parse tree produced by loParser#destructure.
 loVisitor.prototype.visitDestructure = function(ctx) {
-};
-
-
-// Visit a parse tree produced by loParser#constExpr.
-loVisitor.prototype.visitConstExpr = function(ctx) {
-};
-
-
-// Visit a parse tree produced by loParser#externalRef.
-loVisitor.prototype.visitExternalRef = function(ctx) {
-};
-
-
-// Visit a parse tree produced by loParser#localConst.
-loVisitor.prototype.visitLocalConst = function(ctx) {
 };
 
 

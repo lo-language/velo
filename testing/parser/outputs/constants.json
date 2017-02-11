@@ -1,0 +1,107 @@
+{
+  "type": "module",
+  "aliases": {},
+  "definitions": [
+    {
+      "type": "constant",
+      "name": "name",
+      "value": {
+        "type": "string",
+        "val": "Bigfoot Bjornsen"
+      }
+    },
+    {
+      "type": "constant",
+      "name": "game",
+      "value": {
+        "type": "request_expr",
+        "address": {
+          "type": "id",
+          "name": "getGame"
+        },
+        "args": [],
+        "blocking": true
+      }
+    },
+    {
+      "type": "constant",
+      "name": "test",
+      "value": {
+        "type": "procedure",
+        "params": [],
+        "body": {
+          "type": "stmt_list",
+          "head": {
+            "type": "constant",
+            "name": "crew",
+            "value": {
+              "type": "set",
+              "elements": [
+                {
+                  "type": "string",
+                  "val": "Mike Collins"
+                },
+                {
+                  "type": "string",
+                  "val": "Neil Armstrong"
+                },
+                {
+                  "type": "string",
+                  "val": "Buzz Aldrin"
+                }
+              ]
+            }
+          },
+          "tail": {
+            "type": "stmt_list",
+            "head": {
+              "type": "constant",
+              "name": "timeStep",
+              "value": {
+                "type": "request_expr",
+                "address": {
+                  "type": "select",
+                  "record": {
+                    "type": "select",
+                    "record": {
+                      "type": "id",
+                      "name": "env"
+                    },
+                    "field": "clock"
+                  },
+                  "field": "interval"
+                },
+                "args": [
+                  {
+                    "type": "id",
+                    "name": "UPDATE_INTERVAL"
+                  }
+                ],
+                "blocking": true
+              }
+            },
+            "tail": {
+              "type": "stmt_list",
+              "head": {
+                "type": "constant",
+                "name": "moon",
+                "value": {
+                  "type": "request_expr",
+                  "address": {
+                    "type": "id",
+                    "name": "create",
+                    "scope": "Moon"
+                  },
+                  "args": [],
+                  "blocking": true
+                }
+              },
+              "tail": null
+            }
+          }
+        },
+        "isService": true
+      }
+    }
+  ]
+}

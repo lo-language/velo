@@ -91,7 +91,7 @@ __.prototype.visitDefinition = function(ctx) {
 
     return new Lo.constant(
         ctx.ID().getText(),
-        ctx.constant().accept(this)
+        ctx.expr().accept(this)
     );
 };
 
@@ -104,7 +104,7 @@ __.prototype.visitExternalRef = function(ctx) {
     );
 };
 
-__.prototype.visitLocalConst = function(ctx) {
+__.prototype.visitLiteralExpr = function(ctx) {
 
     return ctx.literal().accept(this);
 };
