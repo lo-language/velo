@@ -4,9 +4,4 @@ test is <-> (log) {
 
         log(item);
     }
-
-    x = map foo <-> (item) {
-
-        reply item * 2;
-    };
 };

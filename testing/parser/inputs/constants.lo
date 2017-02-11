@@ -1,0 +1,17 @@
+name is "Bigfoot Bjornsen";
+
+game is getGame();  // this is grammatical but a compile error
+
+test is <-> {
+
+    crew is {
+
+        "Mike Collins",
+        "Neil Armstrong",
+        "Buzz Aldrin"
+    };
+
+    timeStep is env.clock.interval(UPDATE_INTERVAL);
+
+    moon is Moon::create();
+};

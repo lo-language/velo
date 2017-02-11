@@ -1,5 +1,6 @@
 {
   "type": "module",
+  "aliases": {},
   "definitions": [
     {
       "type": "constant",
@@ -172,7 +173,7 @@
                           "right": {
                             "type": "id",
                             "name": "GET",
-                            "scope": "HTTP"
+                            "module": "HTTP"
                           }
                         },
                         "tail": {
@@ -189,13 +190,25 @@
                               "address": {
                                 "type": "id",
                                 "name": "createServer",
-                                "scope": "HTTP"
+                                "module": "HTTP"
                               },
                               "args": [],
                               "blocking": true
                             }
                           },
-                          "tail": null
+                          "tail": {
+                            "type": "stmt_list",
+                            "head": {
+                              "type": "constant",
+                              "name": "PI",
+                              "value": {
+                                "type": "id",
+                                "name": "PI",
+                                "module": "JS:Math"
+                              }
+                            },
+                            "tail": null
+                          }
                         }
                       }
                     }
@@ -208,6 +221,5 @@
         "isService": true
       }
     }
-  ],
-  "references": []
+  ]
 }

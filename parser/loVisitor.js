@@ -17,8 +17,13 @@ loVisitor.prototype.visitModule = function(ctx) {
 };
 
 
-// Visit a parse tree produced by loParser#references.
-loVisitor.prototype.visitReferences = function(ctx) {
+// Visit a parse tree produced by loParser#alias.
+loVisitor.prototype.visitAlias = function(ctx) {
+};
+
+
+// Visit a parse tree produced by loParser#modref.
+loVisitor.prototype.visitModref = function(ctx) {
 };
 
 
@@ -77,8 +82,8 @@ loVisitor.prototype.visitScan = function(ctx) {
 };
 
 
-// Visit a parse tree produced by loParser#constant.
-loVisitor.prototype.visitConstant = function(ctx) {
+// Visit a parse tree produced by loParser#definition.
+loVisitor.prototype.visitDefinition = function(ctx) {
 };
 
 
@@ -147,11 +152,6 @@ loVisitor.prototype.visitSubscript = function(ctx) {
 };
 
 
-// Visit a parse tree produced by loParser#externalId.
-loVisitor.prototype.visitExternalId = function(ctx) {
-};
-
-
 // Visit a parse tree produced by loParser#addSub.
 loVisitor.prototype.visitAddSub = function(ctx) {
 };
@@ -164,6 +164,11 @@ loVisitor.prototype.visitMembership = function(ctx) {
 
 // Visit a parse tree produced by loParser#concat.
 loVisitor.prototype.visitConcat = function(ctx) {
+};
+
+
+// Visit a parse tree produced by loParser#externalRef.
+loVisitor.prototype.visitExternalRef = function(ctx) {
 };
 
 
@@ -197,6 +202,11 @@ loVisitor.prototype.visitBytes = function(ctx) {
 };
 
 
+// Visit a parse tree produced by loParser#literalExpr.
+loVisitor.prototype.visitLiteralExpr = function(ctx) {
+};
+
+
 // Visit a parse tree produced by loParser#syncCall.
 loVisitor.prototype.visitSyncCall = function(ctx) {
 };
@@ -209,16 +219,6 @@ loVisitor.prototype.visitId = function(ctx) {
 
 // Visit a parse tree produced by loParser#wrap.
 loVisitor.prototype.visitWrap = function(ctx) {
-};
-
-
-// Visit a parse tree produced by loParser#map.
-loVisitor.prototype.visitMap = function(ctx) {
-};
-
-
-// Visit a parse tree produced by loParser#litExpr.
-loVisitor.prototype.visitLitExpr = function(ctx) {
 };
 
 

@@ -1,5 +1,6 @@
 {
   "type": "module",
+  "aliases": {},
   "definitions": [
     {
       "type": "constant",
@@ -253,8 +254,8 @@
       "type": "constant",
       "name": "mottTheTuple",
       "value": {
-        "type": "array",
-        "elements": [
+        "type": "record",
+        "fields": [
           {
             "type": "string",
             "val": "Cambridge"
@@ -283,6 +284,5 @@
         ]
       }
     }
-  ],
-  "references": []
+  ]
 }

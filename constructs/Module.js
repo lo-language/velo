@@ -18,17 +18,15 @@ const Q = require('q');
 /**
  * A module definition; the root of an AST. Called by the ASTBuilder
  */
-var __ = function (deps, defs) {
+var __ = function (aliases, defs) {
 
-    this.refs = deps || [];
+    this.aliases = aliases || [];
+    this.deps = null;
     this.defs = defs;
     this.exports = {};
-    this.deps = {};
+    this.aliases = {};
 
-    this.refs.forEach(dep => {
-
-        this.deps[dep.id] = dep.ref;
-    });
+    // todo -- set up aliases
 };
 
 /**
@@ -46,13 +44,15 @@ __.prototype.getAst = function () {
 
     return {
         type: 'module',
+        aliases: this.aliases,
         definitions: this.defs.map(def => def.getAst()),
-        references: this.refs
     };
 };
 
 /**
  * Compiles this module to JS.
+ *
+ * Compiling a module discovers its dependencies.
  */
 __.prototype.compile = function () {
 
@@ -63,13 +63,16 @@ __.prototype.compile = function () {
 
     // a bunch of constants
 
-    var js = null;
+    var stmts = null;
 
     this.defs.forEach(def => {
-        js = JS.stmtList(def.compile(context), js);
+        stmts = JS.stmtList(def.compile(context), stmts);
     });
 
-    return js;
+    // pull the dependencies out of the root context
+    this.deps = context.getDeps();
+
+    return stmts;
 };
 
 /**

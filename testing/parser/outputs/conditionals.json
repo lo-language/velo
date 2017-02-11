@@ -1,5 +1,6 @@
 {
   "type": "module",
+  "aliases": {},
   "definitions": [
     {
       "type": "constant",
@@ -206,6 +207,5 @@
         "isService": true
       }
     }
-  ],
-  "references": []
+  ]
 }

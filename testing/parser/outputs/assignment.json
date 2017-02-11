@@ -1,5 +1,6 @@
 {
   "type": "module",
+  "aliases": {},
   "definitions": [
     {
       "type": "constant",
@@ -11,28 +12,28 @@
           "type": "stmt_list",
           "head": {
             "type": "assign",
-            "op": "*=",
+            "op": "=",
             "left": {
               "type": "id",
-              "name": "bar"
+              "name": "message"
             },
             "right": {
-              "type": "id",
-              "name": "baz"
+              "type": "string",
+              "val": "hi there"
             }
           },
           "tail": {
             "type": "stmt_list",
             "head": {
               "type": "assign",
-              "op": "+=",
+              "op": "=",
               "left": {
                 "type": "id",
-                "name": "binky"
+                "name": "foo"
               },
               "right": {
-                "type": "number",
-                "val": "64"
+                "type": "boolean",
+                "val": true
               }
             },
             "tail": {
@@ -42,45 +43,95 @@
                 "op": "=",
                 "left": {
                   "type": "id",
-                  "name": "message"
+                  "name": "baz"
                 },
                 "right": {
-                  "type": "string",
-                  "val": "hi there"
+                  "type": "cardinality",
+                  "operand": {
+                    "type": "id",
+                    "name": "someList"
+                  }
                 }
               },
               "tail": {
                 "type": "stmt_list",
                 "head": {
-                  "type": "assign",
-                  "op": "=",
-                  "left": {
+                  "type": "increment",
+                  "operand": {
                     "type": "id",
                     "name": "foo"
-                  },
-                  "right": {
-                    "type": "boolean",
-                    "val": true
                   }
                 },
                 "tail": {
                   "type": "stmt_list",
                   "head": {
-                    "type": "assign",
-                    "op": "=",
-                    "left": {
+                    "type": "decrement",
+                    "operand": {
                       "type": "id",
-                      "name": "baz"
-                    },
-                    "right": {
-                      "type": "cardinality",
-                      "operand": {
-                        "type": "id",
-                        "name": "someList"
-                      }
+                      "name": "foo"
                     }
                   },
-                  "tail": null
+                  "tail": {
+                    "type": "stmt_list",
+                    "head": {
+                      "type": "assign",
+                      "op": "+=",
+                      "left": {
+                        "type": "id",
+                        "name": "foo"
+                      },
+                      "right": {
+                        "type": "number",
+                        "val": "12"
+                      }
+                    },
+                    "tail": {
+                      "type": "stmt_list",
+                      "head": {
+                        "type": "assign",
+                        "op": "-=",
+                        "left": {
+                          "type": "id",
+                          "name": "foo"
+                        },
+                        "right": {
+                          "type": "number",
+                          "val": "7"
+                        }
+                      },
+                      "tail": {
+                        "type": "stmt_list",
+                        "head": {
+                          "type": "assign",
+                          "op": "*=",
+                          "left": {
+                            "type": "id",
+                            "name": "foo"
+                          },
+                          "right": {
+                            "type": "number",
+                            "val": "10"
+                          }
+                        },
+                        "tail": {
+                          "type": "stmt_list",
+                          "head": {
+                            "type": "assign",
+                            "op": "/=",
+                            "left": {
+                              "type": "id",
+                              "name": "foo"
+                            },
+                            "right": {
+                              "type": "number",
+                              "val": "4"
+                            }
+                          },
+                          "tail": null
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -89,6 +140,5 @@
         "isService": true
       }
     }
-  ],
-  "references": []
+  ]
 }

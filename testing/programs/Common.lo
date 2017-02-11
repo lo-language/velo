@@ -1,14 +1,15 @@
-PI is 3.14159;
-E is 2.71828;
+PI  is 3.14159;
+E   is 2.71828;
+
 GREETING is "hello, world!";
 
 createGreeter is <-> (name) {
 
-    reply [
+    reply (
 
         greet: <-> (io) {
 
             io.out.write("hello, `name`!");
         }
-    ];
+    );
 };

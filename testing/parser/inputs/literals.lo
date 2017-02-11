@@ -26,18 +26,13 @@ HardyRamanujan is <-> {
     reply 1729;
 };
 
-// a little sugar -- these are like macros
-// setX is set x; // sugar for <-> (newX) { x = newX; }
-// getX is get x; // sugar for <-> { reply x; }
-// could combine getter and setter into one service that if it gets 'empty' returns the cur val?
+// labeled nested record literal with no commas between top-level fields
 
-// labeled nested form literal
-// no commas between top-level fields
-student is [
-    name: [first: "Alyssa", middle: "P", last: "Hacker"]
+student is (
+    name: (first: "Alyssa", middle: "P", last: "Hacker")
     course: 6
     year: 2001
-];
+);
 
-// unlabeled form literal
-mottTheTuple is ["Cambridge", ["02138", "02139"], "MA", 1630];
+// unlabeled record literal
+mottTheTuple is ("Cambridge", ["02138", "02139"], "MA", 1630);

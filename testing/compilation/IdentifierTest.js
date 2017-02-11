@@ -23,19 +23,22 @@ module.exports["identifiers"] = {
 
         var node = new Lo.identifier('foo', 'HTTP');
 
-        var context = new Context({
+        var parent = new Context();
+        var context = parent.createInner();
 
-            resolveExternal: function (name, ref) {
-                test.equal(ref, 'HTTP');
-                return "M0.foo";
-            }
-        });
+        test.deepEqual(parent.getDeps(), {});
 
         test.deepEqual(node.compile(context).renderTree(), [ 'subscript',
             [ 'subscript',
                 [ 'select', [ 'id', 'module' ], 'deps' ],
                 [ 'string', 'HTTP' ] ],
             [ 'string', '$foo' ] ]);
+
+        // should have the side effect of declaring a dependency
+        test.deepEqual(parent.getDeps(), {
+            'HTTP': 'HTTP'
+        });
+
         test.done();
     },
 
@@ -45,25 +48,26 @@ module.exports["identifiers"] = {
 
         var node = new Lo.identifier('foo', 'HTTP');
 
-        var context = new Context({
-
-            has: function () {
-                return false;
-            },
-            
-            resolveExternal: function (name, ref) {
-                test.equal(ref, 'HTTP');
-                return "M0.foo";
-            }
-        });
+        var parent = new Context();
+        var context = parent.createInner();
 
         context.define("foo", 42);
+        test.deepEqual(parent.getDeps(), {});
 
         test.deepEqual(node.compile(context).renderTree(), [ 'subscript',
             [ 'subscript',
                 [ 'select', [ 'id', 'module' ], 'deps' ],
                 [ 'string', 'HTTP' ] ],
             [ 'string', '$foo' ] ]);
+
+        // should have the side effect of declaring a dependency
+        test.deepEqual(parent.getDeps(), {
+            'HTTP': 'HTTP'
+        });
+
+        // deps only get registered on the root context
+        test.deepEqual(context.getDeps(), {});
+
         test.done();
     }
 };
