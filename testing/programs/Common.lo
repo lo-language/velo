@@ -5,11 +5,11 @@ GREETING is "hello, world!";
 
 createGreeter is <-> (name) {
 
-    reply [
+    reply (
 
         greet: <-> (io) {
 
             io.out.write("hello, `name`!");
         }
-    ];
+    );
 };

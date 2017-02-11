@@ -21,16 +21,12 @@ const Q = require('q');
 var __ = function (aliases, defs) {
 
     this.aliases = aliases || [];
+    this.deps = null;
     this.defs = defs;
     this.exports = {};
     this.aliases = {};
 
     // todo -- set up aliases
-
-    // this.refs.forEach(dep => {
-    //
-    //     this.deps[dep.id] = dep.ref;
-    // });
 };
 
 /**
@@ -55,6 +51,8 @@ __.prototype.getAst = function () {
 
 /**
  * Compiles this module to JS.
+ *
+ * Compiling a module discovers its dependencies.
  */
 __.prototype.compile = function () {
 
@@ -65,13 +63,16 @@ __.prototype.compile = function () {
 
     // a bunch of constants
 
-    var js = null;
+    var stmts = null;
 
     this.defs.forEach(def => {
-        js = JS.stmtList(def.compile(context), js);
+        stmts = JS.stmtList(def.compile(context), stmts);
     });
 
-    return js;
+    // pull the dependencies out of the root context
+    this.deps = context.getDeps();
+
+    return stmts;
 };
 
 /**

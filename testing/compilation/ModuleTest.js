@@ -6,31 +6,32 @@
 "use strict";
 
 const Module = require('../../constructs/Module');
-const Context = require('../../codegen/Context');
-const JS = require('../../codegen/JsPrimitives');
-const util = require('util');
+const Lo = require('../../constructs');
 var Q = require('q');
 
 module.exports["load deps"] = {
 
     "no nested": function (test) {
 
-        var root = new Module([
-            {id: 'Common', ref: 'common'}
+        var root = new Module([], [
+            new Lo.constant("PI", new Lo.identifier("Pi", "Math"))
         ]);
+
+        // compiling the module discovers deps
+        var js = root.compile();
+        var mockModule = {};
 
         var mockProgram = {
 
             loadModule: function (modRef) {
 
-                test.equal(modRef, 'common');
-                return Q();
+                test.equal(modRef, 'Math');
+                return Q(mockModule);
             }
         };
 
         root.loadDeps(mockProgram).then(
             function () {
-
 
                 test.done();
             }

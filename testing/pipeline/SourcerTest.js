@@ -16,7 +16,7 @@ module.exports['basics'] = {
 
         sourcer.acquire("factorial").then(mod => {
 
-            test.deepEqual(mod.refs, []);
+            test.equal(mod.deps, null);
             test.equal(mod.defs[0].name, 'main');
             test.equal(mod.name, 'factorial');
             test.done();

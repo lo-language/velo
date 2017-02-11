@@ -37,7 +37,7 @@ __.prototype.getAst = function () {
     };
 
     if (this.nameSpace) {
-        result.scope = this.nameSpace;
+        result.module = this.nameSpace;
     }
 
     return result;
@@ -59,22 +59,9 @@ __.prototype.compile = function (context) {
 
     if (this.nameSpace) {
 
-        // having a qualifier implies a constant
-        return JS.subscript(JS.subscript(JS.select(JS.ID('module'), 'deps'), JS.string(this.nameSpace)), JS.string('$' + this.name));
+        // inform the context that we have a dependency
+        return context.getExternalRef(this.nameSpace, this.name);
     }
-
-    // commented out because resolve is now a misnomer (it just tests existence)
-    // if (context.isConstant(this.name)) {
-    //     return context.resolve(this.name);
-    // }
-
-    // see if the name is a local constant
-    // try {
-    //     return context.resolve(this.name);
-    // }
-    // catch (err) {
-    //     // ignore
-    // }
 
     // todo just return whatever the ID resolves to in this nameSpace?
     // make resolve able to return a Future or a $ name?

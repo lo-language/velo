@@ -45,6 +45,9 @@ var __ = function (parent, isService) {
     // our local symbol table, containing params, locals, constants, futures, etc.
     this.symbols = {};
 
+    // dependency set
+    this.deps = {};
+
     this.envs = [];
     this.envId = 0;
 
@@ -351,6 +354,30 @@ __.prototype.getConnector = function () {
     else if (this.parent) {
         return this.parent.getConnector();
     }
+};
+
+
+__.prototype.getExternalRef = function (modRef, id) {
+
+    if (this.parent) {
+        return this.parent.getExternalRef(modRef, id);
+    }
+
+    // the root context
+
+    // register the dependency
+    this.deps[modRef] = modRef;
+
+    return JS.subscript(JS.subscript(JS.select(JS.ID('module'), 'deps'), JS.string(modRef)), JS.string('$' + id));
+};
+
+
+/**
+ * Returns the deps collected by this context.
+ */
+__.prototype.getDeps = function () {
+
+    return this.deps;
 };
 
 

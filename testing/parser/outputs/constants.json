@@ -90,7 +90,7 @@
                   "address": {
                     "type": "id",
                     "name": "create",
-                    "scope": "Moon"
+                    "module": "Moon"
                   },
                   "args": [],
                   "blocking": true
