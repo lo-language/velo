@@ -5,6 +5,8 @@
 
 test is <-> {
 
+    foo is bar > 3 ? a : b;
+
     if foo > 2 {
         x++;
     }

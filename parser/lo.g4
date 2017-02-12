@@ -44,18 +44,18 @@ INTER_END   : '`' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1);} ;
 // but records normally can't refer to their own parts...
 
 module
-    : alias* definition+ EOF
+    : definition+ EOF   // had alias* at beginning
     ;
 
 // declarative, not imperative
-alias
-    : 'alias' modref 'to' ID ';'
-    ;
+//alias
+//    : 'alias' modref 'to' ID ';'
+//    ;
 
-modref
-    : ID
-    | modref ':' ID
-    ;
+//modref
+//    : ID
+//    | modref ':' ID
+//    ;
 
 // we do this the old-fashioned way because that's what the compiler wants
 statementList
@@ -71,6 +71,7 @@ statement
     | conditional                                           # condStmt
     | expr '(' exprList? ')' handlers                       # syncRequest
     | '@' expr '(' exprList? ')' handlers                   # asyncRequest
+    | 'on' expr sink ';'                                    # subscribe
     | expr '>>' expr ';'                                    # send  // fire-and-forget to be clear and prevent us from using @syntax; is NOT a request, note that it is a statement, not an expression; precludes reply. could reuse -> here instead
     | 'while' expr block                                    # iteration
     | 'scan' expr expr                                      # scan
@@ -133,6 +134,7 @@ expr
     | expr op=('<'|'>'|'<='|'>='|'=='|'!=') expr                # compare
     | expr op=('and'|'or') expr                                 # logical
     | expr 'in' expr                                            # membership // not sure where this guy should go, precedence-wise
+    | expr '?' expr ':' expr                                    # condExpr
     | expr '><' expr                                            # concat
     | '(' expr ')'                                              # wrap
     | expr '[' expr ']'                                         # subscript
@@ -141,7 +143,7 @@ expr
     | '(' ID (',' ID)+ ')'                                      # destructure
     | INTER_BEGIN interpolated INTER_END                        # dynastring
     | literal                                                   # literalExpr
-    | modref '::' ID                                            # externalRef
+    | ID? '::' ID                                               # moduleRef
     | ID                                                        # id
     ;
 
@@ -168,7 +170,6 @@ literal
     | sink                                      # handler
     | '<->' procedure                           # service
     | '-<' paramList?                           # event
-    | 'on' expr sink                            # subscribe  // maybe not a literal
     ;
 
 sink

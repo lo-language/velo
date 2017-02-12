@@ -13,5 +13,7 @@ test is <-> {
 
     timeStep is env.clock.interval(UPDATE_INTERVAL);
 
-    moon is Moon::create();
+    moon is ::Moon.create();
+
+    http is NPM::HTTP;
 };

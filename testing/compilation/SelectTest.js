@@ -18,7 +18,7 @@ module.exports["select"] = {
             'bar'
         );
 
-        test.deepEqual(node.compile(new Context()).renderTree(), JS.select(JS.ID('$foo'), 'bar').renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(), JS.select(JS.ID('$foo'), '$bar').renderTree());
         test.done();
     }
 };

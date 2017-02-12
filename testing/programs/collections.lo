@@ -60,11 +60,6 @@ main is <-> {
         "phi" => "Philadelphia"
     };
 
-    // todo this shouldn't work, it does incidentally
-    if cities.nyc != "New York" {
-        fail "something happened";
-    }
-
     if cities["nyc"] != "New York" {
         fail "whoops";
     }

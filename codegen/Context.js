@@ -357,18 +357,27 @@ __.prototype.getConnector = function () {
 };
 
 
-__.prototype.getExternalRef = function (modRef, id) {
+__.prototype.getModuleRef = function (namespace, name) {
 
     if (this.parent) {
-        return this.parent.getExternalRef(modRef, id);
+        return this.parent.getModuleRef(namespace, name);
     }
 
     // the root context
 
-    // register the dependency
-    this.deps[modRef] = modRef;
+    // register the dependency to be resolved later
 
-    return JS.subscript(JS.subscript(JS.select(JS.ID('module'), 'deps'), JS.string(modRef)), JS.string('$' + id));
+    if (namespace == null) {
+        namespace = '__local';
+    }
+
+    if (this.deps[namespace] == null) {
+        this.deps[namespace] = {}
+    }
+
+    this.deps[namespace][name] = name;
+
+    return JS.subscript(JS.subscript(JS.select(JS.ID('module'), 'deps'), JS.string(namespace)), JS.string(name));
 };
 
 
@@ -378,6 +387,11 @@ __.prototype.getExternalRef = function (modRef, id) {
 __.prototype.getDeps = function () {
 
     return this.deps;
+};
+
+
+__.prototype.isRValue = function () {
+    return false;
 };
 
 

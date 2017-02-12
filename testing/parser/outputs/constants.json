@@ -1,6 +1,5 @@
 {
   "type": "module",
-  "aliases": {},
   "definitions": [
     {
       "type": "constant",
@@ -88,15 +87,31 @@
                 "value": {
                   "type": "request_expr",
                   "address": {
-                    "type": "id",
-                    "name": "create",
-                    "module": "Moon"
+                    "type": "select",
+                    "record": {
+                      "type": "modref",
+                      "namespace": null,
+                      "id": "Moon"
+                    },
+                    "field": "create"
                   },
                   "args": [],
                   "blocking": true
                 }
               },
-              "tail": null
+              "tail": {
+                "type": "stmt_list",
+                "head": {
+                  "type": "constant",
+                  "name": "http",
+                  "value": {
+                    "type": "modref",
+                    "namespace": "NPM",
+                    "id": "HTTP"
+                  }
+                },
+                "tail": null
+              }
             }
           }
         },

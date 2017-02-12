@@ -94,11 +94,12 @@ module.exports["literals"] = {
             new Lo.field('Trillian', new Lo.literal('string', 'Earth')),
         ]);
 
-        test.deepEqual(node.compile(new Context()).renderTree(), [ 'objLiteral',
-            [ [ [ 'string', 'Zaphod' ], [ 'string', 'Betelgeuse' ] ],
-                [ [ 'string', 'Ford' ], [ 'string', 'Betelgeuse' ] ],
-                [ [ 'string', 'Arthur' ], [ 'string', 'Earth' ] ],
-                [ [ 'string', 'Trillian' ], [ 'string', 'Earth' ] ] ] ]);
+        test.deepEqual(node.compile(new Context()).renderTree(),
+            [ 'objLiteral',
+                [ [ [ 'string', '$Zaphod' ], [ 'string', 'Betelgeuse' ] ],
+                    [ [ 'string', '$Ford' ], [ 'string', 'Betelgeuse' ] ],
+                    [ [ 'string', '$Arthur' ], [ 'string', 'Earth' ] ],
+                    [ [ 'string', '$Trillian' ], [ 'string', 'Earth' ] ] ] ]);
 
         test.done();
     }

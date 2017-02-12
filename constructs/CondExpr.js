@@ -7,21 +7,29 @@
  *
  =============================================================================*/
 
+/**
+ * C-style conditional expression
+ *
+ * Created by seth on 11/12/16.
+ */
+
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
 
 
 /**
- * A record select (dot operator) expression
+ * A conditional expression
  *
- * @param recordExpr
- * @param field
+ * @param predicate
+ * @param consequent
+ * @param alternate
  */
-var __ = function (recordExpr, field) {
+var __ = function (predicate, consequent, alternate) {
 
-    this.recordExpr = recordExpr;
-    this.field = field;
+    this.predicate = predicate;
+    this.consequent = consequent;
+    this.alternate = alternate;
 };
 
 /**
@@ -29,11 +37,17 @@ var __ = function (recordExpr, field) {
  */
 __.prototype.getAst = function () {
 
-    return {
-        type: 'select',
-        record: this.recordExpr.getAst(),
-        field: this.field
+    var result = {
+        type: 'cond-expr',
+        predicate: this.predicate.getAst(),
+        trueVal: this.consequent.getAst()
     };
+
+    if (this.alternate) {
+        result.falseVal = this.alternate.getAst();
+    }
+
+    return result;
 };
 
 /**
@@ -43,7 +57,7 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
-    return JS.select(this.recordExpr.compile(context), '$' + this.field);
+    // todo
 };
 
 module.exports = __;

@@ -15,6 +15,8 @@
 
 const JS = require('../codegen/JsPrimitives');
 const Identifier = require('./Identifier');
+const RValueContext = require('../codegen/RValueContext');
+
 
 /**
  * An assignment statement.

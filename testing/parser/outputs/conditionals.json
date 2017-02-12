@@ -1,6 +1,5 @@
 {
   "type": "module",
-  "aliases": {},
   "definitions": [
     {
       "type": "constant",
@@ -11,29 +10,30 @@
         "body": {
           "type": "stmt_list",
           "head": {
-            "type": "conditional",
-            "predicate": {
-              "type": "op",
-              "op": ">",
-              "left": {
-                "type": "id",
-                "name": "foo"
-              },
-              "right": {
-                "type": "number",
-                "val": "2"
-              }
-            },
-            "consequent": {
-              "type": "stmt_list",
-              "head": {
-                "type": "increment",
-                "operand": {
+            "type": "constant",
+            "name": "foo",
+            "value": {
+              "type": "cond-expr",
+              "predicate": {
+                "type": "op",
+                "op": ">",
+                "left": {
                   "type": "id",
-                  "name": "x"
+                  "name": "bar"
+                },
+                "right": {
+                  "type": "number",
+                  "val": "3"
                 }
               },
-              "tail": null
+              "trueVal": {
+                "type": "id",
+                "name": "a"
+              },
+              "falseVal": {
+                "type": "id",
+                "name": "b"
+              }
             }
           },
           "tail": {
@@ -42,28 +42,17 @@
               "type": "conditional",
               "predicate": {
                 "type": "op",
-                "op": "==",
+                "op": ">",
                 "left": {
                   "type": "id",
                   "name": "foo"
                 },
                 "right": {
                   "type": "number",
-                  "val": "4"
+                  "val": "2"
                 }
               },
               "consequent": {
-                "type": "stmt_list",
-                "head": {
-                  "type": "decrement",
-                  "operand": {
-                    "type": "id",
-                    "name": "x"
-                  }
-                },
-                "tail": null
-              },
-              "alternate": {
                 "type": "stmt_list",
                 "head": {
                   "type": "increment",
@@ -88,10 +77,21 @@
                   },
                   "right": {
                     "type": "number",
-                    "val": "42"
+                    "val": "4"
                   }
                 },
                 "consequent": {
+                  "type": "stmt_list",
+                  "head": {
+                    "type": "decrement",
+                    "operand": {
+                      "type": "id",
+                      "name": "x"
+                    }
+                  },
+                  "tail": null
+                },
+                "alternate": {
                   "type": "stmt_list",
                   "head": {
                     "type": "increment",
@@ -101,26 +101,6 @@
                     }
                   },
                   "tail": null
-                },
-                "alternate": {
-                  "type": "conditional",
-                  "predicate": {
-                    "type": "op",
-                    "op": "==",
-                    "left": {
-                      "type": "id",
-                      "name": "foo"
-                    },
-                    "right": {
-                      "type": "number",
-                      "val": "15"
-                    }
-                  },
-                  "consequent": {
-                    "type": "stmt_list",
-                    "head": null,
-                    "tail": null
-                  }
                 }
               },
               "tail": {
@@ -168,37 +148,86 @@
                       "type": "stmt_list",
                       "head": null,
                       "tail": null
-                    },
-                    "alternate": {
-                      "type": "stmt_list",
-                      "head": null,
-                      "tail": null
                     }
                   }
                 },
                 "tail": {
                   "type": "stmt_list",
                   "head": {
-                    "type": "iteration",
-                    "condition": {
+                    "type": "conditional",
+                    "predicate": {
                       "type": "op",
-                      "op": "<",
+                      "op": "==",
                       "left": {
                         "type": "id",
                         "name": "foo"
                       },
                       "right": {
                         "type": "number",
-                        "val": "15"
+                        "val": "42"
                       }
                     },
-                    "statements": {
+                    "consequent": {
                       "type": "stmt_list",
-                      "head": null,
+                      "head": {
+                        "type": "increment",
+                        "operand": {
+                          "type": "id",
+                          "name": "x"
+                        }
+                      },
                       "tail": null
+                    },
+                    "alternate": {
+                      "type": "conditional",
+                      "predicate": {
+                        "type": "op",
+                        "op": "==",
+                        "left": {
+                          "type": "id",
+                          "name": "foo"
+                        },
+                        "right": {
+                          "type": "number",
+                          "val": "15"
+                        }
+                      },
+                      "consequent": {
+                        "type": "stmt_list",
+                        "head": null,
+                        "tail": null
+                      },
+                      "alternate": {
+                        "type": "stmt_list",
+                        "head": null,
+                        "tail": null
+                      }
                     }
                   },
-                  "tail": null
+                  "tail": {
+                    "type": "stmt_list",
+                    "head": {
+                      "type": "iteration",
+                      "condition": {
+                        "type": "op",
+                        "op": "<",
+                        "left": {
+                          "type": "id",
+                          "name": "foo"
+                        },
+                        "right": {
+                          "type": "number",
+                          "val": "15"
+                        }
+                      },
+                      "statements": {
+                        "type": "stmt_list",
+                        "head": null,
+                        "tail": null
+                      }
+                    },
+                    "tail": null
+                  }
                 }
               }
             }

@@ -26,8 +26,10 @@ module.exports['fail'] = {
 
         test.expect(2);
 
+        // this.harness.enableDump();
+
         this.harness.run([{
-            ok: function (task) {
+            $ok: function (task) {
                 test.ok(task.args[0]);
             }
         }]).then(
@@ -65,8 +67,8 @@ module.exports['factorial2'] = {
     'success': function (test) {
 
         var io = {
-            stdout: {
-                write: function (task) {
+            $stdout: {
+                $write: function (task) {
                     test.equal(task.args[0], '3628800\n');
                     task.respond("reply");
                 }
@@ -87,6 +89,7 @@ module.exports['collections'] = {
 
     'all': function (test) {
 
+        // this.harness.enableDump();
         this.harness.testSuccess(test);
     }
 };
@@ -106,8 +109,8 @@ module.exports['helloWorld'] = {
         // this.harness.enableDump();
 
         var io = {
-            out: {
-                write: function (task) {
+            $out: {
+                $write: function (task) {
                     console.log(task.args);
                     test.equal(task.args[0], "hello, world!");
                     task.respond("reply");
@@ -285,7 +288,7 @@ module.exports['reply arity'] = {
         // todo add a test that does this experiment within a reply handler
 
         this.harness.run([{
-            equal: function (task) {
+            $equal: function (task) {
 
                 test.deepEqual(task.args[0], task.args[1]);
             }
