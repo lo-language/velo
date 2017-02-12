@@ -8,8 +8,8 @@ test is <-> {
     quux = foo.bar[i];
     moi = __;
 
-    method = HTTP::GET;
-    server = HTTP::createServer();
+    method = Node::HTTP.GET;
+    server = Node::HTTP.createServer();
 
-    PI is JS:Math::PI;
+    PI is JS::Math.PI;
 };

@@ -43,28 +43,8 @@ __.prototype.parse = function (input) {
 __.prototype.visitModule = function(ctx) {
 
     return new Lo.module(
-        ctx.alias().map(alias => alias.accept(this)),
         ctx.definition().map(def => def.accept(this))
     );
-};
-
-__.prototype.visitReferences = function(ctx) {
-
-    var refs = [];
-
-    var offset = 0;
-
-    while (ctx.ID(offset)) {
-
-        refs.push({
-            id: ctx.ID(offset).getText(),
-            ref: ctx.MODREF(offset).getText()
-        });
-
-        offset++;
-    }
-
-    return refs;
 };
 
 __.prototype.visitStatementList = function(ctx) {
@@ -96,13 +76,16 @@ __.prototype.visitDefinition = function(ctx) {
 };
 
 
-__.prototype.visitExternalRef = function(ctx) {
+__.prototype.visitModuleRef = function (ctx) {
 
-    return new Lo.identifier(
-        ctx.ID().getText(),
-        ctx.modref().getText()
+    var ids = ctx.ID().map(id => id.getText());
+
+    return new Lo.moduleRef(
+        ids[1] ? ids[0] : null,
+        ids[1] ? ids[1] : ids[0]
     );
 };
+
 
 __.prototype.visitLiteralExpr = function(ctx) {
 
@@ -113,8 +96,8 @@ __.prototype.visitAssignment = function(ctx) {
 
     return new Lo.assignment(
         ctx.assignment_op().getText(),
-        ctx.expr(0).accept(this),
-        ctx.expr(1).accept(this)
+        ctx.expr(0).accept(this),   // l-value
+        ctx.expr(1).accept(this)    // r-value
     );
 };
 
@@ -251,6 +234,13 @@ __.prototype.visitConstExpr = function(ctx) {
 __.prototype.visitValExpr = function(ctx) {
 
     return ctx.lvalue().accept(this);
+};
+
+__.prototype.visitCondExpr = function(ctx) {
+
+    var exprs = ctx.expr().map(expr => expr.accept(this));
+
+    return new Lo.condExpr(exprs[0], exprs[1], exprs[2]);
 };
 
 __.prototype.visitExprList = function(ctx) {

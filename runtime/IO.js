@@ -15,9 +15,9 @@ const Task = require('./Task');
 
 module.exports = {
 
-    in: {
+    $in: {
 
-        listen: function (task) {
+        $listen: function (task) {
 
             var service = task.args[0];
 
@@ -38,18 +38,18 @@ module.exports = {
         }
     },
 
-    out: {
+    $out: {
 
-        write: function (task) {
+        $write: function (task) {
 
             process.stdout.write.apply(process.stdout, task.args);
             task.respond("reply");
         }
     },
 
-    err: {
+    $err: {
 
-        write: function (task) {
+        $write: function (task) {
 
             process.stderr.write.apply(process.stderr, task.args);
             task.respond("reply");

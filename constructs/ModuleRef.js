@@ -5,24 +5,23 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
+ * The machine does not isolate us from the great problems of nature but
+ * plunges us more deeply into them.
  =============================================================================*/
 
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
 
-
 /**
- * A record select (dot operator) expression
- *
- * @param recordExpr
- * @param field
+ * A module reference
  */
-var __ = function (recordExpr, field) {
+var __ = function (namespace, id) {
 
-    this.recordExpr = recordExpr;
-    this.field = field;
+    this.namespace = namespace;
+    this.name = id;
 };
+
 
 /**
  * Returns the Lo AST for this node.
@@ -30,20 +29,19 @@ var __ = function (recordExpr, field) {
 __.prototype.getAst = function () {
 
     return {
-        type: 'select',
-        record: this.recordExpr.getAst(),
-        field: this.field
+        type: 'modref',
+        namespace: this.namespace,
+        id: this.name
     };
 };
 
 /**
- * Compiles this node to JS in the given context.
- *
- * @param context
+ * Compiles this module to JS.
  */
 __.prototype.compile = function (context) {
 
-    return JS.select(this.recordExpr.compile(context), '$' + this.field);
+    return context.getModuleRef(this.namespace, this.name);
 };
+
 
 module.exports = __;

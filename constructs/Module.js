@@ -18,15 +18,15 @@ const Q = require('q');
 /**
  * A module definition; the root of an AST. Called by the ASTBuilder
  */
-var __ = function (aliases, defs) {
+var __ = function (defs) {
 
-    this.aliases = aliases || [];
     this.deps = null;
     this.defs = defs;
     this.exports = {};
     this.aliases = {};
 
     // todo -- set up aliases
+    // this.aliases = aliases || [];
 };
 
 /**
@@ -44,7 +44,7 @@ __.prototype.getAst = function () {
 
     return {
         type: 'module',
-        aliases: this.aliases,
+        // aliases: this.aliases,
         definitions: this.defs.map(def => def.getAst()),
     };
 };
@@ -101,21 +101,28 @@ __.prototype.loadDeps = function (program) {
 
     // resolve all unresolved deps
 
-    // scan our dependencies and load any that are missing
+    // iterate over the namespaces
 
-    return Q.all(Object.keys(this.deps).map(depName => {
+    return Q.all(Object.keys(this.deps).map(namespace => {
 
-        // see if we've already loaded the dep
+        return Q.all(Object.keys(this.deps[namespace]).map(module => {
 
-        if (typeof this.deps[depName] == 'string') {
+            // see if we've already loaded the dep
+            // module names are strings if they still need to be loaded; object refs otherwise
 
-            return program.loadModule(this.deps[depName]).then(exports => {
+            if (typeof module == 'string') {
 
-                return this.deps[depName] = exports;
-            });
-        }
+                // console.log("LOADING", namespace, module);
 
-        return this.deps[depName];
+                // todo -- hand this off to a sourcer per namespace
+                return program.loadModule(module).then(exports => {
+
+                    return this.deps[namespace][module] = exports;
+                });
+            }
+
+            return module;
+        }));
     }));
 };
 

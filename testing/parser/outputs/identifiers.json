@@ -1,6 +1,5 @@
 {
   "type": "module",
-  "aliases": {},
   "definitions": [
     {
       "type": "constant",
@@ -171,9 +170,13 @@
                             "name": "method"
                           },
                           "right": {
-                            "type": "id",
-                            "name": "GET",
-                            "module": "HTTP"
+                            "type": "select",
+                            "record": {
+                              "type": "modref",
+                              "namespace": "Node",
+                              "id": "HTTP"
+                            },
+                            "field": "GET"
                           }
                         },
                         "tail": {
@@ -188,9 +191,13 @@
                             "right": {
                               "type": "request_expr",
                               "address": {
-                                "type": "id",
-                                "name": "createServer",
-                                "module": "HTTP"
+                                "type": "select",
+                                "record": {
+                                  "type": "modref",
+                                  "namespace": "Node",
+                                  "id": "HTTP"
+                                },
+                                "field": "createServer"
                               },
                               "args": [],
                               "blocking": true
@@ -202,9 +209,13 @@
                               "type": "constant",
                               "name": "PI",
                               "value": {
-                                "type": "id",
-                                "name": "PI",
-                                "module": "JS:Math"
+                                "type": "select",
+                                "record": {
+                                  "type": "modref",
+                                  "namespace": "JS",
+                                  "id": "Math"
+                                },
+                                "field": "PI"
                               }
                             },
                             "tail": null

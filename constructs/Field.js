@@ -17,7 +17,7 @@ const JS = require('../codegen/JsPrimitives');
 
 
 /**
- * A set pair literal
+ * A record literal field definition
  *
  * @param label
  * @param value
@@ -48,7 +48,7 @@ __.prototype.getAst = function () {
 __.prototype.compile = function (context) {
 
     // we don't qualify field labels
-    return [JS.string(this.label), this.value.compile(context)];
+    return [JS.string('$' + this.label), this.value.compile(context)];
 };
 
 module.exports = __;
