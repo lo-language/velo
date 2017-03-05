@@ -340,7 +340,7 @@ module.exports['built-ins'] = {
 
    'success': function (test) {
 
-       this.harness.testSuccess(test, [], Math.PI);
+       this.harness.testSuccess(test, [], -1);
    }
 };
 

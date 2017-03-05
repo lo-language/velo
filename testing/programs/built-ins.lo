@@ -5,5 +5,5 @@
 
 main is <-> {
 
-    reply JS::Math.PI;
+    reply JS::Math.cos(JS::Math.PI);
 };

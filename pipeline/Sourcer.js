@@ -42,8 +42,24 @@ __.prototype.acquire = function (namespace, name) {
                 var mod = new Module([]);
 
                 mod.load = function () {
+
                     return {
-                        $PI: Math.PI
+
+                        $E: Math.E,
+
+                        $PI: Math.PI,
+
+                        $sin: function (task) {
+                            task.respond('reply', [Math.sin(task.args[0])]);
+                        },
+
+                        $cos: function (task) {
+                            task.respond('reply', [Math.cos(task.args[0])]);
+                        },
+
+                        $random: function (task) {
+                            task.respond('fail', ["naughty!"]);
+                        }
                     };
                 };
 

@@ -124,7 +124,7 @@ expr
     | expr op=('+'|'-') expr                                    # addSub
     | expr op=('<'|'>'|'<='|'>='|'=='|'!=') expr                # compare
     | expr op=('and'|'or') expr                                 # logical
-    | expr 'in' expr                                            # membership // not sure where this guy should go, precedence-wise
+    | expr ('has'|'contains') expr                                           # membership // not sure where this guy should go, precedence-wise
     | expr '?' expr ':' expr                                    # condExpr
     | expr '><' expr                                            # concat
     | '(' expr ')'                                              # wrap

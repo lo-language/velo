@@ -67,8 +67,8 @@ module.exports["op"] = {
     "in operator": function (test) {
 
         var node = new Lo.membership(
-            new Lo.literal('string', 'trillian'),
-            new Lo.identifier('dudes'));
+            new Lo.identifier('dudes'),
+            new Lo.literal('string', 'trillian'));
 
         test.deepEqual(node.compile(new Context()).renderTree(), [ 'call',
             [ 'select', [ 'id', 'task' ], 'in' ],
