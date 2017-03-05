@@ -17,6 +17,14 @@ module.exports = {
 
     $in: {
 
+        $isTTY: process.stdin.isTTY,
+
+        $setRawMode: function (task) {
+
+            process.stdin.setRawMode(task.args[0]);
+            task.respond("reply");
+        },
+
         $listen: function (task) {
 
             var service = task.args[0];

@@ -15,13 +15,13 @@ const JS = require('../codegen/JsPrimitives');
 /**
  * A set membership test operator expression
  *
- * @param left
- * @param right
+ * @param set
+ * @param member
  */
-var __ = function (left, right) {
+var __ = function (set, member) {
 
-    this.left = left;
-    this.right = right;
+    this.set = set;
+    this.member = member;
 };
 
 /**
@@ -30,9 +30,9 @@ var __ = function (left, right) {
 __.prototype.getAst = function () {
 
     return {
-        type: 'in',
-        left: this.left.getAst(),
-        right: this.right.getAst()
+        type: 'testMembership',
+        set: this.set.getAst(),
+        member: this.member.getAst()
     };
 };
 
@@ -45,8 +45,8 @@ __.prototype.compile = function (context) {
 
     return JS.runtimeCall(
         'in', [
-            this.left.compile(context),
-            this.right.compile(context)
+            this.member.compile(context),
+            this.set.compile(context)
         ]);
 };
 

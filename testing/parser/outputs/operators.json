@@ -97,12 +97,12 @@
                     "name": "foo"
                   },
                   "right": {
-                    "type": "in",
-                    "left": {
+                    "type": "testMembership",
+                    "set": {
                       "type": "id",
                       "name": "baz"
                     },
-                    "right": {
+                    "member": {
                       "type": "id",
                       "name": "bar"
                     }
@@ -118,23 +118,14 @@
                       "name": "foo"
                     },
                     "right": {
-                      "type": "op",
-                      "op": "or",
-                      "left": {
-                        "type": "op",
-                        "op": "and",
-                        "left": {
-                          "type": "id",
-                          "name": "baz"
-                        },
-                        "right": {
-                          "type": "id",
-                          "name": "bar"
-                        }
-                      },
-                      "right": {
+                      "type": "testMembership",
+                      "set": {
                         "type": "id",
-                        "name": "buzzy"
+                        "name": "baz"
+                      },
+                      "member": {
+                        "type": "id",
+                        "name": "bar"
                       }
                     }
                   },
@@ -145,22 +136,53 @@
                       "op": "=",
                       "left": {
                         "type": "id",
-                        "name": "doghouse"
+                        "name": "foo"
                       },
                       "right": {
                         "type": "op",
-                        "op": "concat",
+                        "op": "or",
                         "left": {
-                          "type": "string",
-                          "val": "dog"
+                          "type": "op",
+                          "op": "and",
+                          "left": {
+                            "type": "id",
+                            "name": "baz"
+                          },
+                          "right": {
+                            "type": "id",
+                            "name": "bar"
+                          }
                         },
                         "right": {
-                          "type": "string",
-                          "val": "house"
+                          "type": "id",
+                          "name": "buzzy"
                         }
                       }
                     },
-                    "tail": null
+                    "tail": {
+                      "type": "stmt_list",
+                      "head": {
+                        "type": "assign",
+                        "op": "=",
+                        "left": {
+                          "type": "id",
+                          "name": "doghouse"
+                        },
+                        "right": {
+                          "type": "op",
+                          "op": "concat",
+                          "left": {
+                            "type": "string",
+                            "val": "dog"
+                          },
+                          "right": {
+                            "type": "string",
+                            "val": "house"
+                          }
+                        }
+                      },
+                      "tail": null
+                    }
                   }
                 }
               }
