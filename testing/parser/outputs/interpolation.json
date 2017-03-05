@@ -88,7 +88,35 @@
                   "right": "."
                 }
               },
-              "tail": null
+              "tail": {
+                "type": "stmt_list",
+                "head": {
+                  "type": "assign",
+                  "op": "=",
+                  "left": {
+                    "type": "id",
+                    "name": "foo"
+                  },
+                  "right": {
+                    "type": "interpolation",
+                    "left": "",
+                    "middle": {
+                      "type": "op",
+                      "op": "+",
+                      "left": {
+                        "type": "id",
+                        "name": "bar"
+                      },
+                      "right": {
+                        "type": "id",
+                        "name": "baz"
+                      }
+                    },
+                    "right": ""
+                  }
+                },
+                "tail": null
+              }
             }
           }
         },

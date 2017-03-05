@@ -56,7 +56,7 @@ module.exports["basics"] = {
 
         program.exports["math"] = exports;
 
-        program.loadModule("math").then(
+        program.loadModule(null, "math").then(
             function (exported) {
                 test.equal(exported, exports);
                 test.done();
@@ -66,7 +66,7 @@ module.exports["basics"] = {
 
     "loadModule loads and caches": function (test) {
 
-        test.expect(3);
+        test.expect(4);
 
         var exports = {
             $main: "snarf"
@@ -84,18 +84,19 @@ module.exports["basics"] = {
         };
 
         var program = new Program(mod, {
-            acquire: function (ref) {
+            acquire: function (namespace, name) {
 
-                test.equal(ref, 'math');
+                test.equal(namespace, 'JS')
+                test.equal(name, 'Math');
                 return Q(mod);
             }
         });
 
-        program.loadModule("math").then(
+        program.loadModule('JS', "Math").then(
             function (exported) {
 
                 test.equal(exported, exports);
-                test.equal(program.exports["math"], exports);
+                test.equal(program.exports["Math"], exports);
                 test.done();
             }
         ).done();

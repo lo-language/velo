@@ -86,7 +86,6 @@ __.prototype.visitModuleRef = function (ctx) {
     );
 };
 
-
 __.prototype.visitLiteralExpr = function(ctx) {
 
     return ctx.literal().accept(this);
@@ -383,15 +382,6 @@ __.prototype.visitString = function(ctx) {
     return new Lo.literal('string', ctx.STRING().getText());
 };
 
-__.prototype.visitDynastring = function(ctx) {
-
-    return new Lo.interpolation(
-        ctx.INTER_BEGIN().getText(),
-        ctx.interpolated().accept(this),
-        ctx.INTER_END().getText()
-    );
-};
-
 __.prototype.visitInterpolated = function(ctx) {
 
     var mid = ctx.INTER_MID();
@@ -406,6 +396,24 @@ __.prototype.visitInterpolated = function(ctx) {
     }
 
     return ctx.expr().accept(this);
+};
+
+__.prototype.visitStringify = function(ctx) {
+
+    return new Lo.interpolation(
+        '',
+        ctx.expr().accept(this),
+        ''
+    );
+};
+
+__.prototype.visitDynastring = function(ctx) {
+
+    return new Lo.interpolation(
+        ctx.INTER_BEGIN().getText(),
+        ctx.interpolated().accept(this),
+        ctx.INTER_END().getText()
+    );
 };
 
 __.prototype.visitService = function(ctx) {

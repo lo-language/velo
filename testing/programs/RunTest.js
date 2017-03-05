@@ -330,22 +330,19 @@ module.exports['reply handling'] = {
 };
 
 
-// //module.exports['recovery'] = {
-// //
-// //    "setUp": function (cb) {
-// //
-// //        this.harness = new Harness(loader, 'recovery');
-// //
-// //        this.harness.setUp(cb);
-// //    },
-// //
-// //    'success': function (test) {
-// //
-// //        console.log(util.inspect(this.harness.parse(), {depth: null, colors: true}));
-// ////        console.log(this.harness.renderJs().render(true));
-// //        this.harness.testSuccess(test, [], "oh no!");
-// //    }
-// //};
+module.exports['built-ins'] = {
+
+   "setUp": function (cb) {
+
+       this.harness = new Harness(__dirname, 'built-ins');
+       cb();
+   },
+
+   'success': function (test) {
+
+       this.harness.testSuccess(test, [], Math.PI);
+   }
+};
 
 
 //module.exports['fibonacci2'] = {

@@ -356,16 +356,20 @@ __.prototype.getConnector = function () {
     }
 };
 
-
+/**
+ * Records a dependency.
+ *
+ * @param namespace
+ * @param name
+ * @returns JS
+ */
 __.prototype.getModuleRef = function (namespace, name) {
 
     if (this.parent) {
         return this.parent.getModuleRef(namespace, name);
     }
 
-    // the root context
-
-    // register the dependency to be resolved later
+    // we're in the root context, so register the dependency to be resolved later
 
     if (namespace == null) {
         namespace = '__local';

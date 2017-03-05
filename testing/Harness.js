@@ -32,7 +32,7 @@ __.prototype.enableDump = function () {
  */
 __.prototype.run = function (args) {
 
-    return this.sourcer.acquire(this.mainModName).then(
+    return this.sourcer.acquire(null, this.mainModName).then(
         main => {
 
             var program = new Program(main, this.sourcer);

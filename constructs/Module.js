@@ -20,7 +20,7 @@ const Q = require('q');
  */
 var __ = function (defs) {
 
-    this.deps = null;
+    this.deps = [];
     this.defs = defs;
     this.exports = {};
     this.aliases = {};
@@ -105,23 +105,23 @@ __.prototype.loadDeps = function (program) {
 
     return Q.all(Object.keys(this.deps).map(namespace => {
 
-        return Q.all(Object.keys(this.deps[namespace]).map(module => {
+        return Q.all(Object.keys(this.deps[namespace]).map(name => {
 
             // see if we've already loaded the dep
             // module names are strings if they still need to be loaded; object refs otherwise
 
-            if (typeof module == 'string') {
+            if (typeof name == 'string') {
 
-                // console.log("LOADING", namespace, module);
+                // console.log("LOADING", namespace, name);
 
                 // todo -- hand this off to a sourcer per namespace
-                return program.loadModule(module).then(exports => {
+                return program.loadModule(namespace, name).then(exports => {
 
-                    return this.deps[namespace][module] = exports;
+                    return this.deps[namespace][name] = exports;
                 });
             }
 
-            return module;
+            return name;
         }));
     }));
 };

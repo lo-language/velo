@@ -1,16 +1,7 @@
 grammar lo;
 
-// could *start* in newline mode
-// when we find indent in newline mode
-// scan each line, when we find non-ws
-// if we find whitespace,
-
-//NEWLINE         : '\r'? '\n' -> pushMode(newline);
-
-//mode newline;
-
 WS              : [ \t\r\n]+ -> skip ;
-LINE_COMMENT    : '//' .*? '\r'? '\n' -> skip ; // from BCPL!
+LINE_COMMENT    : '//' .*? '\r'? ('\n'|EOF) -> skip ; // thanks, BCPL!
 COMMENT         : '/*' .*? '*/' -> skip ;
 BEGIN           : '{' ;
 END             : '}' ;
@@ -36,9 +27,9 @@ NUMBER
 ID      : ID_LETTER (ID_LETTER | DIGIT)* ;
 
 STRING      : '"' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1);} ;
-INTER_BEGIN : '"' (ESC|~[`"])* '`' {this.text = this.text.slice(1, -1);} ;
-INTER_MID   : '`' (ESC|~[`"])* '`' {this.text = this.text.slice(1, -1);} ;
-INTER_END   : '`' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1);} ;
+INTER_BEGIN : '"' (ESC|~[`"])* '`' {this.text = this.text.slice(1, -1); this.inString = true;} ;
+INTER_MID   : {this.inString}? '`' (ESC|~[`"])* '`' {this.text = this.text.slice(1, -1);} ;
+INTER_END   : '`' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1); this.inString = false;} ;
 
 // should a module just be a record def?
 // but records normally can't refer to their own parts...
@@ -137,6 +128,7 @@ expr
     | expr '?' expr ':' expr                                    # condExpr
     | expr '><' expr                                            # concat
     | '(' expr ')'                                              # wrap
+    | '`' expr '`'                                              # stringify
     | expr '[' expr ']'                                         # subscript
     | expr '[' expr '..' expr? ']'                              # slice
     | expr '.' ID                                               # select
@@ -165,7 +157,7 @@ literal
     | NUMBER                                    # number
     | STRING                                    # string
     | '[' exprList? ']'                         # array
-    | '(' (fieldList|exprList) ')'              # record // form? compound? composite? frame?
+    | '(' fieldList ')'                         # record // form? compound? composite? frame?
     | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
     | sink                                      # handler
     | '<->' procedure                           # service
