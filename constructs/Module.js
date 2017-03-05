@@ -13,6 +13,7 @@
 
 const JS = require('../codegen/JsPrimitives');
 const Context = require('../codegen/Context');
+const vm = require('vm');
 const Q = require('q');
 
 /**
@@ -82,12 +83,19 @@ __.prototype.load = function () {
 
     var body = this.compile().renderJs();
 
-    var loadMod = new Function("module",
-        "'use strict';\n\n" +
-        body + '\n\n');
+    // in the browser we can do it this way:
+    // var loadMod = new Function("module",
+    //     "'use strict';\n\n" +
+    //     body + '\n\n');
+    //
+    // // load that bad boy
+    // loadMod(this);
 
-    // load that bad boy
-    loadMod(this);
+    var code = "(function(module) {'use strict';\n\n" + body + '\n\n})';
+
+    vm.runInNewContext(code, {
+        setImmediate: global.setImmediate
+    })(this);
 
     return this.exports;
 };
