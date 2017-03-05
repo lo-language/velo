@@ -12,6 +12,7 @@
 const fs = require('fs');
 const Q = require('q');
 const ASTBuilder = require('./../parser/ASTBuilder');
+const Module = require('./../constructs/Module');
 
 
 var __ = function (basePath) {
@@ -23,22 +24,45 @@ var __ = function (basePath) {
 /**
  * Acquires the specified module as an AST, ready to compile.
  *
- * @param modRef
+ * @param namespace
+ * @param name
  * @return {Module}
  */
-__.prototype.acquire = function (modRef) {
+__.prototype.acquire = function (namespace, name) {
 
-    var path = this.basePath + '/' + modRef + '.lo';
+    // see if the modref is a built-in
+
+    if (namespace == 'JS') {
+
+        if (name == 'Math') {
+
+            // HACK ALERT!
+            return Q().then(function () {
+
+                var mod = new Module([]);
+
+                mod.load = function () {
+                    return {
+                        $PI: Math.PI
+                    };
+                };
+
+                return mod;
+            });
+        }
+    }
+
+    var path = this.basePath + '/' + name + '.lo';
 
     // read the file
     return Q.denodeify(fs.readFile)(path, 'utf8').then(source => {
 
-        process.stderr.write("PARSING   " + modRef);
+        process.stderr.write("PARSING   " + name);
 
         var start = new Date();
         var module = new ASTBuilder().parse(source);
 
-        module.setName(modRef);
+        module.setName(name);
 
         process.stderr.write(" [" + (new Date().getTime() - start.getTime()) + "ms]\n");
 

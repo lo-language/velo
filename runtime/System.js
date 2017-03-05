@@ -11,36 +11,13 @@
 
 const Task = require('./Task');
 
+// any provided ports should be stuffed into this
+
 module.exports = {
 
-    clock: {
+    $in: {
 
-        trigger: function (task) {
-
-            var service = task.args[0];
-            var delay = task.args[1];
-            var interval = task.args[2];
-
-            // creates a root task
-
-            if (interval == 0) {
-                setTimeout(function () {
-                    Task.sendRootRequest(service, [], function () {}, function () {})
-                }, delay);
-            }
-            else {
-                setInterval(function () {
-                    Task.sendRootRequest(service, [], function () {}, function () {})
-                }, interval);
-            }
-
-            task.respond("reply");
-        }
-    },
-
-    keyboard: {
-
-        listen: function (task) {
+        $listen: function (task) {
 
             var service = task.args[0];
 
@@ -57,6 +34,36 @@ module.exports = {
                 }
             });
 
+            task.respond("reply");
+        }
+    },
+
+    $out: {
+
+        $write: function (task) {
+
+            process.stdout.write.apply(process.stdout, task.args);
+            task.respond("reply");
+        },
+
+        $writeln: function (task) {
+
+            process.stdout.write(task.args + '\n');
+            task.respond("reply");
+        }
+    },
+
+    $err: {
+
+        $write: function (task) {
+
+            process.stderr.write.apply(process.stderr, task.args);
+            task.respond("reply");
+        },
+
+        $writeln: function (task) {
+
+            process.stderr.write(task.args + '\n');
             task.respond("reply");
         }
     }

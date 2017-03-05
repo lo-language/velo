@@ -3,7 +3,7 @@
 
 ## A Lo-to-JavaScript compiler, written in Node.js [![Build Status](https://travis-ci.org/lo-language/velo.svg?branch=master)](https://travis-ci.org/lo-language/velo)
 
-This is a proof-of-concept compiler for the [Lo programming language](http://lolang.org). It can operate as a load-and-go compiler to seamlessly compile, load, and run a Lo program within a Node environment, or be used to build statically-linked JavaScript files for execution in Node or a browser.
+This is a proof-of-concept compiler for the [Lo](http://lolang.org) programming language. It can operate as a load-and-go compiler to seamlessly compile, load, and run a Lo program within a Node environment, or be used to build statically-linked JavaScript files for execution in Node or a browser.
 
 ## Installation
 
@@ -32,6 +32,11 @@ The root module of a Lo program must define a `main` service that takes two argu
 
 The first argument is the array of strings provided on the command line after the root module name (arguments before the root module name are handled by Velo). The second argument is the [system API](system.md) object, which contains all the authority available to the program.
 
+
+#### To compile a program and dump the JavaScript to the console
+
+    $ velo dump <root module>
+    
 #### To build a statically-linked Node.js executable
 
     $ velo build <root module>

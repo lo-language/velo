@@ -22,7 +22,6 @@ const util = require('util');
 const path = require('path');
 const argv = require('minimist')(process.argv.slice(2));
 
-const IO = require('../runtime/IO');
 const System = require('../runtime/System');
 
 const Sourcer = require('../pipeline/Sourcer');
@@ -39,7 +38,7 @@ if (sourceFile == null) {
 
 var sourcer = new Sourcer(path.dirname(sourceFile));
 
-sourcer.acquire(path.basename(sourceFile, '.lo')).then(
+sourcer.acquire(null, path.basename(sourceFile, '.lo')).then(
     function (main) {
 
         var program = new Program(main, sourcer);
@@ -59,7 +58,7 @@ sourcer.acquire(path.basename(sourceFile, '.lo')).then(
         //     return new NodeBuilder().build(program, argv.build);
         // }
 
-        return program.run([argv._, IO, System]);
+        return program.run([argv._, System]);
 
     }).catch(
     function (err) {

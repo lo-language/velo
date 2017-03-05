@@ -14,9 +14,9 @@ module.exports['basics'] = {
 
         var sourcer = new Sourcer(__dirname + '/../programs');
 
-        sourcer.acquire("factorial").then(mod => {
+        sourcer.acquire(null, "factorial").then(mod => {
 
-            test.equal(mod.deps, null);
+            test.deepEqual(mod.deps, []);
             test.equal(mod.defs[0].name, 'main');
             test.equal(mod.name, 'factorial');
             test.done();
@@ -29,7 +29,7 @@ module.exports['basics'] = {
 
         var sourcer = new Sourcer(__dirname);
 
-        sourcer.acquire("collections").then(
+        sourcer.acquire(null, "collections").then(
             test.fail.bind(test),
             function (err) {
 

@@ -49,24 +49,25 @@ var __ = function (rootModule, resolver) {
 /**
  * Recursively resolves the specified module (checking the cache first) and loads it.
  *
- * @param modRef
+ * @param namespace
+ * @param name
  * @return promise for the module's exports
  */
-__.prototype.loadModule = function (modRef) {
+__.prototype.loadModule = function (namespace, name) {
 
-    if (this.exports[modRef]) {
-        return Q(this.exports[modRef]);
+    if (this.exports[name]) {
+        return Q(this.exports[name]);
     }
 
-    return this.resolver.acquire(modRef).then(
+    return this.resolver.acquire(namespace, name).then(
         mod => {
 
             // stash the exports
-            this.exports[modRef] = mod.load();
+            this.exports[name] = mod.load();
 
             return mod.loadDeps(this).then(
                 () => {
-                    return this.exports[modRef];
+                    return this.exports[name];
                 }
             );
         }
