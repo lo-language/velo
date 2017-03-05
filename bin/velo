@@ -29,6 +29,7 @@ const Sourcer = require('../pipeline/Sourcer');
 const Program = require('../pipeline/Program');
 // const NodeBuilder = require('../pipeline/NodeBuilder');
 
+var cmd = argv._.shift();
 var sourceFile = argv._.shift();
 
 if (sourceFile == null) {
@@ -43,8 +44,13 @@ sourcer.acquire(path.basename(sourceFile, '.lo')).then(
 
         var program = new Program(main, sourcer);
 
-        if (argv.dump != null) {
+        if (cmd == 'dump') {
             return program.dump();
+        }
+
+        if (cmd == 'build') {
+            console.error("building not supported yet");
+            return;
         }
 
         // see if we should build

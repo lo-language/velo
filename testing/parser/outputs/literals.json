@@ -248,40 +248,6 @@
           }
         ]
       }
-    },
-    {
-      "type": "constant",
-      "name": "mottTheTuple",
-      "value": {
-        "type": "record",
-        "fields": [
-          {
-            "type": "string",
-            "val": "Cambridge"
-          },
-          {
-            "type": "array",
-            "elements": [
-              {
-                "type": "string",
-                "val": "02138"
-              },
-              {
-                "type": "string",
-                "val": "02139"
-              }
-            ]
-          },
-          {
-            "type": "string",
-            "val": "MA"
-          },
-          {
-            "type": "number",
-            "val": "1630"
-          }
-        ]
-      }
     }
   ]
 }

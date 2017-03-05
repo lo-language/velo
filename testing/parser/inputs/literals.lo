@@ -35,4 +35,4 @@ student is (
 );
 
 // unlabeled record literal
-mottTheTuple is ("Cambridge", ["02138", "02139"], "MA", 1630);
+//mottTheTuple is ("Cambridge", ["02138", "02139"], "MA", 1630);
