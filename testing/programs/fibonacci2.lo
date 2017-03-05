@@ -2,22 +2,29 @@
  * iterative fibonacci number calculator
  */
 
-receive n;
+main is <-> (n) {
 
-if n < 0:
-    fail "Whatsamatta, you?";
+    if n < 0 {
+        fail "Whatsamatta, you?";
+    }
 
-if n <= 1:
-    reply n;
+    if n <= 1 {
+        reply n;
+    }
 
-j = 0;
-k = 1;
-num = 1;
+    j = 0;
+    k = 1;
+    num = 1;
+    count = 2;
 
-2..n >>
-    num = j + k;
-    j = k;
-    k = num;
-;
+    while count <= n {
 
-reply num;
+        num = j + k;
+        j = k;
+        k = num;
+
+        count++;
+    }
+
+    reply num;
+};

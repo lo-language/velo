@@ -28,8 +28,17 @@ const Sourcer = require('../pipeline/Sourcer');
 const Program = require('../pipeline/Program');
 // const NodeBuilder = require('../pipeline/NodeBuilder');
 
+var commands = ['run', 'build', 'dump'];
+
 var cmd = argv._.shift();
 var sourceFile = argv._.shift();
+
+if (commands.indexOf(cmd) == -1) {
+
+    console.error("unknown command '" + cmd + "'");
+    console.error("valid commands are:", commands.join(', '));
+    process.exit(1);
+}
 
 if (sourceFile == null) {
     console.error("error: no source file specified");
@@ -43,23 +52,19 @@ sourcer.acquire(null, path.basename(sourceFile, '.lo')).then(
 
         var program = new Program(main, sourcer);
 
-        if (cmd == 'dump') {
-            return program.dump();
+        switch (cmd) {
+
+            case 'dump':
+                return program.dump();
+
+            case 'build':
+                console.error("sorry, building not supported yet");
+                //return new NodeBuilder().build(program, argv.build);
+                return;
+
+            case 'run':
+                return program.run([argv._, System]);
         }
-
-        if (cmd == 'build') {
-            console.error("building not supported yet");
-            return;
-        }
-
-        // see if we should build
-
-        // if (argv.build != null) {
-        //     return new NodeBuilder().build(program, argv.build);
-        // }
-
-        return program.run([argv._, System]);
-
     }).catch(
     function (err) {
 

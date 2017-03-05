@@ -215,63 +215,6 @@ module.exports['conditional in loop'] = {
     }
 };
 
-// module.exports['futures2'] = {
-//
-//     // test that uncaught errors are properly escalated out of the program
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'futures2');
-//         cb();
-//     },
-//
-//     "run in parallel": function (test) {
-//
-//         //test.expect(5);
-//
-//         var httpGet = function (task) {
-//             test.ok(true);
-//             setTimeout(task.doAsync(function () {
-//                 task.respond("reply", [{statusCode: 200}, "this is a response"]);
-//             }), 50);
-//         };
-//
-//         var writeLine = function (task) {
-//             test.ok(true);
-//             //console.log('write:', task.args);
-//             task.respond("reply"); // todo this is now superfluous
-//         };
-//
-//         this.harness.testSuccess(test, [httpGet, writeLine], 18);
-//     }
-// };
-//
-// module.exports['futures'] = {
-//
-//     // test that uncaught errors are properly escalated out of the program
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'futures');
-//         cb();
-//     },
-//
-//     "run in parallel": function (test) {
-//
-//         var foo = function (task) {
-//             test.ok(true);
-//             task.respond("reply", 21);
-//         };
-//
-//         var bar = function (task) {
-//             test.ok(true);
-//             task.respond("reply", 42);
-//         };
-//
-//         this.harness.testSuccess(test, [foo, bar], "bar wins");
-//     }
-// };
-
 module.exports['reply arity'] = {
 
     "setUp": function (cb) {
@@ -345,22 +288,79 @@ module.exports['built-ins'] = {
 };
 
 
-//module.exports['fibonacci2'] = {
+module.exports['fibonacci2'] = {
+
+   "setUp": function (cb) {
+
+       this.harness = new Harness(__dirname, 'fibonacci2');
+       cb();
+   },
+
+   'success': function (test) {
+
+       this.harness.testSuccess(test, [10], 55);
+   },
+
+   'failure': function (test) {
+
+       this.harness.testFailure(test, [-1], "Whatsamatta, you?");
+   }
+};
+
+
+// module.exports['futures'] = {
 //
-//    "setUp": function (cb) {
+//     // test that uncaught errors are properly escalated out of the program
 //
-//        this.harness = new Harness(loader, 'fibonacci2');
+//     "setUp": function (cb) {
 //
-//        this.harness.setUp(cb);
-//    },
+//         this.harness = new Harness(__dirname, 'futures');
+//         cb();
+//     },
 //
-//    'success': function (test) {
+//     "run in parallel": function (test) {
 //
-//        this.harness.testSuccess(test, 10, 55);
-//    },
+//         var foo = function (task) {
+//             test.ok(true);
+//             task.respond("reply", 21);
+//         };
 //
-//    'failure': function (test) {
+//         var bar = function (task) {
+//             test.ok(true);
+//             task.respond("reply", 42);
+//         };
 //
-//        this.harness.testFailure(test, -1, "Whatsamatta, you?");
-//    }
-//};
+//         this.harness.testSuccess(test, [foo, bar], "bar wins");
+//     }
+// };
+
+// module.exports['futures2'] = {
+//
+//     // test that uncaught errors are properly escalated out of the program
+//
+//     "setUp": function (cb) {
+//
+//         this.harness = new Harness(__dirname, 'futures2');
+//         cb();
+//     },
+//
+//     "run in parallel": function (test) {
+//
+//         //test.expect(5);
+//
+//         var httpGet = function (task) {
+//             test.ok(true);
+//             setTimeout(task.doAsync(function () {
+//                 task.respond("reply", [{statusCode: 200}, "this is a response"]);
+//             }), 50);
+//         };
+//
+//         var writeLine = function (task) {
+//             test.ok(true);
+//             //console.log('write:', task.args);
+//             task.respond("reply"); // todo this is now superfluous
+//         };
+//
+//         this.harness.testSuccess(test, [httpGet, writeLine], 18);
+//     }
+// };
