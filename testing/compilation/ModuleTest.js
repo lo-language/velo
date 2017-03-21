@@ -7,46 +7,22 @@
 
 const Module = require('../../constructs/Module');
 const Lo = require('../../constructs');
-var Q = require('q');
 
-module.exports["load deps"] = {
 
-    "no nested": function (test) {
+module.exports["compilation"] = {
 
-        var root = new Module([], [
-            new Lo.constant("PI", new Lo.identifier("Pi", "Math"))
+    "adds exports to definitions": function (test) {
+
+        var root = new Module([
+            new Lo.constant("PI", new Lo.literal("number", "3.14159")),
+            new Lo.constant("E", new Lo.literal("number", "2.71828"))
         ]);
 
         // compiling the module discovers deps
         var js = root.compile();
-        var mockModule = {};
 
-        var mockProgram = {
+        test.equal(js.renderJs(), "const $PI = 3.14159;\nconst $E = 2.71828;\nreturn {\'$E\': 2.71828,\'$PI\': 3.14159};\n");
 
-            loadModule: function (modRef) {
-
-                test.equal(modRef, 'Math');
-                return Q(mockModule);
-            }
-        };
-
-        root.loadDeps(mockProgram).then(
-            function () {
-
-                test.done();
-            }
-        ).done();
-    },
-
-    "nested deps": function (test) {
-
-        // todo
-        test.done();
-    },
-
-    "with cycles": function (test) {
-
-        // todo
         test.done();
     }
 };

@@ -3,18 +3,18 @@
  */
 
 
-const Sourcer = require('../../pipeline/Sourcer');
+const LMS = require('../../pipeline/LocalModuleSpace');
 const util = require('util');
 
-module.exports['basics'] = {
+module.exports['acquire'] = {
 
     "file success": function (test) {
 
         test.expect(3);
 
-        var sourcer = new Sourcer(__dirname + '/../programs');
+        var lms = new LMS(__dirname + '/../programs');
 
-        sourcer.acquire(null, "factorial").then(mod => {
+        lms.acquire("factorial").then(mod => {
 
             test.deepEqual(mod.deps, []);
             test.equal(mod.defs[0].name, 'main');
@@ -27,9 +27,9 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var sourcer = new Sourcer(__dirname);
+        var lms = new LMS(__dirname);
 
-        sourcer.acquire(null, "collections").then(
+        lms.acquire("collections").then(
             test.fail.bind(test),
             function (err) {
 

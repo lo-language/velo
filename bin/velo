@@ -22,10 +22,10 @@ const util = require('util');
 const path = require('path');
 const argv = require('minimist')(process.argv.slice(2));
 
-const System = require('../runtime/System');
+const LocalModuleSpace = require('../pipeline/LocalModuleSpace');
+const LoadAndGo = require('../pipeline/LoadAndGo');
+const LoSystem = require('../runtime/System');
 
-const Sourcer = require('../pipeline/Sourcer');
-const Program = require('../pipeline/Program');
 // const NodeBuilder = require('../pipeline/NodeBuilder');
 
 var commands = ['run', 'build', 'dump'];
@@ -33,42 +33,41 @@ var commands = ['run', 'build', 'dump'];
 var cmd = argv._.shift();
 var sourceFile = argv._.shift();
 
-if (commands.indexOf(cmd) == -1) {
-
-    console.error("unknown command '" + cmd + "'");
-    console.error("valid commands are:", commands.join(', '));
-    process.exit(1);
-}
-
 if (sourceFile == null) {
     console.error("error: no source file specified");
     process.exit();
 }
 
-var sourcer = new Sourcer(path.dirname(sourceFile));
 
-sourcer.acquire(null, path.basename(sourceFile, '.lo')).then(
-    function (main) {
+// initialize
 
-        var program = new Program(main, sourcer);
+var localSpace = new LocalModuleSpace(path.dirname(sourceFile));
+var program = new LoadAndGo(localSpace, path.basename(sourceFile, '.lo'));
 
-        switch (cmd) {
 
-            case 'dump':
-                return program.dump();
+switch (cmd) {
 
-            case 'build':
-                console.error("sorry, building not supported yet");
-                //return new NodeBuilder().build(program, argv.build);
-                return;
+    case 'dump':
+        return localSpace.resolve(program).then(function () {
+            localSpace.dumpModules(process.stdout);
+        });
 
-            case 'run':
-                return program.run([argv._, System]);
-        }
-    }).catch(
-    function (err) {
+    case 'build':
+        console.error("sorry, building not supported yet");
+        //return new NodeBuilder().build(program, argv.build);
+        return;
 
-        // todo include line failed at
-        console.error("FAIL", err);
+    case 'run':
+        return program.run([argv._, LoSystem]).catch(
+            function (err) {
+
+                // todo include line failed at
+                console.error("FAIL", err);
+                process.exit(1);
+            });
+
+    default:
+        console.error("unknown command '" + cmd + "'");
+        console.error("valid commands are:", commands.join(', '));
         process.exit(1);
-    });
+}
