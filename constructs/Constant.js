@@ -44,29 +44,12 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
-    // insert into the symbol table
-    context.define(this.name);
-
-    const jsID = '$' + this.name;
-
     var value = this.value.compile(context);
-    var result = JS.constDecl(jsID, value);
 
-    if (context.isRoot()) {
+    // register with the symbol table
+    context.define(this.name, value);
 
-        // we're defining a module-level constant, so export it
-
-        result = JS.stmtList(result, JS.exprStmt(
-            JS.assign(
-                JS.select(
-                    JS.select(JS.ID("module"), "exports"),
-                    jsID
-                ),
-                JS.ID(jsID)
-            )));
-    }
-
-    return result;
+    return JS.constDecl('$' + this.name, value);
 };
 
 module.exports = __;

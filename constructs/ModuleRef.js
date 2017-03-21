@@ -19,7 +19,7 @@ const JS = require('../codegen/JsPrimitives');
 var __ = function (namespace, id) {
 
     this.namespace = namespace;
-    this.name = id;
+    this.id = id;
 };
 
 
@@ -31,16 +31,20 @@ __.prototype.getAst = function () {
     return {
         type: 'modref',
         namespace: this.namespace,
-        id: this.name
+        id: this.id
     };
 };
 
 /**
- * Compiles this module to JS.
+ * Compiles this module reference to JS.
  */
 __.prototype.compile = function (context) {
 
-    return context.getModuleRef(this.namespace, this.name);
+    // will throw if namespace is unknown
+    context.registry.include(this.namespace || '__local', this.id);
+
+    // module namespaces are injected as globals at load-time
+    return JS.select(JS.ID(this.namespace || '__local'), this.id);
 };
 
 

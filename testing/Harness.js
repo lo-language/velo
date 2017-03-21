@@ -7,14 +7,14 @@
 
 "use strict";
 
-const Sourcer = require('../pipeline/Sourcer');
-const Program = require('../pipeline/Program');
-
+const LocalModuleSpace = require('../pipeline/LocalModuleSpace');
+const LoadAndGo = require('../pipeline/LoadAndGo');
 
 
 var __ = function (sourceDir, mainModName) {
 
-    this.sourcer = new Sourcer(sourceDir);
+    this.localSpace = new LocalModuleSpace(sourceDir);
+    this.program = new LoadAndGo(this.localSpace, mainModName);
     this.mainModName = mainModName;
     this.dump = false;
 };
@@ -27,42 +27,28 @@ __.prototype.enableDump = function () {
 };
 
 
+__.prototype.dumpModules = function () {
+
+    return this.localSpace.resolve(this.program).then(() => {
+
+        this.localSpace.dumpModules(process.stdout);
+    });
+};
+
+
 /**
  *
  */
 __.prototype.run = function (args) {
 
-    return this.sourcer.acquire(null, this.mainModName).then(
-        main => {
-
-            var program = new Program(main, this.sourcer);
-
-            if (this.dump) {
-                console.log(main.compile().renderJs());
-            }
-
-            return program.run(args);
-        }
-    );
-
-
-    // return this.program.compile().then(
-    //     () => {
-    //
-    //         if (this.dump) {
-    //             console.log(this.program.render());
-    //         }
-    //
-    //         return this.program.run(args);
-    //     }
-    // );
+    return this.program.run(args);
 };
 
 
 
 __.prototype.testSuccess = function (test, args, expected) {
 
-    return this.run(args).then(
+    return this.program.run(args).then(
         result => {
 
             if (expected !== undefined) {
@@ -86,7 +72,7 @@ __.prototype.testSuccess = function (test, args, expected) {
 
 __.prototype.testFailure = function (test, args, expected) {
 
-    return this.run(args).then(
+    return this.program.run(args).then(
         function () {
             test.fail();
         },

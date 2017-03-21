@@ -1,9 +1,9 @@
-main is <-> (args, io) {
+main is <-> (args, system) {
 
     greeter = ::Common.createGreeter("world");
 
-    greeter.greet(io);
+    greeter.greet(system);
 
     // fire and forget - we won't wait!
-    @io.out.write(::Common.GREETING);
+    @system.out.write(::Common.GREETING);
 };

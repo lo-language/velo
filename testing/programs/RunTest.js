@@ -14,6 +14,28 @@ const Harness = require('../Harness');
 const util = require('util');
 
 
+// module.exports['nestedLoops'] = {
+//
+//     "setUp": function (cb) {
+//
+//         this.harness = new Harness(__dirname, 'nestedLoops');
+//         cb();
+//     },
+//
+//     'success': function (test) {
+//
+//         // this.harness.enableDump();
+//
+//         var log = function (task) {
+//             console.log(task.args);
+//             task.respond("reply");
+//         };
+//
+//         this.harness.testSuccess(test, [log], 9);
+//     }
+// };
+
+
 module.exports['fail'] = {
 
     "setUp": function (cb) {
@@ -25,8 +47,6 @@ module.exports['fail'] = {
     'success': function (test) {
 
         test.expect(2);
-
-        // this.harness.enableDump();
 
         this.harness.run([{
             $ok: function (task) {
@@ -108,7 +128,7 @@ module.exports['helloWorld'] = {
 
         // this.harness.enableDump();
 
-        var io = {
+        var system = {
             $out: {
                 $write: function (task) {
                     console.log(task.args);
@@ -118,7 +138,7 @@ module.exports['helloWorld'] = {
             }
         };
 
-        this.harness.testSuccess(test, [[], io, {}]);
+        this.harness.testSuccess(test, [[], system, {}]);
     }
 };
 
@@ -282,6 +302,8 @@ module.exports['built-ins'] = {
    },
 
    'success': function (test) {
+
+       this.harness.enableDump();
 
        this.harness.testSuccess(test, [], -1);
    }

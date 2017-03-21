@@ -34,6 +34,8 @@ INTER_END   : '`' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1); this.inS
 // should a module just be a record def?
 // but records normally can't refer to their own parts...
 
+// should module definitions be captured as a linked list like statements? they are statements, after all
+
 module
     : definition+ EOF   // had alias* at beginning
     ;

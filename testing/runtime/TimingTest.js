@@ -4,11 +4,9 @@
  * Created by spurcell on 12/5/15.
  */
 
-const Program = require('../../pipeline/Program');
-const Module = require('../../constructs/Module');
-const Q = require('q');
+const Program = require('../../pipeline/LoadAndGo');
+const MockModuleSpace = require('../MockModuleSpace');
 const util = require('util');
-const ASTBuilder = require('../../parser/ASTBuilder');
 
 
 module.exports['basics'] = {
@@ -17,9 +15,9 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var source = 'main is <-> {reply "hullo!";};';
+        var modSpace = new MockModuleSpace('main is <-> {reply "hullo!";};');
 
-        var program = new Program(new ASTBuilder().parse(source));
+        var program = new Program(modSpace, 'ROOT');
 
         program.run().then(
             function (res) {
@@ -33,15 +31,15 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var root = new ASTBuilder().parse(
+        var modSpace = new MockModuleSpace(
                     'sayHello is <-> {\n' +
                     '    reply "hullo!";\n};\n' +
                     'main is <-> {\n' +
                     '    reply sayHello();\n};\n');
 
-        var p = new Program(root);
+        var program = new Program(modSpace, 'ROOT');
 
-        p.run().then(
+        program.run().then(
             function (res) {
                 test.equal(res, "hullo!");
                 test.done();
@@ -52,15 +50,15 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var root = new ASTBuilder().parse(
+        var modSpace = new MockModuleSpace(
                     'sayHello is <-> {\n' +
                     '    reply "hullo!";\n};\n' +
                     'main is <-> {\n' +
                     '    sayHello();\n};\n');
 
-        var p = new Program(root);
+        var program = new Program(modSpace, 'ROOT');
 
-        p.run().then(
+        program.run().then(
             function (res) {
                 test.equal(res, undefined);
                 test.done();
@@ -71,16 +69,16 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var root =new ASTBuilder().parse(
+        var modSpace = new MockModuleSpace(
                     'sayHello is <-> {\n' +
                     '    reply "hullo!";\n};\n' +
                     'main is <-> {\n' +
                     '    sayHello();\n' +
                     '    reply "howdy!";\n};\n');
 
-        var p = new Program(root);
+        var program = new Program(modSpace, 'ROOT');
 
-        p.run().then(
+        program.run().then(
             function (res) {
                 test.equal(res, "howdy!");
                 test.done();
@@ -99,13 +97,13 @@ module.exports['basics'] = {
             task.respond("reply");
         };
 
-        var root = new ASTBuilder().parse(
+        var modSpace = new MockModuleSpace(
                     'main is <-> (write) {\n' +
                     '@write("hi there!");\n};\n');
 
-        var p = new Program(root);
+        var program = new Program(modSpace, 'ROOT');
 
-        p.run([write]).then(
+        program.run([write]).then(
             function (res) {
                 setImmediate(test.done.bind(test));
             }).done();

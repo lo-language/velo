@@ -54,6 +54,7 @@ var __ = function (parent, isService) {
     this.connector = null;
     this.continuous = true; // continuous until proven async
     this.contId = 0;
+    this.registry = parent ? parent.registry : null;
 };
 
 
@@ -83,6 +84,14 @@ __.prototype.isSink = function () {
     return this.type == 'sink';
 };
 
+/**
+ * Sets the module registry for this context.
+ */
+__.prototype.setRegistry = function (registry) {
+
+    this.registry = registry;
+};
+
 
 /**
  * Declares a variable in this context.
@@ -103,8 +112,9 @@ __.prototype.declare = function (name) {
  * Defines a constant in this context.
  *
  * @param name
+ * @param value
  */
-__.prototype.define = function (name) {
+__.prototype.define = function (name, value) {
 
     if (this.has(name)) {
         throw new Error(name + " is a constant or variable in this context");
@@ -112,7 +122,8 @@ __.prototype.define = function (name) {
 
     this.symbols['@' + name] = {
         type: 'const',
-        name: name
+        name: name,
+        value: value
     };
 };
 
@@ -159,7 +170,6 @@ __.prototype.has = function (name) {
 };
 
 
-
 __.prototype.getJsVars = function () {
 
     return Object.keys(this.symbols).reduce((accum, key) => {
@@ -168,6 +178,22 @@ __.prototype.getJsVars = function () {
 
         if (symbol.type == 'var' || symbol.type == 'future') {
             accum.push('$' + symbol.name);
+        }
+
+        return accum;
+
+    }, []);
+};
+
+
+__.prototype.getConstants = function () {
+
+    return Object.keys(this.symbols).reduce((accum, key) => {
+
+        var symbol = this.symbols[key];
+
+        if (symbol.type == 'const') {
+            accum.push(symbol);
         }
 
         return accum;
@@ -354,43 +380,6 @@ __.prototype.getConnector = function () {
     else if (this.parent) {
         return this.parent.getConnector();
     }
-};
-
-/**
- * Records a dependency.
- *
- * @param namespace
- * @param name
- * @returns JS
- */
-__.prototype.getModuleRef = function (namespace, name) {
-
-    if (this.parent) {
-        return this.parent.getModuleRef(namespace, name);
-    }
-
-    // we're in the root context, so register the dependency to be resolved later
-
-    if (namespace == null) {
-        namespace = '__local';
-    }
-
-    if (this.deps[namespace] == null) {
-        this.deps[namespace] = {}
-    }
-
-    this.deps[namespace][name] = name;
-
-    return JS.subscript(JS.subscript(JS.select(JS.ID('module'), 'deps'), JS.string(namespace)), JS.string(name));
-};
-
-
-/**
- * Returns the deps collected by this context.
- */
-__.prototype.getDeps = function () {
-
-    return this.deps;
 };
 
 

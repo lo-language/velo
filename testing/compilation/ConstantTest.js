@@ -22,7 +22,7 @@ module.exports["root constants"] = {
         test.equal(context.has('port'), false);
         test.equal(context.isConstant('port'), false);
 
-        test.equal(node.compile(context).renderJs(), 'const $port = 443;\nmodule.exports.$port = $port;');
+        test.equal(node.compile(context).renderJs(), 'const $port = 443;');
 
         test.equal(context.has('port'), true);
         test.ok(context.isConstant('port'));
@@ -39,7 +39,7 @@ module.exports["root constants"] = {
         test.equal(context.has('album'), false);
         test.equal(context.isConstant('album'), false);
 
-        test.equal(node.compile(context).renderJs(), "const $album = 'Mellon Collie';\nmodule.exports.$album = $album;");
+        test.equal(node.compile(context).renderJs(), "const $album = 'Mellon Collie';");
 
         test.equal(context.has('album'), true);
         test.ok(context.isConstant('album'));
