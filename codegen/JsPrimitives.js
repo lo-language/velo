@@ -90,6 +90,14 @@ JS.varDecl = (name, value) => {
     };
 };
 
+JS.varDeclMulti = (names) => {
+
+    return {
+        renderTree: () => ['var', names.length == 1 ? names[0] : names],
+        renderJs: () => 'var ' + names.join(', ') + ';'
+    };
+};
+
 JS.letDecl = (name, value) => {
 
     return {

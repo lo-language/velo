@@ -115,23 +115,20 @@ module.exports["non-root constants"] = {
                     null,
                     [ 'task' ],
                     [ 'stmtList',
-                        [ 'var', '$next' ],
+                        [ 'var', [ '$next', '$result' ] ],
                         [ 'stmtList',
-                            [ 'var', '$result' ],
+                            [ 'expr-stmt',
+                                [ 'assign',
+                                    [ 'id', '$next' ],
+                                    [ 'subscript',
+                                        [ 'select', [ 'id', 'task' ], 'args' ],
+                                        [ 'num', '0' ] ] ] ],
                             [ 'stmtList',
                                 [ 'expr-stmt',
-                                    [ 'assign',
-                                        [ 'id', '$next' ],
-                                        [ 'subscript',
-                                            [ 'select', [ 'id', 'task' ], 'args' ],
-                                            [ 'num', '0' ] ] ] ],
-                                [ 'stmtList',
-                                    [ 'expr-stmt',
-                                        [ 'assign', [ 'id', '$result' ], [ 'num', '10' ], '*=' ] ] ] ] ] ] ] ]);
+                                    [ 'assign', [ 'id', '$result' ], [ 'num', '10' ], '*=' ] ] ] ] ] ] ]);
 
         test.equal(context.has('main'), true);
         test.ok(context.isConstant('main'));
-        // test.deepEqual(context.resolve('main').renderTree(), [ 'id', '$main' ]);
 
         test.done();
     },
