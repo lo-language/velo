@@ -361,6 +361,26 @@ __.prototype.wrapFollowing = function () {
     return null;
 };
 
+/**
+ * Wraps the following statements in an async loop construct.
+ */
+__.prototype.createAsyncLoop = function (condition, body) {
+
+    // todo - code improvement ideas:
+    // - don't define loop functions within loops
+    // - don't define continuations just to call into loop functions (would still need to wrap in setImmediate)
+
+    this.continuous = false;
+
+    var loopName = 'l' + this.getNextLabel();
+    var loopId = JS.ID(loopName);
+
+    var loopDef = JS.letDecl(loopName, JS.fnDef([], JS.stmtList(JS.cond(condition, body, this.following))));
+
+    this.following = null;
+
+    return {id: loopId, def: loopDef};
+};
 
 __.prototype.getNextLabel = function () {
 
