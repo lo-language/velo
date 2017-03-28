@@ -42,15 +42,14 @@ __.prototype.getAst = function () {
 __.prototype.compile = function (context) {
 
     var condition = this.cond.compile(context);
-    var loopName = 'l0';
 
-    // push a connector into context to wire up the loop
-    // can we make this somehow contingent on async behavior in the loop body or cond?
-
-    // we need to create a new context here for the loop body
+    // create a branch context here for the loop body
 
     var bc = new BranchContext(context);
     var body = this.body.compile(bc);
+
+    // test both the current context and the loop-body context for discontinuities
+    // in either the loop condition or the loop body, respectively
 
     if (context.isContinuous() && bc.isContinuous()) {
 
@@ -60,18 +59,15 @@ __.prototype.compile = function (context) {
 
     // gotta do it the hard way
 
+    var loop = context.createAsyncLoop(condition, body);
+
     var loopCall = JS.stmtList(JS.exprStmt(
-        JS.fnCall(JS.ID("setImmediate"), [JS.runtimeCall('doAsync', [JS.ID(loopName)])])));
+        JS.fnCall(JS.ID("setImmediate"), [JS.runtimeCall('doAsync', [loop.id])])));
 
     // connect the body to the loop entry point to create the loop
     bc.connect(loopCall);
 
-    var loopDef = JS.letDecl(loopName, JS.fnDef([], JS.stmtList(JS.cond(condition, body, context.getFollowing()))));
-
-    // since we've already wrapped the following stmts in the loop def
-    context.setFollowing(null);
-
-    return JS.stmtList(loopDef, JS.stmtList(JS.exprStmt(JS.fnCall(JS.ID(loopName), []))));
+    return JS.stmtList(loop.def, JS.stmtList(JS.exprStmt(JS.fnCall(loop.id, []))));
 };
 
 

@@ -65,8 +65,6 @@ __.prototype.compile = function (context) {
     // compile the statement(s) in the context of the local scope
     var body = this.body.compile(local);
 
-    // get our declared vars from the context
-    var localVars = local.getJsVars();
 
     // bind values to our params
     for (var i = this.params.length - 1; i >= 0; i--) {
@@ -74,8 +72,10 @@ __.prototype.compile = function (context) {
     }
 
     // declare our local vars
-    for (var j = localVars.length - 1; j >= 0; j--) {
-        body = JS.stmtList(JS.varDecl(localVars[j]), body);
+    var localVars = local.getJsVars();
+
+    if (localVars.length > 0) {
+        body = JS.stmtList(JS.varDeclMulti(localVars), body);
     }
 
     return JS.fnDef([(this.isService ? 'task' : 'args')], body);

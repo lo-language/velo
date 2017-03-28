@@ -21,7 +21,7 @@ module.exports["compilation"] = {
         // compiling the module discovers deps
         var js = root.compile();
 
-        test.equal(js.renderJs(), "const $PI = 3.14159;\nconst $E = 2.71828;\nreturn {\'$E\': 2.71828,\'$PI\': 3.14159};\n");
+        test.equal(js.renderJs(), "const $PI = 3.14159;\nconst $E = 2.71828;\nreturn {\'$E\': $E,\'$PI\': $PI};\n");
 
         test.done();
     }

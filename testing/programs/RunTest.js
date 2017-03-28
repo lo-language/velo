@@ -13,27 +13,26 @@
 const Harness = require('../Harness');
 const util = require('util');
 
+module.exports['nestedLoops'] = {
 
-// module.exports['nestedLoops'] = {
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'nestedLoops');
-//         cb();
-//     },
-//
-//     'success': function (test) {
-//
-//         // this.harness.enableDump();
-//
-//         var log = function (task) {
-//             console.log(task.args);
-//             task.respond("reply");
-//         };
-//
-//         this.harness.testSuccess(test, [log], 9);
-//     }
-// };
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'nestedLoops');
+        cb();
+    },
+
+    'success': function (test) {
+
+        var log = function (task) {
+            task.respond("reply");
+        };
+
+        // this.harness.dumpModules().then(() => {
+
+            this.harness.testSuccess(test, [log], 9);
+        // });
+    }
+};
 
 
 module.exports['fail'] = {
@@ -109,7 +108,6 @@ module.exports['collections'] = {
 
     'all': function (test) {
 
-        // this.harness.enableDump();
         this.harness.testSuccess(test);
     }
 };
@@ -125,8 +123,6 @@ module.exports['helloWorld'] = {
     'success': function (test) {
 
         test.expect(2);
-
-        // this.harness.enableDump();
 
         var system = {
             $out: {
@@ -302,8 +298,6 @@ module.exports['built-ins'] = {
    },
 
    'success': function (test) {
-
-       this.harness.enableDump();
 
        this.harness.testSuccess(test, [], -1);
    }

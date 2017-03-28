@@ -35,9 +35,7 @@ module.exports["service"] = {
             null,
             [ 'task' ],
             [ 'stmtList',
-                [ 'var', '$next' ],
-                [ 'stmtList',
-                    [ 'var', '$result' ],
+                [ 'var', [ '$next', '$result' ] ],
                     [ 'stmtList',
                         [ 'expr-stmt',
                             [ 'assign',
@@ -56,7 +54,7 @@ module.exports["service"] = {
                                             [ 'res0' ],
                                             [ 'stmtList', [ 'expr-stmt',
                                                 [ "assign", [ "id", "$result" ], [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ], "*="] ] ] ],
-                                        [ 'null' ] ] ] ] ] ] ] ] ];
+                                        [ 'null' ] ] ] ] ] ] ] ];
 
         test.deepEqual(node.compile(new Context()).renderTree(), result);
         test.done();
@@ -82,9 +80,7 @@ module.exports["service"] = {
             null,
             [ 'task' ],
             [ 'stmtList',
-                [ 'var', '$args' ],
-                [ 'stmtList',
-                    [ 'var', '$io' ],
+                [ 'var', [ '$args', '$io' ] ],
                     [ 'stmtList',
                         [ 'expr-stmt',
                             [ 'assign',
@@ -106,7 +102,7 @@ module.exports["service"] = {
                                         [ [ 'id', '$write' ],
                                             [ 'arrayLiteral', [ [ "string", "hello" ] ] ],
                                             [ 'null' ],
-                                            [ 'null' ] ] ] ] ] ] ] ] ] ];
+                                            [ 'null' ] ] ] ] ] ] ] ] ];
 
         test.deepEqual(node.compile(new Context()).renderTree(), result);
         test.done();

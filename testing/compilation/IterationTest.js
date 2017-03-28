@@ -84,7 +84,7 @@ module.exports["basics"] = {
         test.deepEqual(a.renderTree(),
             [ 'stmtList',
                 [ 'let',
-                    'l0',
+                    'l1',
                     [ 'function',
                         null,
                         [],
@@ -104,8 +104,8 @@ module.exports["basics"] = {
                                             'c0',
                                             [],
                                             [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', "setImmediate" ],
-                                                [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "l0" ] ] ] ] ] ] ] ] ] ] ] ] ] ],
-                [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'l0' ], [] ] ] ] ]);
+                                                [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "l1" ] ] ] ] ] ] ] ] ] ] ] ] ] ],
+                [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'l1' ], [] ] ] ] ]);
 
         // // try attaching a statement
         // a.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('z'), JS.num('57')))));
@@ -141,6 +141,82 @@ module.exports["basics"] = {
         // test.equal(a.renderTree(),
         //     'let loop = function () {if ($foo) {task.sendMessage($foo, [57], ' +
         //     'function (res) {\nvar res0 = res ? res[0] : null;\nsetImmediate(task.doAsync(loop));}, null);\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
+
+        test.done();
+    },
+
+    "nested async loops": function (test) {
+
+        // while y < MAX {
+        //   while x < MAX {
+        //      log(count);
+        //      x++;
+        //   }
+        //   y++;
+        // }
+
+        var node = new Lo.while(
+            new Lo.binaryOpExpr('<', new Lo.identifier('y'), new Lo.identifier('MAX')),
+            new Lo.stmtList(
+                new Lo.while(
+                    new Lo.binaryOpExpr('<', new Lo.identifier('x'), new Lo.identifier('MAX')),
+                    new Lo.stmtList(
+                        new Lo.requestStmt(
+                            new Lo.identifier('log'),
+                            [new Lo.identifier('count')],
+                            null,
+                            null,
+                            true
+                        )
+                    )
+                )
+            )
+        );
+
+        var a = node.compile(new Context().createInner());
+
+        test.deepEqual(a.renderTree(),
+            [ 'stmtList',
+                [ 'let',
+                    'l2',
+                    [ 'function',
+                        null,
+                        [],
+                        [ 'stmtList',
+                            [ 'if',
+                                [ 'lt', [ 'id', '$y' ], [ 'id', '$MAX' ] ],
+                                [ 'stmtList',
+                                    [ 'let',
+                                        'l1',
+                                        [ 'function',
+                                            null,
+                                            [],
+                                            [ 'stmtList',
+                                                [ 'if',
+                                                    [ 'lt', [ 'id', '$x' ], [ 'id', '$MAX' ] ],
+                                                    [ 'stmtList', [
+                                                        "expr-stmt",
+                                                        [ "call",
+                                                            [ "select", [ "id", "task" ], "sendMessage" ],
+                                                            [
+                                                                [ "id", "$log" ],
+                                                                [ "arrayLiteral", [ [ "id", "$count" ] ] ],
+                                                                [ "id", "c0" ],
+                                                                [ "id", "c0" ] ] ] ],
+                                                        [ "stmtList",
+                                                            [ "function", "c0",
+                                                                [],
+                                                                [ "stmtList", [ "expr-stmt", [ "call", [ "id", "setImmediate" ],
+                                                                            [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "l1" ] ] ] ]
+                                                                        ] ] ] ] ] ],
+                                                    [ 'stmtList', ["expr-stmt",
+                                                        [ "call",
+                                                            [ "id", "setImmediate" ],
+                                                            [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "l2" ] ] ] ]
+                                                        ]
+                                                    ] ] ] ] ] ],
+                                    [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'l1' ], [] ] ] ] ] ] ] ] ],
+                [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'l2' ], [] ] ] ] ]);
 
         test.done();
     },
