@@ -51,14 +51,14 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
-    // if the left node is a bare ID, then we compile it as an lvalue
-    // otherwise all IDs are compiled as rvalues
 
     var left = this.left.compile(context);
     var right = this.right.compile(context);
 
     // todo this implies block-level scoping
     if (this.left instanceof Identifier) {
+
+        // if the LHS is a bare ID,
 
         var name = this.left.name;
 
@@ -68,7 +68,6 @@ __.prototype.compile = function (context) {
         }
 
         // declare if a new var
-        // can this not be idempotent?
         if (context.has(name) == false) {
             context.declare(name);
         }

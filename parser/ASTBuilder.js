@@ -219,7 +219,6 @@ __.prototype.visitLogical = function(ctx) {
 };
 
 
-
 __.prototype.visitWrap = function(ctx) {
 
     return ctx.expr().accept(this);
@@ -253,7 +252,7 @@ __.prototype.visitExprList = function(ctx) {
 
 __.prototype.visitId = function(ctx) {
 
-    return new Lo.identifier(ctx.ID().getText());
+    return new Lo.identifier(ctx.ID().getText(), ctx.ID().symbol.line);
 };
 
 

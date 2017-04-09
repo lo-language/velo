@@ -141,7 +141,7 @@ __.prototype.acquire = function (id) {
         var start = new Date();
         var module = new ASTBuilder().parse(source);
 
-        module.setName(id);
+        module.setInfo(id, path);
 
         process.stderr.write(" [" + (new Date().getTime() - start.getTime()) + "ms]\n");
 

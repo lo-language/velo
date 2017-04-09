@@ -71,7 +71,7 @@ statement
     ;
 
 definition
-    : ID 'is' expr ';'
+    : ID ('is'|'are') expr ';'
     ;
 
 handlers
@@ -94,7 +94,7 @@ failHandler
 // todo multiple lvalues separated by commas for destructuring
 
 // assignments are NOT expressions
-// all but = should probably be considered edits instead of assignments
+// all but = should be considered combined operators instead of assignments
 assignment_op
     : '='
     | '+='
@@ -129,6 +129,8 @@ expr
     | expr ('has'|'contains') expr                                           # membership // not sure where this guy should go, precedence-wise
     | expr '?' expr ':' expr                                    # condExpr
     | expr '><' expr                                            # concat
+    | expr '+>' expr                                            # pushFront
+    | expr '<+' expr                                            # pushBack
     | '(' expr ')'                                              # wrap
     | '`' expr '`'                                              # stringify
     | expr '[' expr ']'                                         # subscript

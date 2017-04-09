@@ -58,6 +58,9 @@ switch (cmd) {
         return;
 
     case 'run':
+        // have load and go produce an object that can be run?
+        // there's the prep stage which involves loading (maybe) to create a runnable
+        // can also just directly create a runnable?
         return program.run([argv._, LoSystem]).catch(
             function (err) {
 
