@@ -45,7 +45,7 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
-    return JS.runtimeCall('scan', [this.over.compile(context), this.into.compile(context)]);
+    return JS.exprStmt(JS.runtimeCall('scan', [this.over.compile(context), this.into.compile(context)]));
 };
 
 module.exports = __;

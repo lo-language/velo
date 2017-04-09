@@ -13,4 +13,7 @@ test is <-> {
 
     fruits <+ "banana";
     "mango" +> fruits;
+
+    // test precedence
+    result = base >< person.getName();
 };

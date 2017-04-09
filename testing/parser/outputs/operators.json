@@ -230,7 +230,39 @@
                                 "name": "fruits"
                               }
                             },
-                            "tail": null
+                            "tail": {
+                              "type": "stmt_list",
+                              "head": {
+                                "type": "assign",
+                                "op": "=",
+                                "left": {
+                                  "type": "id",
+                                  "name": "result"
+                                },
+                                "right": {
+                                  "type": "op",
+                                  "op": "concat",
+                                  "left": {
+                                    "type": "id",
+                                    "name": "base"
+                                  },
+                                  "right": {
+                                    "type": "request_expr",
+                                    "address": {
+                                      "type": "select",
+                                      "record": {
+                                        "type": "id",
+                                        "name": "person"
+                                      },
+                                      "field": "getName"
+                                    },
+                                    "args": [],
+                                    "blocking": true
+                                  }
+                                }
+                              },
+                              "tail": null
+                            }
                           }
                         }
                       }

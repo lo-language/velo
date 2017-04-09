@@ -21,20 +21,21 @@ module.exports["basics"] = {
         );
 
         test.deepEqual(node.compile(new Context()).renderTree(),
-            [ 'call',
-                [ 'select', [ 'id', 'task' ], 'scan' ],
-                [ [ 'id', '$foo' ],
-                    [ 'function',
-                        null,
-                        [ 'args' ],
-                        [ 'stmtList',
-                            [ 'var', '$item' ],
+            [ 'expr-stmt',
+                [ 'call',
+                    [ 'select', [ 'id', 'task' ], 'scan' ],
+                    [ [ 'id', '$foo' ],
+                        [ 'function',
+                            null,
+                            [ 'args' ],
                             [ 'stmtList',
-                                [ 'expr-stmt',
-                                    [ 'assign',
-                                        [ 'id', '$item' ],
-                                        [ 'subscript', [ 'id', 'args' ], [ 'num', '0' ] ] ] ],
-                                [ 'stmtList', [ 'expr-stmt', [ 'inc', [ 'id', '$count' ] ] ] ] ] ] ] ] ]);
+                                [ 'var', '$item' ],
+                                [ 'stmtList',
+                                    [ 'expr-stmt',
+                                        [ 'assign',
+                                            [ 'id', '$item' ],
+                                            [ 'subscript', [ 'id', 'args' ], [ 'num', '0' ] ] ] ],
+                                    [ 'stmtList', [ 'expr-stmt', [ 'inc', [ 'id', '$count' ] ] ] ] ] ] ] ] ] ]);
 
         test.done();
     }
