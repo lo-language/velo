@@ -14,7 +14,6 @@
 const JS = require('../codegen/JsPrimitives');
 const Context = require('../codegen/Context');
 const vm = require('vm');
-const Q = require('q');
 
 /**
  * A module definition; the root of an AST. Called by the ASTBuilder
@@ -24,14 +23,17 @@ var __ = function (defs) {
     this.deps = [];
     this.defs = defs;
     this.exports = {};
+    this.name = 'UNK';
+    this.path = 'UNK';
 };
 
 /**
  * Sets the name of this module
  */
-__.prototype.setName = function (name) {
+__.prototype.setInfo = function (id, path) {
 
-    this.name = name;
+    this.name = id;
+    this.path = path;
 };
 
 /**
@@ -61,6 +63,12 @@ __.prototype.compile = function (registry) {
 
     for (var i = this.defs.length - 1; i >= 0; i--) {
         stmts = JS.stmtList(this.defs[i].compile(context), stmts);
+    }
+
+    var errors = context.getErrors();
+
+    if (errors.length > 0) {
+        console.error(errors);
     }
 
     var exports = context.getConstants().map(c => {

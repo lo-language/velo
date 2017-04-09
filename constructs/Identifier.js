@@ -20,9 +20,10 @@ const Future = require('../codegen/Future');
 /**
  * An identifer
  */
-var __ = function (name) {
+var __ = function (name, line) {
 
     this.name = name;
+    this.line = line || '??';
 };
 
 /**
@@ -43,6 +44,14 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
+    // see if the identifier is defined
+
+    if (context.has(this.name)) {
+        return JS.ID('$' + this.name);
+    }
+
+    // of course, we need to see inside a conditional to know if it's been defined...
+    context.pushError(this.line, "reference to '" + this.name + "' before definition");
     return JS.ID('$' + this.name);
 };
 

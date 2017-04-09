@@ -219,7 +219,6 @@ __.prototype.visitLogical = function(ctx) {
 };
 
 
-
 __.prototype.visitWrap = function(ctx) {
 
     return ctx.expr().accept(this);
@@ -253,7 +252,7 @@ __.prototype.visitExprList = function(ctx) {
 
 __.prototype.visitId = function(ctx) {
 
-    return new Lo.identifier(ctx.ID().getText());
+    return new Lo.identifier(ctx.ID().getText(), ctx.ID().symbol.line);
 };
 
 
@@ -544,6 +543,16 @@ __.prototype.visitConcat = function(ctx) {
         ctx.expr(1).accept(this)
     );
 };
+
+__.prototype.visitPush = function(ctx) {
+
+    return new Lo.arrayPush(
+        ctx.op.text == '<+' ? 'push-back' : 'push-front',
+        ctx.expr(0).accept(this),
+        ctx.expr(1).accept(this)
+    );
+};
+
 
 __.prototype.visitMembership = function(ctx) {
 

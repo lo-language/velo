@@ -54,6 +54,12 @@ loVisitor.prototype.visitCondStmt = function(ctx) {
 };
 
 
+// Visit a parse tree produced by loParser#push.
+loVisitor.prototype.visitPush = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by loParser#syncRequest.
 loVisitor.prototype.visitSyncRequest = function(ctx) {
   return this.visitChildren(ctx);

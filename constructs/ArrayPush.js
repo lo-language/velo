@@ -37,8 +37,7 @@ var __ = function (op, left, right) {
 __.prototype.getAst = function () {
 
     return {
-        type: 'assign',
-        op: this.op,
+        type: this.op,
         left: this.left.getAst(),
         right: this.right.getAst()
     };
@@ -51,38 +50,15 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
-
     var left = this.left.compile(context);
     var right = this.right.compile(context);
 
-    // todo this implies block-level scoping
-    if (this.left instanceof Identifier) {
-
-        // if the LHS is a bare ID,
-
-        var name = this.left.name;
-
-        // validate we're not assigning to a constant
-        if (context.isConstant(name)) {
-            throw new Error("can't assign to a constant (" + name + ")");
-        }
-
-        // declare if a new var
-        if (context.has(name) == false) {
-            context.declare(name);
-        }
-
-        // see if the RHS is a dispatch
-        // if (this.right.type == 'message') {
-        //     context.setFuture(name);
-        // }
+    if (this.op == 'push-front') {
+        return JS.exprStmt(JS.fnCall(JS.select(right, 'unshift'), [left]));
     }
-
-    return JS.exprStmt(JS.assign(left, right, this.op == '=' ? null : this.op));
-
-    // this was genius
-    // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP
-
+    else {
+        return JS.exprStmt(JS.fnCall(JS.select(left, 'push'), [right]));
+    }
 };
 
 module.exports = __;

@@ -7,5 +7,9 @@ test is <-> {
     foo = baz contains bar;
     foo = baz and bar or buzzy;
 
-    doghouse = "dog" >< "house";    // either arg can be an atom or an array; an array is the result
+    doghouse = "dog" >< "house";
+
+    fruits = ["apple", "pear"];
+    fruits <+ "banana";
+    "mango" +> fruits;
 };

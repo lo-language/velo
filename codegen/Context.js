@@ -55,6 +55,17 @@ var __ = function (parent, isService) {
     this.continuous = true; // continuous until proven async
     this.contId = 0;
     this.registry = parent ? parent.registry : null;
+
+    this.errors = [];
+};
+
+
+/**
+ *
+ */
+__.prototype.getModulePath = function () {
+
+    return this.parent ? this.parent.getModulePath() : (this.path || '??');
 };
 
 
@@ -405,6 +416,16 @@ __.prototype.getConnector = function () {
 
 __.prototype.isRValue = function () {
     return false;
+};
+
+__.prototype.pushError = function (line, message) {
+
+    this.errors.push(new Error(this.getModulePath() + ':' + line + ' ' + message));
+};
+
+__.prototype.getErrors = function () {
+
+    return this.errors;
 };
 
 
