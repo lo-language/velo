@@ -181,7 +181,59 @@
                           }
                         }
                       },
-                      "tail": null
+                      "tail": {
+                        "type": "stmt_list",
+                        "head": {
+                          "type": "assign",
+                          "op": "=",
+                          "left": {
+                            "type": "id",
+                            "name": "fruits"
+                          },
+                          "right": {
+                            "type": "array",
+                            "elements": [
+                              {
+                                "type": "string",
+                                "val": "apple"
+                              },
+                              {
+                                "type": "string",
+                                "val": "pear"
+                              }
+                            ]
+                          }
+                        },
+                        "tail": {
+                          "type": "stmt_list",
+                          "head": {
+                            "type": "push-back",
+                            "left": {
+                              "type": "id",
+                              "name": "fruits"
+                            },
+                            "right": {
+                              "type": "string",
+                              "val": "banana"
+                            }
+                          },
+                          "tail": {
+                            "type": "stmt_list",
+                            "head": {
+                              "type": "push-front",
+                              "left": {
+                                "type": "string",
+                                "val": "mango"
+                              },
+                              "right": {
+                                "type": "id",
+                                "name": "fruits"
+                              }
+                            },
+                            "tail": null
+                          }
+                        }
+                      }
                     }
                   }
                 }

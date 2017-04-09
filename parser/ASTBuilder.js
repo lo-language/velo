@@ -544,6 +544,16 @@ __.prototype.visitConcat = function(ctx) {
     );
 };
 
+__.prototype.visitPush = function(ctx) {
+
+    return new Lo.arrayPush(
+        ctx.op.text == '<+' ? 'push-back' : 'push-front',
+        ctx.expr(0).accept(this),
+        ctx.expr(1).accept(this)
+    );
+};
+
+
 __.prototype.visitMembership = function(ctx) {
 
     return new Lo.membership(

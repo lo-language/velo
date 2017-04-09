@@ -62,6 +62,7 @@ statement
     | expr assignment_op expr ';'                           # assignment
     | expr op=('++'|'--') ';'                               # incDec
     | conditional                                           # condStmt
+    | expr op=('+>'|'<+') expr ';'                          # push
     | expr '(' exprList? ')' handlers                       # syncRequest
     | '@' expr '(' exprList? ')' handlers                   # asyncRequest
     | 'on' expr sink ';'                                    # subscribe
@@ -129,8 +130,6 @@ expr
     | expr ('has'|'contains') expr                                           # membership // not sure where this guy should go, precedence-wise
     | expr '?' expr ':' expr                                    # condExpr
     | expr '><' expr                                            # concat
-    | expr '+>' expr                                            # pushFront
-    | expr '<+' expr                                            # pushBack
     | '(' expr ')'                                              # wrap
     | '`' expr '`'                                              # stringify
     | expr '[' expr ']'                                         # subscript

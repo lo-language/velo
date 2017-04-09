@@ -12,6 +12,7 @@
 module.exports = {
 
     array: require("./Array"),
+    arrayPush: require("./ArrayPush"),
     assignment: require("./Assignment"),
     binaryOpExpr: require("./BinaryOpExpr"),
     conditional: require("./Conditional"),
