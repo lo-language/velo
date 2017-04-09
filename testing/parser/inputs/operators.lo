@@ -10,6 +10,7 @@ test is <-> {
     doghouse = "dog" >< "house";
 
     fruits = ["apple", "pear"];
+
     fruits <+ "banana";
     "mango" +> fruits;
 };

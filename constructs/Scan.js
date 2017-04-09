@@ -9,8 +9,13 @@
 
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+
+
 /**
- * A scan statement.
+ * A scan statement. Scan is different from something like "for every X in Y" because
+ * a) there's no item referent in the same scope as scan, if it's named, it's in a subscope
+ * b) it's more like an emitter of a sequence (a msg source) than a control structure like while
  *
  * @param over
  * @param into
@@ -40,6 +45,7 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
+    return JS.runtimeCall('scan', [this.over.compile(context), this.into.compile(context)]);
 };
 
 module.exports = __;
