@@ -136,7 +136,7 @@ expr
     | '(' ID (',' ID)+ ')'                                      # destructure   // lvalue
     | INTER_BEGIN interpolated INTER_END                        # dynastring
     | literal                                                   # literalExpr
-    | expr '?' expr ':' expr                                    # condExpr
+    | expr '?' expr ':' expr                                    # condExpr      // we want this before concat
     | expr '><' expr                                            # concat
     | ID? '::' ID                                               # moduleRef
     | ID                                                        # id            // lvalue

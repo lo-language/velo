@@ -57,7 +57,10 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
-    // todo
+    return JS.condExpr(
+        this.predicate.compile(context),
+        this.consequent.compile(context),
+        this.alternate.compile(context));
 };
 
 module.exports = __;
