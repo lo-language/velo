@@ -145,6 +145,22 @@ __.prototype.in = function (item, collection) {
     }
 };
 
+__.prototype.scan = function (collection, handler) {
+
+    // handler is a proc fn that takes an args array
+
+    // todo we probably need to make this async-safe by waiting for each task to complete
+    // and registering each call with our bookkeeping
+
+    return Array.isArray(collection) ?
+        collection.forEach(function (elem) {
+            return handler([elem]);
+        }) :
+        Object.keys(collection).forEach(function (key) {
+            return handler([key, collection[key]]);
+        });
+};
+
 __.sendRootRequest = function (service, args, onReply, onFail) {
 
     var root = new __(service, args, onReply, onFail);

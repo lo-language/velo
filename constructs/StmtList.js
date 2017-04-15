@@ -13,6 +13,9 @@
 
 const JS = require('../codegen/JsPrimitives');
 const BranchContext = require('../codegen/BranchContext');
+const Assignment = require('./Assignment');
+const Identifier = require('./Identifier');
+
 
 
 /**
@@ -76,7 +79,25 @@ __.prototype.compile = function (context) {
     // var branch = context.getBranchContext();
     var connector = context.getConnector();
 
+    // look for a defacto declaration
+    if (this.head instanceof Assignment &&
+        this.head.left instanceof Identifier) {
+
+        var name = this.head.left.name;
+
+        if (context.isConstant(name)) {
+            throw new Error("can't assign to a constant (" + name + ")");
+        }
+
+        // declare if a new var
+        // need to check if exists in case defined in outer scope
+        if (context.has(name) == false) {
+            context.declare(name);
+        }
+    }
+
     // if there's a tail, compile it first
+    // todo this creates a bug because var declarations aren't seen yet
     if (this.tail) {
         tail = this.tail.compile(context);
     }
@@ -90,6 +111,7 @@ __.prototype.compile = function (context) {
     }
 
     // tell the context about the following statements, in case the head statement wants to wrap them in a continuation
+    // todo if we compile the head first, we'd have to push a context to wrap the tail?
     context.setFollowing(tail);
 
     var head = this.head ? this.head.compile(context) : null;

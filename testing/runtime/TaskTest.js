@@ -566,9 +566,9 @@ module.exports['await'] = {
 };
 
 
-module.exports['concat'] = {
+module.exports['runtime methods'] = {
 
-    "success": function (test) {
+    "concat": function (test) {
 
         var task = new Task();
 
@@ -587,6 +587,45 @@ module.exports['concat'] = {
         // two strings - we treat strings like arrays!
         test.equal(task.concat("vic", "thrill"), "victhrill");
 
+        test.done();
+    },
+
+    "scan array": function (test) {
+
+        var task = new Task();
+        var fruit = ["apple", "orange", "banana"];
+
+        var items = [];
+
+        task.scan(fruit, function (args) {
+
+            var $item = args[0];
+            items.push($item);
+        });
+
+        test.deepEqual(items, fruit);
+        test.done();
+    },
+
+    "scan object": function (test) {
+
+        var task = new Task();
+        var crew = {"Fry": "human", "Leela": "mutant", "Zoidberg": "alien"};
+
+        var items = [];
+
+        task.scan(crew, function (args) {
+
+            var $name = args[0];
+            var $kind = args[1];
+
+            items.push([$name, $kind]);
+        });
+
+        test.deepEqual(items, [
+            [ 'Fry', 'human' ],
+            [ 'Leela', 'mutant' ],
+            [ 'Zoidberg', 'alien' ] ]);
         test.done();
     }
 };

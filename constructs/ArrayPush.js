@@ -53,6 +53,8 @@ __.prototype.compile = function (context) {
     var left = this.left.compile(context);
     var right = this.right.compile(context);
 
+    // todo probably want to add some runtime checks
+
     if (this.op == 'push-front') {
         return JS.exprStmt(JS.fnCall(JS.select(right, 'unshift'), [left]));
     }

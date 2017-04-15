@@ -39,6 +39,8 @@ The first argument is the array of strings provided on the command line after th
     
 #### To build a statically-linked Node.js executable
 
+Not implemented yet, but will look like:
+
     $ velo build <root module>
 
 ## Module Bindings
@@ -106,6 +108,10 @@ Each node in the Lo AST compiles itself to a JavaScript AST which is then render
 #### Runtime
 
 The runtime consists of Task.js, which implements the Lo task tree.
+
+#### Testing Strategy
+
+Parsing, code generation, and runtime methods are tested independently, as is the pipeline logic (linking and loading). To make sure this all adds up to Lo programs that actually do what they should, there are integration tests in the `programs` directory that read in a program, run it, and inspect the result.
 
 ## License
 

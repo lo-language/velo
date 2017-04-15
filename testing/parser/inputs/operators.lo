@@ -10,6 +10,10 @@ test is <-> {
     doghouse = "dog" >< "house";
 
     fruits = ["apple", "pear"];
+
     fruits <+ "banana";
     "mango" +> fruits;
+
+    // test precedence
+    result = base >< person.getName();
 };

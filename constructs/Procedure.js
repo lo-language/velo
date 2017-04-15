@@ -65,7 +65,6 @@ __.prototype.compile = function (context) {
     // compile the statement(s) in the context of the local scope
     var body = this.body.compile(local);
 
-
     // bind values to our params
     for (var i = this.params.length - 1; i >= 0; i--) {
         body = JS.stmtList(JS.exprStmt(JS.assign(JS.ID('$' + this.params[i]), JS.subscript(argList, JS.num(String(i))))), body);

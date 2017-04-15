@@ -106,5 +106,63 @@ module.exports["service"] = {
 
         test.deepEqual(node.compile(new Context()).renderTree(), result);
         test.done();
+    },
+
+    "nested procs doesn't duplicate var declarations": function (test) {
+
+        var node = new Lo.procedure(
+            [],
+            new Lo.stmtList(
+                new Lo.assignment(
+                    '=',
+                    new Lo.identifier('report'),
+                    new Lo.literal('string', '')
+                ),
+                new Lo.stmtList(
+                    new Lo.scan(new Lo.identifier('tests'),
+                    new Lo.procedure(
+                        ['test'],
+                        new Lo.stmtList(
+                            new Lo.assignment(
+                                '=',
+                                new Lo.identifier('report'),
+                                new Lo.identifier('test')
+                            )
+                        )
+                    ))
+                )
+            ),
+            true);
+
+        test.deepEqual(node.compile(new Context()).renderTree(), [ 'function',
+            null,
+            [ 'task' ],
+            [ 'stmtList',
+                [ 'var', '$report' ],
+                [ 'stmtList',
+                    [ 'expr-stmt',
+                        [ 'assign', [ 'id', '$report' ], [ 'string', '' ] ] ],
+                    [ 'stmtList',
+                        [ 'expr-stmt',
+                            [ 'call',
+                                [ 'select', [ 'id', 'task' ], 'scan' ],
+                                [ [ 'id', '$tests' ],
+                                    [ 'function',
+                                        null,
+                                        [ 'args' ],
+                                        [ 'stmtList',
+                                            [ 'var', '$test' ],
+                                            [ 'stmtList',
+                                                [ 'expr-stmt', ["assign",
+                                                    [ "id", "$test" ],
+                                                    [ "subscript",
+                                                        [ "id", "args" ],
+                                                        [ "num", "0" ]
+                                                    ] ] ],
+                                                [ 'stmtList', ["expr-stmt",
+                                                    [ "assign",
+                                                        [ "id", "$report" ],
+                                                        [ "id", "$test" ] ] ] ] ] ] ] ] ] ] ] ] ] ]);
+        test.done();
     }
 };

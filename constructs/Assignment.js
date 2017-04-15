@@ -51,14 +51,13 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
-
     var left = this.left.compile(context);
     var right = this.right.compile(context);
 
     // todo this implies block-level scoping
     if (this.left instanceof Identifier) {
 
-        // if the LHS is a bare ID,
+        // if the LHS is a bare ID...
 
         var name = this.left.name;
 
