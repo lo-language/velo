@@ -173,6 +173,7 @@ __.prototype.has = function (name) {
         return true;
     }
 
+    // console.log(this.parent == null ? "no parent" : "has parent");
     if (this.parent) {
         return this.parent.has(name);
     }

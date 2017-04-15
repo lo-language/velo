@@ -130,16 +130,16 @@ expr
     | expr ('has'|'contains') expr                              # membership // not sure where this guy should go, precedence-wise
     | '(' expr ')'                                              # wrap
     | '`' expr '`'                                              # stringify
-    | expr '[' expr ']'                                         # subscript
+    | expr '[' expr ']'                                         # subscript     // lvalue
     | expr '[' expr '..' expr? ']'                              # slice
-    | expr '.' ID                                               # select
-    | '(' ID (',' ID)+ ')'                                      # destructure
+    | expr '.' ID                                               # select        // lvalue
+    | '(' ID (',' ID)+ ')'                                      # destructure   // lvalue
     | INTER_BEGIN interpolated INTER_END                        # dynastring
     | literal                                                   # literalExpr
     | expr '?' expr ':' expr                                    # condExpr
     | expr '><' expr                                            # concat
     | ID? '::' ID                                               # moduleRef
-    | ID                                                        # id
+    | ID                                                        # id            // lvalue
     ;
 
 interpolated

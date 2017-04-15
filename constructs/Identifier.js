@@ -51,7 +51,7 @@ __.prototype.compile = function (context) {
     }
 
     // of course, we need to see inside a conditional to know if it's been defined...
-    context.pushError(this.line, "reference to '" + this.name + "' before definition");
+    context.pushError(this.line, "unbound identifier '" + this.name + "' used as reference");
     return JS.ID('$' + this.name);
 };
 
