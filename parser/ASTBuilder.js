@@ -295,7 +295,7 @@ __.prototype.visitSyncRequest = function(ctx) {
     );
 };
 
-__.prototype.visitSend = function(ctx) {
+__.prototype.visitSendMessage = function(ctx) {
 
     var args = ctx.exprList();
     var handlers = ctx.handlers() ? ctx.handlers().accept(this) : null;
@@ -305,7 +305,7 @@ __.prototype.visitSend = function(ctx) {
         args ? args.accept(this) : [],
         handlers ? handlers.subsequent : null,
         handlers ? handlers.contingency : null,
-        ctx.AWAIT() ? true : false
+        ctx.ASYNC() ? false : true
     );
 };
 

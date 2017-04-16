@@ -5,7 +5,7 @@ main is <-> (foo, bar) {
     value = 0;
 
     // send an async message that returns quickly
-    () >> foo -> {
+    foo -> {
 
         // value should always be whatever's returned by bar() here
         reply 42;

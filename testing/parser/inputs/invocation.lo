@@ -13,20 +13,20 @@ test is <-> {
 
     // async calls
 
-    (18) >> foo;
+    @foo << (18);
 
-    (sessionID) >> sessionStore.getByID;
+    async sessionStore.getByID << (sessionID);
 
     (bar, baz) = @foo(47);  // destructuring
     //47 >> foo => (bar, baz);  // destructuring
 
     // handle success only
-    (48) >> bar -> {
+    @bar << (48) -> {
         reply "hello";
     };
 
     // handle failure only
-    (128) >> baz -> (result) {
+    @baz << (128) -> (result) {
     }
     on fail -> (err) {
         reply "bummer";
@@ -36,7 +36,7 @@ test is <-> {
     // after baz(12) mute;
 
     // handle both success and failure
-    (42) >> foo -> (a, b) {
+    async foo << (42) -> (a, b) {
         reply "yay";
     }
     on fail -> {
@@ -46,9 +46,9 @@ test is <-> {
 
     // nested requests
     // should we support pipes like 42 -> foo -> bar -> baz?
-    (42) >> foo -> {
+    @foo << (42) -> {
 
-        (result) >> bar -> {
+        @bar << (result) -> {
 
             yarp = @baz(result);
         }
@@ -68,12 +68,12 @@ test is <-> {
 
     // async with fail handler only
 
-    await () >> foo on fail -> (error) {
+    foo on fail -> (error) {
         substitute "ok";
     };
 
     // both handlers
-    await () >> bar -> (result) {
+    bar -> (result) {
         reply "ok";
     }
     on fail -> (error) {

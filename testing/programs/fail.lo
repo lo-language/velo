@@ -6,14 +6,14 @@ main is <-> (test) {
 
     // fail handler only
 
-    await () >> mightFail on fail -> {
+    mightFail on fail -> {
 
         test.ok(true);
     };
 
     // both handlers
 
-    await () >> mightFail -> {
+    mightFail -> {
 
         test.ok(false);
     }

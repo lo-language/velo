@@ -24,6 +24,7 @@ NUMBER
     | '-'? INT
     ;
 
+ASYNC   : 'async'|'@';
 AWAIT   : 'await';
 
 ID      : ID_LETTER (ID_LETTER | DIGIT)* ;
@@ -66,9 +67,9 @@ statement
     | expr op=('++'|'--') ';'                               # incDec
     | conditional                                           # condStmt
     | expr op=('+>'|'<+') expr ';'                          # push
-    | expr '(' exprList? ')' ';'                            # syncRequest   // not strictly necessary
+    | expr '(' exprList? ')' ';'                            # syncRequest   // redundant; remove?
     | 'on' expr sink ';'                                    # subscribe
-    | AWAIT? '(' exprList? ')' '>>' expr handlers? ';'      # send
+    | ASYNC? expr ('<<' '(' exprList? ')')? handlers? ';'   # sendMessage
     | 'while' expr block                                    # iteration
     | 'scan' expr expr                                      # scan
     ;
@@ -120,7 +121,7 @@ block
 
 expr
     : expr '(' exprList? ')'                                    # syncCall  // blocking request. the value of the expr is the *return value*
-    | '@' expr '(' exprList? ')'                                # asyncCall // non-blocking request. the value of the expr is a *future*
+    | ASYNC expr '(' exprList? ')'                              # asyncCall // non-blocking request. the value of the expr is a *future*
     | '#' expr                                                  # cardinality
     | 'not' expr                                                # negation
     | 'bytes' expr                                              # bytes

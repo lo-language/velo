@@ -72,8 +72,8 @@ loVisitor.prototype.visitSubscribe = function(ctx) {
 };
 
 
-// Visit a parse tree produced by loParser#send.
-loVisitor.prototype.visitSend = function(ctx) {
+// Visit a parse tree produced by loParser#sendMessage.
+loVisitor.prototype.visitSendMessage = function(ctx) {
   return this.visitChildren(ctx);
 };
 
