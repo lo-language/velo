@@ -66,12 +66,6 @@ loVisitor.prototype.visitSyncRequest = function(ctx) {
 };
 
 
-// Visit a parse tree produced by loParser#asyncRequest.
-loVisitor.prototype.visitAsyncRequest = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
 // Visit a parse tree produced by loParser#subscribe.
 loVisitor.prototype.visitSubscribe = function(ctx) {
   return this.visitChildren(ctx);

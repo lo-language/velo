@@ -3,10 +3,10 @@
 
 main is <-> (test) {
 
-    foo() -> (result) {
+    () >> foo -> (result) {
 
         test.equal(result, ["Voigt", "Kampff", "machine"]);
-    }
+    };
 };
 
 foo is <-> {

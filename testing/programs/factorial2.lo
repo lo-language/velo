@@ -13,5 +13,5 @@ main is <-> (args, io) {
         reply num * factorial(num - 1);
     };
 
-    @io.stdout.write("`factorial(args[0])`\n");
+    io.stdout.write("`factorial(args[0])`\n");
 };

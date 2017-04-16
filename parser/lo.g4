@@ -24,12 +24,15 @@ NUMBER
     | '-'? INT
     ;
 
+AWAIT   : 'await';
+
 ID      : ID_LETTER (ID_LETTER | DIGIT)* ;
 
 STRING      : '"' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1);} ;
 INTER_BEGIN : '"' (ESC|~[`"])* '`' {this.text = this.text.slice(1, -1); this.inString = true;} ;
 INTER_MID   : {this.inString}? '`' (ESC|~[`"])* '`' {this.text = this.text.slice(1, -1);} ;
 INTER_END   : '`' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1); this.inString = false;} ;
+
 
 // should a module just be a record def?
 // but records normally can't refer to their own parts...
@@ -63,10 +66,9 @@ statement
     | expr op=('++'|'--') ';'                               # incDec
     | conditional                                           # condStmt
     | expr op=('+>'|'<+') expr ';'                          # push
-    | expr '(' exprList? ')' handlers                       # syncRequest
-    | '@' expr '(' exprList? ')' handlers                   # asyncRequest
+    | expr '(' exprList? ')' ';'                            # syncRequest   // not strictly necessary
     | 'on' expr sink ';'                                    # subscribe
-    | expr '>>' expr ';'                                    # send  // fire-and-forget to be clear and prevent us from using @syntax; is NOT a request, note that it is a statement, not an expression; precludes reply. could reuse -> here instead
+    | AWAIT? '(' exprList? ')' '>>' expr handlers? ';'      # send
     | 'while' expr block                                    # iteration
     | 'scan' expr expr                                      # scan
     ;
@@ -76,8 +78,7 @@ definition
     ;
 
 handlers
-    : ';'
-    | replyHandler
+    : replyHandler
     | failHandler
     | replyHandler failHandler
     ;

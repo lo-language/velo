@@ -99,7 +99,7 @@ module.exports['basics'] = {
 
         var modSpace = new MockModuleSpace(
                     'main is <-> (write) {\n' +
-                    '@write("hi there!");\n};\n');
+                    'write("hi there!");\n};\n');
 
         var program = new Program(modSpace, 'ROOT');
 

@@ -6,10 +6,10 @@ main is <-> (log) {
     while num < 3 {
 
         if num > 1 {
-            @log("hello hello!\n");
+            ("hello hello!\n") >> log;
         }
         else {
-            @log("howdy!\n");
+            ("howdy!\n") >> log;
         }
 
         num++;
@@ -17,7 +17,7 @@ main is <-> (log) {
 
     while num < 5 {
 
-        @log("ok.\n");
+        ("ok.\n") >> log;
         num++;
     }
 

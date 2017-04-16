@@ -285,28 +285,27 @@ __.prototype.visitAsyncCall = function(ctx) {
 __.prototype.visitSyncRequest = function(ctx) {
 
     var args = ctx.exprList();
-    var handlers = ctx.handlers().accept(this);
 
     return new Lo.requestStmt(
         ctx.expr().accept(this),
         args ? args.accept(this) : [],
-        handlers.subsequent,
-        handlers.contingency,
+        null,
+        null,
         true
     );
 };
 
-__.prototype.visitAsyncRequest = function(ctx) {
+__.prototype.visitSend = function(ctx) {
 
     var args = ctx.exprList();
-    var handlers = ctx.handlers().accept(this);
+    var handlers = ctx.handlers() ? ctx.handlers().accept(this) : null;
 
     return new Lo.requestStmt(
         ctx.expr().accept(this),
         args ? args.accept(this) : [],
-        handlers.subsequent,
-        handlers.contingency,
-        false
+        handlers ? handlers.subsequent : null,
+        handlers ? handlers.contingency : null,
+        ctx.AWAIT() ? true : false
     );
 };
 
