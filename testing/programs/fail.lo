@@ -6,21 +6,21 @@ main is <-> (test) {
 
     // fail handler only
 
-    mightFail() on fail -> {
+    mightFail on fail -> {
 
         test.ok(true);
-    }
+    };
 
     // both handlers
 
-    mightFail() -> {
+    mightFail -> {
 
         test.ok(false);
     }
     on fail -> {
 
         test.ok(true);
-    }
+    };
 };
 
 

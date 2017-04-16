@@ -14,7 +14,7 @@ module.exports["basics"] = {
     "push front": function (test) {
 
         var node = new Lo.arrayPush('push-front',
-            new Lo.literal('string', 'kiwi'), new Lo.identifier('foo'));
+            new Lo.string('kiwi'), new Lo.identifier('foo'));
 
         var context = new Context().createInner();
 
@@ -30,7 +30,7 @@ module.exports["basics"] = {
     "push back": function (test) {
 
         var node = new Lo.arrayPush('push-back',
-            new Lo.identifier('foo'), new Lo.literal('number', '57'));
+            new Lo.identifier('foo'), new Lo.number('57'));
 
         var context = new Context().createInner();
 

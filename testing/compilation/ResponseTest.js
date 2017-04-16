@@ -26,7 +26,7 @@ module.exports["basics"] = {
     "reply with following stmts should omit them": function (test) {
 
         var node = new Lo.stmtList(new Lo.response('reply'),
-            new Lo.stmtList(new Lo.assignment('=', new Lo.identifier('x'), new Lo.literal('number', '47'))));
+            new Lo.stmtList(new Lo.assignment('=', new Lo.identifier('x'), new Lo.number('47'))));
 
         var result = node.compile(new Context().createInner(true));
 
@@ -43,7 +43,7 @@ module.exports["basics"] = {
 
     "reply with one arg": function (test) {
 
-        var node = new Lo.response('reply', [new Lo.literal('number', '42')]);
+        var node = new Lo.response('reply', [new Lo.number('42')]);
 
         test.deepEqual(node.compile(new Context().createInner(true)).renderTree(),
                 [ 'expr-stmt',
@@ -57,8 +57,8 @@ module.exports["basics"] = {
     "reply with two args": function (test) {
 
         var node = new Lo.response('reply', [
-            new Lo.literal('number', '42'),
-            new Lo.literal('string', 'hot dog!')
+            new Lo.number('42'),
+            new Lo.string('hot dog!')
         ]);
 
         test.deepEqual(node.compile(new Context().createInner(true)).renderTree(),
@@ -73,7 +73,7 @@ module.exports["basics"] = {
 
     "fail with one arg": function (test) {
 
-        var node = new Lo.response('fail', [new Lo.literal('number', '42')]);
+        var node = new Lo.response('fail', [new Lo.number('42')]);
 
         test.deepEqual(node.compile(new Context().createInner(true)).renderTree(),
                 [ 'expr-stmt',
@@ -89,13 +89,13 @@ module.exports["context"] = {
 
     "throws error if can't respond": function (test) {
 
-        var node = new Lo.response('fail', [new Lo.literal('number', '42')]);
+        var node = new Lo.response('fail', [new Lo.number('42')]);
 
         test.throws(function () {
             node.compile(new Context()).renderTree()
         });
 
-        node = new Lo.response('reply', [new Lo.literal('number', '42')]);
+        node = new Lo.response('reply', [new Lo.number('42')]);
 
         test.throws(function () {
             node.compile(new Context()).renderTree()

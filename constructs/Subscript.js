@@ -10,7 +10,7 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const Literal = require('./Literal');
+const Number = require('./Number');
 
 // todo break this up into bool, number, string
 
@@ -50,7 +50,7 @@ __.prototype.compile = function (context) {
 
     // support negative subscripts if the subscript is a literal
     // to do this more generally we'd have to catch it at runtime, probably with splice
-    if (this.index instanceof Literal && parseInt(this.index.getValue()) < 0) {
+    if (this.index instanceof Number && parseInt(this.index.getValue()) < 0) {
         index = JS.add(JS.select(array, 'length'), index);
     }
 

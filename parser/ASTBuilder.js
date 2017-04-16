@@ -285,28 +285,27 @@ __.prototype.visitAsyncCall = function(ctx) {
 __.prototype.visitSyncRequest = function(ctx) {
 
     var args = ctx.exprList();
-    var handlers = ctx.handlers().accept(this);
 
     return new Lo.requestStmt(
         ctx.expr().accept(this),
         args ? args.accept(this) : [],
-        handlers.subsequent,
-        handlers.contingency,
+        null,
+        null,
         true
     );
 };
 
-__.prototype.visitAsyncRequest = function(ctx) {
+__.prototype.visitSendMessage = function(ctx) {
 
     var args = ctx.exprList();
-    var handlers = ctx.handlers().accept(this);
+    var handlers = ctx.handlers() ? ctx.handlers().accept(this) : null;
 
     return new Lo.requestStmt(
         ctx.expr().accept(this),
         args ? args.accept(this) : [],
-        handlers.subsequent,
-        handlers.contingency,
-        false
+        handlers ? handlers.subsequent : null,
+        handlers ? handlers.contingency : null,
+        ctx.ASYNC() ? false : true
     );
 };
 
@@ -368,17 +367,17 @@ __.prototype.visitNil = function(ctx) {
 
 __.prototype.visitBool = function(ctx) {
 
-    return new Lo.literal('boolean', ctx.BOOL().getText() == 'true');
+    return new Lo.boolean(ctx.BOOL().getText() == 'true');
 };
 
 __.prototype.visitNumber = function(ctx) {
 
-    return new Lo.literal('number', ctx.NUMBER().getText());
+    return new Lo.number(ctx.NUMBER().getText());
 };
 
 __.prototype.visitString = function(ctx) {
 
-    return new Lo.literal('string', ctx.STRING().getText());
+    return new Lo.string(ctx.STRING().getText());
 };
 
 __.prototype.visitInterpolated = function(ctx) {

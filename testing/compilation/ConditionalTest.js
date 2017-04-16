@@ -23,7 +23,7 @@ module.exports["sync"] = {
             new Lo.stmtList(
                 new Lo.assignment('=',
                     new Lo.identifier('bar'),
-                    new Lo.literal('number', '42')
+                    new Lo.number('42')
                 )
             )
         );
@@ -46,13 +46,13 @@ module.exports["sync"] = {
             new Lo.stmtList(
                 new Lo.assignment('=',
                     new Lo.identifier('bar'),
-                    new Lo.literal('number', '42')
+                    new Lo.number('42')
                 )
             ),
             new Lo.stmtList(
                 new Lo.assignment('=',
                     new Lo.identifier('bar'),
-                    new Lo.literal('number', '32')
+                    new Lo.number('32')
                 )
             )
         );
@@ -77,7 +77,7 @@ module.exports["sync"] = {
             new Lo.stmtList(
                 new Lo.assignment('=',
                     new Lo.identifier('bar'),
-                    new Lo.literal('number', '42')
+                    new Lo.number('42')
                 )
             ),
             new Lo.conditional(
@@ -85,13 +85,13 @@ module.exports["sync"] = {
                 new Lo.stmtList(
                     new Lo.assignment('=',
                         new Lo.identifier('bar'),
-                        new Lo.literal('number', '32')
+                        new Lo.number('32')
                     )
                 ),
                 new Lo.stmtList(
                     new Lo.assignment('=',
                         new Lo.identifier('baz'),
-                        new Lo.literal('number', '82')
+                        new Lo.number('82')
                     )
                 )
             )
@@ -164,6 +164,29 @@ module.exports["async"] = {
         //     "var cont0 = function () {};if ($foo) {task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\n$bar = P0;\ncont0();}, null);\n\n}\n\nelse {cont0();}\n\n");
         test.done();
     },
+
+    // "bug": function (test) {
+    //
+    //     var node = new Lo.procedure(
+    //         ['test'],
+    //         new Lo.stmtList(
+    //             new Lo.conditional(
+    //                 new Lo.identifier('out'),
+    //                 new Lo.stmtList(
+    //                     new Lo.requestStmt(
+    //                         new Lo.identifier('write'),
+    //                         [new Lo.identifier('summary')],
+    //                         null, null, true
+    //                     )
+    //                 )
+    //             )
+    //         ),
+    //         true
+    //     );
+    //
+    //     test.deepEqual(node.compile(new Context().createInner()).renderJs(), "");
+    //     test.done();
+    // }
 
 //     "nested ifs create separate continuations": function (test) {
 //         // todo

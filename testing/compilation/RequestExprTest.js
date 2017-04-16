@@ -19,7 +19,7 @@ module.exports["blocking calls"] = {
             new Lo.identifier('num'),
             new Lo.requestExpr(
                 new Lo.identifier('main'), [
-                    new Lo.binaryOpExpr('-', new Lo.identifier('num'), new Lo.literal('number', '1'))
+                    new Lo.binaryOpExpr('-', new Lo.identifier('num'), new Lo.number('1'))
                 ],
                 true))]);
 
@@ -87,7 +87,7 @@ module.exports["blocking calls"] = {
             '=',
             new Lo.identifier('baz'),
             new Lo.requestExpr(
-                new Lo.identifier('foo'), [new Lo.literal('number', '42')], true
+                new Lo.identifier('foo'), [new Lo.number('42')], true
             )
         );
 
@@ -117,8 +117,8 @@ module.exports["blocking calls"] = {
             new Lo.identifier('baz'),
             new Lo.requestExpr(
                 new Lo.identifier('foo'), [
-                    new Lo.literal('number', '42'),
-                    new Lo.literal('string', 'hi there')
+                    new Lo.number('42'),
+                    new Lo.string('hi there')
                 ], true
             )
         );

@@ -24,12 +24,16 @@ NUMBER
     | '-'? INT
     ;
 
+ASYNC   : 'async'|'@';
+AWAIT   : 'await';
+
 ID      : ID_LETTER (ID_LETTER | DIGIT)* ;
 
 STRING      : '"' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1);} ;
 INTER_BEGIN : '"' (ESC|~[`"])* '`' {this.text = this.text.slice(1, -1); this.inString = true;} ;
 INTER_MID   : {this.inString}? '`' (ESC|~[`"])* '`' {this.text = this.text.slice(1, -1);} ;
 INTER_END   : '`' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1); this.inString = false;} ;
+
 
 // should a module just be a record def?
 // but records normally can't refer to their own parts...
@@ -63,10 +67,9 @@ statement
     | expr op=('++'|'--') ';'                               # incDec
     | conditional                                           # condStmt
     | expr op=('+>'|'<+') expr ';'                          # push
-    | expr '(' exprList? ')' handlers                       # syncRequest
-    | '@' expr '(' exprList? ')' handlers                   # asyncRequest
+    | expr '(' exprList? ')' ';'                            # syncRequest   // this permits foo(); which would otherwise be caught by sendMessage and wouldn't do what people expect
     | 'on' expr sink ';'                                    # subscribe
-    | expr '>>' expr ';'                                    # send  // fire-and-forget to be clear and prevent us from using @syntax; is NOT a request, note that it is a statement, not an expression; precludes reply. could reuse -> here instead
+    | ASYNC? expr ('<<' '(' exprList? ')')? handlers? ';'   # sendMessage
     | 'while' expr block                                    # iteration
     | 'scan' expr expr                                      # scan
     ;
@@ -76,8 +79,7 @@ definition
     ;
 
 handlers
-    : ';'
-    | replyHandler
+    : replyHandler
     | failHandler
     | replyHandler failHandler
     ;
@@ -119,7 +121,7 @@ block
 
 expr
     : expr '(' exprList? ')'                                    # syncCall  // blocking request. the value of the expr is the *return value*
-    | '@' expr '(' exprList? ')'                                # asyncCall // non-blocking request. the value of the expr is a *future*
+    | ASYNC expr '(' exprList? ')'                              # asyncCall // non-blocking request. the value of the expr is a *future*
     | '#' expr                                                  # cardinality
     | 'not' expr                                                # negation
     | 'bytes' expr                                              # bytes
@@ -136,7 +138,7 @@ expr
     | '(' ID (',' ID)+ ')'                                      # destructure   // lvalue
     | INTER_BEGIN interpolated INTER_END                        # dynastring
     | literal                                                   # literalExpr
-    | expr '?' expr ':' expr                                    # condExpr
+    | expr '?' expr ':' expr                                    # condExpr      // we want this before concat
     | expr '><' expr                                            # concat
     | ID? '::' ID                                               # moduleRef
     | ID                                                        # id            // lvalue

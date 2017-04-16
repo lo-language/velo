@@ -15,7 +15,7 @@ module.exports["root constants"] = {
 
     "numeric": function (test) {
 
-        var node = new Lo.constant('port', new Lo.literal('number', '443'));
+        var node = new Lo.constant('port', new Lo.number('443'));
 
         var context = new Context();
 
@@ -32,7 +32,7 @@ module.exports["root constants"] = {
 
     "string": function (test) {
 
-        var node = new Lo.constant('album', new Lo.literal('string', "Mellon Collie"));
+        var node = new Lo.constant('album', new Lo.string("Mellon Collie"));
 
         var context = new Context();
 
@@ -54,7 +54,7 @@ module.exports["non-root constants"] = {
 
     "numeric": function (test) {
 
-        var node = new Lo.constant('port', new Lo.literal('number', '443'));
+        var node = new Lo.constant('port', new Lo.number('443'));
 
         var context = new Context(rootContext);
 
@@ -71,7 +71,7 @@ module.exports["non-root constants"] = {
 
     "string": function (test) {
 
-        var node = new Lo.constant('album', new Lo.literal('string', "Mellon Collie"));
+        var node = new Lo.constant('album', new Lo.string("Mellon Collie"));
 
         var context = new Context(rootContext);
 
@@ -96,7 +96,7 @@ module.exports["non-root constants"] = {
                     new Lo.assignment(
                         '*=',
                         new Lo.identifier('result'),
-                        new Lo.literal('number', '10')
+                        new Lo.number('10')
                     )
                 ),
                 true
@@ -135,7 +135,7 @@ module.exports["non-root constants"] = {
 
     "avoids JS collisions": function (test) {
 
-        var node = new Lo.constant('constructor', new Lo.literal('string', "Melon Collie"));
+        var node = new Lo.constant('constructor', new Lo.string("Melon Collie"));
 
         var context = new Context(rootContext);
 

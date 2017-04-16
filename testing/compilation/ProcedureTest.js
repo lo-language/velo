@@ -24,7 +24,7 @@ module.exports["service"] = {
                     new Lo.identifier('result'),
                     new Lo.requestExpr(
                         new Lo.identifier('bar'),
-                        [new Lo.literal('number', '42')]
+                        [new Lo.number('42')]
                     )
                 )
             ),
@@ -70,7 +70,7 @@ module.exports["service"] = {
             new Lo.stmtList(
                 new Lo.requestStmt(
                     new Lo.identifier('write'),
-                    [new Lo.literal('string', 'hello')],
+                    [new Lo.string('hello')],
                     false
                 )
             ),
@@ -116,7 +116,7 @@ module.exports["service"] = {
                 new Lo.assignment(
                     '=',
                     new Lo.identifier('report'),
-                    new Lo.literal('string', '')
+                    new Lo.string('')
                 ),
                 new Lo.stmtList(
                     new Lo.scan(new Lo.identifier('tests'),

@@ -8,8 +8,6 @@
  =============================================================================*/
 
 /**
- * C-style conditional expression
- *
  * Created by seth on 11/12/16.
  */
 
@@ -19,17 +17,21 @@ const JS = require('../codegen/JsPrimitives');
 
 
 /**
- * A conditional expression
- *
- * @param predicate
- * @param consequent
- * @param alternate
+ * A literal number
  */
-var __ = function (predicate, consequent, alternate) {
+var __ = function (value) {
 
-    this.predicate = predicate;
-    this.consequent = consequent;
-    this.alternate = alternate;
+    this.value = value;
+};
+
+/**
+ * Accessor
+ *
+ * @returns {*}
+ */
+__.prototype.getValue = function () {
+
+    return this.value;
 };
 
 /**
@@ -37,30 +39,24 @@ var __ = function (predicate, consequent, alternate) {
  */
 __.prototype.getAst = function () {
 
-    var result = {
-        type: 'cond-expr',
-        predicate: this.predicate.getAst(),
-        trueVal: this.consequent.getAst()
+    // ??? might not want to return an actual bool here - number literals are kept as strings
+
+    return {
+        type: 'number',
+        val: this.value
     };
-
-    if (this.alternate) {
-        result.falseVal = this.alternate.getAst();
-    }
-
-    return result;
 };
 
 /**
  * Compiles this node to JS in the given context.
  *
+ * todo break these out into their own classes?
+ *
  * @param context
  */
 __.prototype.compile = function (context) {
 
-    return JS.condExpr(
-        this.predicate.compile(context),
-        this.consequent.compile(context),
-        this.alternate.compile(context));
+    return JS.num(this.value);
 };
 
 module.exports = __;

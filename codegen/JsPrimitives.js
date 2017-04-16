@@ -194,6 +194,14 @@ JS.gte = (left, right) => {
     };
 };
 
+JS.condExpr = (predicate, consequent, alt) => {
+
+    return {
+        renderTree: () => ['cond-expr', predicate.renderTree(), consequent.renderTree(), alt.renderTree()],
+        renderJs: () => '(' + predicate.renderJs() + '?' + consequent.renderJs() + ':' + alt.renderJs() + ')'
+    }
+};
+
 JS.add = (left, right) => {
 
     return {
@@ -304,14 +312,14 @@ JS.stmtList = (head, tail) => {
                 var tailTree = tail ? tail.renderTree() : null;
             }
             catch (e) {
-                tailTree = ['EXCEPTION', e.stack];
+                tailTree = ['ERROR RENDERING TAIL', e.stack];
             }
 
             try {
                 var headTree = head.renderTree();
             }
             catch (e) {
-                headTree = ['EXCEPTION', e.stack];
+                headTree = ['ERROR RENDERING HEAD', e.stack];
             }
 
             return tailTree ? ['stmtList', headTree, tailTree] : ['stmtList', headTree];
@@ -327,14 +335,14 @@ JS.stmtList = (head, tail) => {
                 var tailJs = tail ? tail.renderJs() : null;
             }
             catch (e) {
-                tailJs = 'EXCEPTION';
+                tailJs = 'ERROR RENDERING TAIL';
             }
 
             try {
                 var headJs = head.renderJs();
             }
             catch (e) {
-                headJs = 'EXCEPTION';
+                headJs = 'ERROR RENDERING HEAD';
             }
 
             return headJs + '\n' + (tailJs || '');
