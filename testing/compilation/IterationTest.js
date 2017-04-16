@@ -19,7 +19,7 @@ module.exports["basics"] = {
                 new Lo.assignment(
                     '=',
                     new Lo.identifier('bar'),
-                    new Lo.literal('number', '42')
+                    new Lo.number('42')
                 )
             )
         );
@@ -34,7 +34,7 @@ module.exports["basics"] = {
 
         // // try attaching a statement – should get stuck on the end
         node = new Lo.stmtList(node,
-            new Lo.stmtList(new Lo.assignment('=', new Lo.identifier('z'), new Lo.literal('number', '57'))));
+            new Lo.stmtList(new Lo.assignment('=', new Lo.identifier('z'), new Lo.number('57'))));
 
         result = node.compile(new Context());
 
@@ -48,7 +48,7 @@ module.exports["basics"] = {
                     [ 'expr-stmt', [ 'assign', [ 'id', '$z' ], [ 'num', '57' ] ] ] ] ]);
 
         // // try attaching another statement
-        node.attach(new Lo.stmtList(new Lo.assignment('=', new Lo.identifier('mork'), new Lo.literal('string', 'ork'))));
+        node.attach(new Lo.stmtList(new Lo.assignment('=', new Lo.identifier('mork'), new Lo.string('ork'))));
 
         result = node.compile(new Context());
 
@@ -74,7 +74,7 @@ module.exports["basics"] = {
             new Lo.stmtList(
                 new Lo.requestStmt(
                     new Lo.identifier('bar'),
-                    [new Lo.literal('number', '57')]
+                    [new Lo.number('57')]
                 )
             )
         );

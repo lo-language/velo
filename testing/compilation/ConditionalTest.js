@@ -23,7 +23,7 @@ module.exports["sync"] = {
             new Lo.stmtList(
                 new Lo.assignment('=',
                     new Lo.identifier('bar'),
-                    new Lo.literal('number', '42')
+                    new Lo.number('42')
                 )
             )
         );
@@ -46,13 +46,13 @@ module.exports["sync"] = {
             new Lo.stmtList(
                 new Lo.assignment('=',
                     new Lo.identifier('bar'),
-                    new Lo.literal('number', '42')
+                    new Lo.number('42')
                 )
             ),
             new Lo.stmtList(
                 new Lo.assignment('=',
                     new Lo.identifier('bar'),
-                    new Lo.literal('number', '32')
+                    new Lo.number('32')
                 )
             )
         );
@@ -77,7 +77,7 @@ module.exports["sync"] = {
             new Lo.stmtList(
                 new Lo.assignment('=',
                     new Lo.identifier('bar'),
-                    new Lo.literal('number', '42')
+                    new Lo.number('42')
                 )
             ),
             new Lo.conditional(
@@ -85,13 +85,13 @@ module.exports["sync"] = {
                 new Lo.stmtList(
                     new Lo.assignment('=',
                         new Lo.identifier('bar'),
-                        new Lo.literal('number', '32')
+                        new Lo.number('32')
                     )
                 ),
                 new Lo.stmtList(
                     new Lo.assignment('=',
                         new Lo.identifier('baz'),
-                        new Lo.literal('number', '82')
+                        new Lo.number('82')
                     )
                 )
             )

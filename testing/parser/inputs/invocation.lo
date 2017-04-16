@@ -2,8 +2,8 @@ test is <-> {
 
     // sync calls
 
-    foo();
-    foo.bar();
+    foo;        // how it's supposed to work in Lo
+    foo.bar();  // only supported for backwards-compatibility with programmers; should emit warning
 
     x = foo();
     (x, y) = foo();

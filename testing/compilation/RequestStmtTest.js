@@ -22,7 +22,7 @@ module.exports["blocking"] = {
                         new Lo.assignment(
                             '=',
                             new Lo.identifier('baz'),
-                            new Lo.literal('number', '42')
+                            new Lo.number('42')
                         )
                     )
                 ),
@@ -62,7 +62,7 @@ module.exports["blocking"] = {
                         new Lo.assignment(
                             '=',
                             new Lo.identifier('baz'),
-                            new Lo.literal('number', '42')
+                            new Lo.number('42')
                         )
                     )
                 ),
@@ -70,7 +70,7 @@ module.exports["blocking"] = {
                 true
             ),
             new Lo.stmtList(
-                new Lo.assignment('=', new Lo.identifier('bazball'), new Lo.literal('number', '42'))));
+                new Lo.assignment('=', new Lo.identifier('bazball'), new Lo.number('42'))));
 
         test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -111,7 +111,7 @@ module.exports["blocking"] = {
                         new Lo.assignment(
                             '=',
                             new Lo.identifier('foo'),
-                            new Lo.literal('number', '42')
+                            new Lo.number('42')
                         )
                     )
                 ),
@@ -149,14 +149,14 @@ module.exports["blocking"] = {
                         new Lo.assignment(
                             '=',
                             new Lo.identifier('baz'),
-                            new Lo.literal('number', '42')
+                            new Lo.number('42')
                         )
                     )
                 ),
                 true
             ),
             new Lo.stmtList(
-                new Lo.assignment('=', new Lo.identifier('bazball'), new Lo.literal('number', '42'))));
+                new Lo.assignment('=', new Lo.identifier('bazball'), new Lo.number('42'))));
 
         test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -196,7 +196,7 @@ module.exports["blocking"] = {
                         new Lo.assignment(
                             '=',
                             new Lo.identifier('foo'),
-                            new Lo.literal('number', '42')
+                            new Lo.number('42')
                         )
                     )
                 ),
@@ -206,7 +206,7 @@ module.exports["blocking"] = {
                         new Lo.assignment(
                             '=',
                             new Lo.identifier('bar'),
-                            new Lo.literal('number', '57')
+                            new Lo.number('57')
                         )
                     )
                 ),
@@ -237,7 +237,7 @@ module.exports["blocking"] = {
 
         var node = new Lo.stmtList(reqStmt,
             new Lo.stmtList(
-                new Lo.assignment('=', new Lo.identifier('bazball'), new Lo.literal('number', '42'))));
+                new Lo.assignment('=', new Lo.identifier('bazball'), new Lo.number('42'))));
 
         test.deepEqual(node.compile(new Context()).renderTree(),
             [ 'stmtList',
@@ -275,7 +275,7 @@ module.exports["blocking"] = {
 
         var reqStmt = new Lo.requestStmt(
             new Lo.identifier('foo'),
-            [new Lo.literal('number', '42')],
+            [new Lo.number('42')],
             null,
             null,
             true
@@ -369,7 +369,7 @@ module.exports["blocking"] = {
             new Lo.assignment(
                 '=',
                 new Lo.identifier('bazball'),
-                new Lo.literal('number', 12)
+                new Lo.number(12)
             )
         ));
 
@@ -497,7 +497,7 @@ module.exports["non-blocking"] = {
                     new Lo.assignment(
                         '=',
                         new Lo.identifier('foo'),
-                        new Lo.literal('number', '42')
+                        new Lo.number('42')
                     )
                 )
             ),
@@ -527,7 +527,7 @@ module.exports["non-blocking"] = {
             new Lo.stmtList(new Lo.assignment(
                 '=',
                 new Lo.identifier('bazball'),
-                new Lo.literal('number', '42')
+                new Lo.number('42')
             ))).compile(new Context());
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
@@ -563,7 +563,7 @@ module.exports["non-blocking"] = {
                     new Lo.assignment(
                         '=',
                         new Lo.identifier('foo'),
-                        new Lo.literal('number', '42')
+                        new Lo.number('42')
                     )
                 )
             ),
@@ -599,7 +599,7 @@ module.exports["non-blocking"] = {
                     new Lo.assignment(
                         '=',
                         new Lo.identifier('foo'),
-                        new Lo.literal('number', '42')
+                        new Lo.number('42')
                     )
                 )
             ),
@@ -609,7 +609,7 @@ module.exports["non-blocking"] = {
                     new Lo.assignment(
                         '=',
                         new Lo.identifier('bar'),
-                        new Lo.literal('number', '57')
+                        new Lo.number('57')
                     )
                 )
             ),

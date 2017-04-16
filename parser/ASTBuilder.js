@@ -367,17 +367,17 @@ __.prototype.visitNil = function(ctx) {
 
 __.prototype.visitBool = function(ctx) {
 
-    return new Lo.literal('boolean', ctx.BOOL().getText() == 'true');
+    return new Lo.boolean(ctx.BOOL().getText() == 'true');
 };
 
 __.prototype.visitNumber = function(ctx) {
 
-    return new Lo.literal('number', ctx.NUMBER().getText());
+    return new Lo.number(ctx.NUMBER().getText());
 };
 
 __.prototype.visitString = function(ctx) {
 
-    return new Lo.literal('string', ctx.STRING().getText());
+    return new Lo.string(ctx.STRING().getText());
 };
 
 __.prototype.visitInterpolated = function(ctx) {

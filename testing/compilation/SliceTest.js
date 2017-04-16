@@ -16,8 +16,8 @@ module.exports["slice"] = {
         
         var node = new Lo.slice(
             new Lo.identifier('foo'),
-            new Lo.literal('number', '1'),
-            new Lo.literal('number', '3')
+            new Lo.number('1'),
+            new Lo.number('3')
         );
 
         test.deepEqual(node.compile(new Context()).renderTree(),
@@ -46,8 +46,8 @@ module.exports["slice"] = {
 
         var node = new Lo.slice(
             new Lo.identifier('foo'),
-            new Lo.literal('number', '-3'),
-            new Lo.literal('number', '-1')
+            new Lo.number('-3'),
+            new Lo.number('-1')
         );
 
         test.deepEqual(node.compile(new Context()).renderTree(),

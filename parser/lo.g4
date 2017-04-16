@@ -67,7 +67,7 @@ statement
     | expr op=('++'|'--') ';'                               # incDec
     | conditional                                           # condStmt
     | expr op=('+>'|'<+') expr ';'                          # push
-    | expr '(' exprList? ')' ';'                            # syncRequest   // redundant; remove?
+    | expr '(' exprList? ')' ';'                            # syncRequest   // this permits foo(); which would otherwise be caught by sendMessage and wouldn't do what people expect
     | 'on' expr sink ';'                                    # subscribe
     | ASYNC? expr ('<<' '(' exprList? ')')? handlers? ';'   # sendMessage
     | 'while' expr block                                    # iteration

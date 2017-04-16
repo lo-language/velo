@@ -17,11 +17,10 @@ const JS = require('../codegen/JsPrimitives');
 
 
 /**
- * A literal value
+ * A literal string
  */
-var __ = function (type, value) {
+var __ = function (value) {
 
-    this.type = type;
     this.value = value;
 };
 
@@ -43,7 +42,7 @@ __.prototype.getAst = function () {
     // ??? might not want to return an actual bool here - number literals are kept as strings
 
     return {
-        type: this.type,
+        type: 'string',
         val: this.value
     };
 };
@@ -57,20 +56,7 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
-    switch (this.type) {
-
-        case 'boolean':
-            return JS.bool(this.value ? 'true' : 'false');
-            break;
-
-        case 'number':
-            return JS.num(this.value);
-            break;
-
-        case 'string':
-            return JS.string(this.value);
-            break;
-    }
+    return JS.string(this.value);
 };
 
 module.exports = __;

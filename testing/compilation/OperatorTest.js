@@ -31,7 +31,7 @@ module.exports["op"] = {
 
         cases.forEach(op => {
 
-            var node = new Lo.binaryOpExpr(op[0], new Lo.literal('number', '1'), new Lo.literal('number', '2'));
+            var node = new Lo.binaryOpExpr(op[0], new Lo.number('1'), new Lo.number('2'));
 
             test.deepEqual(node.compile(new Context()).renderTree(), [ op[1], [ 'num', '1' ], [ 'num', '2' ] ]);
         });
@@ -45,9 +45,9 @@ module.exports["op"] = {
             'or',
             new Lo.binaryOpExpr(
                 'and',
-                new Lo.literal('number', '1'),
-                new Lo.literal('number', '2')),
-            new Lo.literal('number', '3'));
+                new Lo.number('1'),
+                new Lo.number('2')),
+            new Lo.number('3'));
 
         test.deepEqual(node.compile(new Context()).renderTree(), [ '||',
             [ '&&', [ 'num', '1' ], [ 'num', '2' ] ],
@@ -68,7 +68,7 @@ module.exports["op"] = {
 
         var node = new Lo.membership(
             new Lo.identifier('dudes'),
-            new Lo.literal('string', 'trillian'));
+            new Lo.string('trillian'));
 
         test.deepEqual(node.compile(new Context()).renderTree(), [ 'call',
             [ 'select', [ 'id', 'task' ], 'in' ],

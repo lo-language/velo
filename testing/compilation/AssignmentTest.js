@@ -14,7 +14,7 @@ module.exports["assignment"] = {
     "assign literal to id": function (test) {
 
         var node = new Lo.assignment('=',
-            new Lo.identifier('foo'), new Lo.literal('number', '57'));
+            new Lo.identifier('foo'), new Lo.number('57'));
 
         var context = new Context().createInner();
 
@@ -31,7 +31,7 @@ module.exports["assignment"] = {
 
         var node = new Lo.assignment('*=',
             new Lo.subscript(new Lo.identifier('foo'), new Lo.identifier('bar')),
-            new Lo.literal('number', '57'));
+            new Lo.number('57'));
 
         var context = new Context().createInner();
 
@@ -87,7 +87,7 @@ module.exports["assignment"] = {
     "doesn't declare if in parent context": function (test) {
 
         var node = new Lo.assignment('=',
-            new Lo.identifier('foo'), new Lo.literal('number', '57'));
+            new Lo.identifier('foo'), new Lo.number('57'));
 
         var parent = new Context().createInner();
 
@@ -133,7 +133,7 @@ module.exports["combined assignment"] = {
 
         var node = new Lo.incrDecr('increment',
             new Lo.subscript(
-                new Lo.identifier('bar'), new Lo.literal('number', "1")));
+                new Lo.identifier('bar'), new Lo.number("1")));
 
         test.deepEqual(node.compile(new Context()).renderTree(),
             [ 'expr-stmt',

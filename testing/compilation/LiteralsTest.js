@@ -13,7 +13,7 @@ module.exports["literals"] = {
 
     "boolean": function (test) {
 
-        var node = new Lo.literal('boolean', 'true');
+        var node = new Lo.boolean('true');
 
         test.deepEqual(node.compile(new Context()).renderTree(), JS.bool('true').renderTree());
         test.done();
@@ -21,7 +21,7 @@ module.exports["literals"] = {
 
     "number": function (test) {
 
-        var node = new Lo.literal('number', '42');
+        var node = new Lo.number('42');
 
         test.deepEqual(node.compile(new Context()).renderTree(), JS.num('42').renderTree());
         test.done();
@@ -29,7 +29,7 @@ module.exports["literals"] = {
 
     "string": function (test) {
 
-        var node = new Lo.literal('string', "turanga leela");
+        var node = new Lo.string("turanga leela");
 
         test.deepEqual(node.compile(new Context()).renderTree(), JS.string('turanga leela').renderTree());
         test.done();
@@ -38,10 +38,10 @@ module.exports["literals"] = {
     "array": function (test) {
 
         var node = new Lo.array([
-            new Lo.literal('string', "foo"),
-            new Lo.literal('string', "mani"),
-            new Lo.literal('string', "padme"),
-            new Lo.literal('string', "hum")
+            new Lo.string("foo"),
+            new Lo.string("mani"),
+            new Lo.string("padme"),
+            new Lo.string("hum")
         ]);
 
         test.deepEqual(node.compile(new Context()).renderTree(),
@@ -52,10 +52,10 @@ module.exports["literals"] = {
     "set": function (test) {
 
         var node = new Lo.setLiteral([
-            new Lo.literal('string', "foo"),
-            new Lo.literal('string', "mani"),
-            new Lo.literal('string', "padme"),
-            new Lo.literal('string', "hum")
+            new Lo.string("foo"),
+            new Lo.string("mani"),
+            new Lo.string("padme"),
+            new Lo.string("hum")
         ]);
 
         test.deepEqual(node.compile(new Context()).renderTree(), JS.objLiteral([
@@ -70,10 +70,10 @@ module.exports["literals"] = {
     "map": function (test) {
 
         var node = new Lo.mapLiteral([
-            new Lo.pair(new Lo.literal('string', "Zaphod"), new Lo.literal('string', "Betelgeuse")),
-            new Lo.pair(new Lo.literal('string', "Ford"), new Lo.literal('string', "Betelgeuse")),
-            new Lo.pair(new Lo.literal('string', "Arthur"), new Lo.literal('string', "Earth")),
-            new Lo.pair(new Lo.literal('string', "Trillian"), new Lo.literal('string', "Earth")),
+            new Lo.pair(new Lo.string("Zaphod"), new Lo.string("Betelgeuse")),
+            new Lo.pair(new Lo.string("Ford"), new Lo.string("Betelgeuse")),
+            new Lo.pair(new Lo.string("Arthur"), new Lo.string("Earth")),
+            new Lo.pair(new Lo.string("Trillian"), new Lo.string("Earth")),
         ]);
 
         test.deepEqual(node.compile(new Context()).renderTree(), [ 'objLiteral',
@@ -88,10 +88,10 @@ module.exports["literals"] = {
     "record": function (test) {
 
         var node = new Lo.record([
-            new Lo.field('Zaphod', new Lo.literal('string', 'Betelgeuse')),
-            new Lo.field('Ford', new Lo.literal('string', 'Betelgeuse')),
-            new Lo.field('Arthur', new Lo.literal('string', 'Earth')),
-            new Lo.field('Trillian', new Lo.literal('string', 'Earth')),
+            new Lo.field('Zaphod', new Lo.string('Betelgeuse')),
+            new Lo.field('Ford', new Lo.string('Betelgeuse')),
+            new Lo.field('Arthur', new Lo.string('Earth')),
+            new Lo.field('Trillian', new Lo.string('Earth')),
         ]);
 
         test.deepEqual(node.compile(new Context()).renderTree(),
