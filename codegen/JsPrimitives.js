@@ -312,14 +312,14 @@ JS.stmtList = (head, tail) => {
                 var tailTree = tail ? tail.renderTree() : null;
             }
             catch (e) {
-                tailTree = ['EXCEPTION A', e.stack];
+                tailTree = ['ERROR RENDERING TAIL', e.stack];
             }
 
             try {
                 var headTree = head.renderTree();
             }
             catch (e) {
-                headTree = ['EXCEPTION B', e.stack];
+                headTree = ['ERROR RENDERING HEAD', e.stack];
             }
 
             return tailTree ? ['stmtList', headTree, tailTree] : ['stmtList', headTree];
@@ -335,14 +335,14 @@ JS.stmtList = (head, tail) => {
                 var tailJs = tail ? tail.renderJs() : null;
             }
             catch (e) {
-                tailJs = 'EXCEPTION C';
+                tailJs = 'ERROR RENDERING TAIL';
             }
 
             try {
                 var headJs = head.renderJs();
             }
             catch (e) {
-                headJs = 'EXCEPTION D';
+                headJs = 'ERROR RENDERING HEAD';
             }
 
             return headJs + '\n' + (tailJs || '');

@@ -165,6 +165,29 @@ module.exports["async"] = {
         test.done();
     },
 
+    // "bug": function (test) {
+    //
+    //     var node = new Lo.procedure(
+    //         ['test'],
+    //         new Lo.stmtList(
+    //             new Lo.conditional(
+    //                 new Lo.identifier('out'),
+    //                 new Lo.stmtList(
+    //                     new Lo.requestStmt(
+    //                         new Lo.identifier('write'),
+    //                         [new Lo.identifier('summary')],
+    //                         null, null, true
+    //                     )
+    //                 )
+    //             )
+    //         ),
+    //         true
+    //     );
+    //
+    //     test.deepEqual(node.compile(new Context().createInner()).renderJs(), "");
+    //     test.done();
+    // }
+
 //     "nested ifs create separate continuations": function (test) {
 //         // todo
 //         test.done();

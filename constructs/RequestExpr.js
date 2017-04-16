@@ -11,8 +11,6 @@
 
 "use strict";
 
-const JS = require('../codegen/JsPrimitives');
-const Identifier = require('./Identifier');
 const RequestEnv = require('../codegen/RequestEnv');
 
 
