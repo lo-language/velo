@@ -261,7 +261,38 @@
                                   }
                                 }
                               },
-                              "tail": null
+                              "tail": {
+                                "type": "stmt_list",
+                                "head": {
+                                  "type": "assign",
+                                  "op": "=",
+                                  "left": {
+                                    "type": "id",
+                                    "name": "bar"
+                                  },
+                                  "right": {
+                                    "type": "op",
+                                    "op": "+",
+                                    "left": {
+                                      "type": "select",
+                                      "record": {
+                                        "type": "id",
+                                        "name": "assertions"
+                                      },
+                                      "field": "passed"
+                                    },
+                                    "right": {
+                                      "type": "select",
+                                      "record": {
+                                        "type": "id",
+                                        "name": "assertions"
+                                      },
+                                      "field": "failed"
+                                    }
+                                  }
+                                },
+                                "tail": null
+                              }
                             }
                           }
                         }

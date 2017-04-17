@@ -62,10 +62,14 @@ switch (cmd) {
         // there's the prep stage which involves loading (maybe) to create a runnable
         // can also just directly create a runnable?
         return program.run([argv._, LoSystem]).catch(
-            function (err) {
+            function (failParams) {
 
-                // todo include line failed at
-                console.error("FAIL", err);
+                if (failParams.length > 0) {
+
+                    // todo include line failed at
+                    console.error("FAIL", err);
+                }
+
                 process.exit(1);
             });
 
