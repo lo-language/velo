@@ -64,13 +64,20 @@ switch (cmd) {
         return program.run([argv._, LoSystem]).catch(
             function (failParams) {
 
+                var exitCode = 1;
+
                 if (failParams.length > 0) {
 
-                    // todo include line failed at
-                    console.error("FAIL", err);
+                    if (typeof failParams[0] === "number") {
+                        exitCode = failParams[0];
+                    }
+                    else {
+                        // todo include line failed at
+                        console.error("FAILED", failParams[0]);
+                    }
                 }
 
-                process.exit(1);
+                process.exit(exitCode);
             });
 
     default:
