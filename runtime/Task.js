@@ -93,14 +93,21 @@ __.prototype.checkFinished = function () {
     }
 };
 
+/**
+ * Registers an async call with this Task and returns a wrapped callback to take care
+ * of the bookkeeping.
+ *
+ * @param cb    callback
+ * @returns {function()}
+ */
 __.prototype.doAsync = function (cb) {
 
     this.pendingRequests++;
 
-    var _this = this;
+    var t = this;
 
     return function () {
-        _this.pendingRequests--;
+        t.pendingRequests--;
         cb();
     };
 };

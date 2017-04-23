@@ -15,6 +15,7 @@
 
 const JsModuleSpace = require('./JsModuleSpace');
 const Task = require('../runtime/Task');
+const LoSystem = require('../runtime/System');
 const Q = require('q');
 
 
@@ -39,6 +40,8 @@ var __ = function (localSpace, rootModuleId) {
 
 /**
  * Load and run the program.
+ *
+ * @param args  the args for the program
  */
 __.prototype.run = function (args) {
 
@@ -79,6 +82,39 @@ __.prototype.include = function (namespace, id) {
     }
 
     manager.register(id);
+};
+
+/**
+ * Fetches the system object for this program.
+ */
+__.prototype.getSystem = function () {
+
+    // compose the loader with the core system object
+
+    return Object.assign({
+
+        $load: (task) => {
+
+            // call out to the program to load the module
+
+            var moduleId = task.args[0];
+
+            this.include("__local", moduleId);
+
+            // tell the task we're up to something
+
+            var handler = task.doAsync((modules) => {
+
+                // this is actually not async
+                var loaded = this.localSpace.load(moduleId, this.sandbox);
+
+                task.respond("reply", [loaded]);
+            });
+
+            // resolve the modules
+            this.localSpace.resolve(this).then(handler);
+        }
+    }, LoSystem);
 };
 
 

@@ -98,13 +98,26 @@ __.prototype.loadModules = function (sandbox) {
 
     Object.keys(this.modules).forEach(moduleId => {
 
-        var body = this.jsModules[moduleId];
-        var code = "(function() {'use strict';\n\n" + body + '\n\n})';
-
-        this.loaded[moduleId] = vm.runInNewContext(code, sandbox)();
+        this.load(moduleId, sandbox);
     });
 
     return this.loaded;
+};
+
+/**
+ * Compiles and loads a single module, returning the loaded module.
+ *
+ * @param moduleId
+ * @param sandbox
+ */
+__.prototype.load = function (moduleId, sandbox) {
+
+    var body = this.jsModules[moduleId];
+    var code = "(function() {'use strict';\n\n" + body + '\n\n})';
+
+    this.loaded[moduleId] = vm.runInNewContext(code, sandbox)();
+
+    return this.loaded[moduleId];
 };
 
 

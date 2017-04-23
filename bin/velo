@@ -24,7 +24,6 @@ const argv = require('minimist')(process.argv.slice(2));
 
 const LocalModuleSpace = require('../pipeline/LocalModuleSpace');
 const LoadAndGo = require('../pipeline/LoadAndGo');
-const LoSystem = require('../runtime/System');
 
 // const NodeBuilder = require('../pipeline/NodeBuilder');
 
@@ -61,12 +60,23 @@ switch (cmd) {
         // have load and go produce an object that can be run?
         // there's the prep stage which involves loading (maybe) to create a runnable
         // can also just directly create a runnable?
-        return program.run([argv._, LoSystem]).catch(
-            function (err) {
+        return program.run([argv._, program.getSystem()]).catch(
+            function (failParams) {
 
-                // todo include line failed at
-                console.error("FAIL", err);
-                process.exit(1);
+                var exitCode = 1;
+
+                if (failParams.length > 0) {
+
+                    if (typeof failParams[0] === "number") {
+                        exitCode = failParams[0];
+                    }
+                    else {
+                        // todo include line failed at
+                        console.error("FAILED", failParams[0]);
+                    }
+                }
+
+                process.exit(exitCode);
             });
 
     default:

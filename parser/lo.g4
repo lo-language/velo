@@ -123,6 +123,9 @@ expr
     : expr '(' exprList? ')'                                    # syncCall  // blocking request. the value of the expr is the *return value*
     | ASYNC expr '(' exprList? ')'                              # asyncCall // non-blocking request. the value of the expr is a *future*
     | '#' expr                                                  # cardinality
+    | expr '[' expr ']'                                         # subscript     // lvalue
+    | expr '[' expr '..' expr? ']'                              # slice
+    | expr '.' ID                                               # select        // lvalue
     | 'not' expr                                                # negation
     | 'bytes' expr                                              # bytes
     | expr op=('*'|'/'|'%') expr                                # mulDiv
@@ -132,9 +135,6 @@ expr
     | expr ('has'|'contains') expr                              # membership // not sure where this guy should go, precedence-wise
     | '(' expr ')'                                              # wrap
     | '`' expr '`'                                              # stringify
-    | expr '[' expr ']'                                         # subscript     // lvalue
-    | expr '[' expr '..' expr? ']'                              # slice
-    | expr '.' ID                                               # select        // lvalue
     | '(' ID (',' ID)+ ')'                                      # destructure   // lvalue
     | INTER_BEGIN interpolated INTER_END                        # dynastring
     | literal                                                   # literalExpr
