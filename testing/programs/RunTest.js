@@ -13,6 +13,31 @@
 const Harness = require('../Harness');
 const util = require('util');
 
+
+module.exports['exists'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'exists');
+        cb();
+    },
+
+    'obj exists': function (test) {
+
+        var log = function (task) {
+            task.respond("reply");
+        };
+
+        this.harness.testSuccess(test, [log]);
+    },
+
+    'obj not exists': function (test) {
+
+        this.harness.testFailure(test, [], 'no log!');
+    }
+};
+
+
 module.exports['nestedLoops'] = {
 
     "setUp": function (cb) {
@@ -72,6 +97,10 @@ module.exports['factorial'] = {
 
     'failure': function (test) {
         this.harness.testFailure(test, [-1], 'I pity the fool!');
+    },
+
+    'undef failure': function (test) {
+        this.harness.testFailure(test, [], "c'mon!");
     }
 };
 

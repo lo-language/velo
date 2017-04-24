@@ -4,6 +4,10 @@
 
 main is <-> (num) {
 
+    if num undefined {
+        fail "c'mon!";
+    }
+
     if num < 0 {
         fail "I pity the fool!";
     }

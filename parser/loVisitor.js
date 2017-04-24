@@ -180,6 +180,12 @@ loVisitor.prototype.visitCondExpr = function(ctx) {
 };
 
 
+// Visit a parse tree produced by loParser#existence.
+loVisitor.prototype.visitExistence = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by loParser#addSub.
 loVisitor.prototype.visitAddSub = function(ctx) {
   return this.visitChildren(ctx);

@@ -19,4 +19,13 @@ test is <-> {
     result = base >< person.getName();
 
     bar = assertions.passed + assertions.failed;
+
+    if bar exists {
+    }
+
+    if foo undefined {
+    }
+
+    if foo defined {
+    }
 };

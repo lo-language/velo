@@ -145,7 +145,7 @@ module.exports["operators"] = {
 
         var n = JS.strictEqual(JS.ID('foo'), JS.ID('bar'));
 
-        test.deepEqual(n.renderTree(), [ 'strict-equal', [ 'id', 'foo' ], ['id', 'bar'] ]);
+        test.deepEqual(n.renderTree(), [ 'strict-eq', [ 'id', 'foo' ], ['id', 'bar'] ]);
         test.equal(n.renderJs(), "foo === bar");
 
         test.done();
@@ -155,8 +155,18 @@ module.exports["operators"] = {
 
         var n = JS.notEqual(JS.ID('foo'), JS.ID('bar'));
 
-        test.deepEqual(n.renderTree(), [ 'not-equal', [ 'id', 'foo' ], ['id', 'bar'] ]);
+        test.deepEqual(n.renderTree(), [ 'ne', [ 'id', 'foo' ], ['id', 'bar'] ]);
         test.equal(n.renderJs(), "foo != bar");
+
+        test.done();
+    },
+
+    "strict not equal": function (test) {
+
+        var n = JS.strictNotEqual(JS.ID('foo'), JS.ID('bar'));
+
+        test.deepEqual(n.renderTree(), [ 'strict-ne', [ 'id', 'foo' ], ['id', 'bar'] ]);
+        test.equal(n.renderJs(), "foo !== bar");
 
         test.done();
     },
@@ -197,6 +207,16 @@ module.exports["operators"] = {
 
         test.deepEqual(n.renderTree(), [ 'gte', [ 'id', 'foo' ], ['id', 'bar'] ]);
         test.equal(n.renderJs(), "foo >= bar");
+
+        test.done();
+    },
+
+    "typeof": function (test) {
+
+        var n = JS.typeof(JS.ID('foo'));
+
+        test.deepEqual(n.renderTree(), [ 'typeof', [ 'id', 'foo' ] ]);
+        test.equal(n.renderJs(), "typeof foo");
 
         test.done();
     },

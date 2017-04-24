@@ -1,0 +1,15 @@
+/*
+ * tests the semantics of fail handlers: omission means ignore
+ */
+
+main is <-> (log) {
+
+    if log exists {
+        log << ("hooray!");
+    }
+    else {
+        fail "no log!";
+    }
+
+    reply;
+};

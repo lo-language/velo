@@ -22,6 +22,7 @@ module.exports = {
     destructure: require("./Destructure"),
     dynaString: require("./DynaString"),
     eventDef: require("./EventDef"),
+    existence: require("./Existence"),
     field: require("./Field"),
     identifier: require("./Identifier"),
     incrDecr: require("./IncrDecr"),
