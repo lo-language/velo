@@ -119,6 +119,8 @@ block
     : BEGIN statementList? END
     ;
 
+// an expression is one of two types: nominal (l-value or r-value) or operational (l-value or r-value)
+// TODO factor out l-values
 expr
     : expr '(' exprList? ')'                                    # syncCall  // blocking request. the value of the expr is the *return value*
     | ASYNC expr '(' exprList? ')'                              # asyncCall // non-blocking request. the value of the expr is a *future*
@@ -126,6 +128,7 @@ expr
     | expr '[' expr ']'                                         # subscript     // lvalue
     | expr '[' expr '..' expr? ']'                              # slice
     | expr '.' ID                                               # select        // lvalue
+    | expr op=('exists'|'defined'|'undefined')                  # existence
     | 'not' expr                                                # negation
     | 'bytes' expr                                              # bytes
     | expr op=('*'|'/'|'%') expr                                # mulDiv

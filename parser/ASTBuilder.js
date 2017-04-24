@@ -589,5 +589,13 @@ __.prototype.visitSlice = function(ctx) {
     );
 };
 
+__.prototype.visitExistence = function(ctx) {
+
+    return new Lo.existence(
+        ctx.expr().accept(this),
+        ctx.op.text == 'undefined'
+    );
+};
+
 
 module.exports = __;

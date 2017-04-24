@@ -19,14 +19,14 @@ module.exports["op"] = {
             ['*', 'mul'],
             ['/', 'div'],
             ['%', 'mod'],
-            ['==', 'strict-equal'],
+            ['==', 'strict-eq'],
             ['and', '&&'],
             ['or', '||'],
             ['<', 'lt'],
             ['>', 'gt'],
             ['<=', 'lte'],
             ['>=', 'gte'],
-            ['!=', 'not-equal']
+            ['!=', 'ne']
         ];
 
         cases.forEach(op => {
@@ -83,7 +83,7 @@ module.exports["op"] = {
                 new Lo.identifier('foo'),
                 new Lo.identifier('bar'));
 
-        test.deepEqual(node.compile(new Context()).renderTree(), [ 'strict-equal', [ 'id', '$foo' ], [ 'id', '$bar' ] ]);
+        test.deepEqual(node.compile(new Context()).renderTree(), [ 'strict-eq', [ 'id', '$foo' ], [ 'id', '$bar' ] ]);
         test.done();
     },
 

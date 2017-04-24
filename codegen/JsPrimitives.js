@@ -149,7 +149,7 @@ JS.logicalOr = (left, right) => {
 JS.strictEqual = (left, right) => {
 
     return {
-        renderTree: () => ['strict-equal', left.renderTree(), right.renderTree()],
+        renderTree: () => ['strict-eq', left.renderTree(), right.renderTree()],
         renderJs: () => left.renderJs() + ' === ' + right.renderJs()
     };
 };
@@ -157,8 +157,16 @@ JS.strictEqual = (left, right) => {
 JS.notEqual = (left, right) => {
 
     return {
-        renderTree: () => ['not-equal', left.renderTree(), right.renderTree()],
+        renderTree: () => ['ne', left.renderTree(), right.renderTree()],
         renderJs: () => left.renderJs() + ' != ' + right.renderJs()
+    };
+};
+
+JS.strictNotEqual = (left, right) => {
+
+    return {
+        renderTree: () => ['strict-ne', left.renderTree(), right.renderTree()],
+        renderJs: () => left.renderJs() + ' !== ' + right.renderJs()
     };
 };
 
@@ -191,6 +199,14 @@ JS.gte = (left, right) => {
     return {
         renderTree: () => ['gte', left.renderTree(), right.renderTree()],
         renderJs: () => left.renderJs() + ' >= ' + right.renderJs()
+    };
+};
+
+JS.typeof = (left) => {
+
+    return {
+        renderTree: () => ['typeof', left.renderTree()],
+        renderJs: () => 'typeof ' + left.renderJs()
     };
 };
 
