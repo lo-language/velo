@@ -3,7 +3,7 @@
 
 ## A Lo-to-JavaScript compiler, written in Node.js [![Build Status](https://travis-ci.org/lo-language/velo.svg?branch=master)](https://travis-ci.org/lo-language/velo)
 
-This is a proof-of-concept compiler for the [Lo](http://lolang.org) programming language. It can operate as a load-and-go compiler to seamlessly compile, load, and run a Lo program within a Node environment, or be used to build statically-linked JavaScript files for execution in Node or a browser.
+This is a proof-of-concept compiler for the [Lo](http://lo-language.org) programming language. It operates as a load-and-go compiler to seamlessly compile, load, and run a Lo program within a Node environment.
 
 ## Installation
 
@@ -46,7 +46,6 @@ Not implemented yet, but will look like:
 ## Module Bindings
 
 Velo provides several built-in module namespaces.
-You can see the complete list [here](builtins.md).
 
 ### JavaScript Built-In Objects
 
@@ -75,24 +74,6 @@ Arbitrary NPM modules that don't require ambient authority can be linked in usin
     main is <-> (args, system) {
     
         system.out(NPM::HTTP);
-    };
-    
-### Browser Objects
-
-TBD
-
-## Virtual Environments
-
-Since many Node modules depend on the ambient authority that Lo expressly doesn't provide, they can't be loaded and used in Velo programs. To use these modules, they must be loaded in a context where the ambient authority they require exists, and Velo has a facility to provide this called "virtual environments". This is a similar concept to a virtual machine – an execution context that authority can be loaded into.
-
-    main is <-> (args, system) {
-    
-        nodeEnv is Velo::NodeEnv.create(system);
-        
-        // equivalent to const http = require('http');
-        http is nodeEnv.load("http");
-        
-        // http now has the authority provided to its VE
     };
 
 ## Implementation
