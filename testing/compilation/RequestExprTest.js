@@ -53,8 +53,7 @@ module.exports["blocking calls"] = {
 
     "no args": function (test) {
 
-        var node = new Lo.assignment(
-            '=',
+        var node = new Lo.assign(
             new Lo.identifier('baz'),
             new Lo.requestExpr(
                 new Lo.identifier('foo'), [], true
@@ -83,8 +82,7 @@ module.exports["blocking calls"] = {
 
     "one arg": function (test) {
 
-        var node = new Lo.assignment(
-            '=',
+        var node = new Lo.assign(
             new Lo.identifier('baz'),
             new Lo.requestExpr(
                 new Lo.identifier('foo'), [new Lo.number('42')], true
@@ -112,8 +110,7 @@ module.exports["blocking calls"] = {
 
     "two args": function (test) {
 
-        var node = new Lo.assignment(
-            '=',
+        var node = new Lo.assign(
             new Lo.identifier('baz'),
             new Lo.requestExpr(
                 new Lo.identifier('foo'), [
@@ -146,8 +143,7 @@ module.exports["blocking calls"] = {
     "with nested requests": function (test) {
 
 
-        var node = new Lo.assignment(
-            '=',
+        var node = new Lo.assign(
             new Lo.identifier('baz'),
             new Lo.requestExpr(
                 new Lo.identifier('baz'), [

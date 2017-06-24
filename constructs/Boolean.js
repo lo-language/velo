@@ -48,6 +48,14 @@ __.prototype.getAst = function () {
 };
 
 /**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return this.value;
+};
+
+/**
  * Compiles this node to JS in the given context.
  *
  * todo break these out into their own classes?

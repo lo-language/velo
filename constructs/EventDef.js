@@ -33,6 +33,14 @@ __.prototype.getAst = function () {
 };
 
 /**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return ['event-def', this.params];
+};
+
+/**
  * Compiles this node to JS in the given context.
  *
  * @param context

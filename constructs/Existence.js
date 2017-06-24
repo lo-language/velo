@@ -40,6 +40,17 @@ __.prototype.getAst = function () {
 };
 
 /**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return [
+        'exists',
+        this.undef ? 'undefined' : 'defined',
+        this.expr.getTree()];
+};
+
+/**
  * Compiles this node to JS in the given context.
  *
  * @param context

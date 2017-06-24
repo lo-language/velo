@@ -17,7 +17,7 @@ module.exports["basics"] = {
         var node = new Lo.scan(
             new Lo.identifier('foo'),
             new Lo.procedure(['item'],
-            new Lo.stmtList(new Lo.incrDecr('increment', new Lo.identifier('count'))))
+            new Lo.stmtList(new Lo.assign(new Lo.identifier('count'), new Lo.number('1'))))
         );
 
         test.deepEqual(node.compile(new Context()).renderTree(),
@@ -29,13 +29,13 @@ module.exports["basics"] = {
                             null,
                             [ 'args' ],
                             [ 'stmtList',
-                                [ 'var', '$item' ],
+                                [ 'var', [ '$item', '$count' ] ],
                                 [ 'stmtList',
                                     [ 'expr-stmt',
                                         [ 'assign',
                                             [ 'id', '$item' ],
                                             [ 'subscript', [ 'id', 'args' ], [ 'num', '0' ] ] ] ],
-                                    [ 'stmtList', [ 'expr-stmt', [ 'inc', [ 'id', '$count' ] ] ] ] ] ] ] ] ] ]);
+                                    [ 'stmtList', [ 'expr-stmt', [ 'assign', [ 'id', '$count' ], [ 'num', '1' ] ] ] ] ] ] ] ] ] ]);
 
         test.done();
     }

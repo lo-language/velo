@@ -93,19 +93,46 @@ __.prototype.visitLiteralExpr = function(ctx) {
 
 __.prototype.visitAssignment = function(ctx) {
 
-    return new Lo.assignment(
-        ctx.assignment_op().getText(),
-        ctx.expr(0).accept(this),   // l-value
-        ctx.expr(1).accept(this)    // r-value
-    );
+    const left = ctx.expr(0).accept(this);
+    var right = ctx.expr(1).accept(this);
+
+    // desugar compound assignment operators
+
+    switch (ctx.assignment_op().getText()) {
+
+        case '+=':
+            right = new Lo.binaryOpExpr('+', left, right);
+            break;
+
+        case '-=':
+            right = new Lo.binaryOpExpr('-', left, right);
+            break;
+
+        case '*=':
+            right = new Lo.binaryOpExpr('*', left, right);
+            break;
+
+        case '/=':
+            right = new Lo.binaryOpExpr('/', left, right);
+            break;
+
+        case '%=':
+            right = new Lo.binaryOpExpr('%', left, right);
+            break;
+    }
+
+    return new Lo.assign(left, right);
 };
 
 __.prototype.visitIncDec = function(ctx) {
 
-    return new Lo.incrDecr(
-        ctx.op.text == '++' ? 'increment' : 'decrement',
-        ctx.expr().accept(this)
-    );
+    // desugar increment/decrement operators
+
+    const left = ctx.expr().accept(this);
+    const right = new Lo.binaryOpExpr(
+        ctx.op.text == '++' ? '+' : '-', left, new Lo.number('1'));
+
+    return new Lo.assign(left, right);
 };
 
 // conditional statement

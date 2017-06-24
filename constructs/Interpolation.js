@@ -9,6 +9,11 @@
 
 "use strict";
 
+/*
+ * todo this isn't properly a language construct, but just a syntactic helper
+ * (the semantic primitive is string concatenation)
+ */
+
 const JS = require('../codegen/JsPrimitives');
 
 
@@ -36,6 +41,19 @@ __.prototype.getAst = function () {
         middle: this.expr.getAst(),
         right: this.suffix
     };
+};
+
+/**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return [
+        'interpolation',
+        this.prefix,
+        this.expr.getTree(),
+        this.suffix
+    ];
 };
 
 /**

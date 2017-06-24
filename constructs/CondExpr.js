@@ -50,6 +50,24 @@ __.prototype.getAst = function () {
     return result;
 };
 
+
+/**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    var result = ['cond',
+        this.predicate.getTree(),
+        this.consequent.getTree(),
+    ];
+
+    if (this.alternate) {
+        result.push(this.alternate.getTree());
+    }
+
+    return result;
+};
+
 /**
  * Compiles this node to JS in the given context.
  *

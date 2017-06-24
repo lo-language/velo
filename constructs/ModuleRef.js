@@ -22,7 +22,6 @@ var __ = function (namespace, id) {
     this.id = id;
 };
 
-
 /**
  * Returns the Lo AST for this node.
  */
@@ -33,6 +32,18 @@ __.prototype.getAst = function () {
         namespace: this.namespace,
         id: this.id
     };
+};
+
+/**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return [
+        'modref',
+        this.namespace,
+        this.id
+    ];
 };
 
 /**

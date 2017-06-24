@@ -11,7 +11,6 @@
           "type": "stmt_list",
           "head": {
             "type": "assign",
-            "op": "=",
             "left": {
               "type": "id",
               "name": "foo"
@@ -25,7 +24,6 @@
             "type": "stmt_list",
             "head": {
               "type": "assign",
-              "op": "=",
               "left": {
                 "type": "id",
                 "name": "bar"
@@ -46,7 +44,6 @@
               "type": "stmt_list",
               "head": {
                 "type": "assign",
-                "op": "=",
                 "left": {
                   "type": "subscript",
                   "list": {
@@ -78,7 +75,6 @@
                 "type": "stmt_list",
                 "head": {
                   "type": "assign",
-                  "op": "=",
                   "left": {
                     "type": "id",
                     "name": "foo"
@@ -100,7 +96,6 @@
                   "type": "stmt_list",
                   "head": {
                     "type": "assign",
-                    "op": "=",
                     "left": {
                       "type": "id",
                       "name": "_qux"
@@ -125,7 +120,6 @@
                     "type": "stmt_list",
                     "head": {
                       "type": "assign",
-                      "op": "=",
                       "left": {
                         "type": "id",
                         "name": "quux"
@@ -150,7 +144,6 @@
                       "type": "stmt_list",
                       "head": {
                         "type": "assign",
-                        "op": "=",
                         "left": {
                           "type": "id",
                           "name": "moi"
@@ -164,7 +157,6 @@
                         "type": "stmt_list",
                         "head": {
                           "type": "assign",
-                          "op": "=",
                           "left": {
                             "type": "id",
                             "name": "method"
@@ -183,7 +175,6 @@
                           "type": "stmt_list",
                           "head": {
                             "type": "assign",
-                            "op": "=",
                             "left": {
                               "type": "id",
                               "name": "server"

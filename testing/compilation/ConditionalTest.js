@@ -21,7 +21,7 @@ module.exports["sync"] = {
         var node = new Lo.conditional(
             new Lo.identifier('foo'),
             new Lo.stmtList(
-                new Lo.assignment('=',
+                new Lo.assign(
                     new Lo.identifier('bar'),
                     new Lo.number('42')
                 )
@@ -44,13 +44,13 @@ module.exports["sync"] = {
         var node = new Lo.conditional(
             new Lo.identifier('foo'),
             new Lo.stmtList(
-                new Lo.assignment('=',
+                new Lo.assign(
                     new Lo.identifier('bar'),
                     new Lo.number('42')
                 )
             ),
             new Lo.stmtList(
-                new Lo.assignment('=',
+                new Lo.assign(
                     new Lo.identifier('bar'),
                     new Lo.number('32')
                 )
@@ -75,7 +75,7 @@ module.exports["sync"] = {
         var node = new Lo.conditional(
             new Lo.identifier('foo'),
             new Lo.stmtList(
-                new Lo.assignment('=',
+                new Lo.assign(
                     new Lo.identifier('bar'),
                     new Lo.number('42')
                 )
@@ -83,13 +83,13 @@ module.exports["sync"] = {
             new Lo.conditional(
                 new Lo.identifier('bar'),
                 new Lo.stmtList(
-                    new Lo.assignment('=',
+                    new Lo.assign(
                         new Lo.identifier('bar'),
                         new Lo.number('32')
                     )
                 ),
                 new Lo.stmtList(
-                    new Lo.assignment('=',
+                    new Lo.assign(
                         new Lo.identifier('baz'),
                         new Lo.number('82')
                     )
@@ -125,11 +125,11 @@ module.exports["async"] = {
             new Lo.conditional(
                 new Lo.identifier('foo'),
                 new Lo.stmtList(
-                    new Lo.assignment('=', new Lo.identifier('bar'), new Lo.requestExpr(new Lo.identifier('foo'), []))
+                    new Lo.assign( new Lo.identifier('bar'), new Lo.requestExpr(new Lo.identifier('foo'), []))
                 )
             ),
         new Lo.stmtList(
-            new Lo.assignment('=', new Lo.identifier('baz'), new Lo.identifier('ball'))
+            new Lo.assign( new Lo.identifier('baz'), new Lo.identifier('ball'))
         ));
 
         test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList',

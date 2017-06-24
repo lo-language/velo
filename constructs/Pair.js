@@ -36,6 +36,18 @@ __.prototype.getAst = function () {
     };
 };
 
+
+/**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return [
+        this.key.getTree(),
+        this.value.getTree()
+    ];
+};
+
 /**
  * Compiles this node to JS in the given context.
  *

@@ -9,6 +9,9 @@
 
 /**
  * Created by seth on 11/12/16.
+ *
+ * todo this isn't properly a language construct, but just a syntactic helper
+ * (the semantic primitive is string concatenation)
  */
 
 "use strict";
@@ -40,6 +43,14 @@ __.prototype.getAst = function () {
         middle: this.infix,
         right: this.right.getAst()
     };
+};
+
+/**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return ['dynastring', this.left.getTree(), this.infix, this.right.getTree()];
 };
 
 /**

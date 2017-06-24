@@ -20,13 +20,11 @@ const Identifier = require('./Identifier');
 /**
  * An assignment statement.
  *
- * @param op
  * @param left      expr
  * @param right     expr
  */
-var __ = function (op, left, right) {
+var __ = function (left, right) {
 
-    this.op = op;
     this.left = left;
     this.right = right;
 };
@@ -38,10 +36,21 @@ __.prototype.getAst = function () {
 
     return {
         type: 'assign',
-        op: this.op,
         left: this.left.getAst(),
         right: this.right.getAst()
     };
+};
+
+/**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return [
+        'set!',
+        this.left.getTree(),
+        this.right.getTree()
+    ];
 };
 
 /**
@@ -77,7 +86,7 @@ __.prototype.compile = function (context) {
         // }
     }
 
-    return JS.exprStmt(JS.assign(left, right, this.op == '=' ? null : this.op));
+    return JS.exprStmt(JS.assign(left, right));
 
     // this was genius
     // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP

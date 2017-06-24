@@ -78,19 +78,19 @@ module.exports["basics"] = {
                 new Lo.conditional(
                     new Lo.identifier('x'),
                     new Lo.stmtList(
-                        new Lo.assignment('+=',
-                        new Lo.identifier('found'),
-                        new Lo.requestExpr(
-                            new Lo.identifier('explore'),
-                            [],
-                            true
-                        ))
+                        new Lo.assign(
+                            new Lo.identifier('found'),
+                            new Lo.requestExpr(
+                                new Lo.identifier('explore'),
+                                [],
+                                true
+                            ))
                     )
                 )
             )
         ),
             new Lo.stmtList(
-            new Lo.incrDecr('increment', new Lo.identifier('point'))
+            new Lo.assign(new Lo.identifier('point'), new Lo.number('2'))
         ));
 
         var result = node.compile(new Context());
@@ -112,7 +112,7 @@ module.exports["basics"] = {
                                             [ 'res0' ],
                                             [ 'stmtList',
                                                 [ 'expr-stmt', ["assign",
-                                                    [ "id", "$found" ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ], "+=" ] ],
+                                                    [ "id", "$found" ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ] ],
                                                 [ 'stmtList', [ "expr-stmt",
                                                     [ "call", [ "id", "c0" ], [] ] ] ] ] ],
                                         [ 'null' ] ] ] ] ],
@@ -122,7 +122,7 @@ module.exports["basics"] = {
                 [ 'function',
                     'c0',
                     [],
-                    [ 'stmtList', [ 'expr-stmt', [ 'inc', [ 'id', '$point' ] ] ] ] ] ] ]);
+                    [ 'stmtList', [ 'expr-stmt', [ 'assign', [ 'id', '$point' ], [ "num", "2" ] ] ] ] ] ] ]);
 
         test.done();
     },
@@ -144,7 +144,7 @@ module.exports["basics"] = {
             true
         ),
         new Lo.stmtList(
-            new Lo.incrDecr('increment', new Lo.identifier('i'))
+            new Lo.assign(new Lo.identifier('i'), new Lo.number('2'))
         ));
 
         var result = node.compile(new Context().createInner(true));
@@ -177,7 +177,7 @@ module.exports["basics"] = {
                 [ 'function',
                     'c0',
                     [],
-                    [ 'stmtList', [ 'expr-stmt', [ 'inc', [ 'id', '$i' ] ] ] ] ] ] ]);
+                    [ 'stmtList', [ 'expr-stmt', [ 'assign', [ 'id', '$i' ], ['num', '2' ] ] ] ] ] ] ]);
 
         test.done();
     },

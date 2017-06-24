@@ -11,7 +11,6 @@
           "type": "stmt_list",
           "head": {
             "type": "assign",
-            "op": "=",
             "left": {
               "type": "id",
               "name": "qux"
@@ -72,26 +71,49 @@
           "tail": {
             "type": "stmt_list",
             "head": {
-              "type": "increment",
-              "operand": {
+              "type": "assign",
+              "left": {
                 "type": "id",
                 "name": "num"
+              },
+              "right": {
+                "type": "op",
+                "op": "+",
+                "left": {
+                  "type": "id",
+                  "name": "num"
+                },
+                "right": {
+                  "type": "number",
+                  "val": "1"
+                }
               }
             },
             "tail": {
               "type": "stmt_list",
               "head": {
-                "type": "decrement",
-                "operand": {
+                "type": "assign",
+                "left": {
                   "type": "id",
                   "name": "num"
+                },
+                "right": {
+                  "type": "op",
+                  "op": "-",
+                  "left": {
+                    "type": "id",
+                    "name": "num"
+                  },
+                  "right": {
+                    "type": "number",
+                    "val": "1"
+                  }
                 }
               },
               "tail": {
                 "type": "stmt_list",
                 "head": {
                   "type": "assign",
-                  "op": "=",
                   "left": {
                     "type": "id",
                     "name": "foo"
@@ -112,7 +134,6 @@
                   "type": "stmt_list",
                   "head": {
                     "type": "assign",
-                    "op": "=",
                     "left": {
                       "type": "id",
                       "name": "foo"
@@ -133,7 +154,6 @@
                     "type": "stmt_list",
                     "head": {
                       "type": "assign",
-                      "op": "=",
                       "left": {
                         "type": "id",
                         "name": "foo"
@@ -163,7 +183,6 @@
                       "type": "stmt_list",
                       "head": {
                         "type": "assign",
-                        "op": "=",
                         "left": {
                           "type": "id",
                           "name": "doghouse"
@@ -185,7 +204,6 @@
                         "type": "stmt_list",
                         "head": {
                           "type": "assign",
-                          "op": "=",
                           "left": {
                             "type": "id",
                             "name": "fruits"
@@ -234,7 +252,6 @@
                               "type": "stmt_list",
                               "head": {
                                 "type": "assign",
-                                "op": "=",
                                 "left": {
                                   "type": "id",
                                   "name": "result"
@@ -265,7 +282,6 @@
                                 "type": "stmt_list",
                                 "head": {
                                   "type": "assign",
-                                  "op": "=",
                                   "left": {
                                     "type": "id",
                                     "name": "bar"

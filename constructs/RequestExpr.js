@@ -19,13 +19,13 @@ const RequestEnv = require('../codegen/RequestEnv');
  *
  * @param address
  * @param args
- * @param blocking
+ * @param block
  */
-var __ = function (address, args, blocking) {
+var __ = function (address, args, block) {
 
     this.address = address;
     this.args = args;
-    this.blocking = blocking || false;
+    this.block = block || false;
 };
 
 /**
@@ -37,8 +37,21 @@ __.prototype.getAst = function () {
         type: 'request_expr',
         address: this.address.getAst(),
         args: this.args.map(arg => arg.getAst()),
-        blocking: this.blocking
+        blocking: this.block
     };
+};
+
+/**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return [
+        'apply',
+        this.address.getTree(),
+        this.args.map(arg => arg.getTree()),
+        this.block
+    ];
 };
 
 /**

@@ -11,7 +11,6 @@
           "type": "stmt_list",
           "head": {
             "type": "assign",
-            "op": "=",
             "left": {
               "type": "id",
               "name": "message"
@@ -30,7 +29,6 @@
             "type": "stmt_list",
             "head": {
               "type": "assign",
-              "op": "=",
               "left": {
                 "type": "id",
                 "name": "message2"
@@ -57,7 +55,6 @@
               "type": "stmt_list",
               "head": {
                 "type": "assign",
-                "op": "=",
                 "left": {
                   "type": "id",
                   "name": "message3"
@@ -92,7 +89,6 @@
                 "type": "stmt_list",
                 "head": {
                   "type": "assign",
-                  "op": "=",
                   "left": {
                     "type": "id",
                     "name": "foo"

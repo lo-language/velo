@@ -19,8 +19,7 @@ module.exports["service"] = {
         var node = new Lo.procedure(
             ['next'],
             new Lo.stmtList(
-                new Lo.assignment(
-                    '*=',
+                new Lo.assign(
                     new Lo.identifier('result'),
                     new Lo.requestExpr(
                         new Lo.identifier('bar'),
@@ -53,7 +52,7 @@ module.exports["service"] = {
                                             null,
                                             [ 'res0' ],
                                             [ 'stmtList', [ 'expr-stmt',
-                                                [ "assign", [ "id", "$result" ], [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ], "*="] ] ] ],
+                                                [ "assign", [ "id", "$result" ], [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ] ] ] ] ],
                                         [ 'null' ] ] ] ] ] ] ] ];
 
         test.deepEqual(node.compile(new Context()).renderTree(), result);
@@ -113,8 +112,7 @@ module.exports["service"] = {
         var node = new Lo.procedure(
             [],
             new Lo.stmtList(
-                new Lo.assignment(
-                    '=',
+                new Lo.assign(
                     new Lo.identifier('report'),
                     new Lo.string('')
                 ),
@@ -123,8 +121,7 @@ module.exports["service"] = {
                     new Lo.procedure(
                         ['test'],
                         new Lo.stmtList(
-                            new Lo.assignment(
-                                '=',
+                            new Lo.assign(
                                 new Lo.identifier('report'),
                                 new Lo.identifier('test')
                             )

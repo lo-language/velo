@@ -48,6 +48,14 @@ __.prototype.getAst = function () {
 };
 
 /**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return ['module'].concat(this.defs.map(def => def.getTree()));
+};
+
+/**
  * Compiles this module to JS.
  *
  * Compiling a module discovers its dependencies.

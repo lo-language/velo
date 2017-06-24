@@ -13,7 +13,7 @@ module.exports = {
 
     array: require("./Array"),
     arrayPush: require("./ArrayPush"),
-    assignment: require("./Assignment"),
+    assign: require("./Assignment"),
     binaryOpExpr: require("./BinaryOpExpr"),
     boolean: require("./Boolean"),
     conditional: require("./Conditional"),
@@ -25,7 +25,6 @@ module.exports = {
     existence: require("./Existence"),
     field: require("./Field"),
     identifier: require("./Identifier"),
-    incrDecr: require("./IncrDecr"),
     interpolation: require("./Interpolation"),
     mapExpr: require("./MapExpr"),
     mapLiteral: require("./MapLiteral"),

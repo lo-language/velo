@@ -26,7 +26,7 @@ module.exports["basics"] = {
     "reply with following stmts should omit them": function (test) {
 
         var node = new Lo.stmtList(new Lo.response('reply'),
-            new Lo.stmtList(new Lo.assignment('=', new Lo.identifier('x'), new Lo.number('47'))));
+            new Lo.stmtList(new Lo.assign(new Lo.identifier('x'), new Lo.number('47'))));
 
         var result = node.compile(new Context().createInner(true));
 

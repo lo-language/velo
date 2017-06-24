@@ -11,7 +11,6 @@
           "type": "stmt_list",
           "head": {
             "type": "assign",
-            "op": "=",
             "left": {
               "type": "id",
               "name": "result"
@@ -33,7 +32,6 @@
             "type": "stmt_list",
             "head": {
               "type": "assign",
-              "op": "=",
               "left": {
                 "type": "id",
                 "name": "result"
@@ -55,7 +53,6 @@
               "type": "stmt_list",
               "head": {
                 "type": "assign",
-                "op": "=",
                 "left": {
                   "type": "id",
                   "name": "result"
@@ -77,7 +74,6 @@
                 "type": "stmt_list",
                 "head": {
                   "type": "assign",
-                  "op": "=",
                   "left": {
                     "type": "id",
                     "name": "result"
@@ -99,7 +95,6 @@
                   "type": "stmt_list",
                   "head": {
                     "type": "assign",
-                    "op": "=",
                     "left": {
                       "type": "id",
                       "name": "result"
@@ -121,7 +116,6 @@
                     "type": "stmt_list",
                     "head": {
                       "type": "assign",
-                      "op": "=",
                       "left": {
                         "type": "id",
                         "name": "result"

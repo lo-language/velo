@@ -3,7 +3,7 @@
 
 ## A Lo-to-JavaScript compiler, written in Node.js [![Build Status](https://travis-ci.org/lo-language/velo.svg?branch=master)](https://travis-ci.org/lo-language/velo)
 
-This is a proof-of-concept compiler for the [Lo](http://lo-language.org) programming language. It operates as a load-and-go compiler to seamlessly compile, load, and run a Lo program within a Node environment.
+This is a proof-of-concept compiler for the [Lo](http://lo-language.org) programming language. It operates as a load-and-go compiler to compile, load, and run a Lo program within a Node environment.
 
 ## Installation
 
