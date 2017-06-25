@@ -153,66 +153,7 @@
                           "name": "__"
                         }
                       },
-                      "tail": {
-                        "type": "stmt_list",
-                        "head": {
-                          "type": "assign",
-                          "left": {
-                            "type": "id",
-                            "name": "method"
-                          },
-                          "right": {
-                            "type": "select",
-                            "record": {
-                              "type": "modref",
-                              "namespace": "Node",
-                              "id": "HTTP"
-                            },
-                            "field": "GET"
-                          }
-                        },
-                        "tail": {
-                          "type": "stmt_list",
-                          "head": {
-                            "type": "assign",
-                            "left": {
-                              "type": "id",
-                              "name": "server"
-                            },
-                            "right": {
-                              "type": "request_expr",
-                              "address": {
-                                "type": "select",
-                                "record": {
-                                  "type": "modref",
-                                  "namespace": "Node",
-                                  "id": "HTTP"
-                                },
-                                "field": "createServer"
-                              },
-                              "args": [],
-                              "blocking": true
-                            }
-                          },
-                          "tail": {
-                            "type": "stmt_list",
-                            "head": {
-                              "type": "constant",
-                              "name": "PI",
-                              "value": {
-                                "type": "select",
-                                "record": {
-                                  "type": "modref",
-                                  "namespace": "JS",
-                                  "id": "Math"
-                                },
-                                "field": "PI"
-                              }
-                            },
-                            "tail": null
-                          }
-                        }
-                      }
+                      "tail": null
                     }
                   }
                 }

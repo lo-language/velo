@@ -57,6 +57,14 @@ __.prototype.compile = function (context) {
     // see if the identifier is defined
 
     if (context.has(this.name)) {
+
+        // if we're a constant, do the old switcheroo
+        if (context.isModule(this.name)) {
+
+            // console.log('compiling', this.name, context.resolve(this.name).renderJs());
+            return context.resolve(this.name);
+        }
+
         return JS.ID('$' + this.name);
     }
 

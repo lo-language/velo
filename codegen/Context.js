@@ -124,8 +124,9 @@ __.prototype.declare = function (name) {
  *
  * @param name
  * @param value
+ * @param isModule   bind at load-time, not compile-time
  */
-__.prototype.define = function (name, value) {
+__.prototype.define = function (name, value, isModule) {
 
     if (this.has(name)) {
         throw new Error(name + " is a constant or variable in this context");
@@ -134,7 +135,8 @@ __.prototype.define = function (name, value) {
     this.symbols['@' + name] = {
         type: 'const',
         name: name,
-        value: value
+        value: value,
+        isModule: isModule || false
     };
 };
 
@@ -204,7 +206,7 @@ __.prototype.getConstants = function () {
 
         var symbol = this.symbols[key];
 
-        if (symbol.type == 'const') {
+        if (symbol.type == 'const' && symbol.isModule == false) {
             accum.push(symbol);
         }
 
@@ -218,20 +220,40 @@ __.prototype.getConstants = function () {
  * Returns true if the specified name is a defined constant.
  *
  * @param name
- * @param qualifier     name qualifier (module reference)
  * @return {Boolean}
  */
-__.prototype.isConstant = function (name, qualifier) {
+__.prototype.isConstant = function (name) {
 
-    try {
-        this.resolve(name, qualifier);
+    if (this.symbols['@' + name] && this.symbols['@' + name].type == 'const') {
         return true;
     }
-    catch (err) {
-        return false;
+
+    if (this.parent) {
+        return this.parent.isConstant(name);
     }
+
+    return false;
 };
 
+
+/**
+ * Returns true if the specified name is a defined constant.
+ *
+ * @param name
+ * @return {Boolean}
+ */
+__.prototype.isModule = function (name) {
+
+    if (this.symbols['@' + name] && this.symbols['@' + name].isModule) {
+        return true;
+    }
+
+    if (this.parent) {
+        return this.parent.isModule(name);
+    }
+
+    return false;
+};
 
 /**
  * Returns the value of the specified constant.
@@ -241,10 +263,8 @@ __.prototype.isConstant = function (name, qualifier) {
  */
 __.prototype.resolve = function (name) {
 
-    if (this.symbols['@' + name] !== undefined
-        && this.symbols['@' + name].type == 'const') {
-        return true;
-        // return this.symbols['@' + name].value;
+    if (this.symbols['@' + name] !== undefined) {
+        return this.symbols['@' + name].value;
     }
 
     if (this.parent) {

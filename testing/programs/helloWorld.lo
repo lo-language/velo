@@ -1,9 +1,11 @@
+Common is module Common;
+
 main is <-> (args, system) {
 
-    greeter = ::Common.createGreeter("world");
+    greeter = Common.createGreeter("world");
 
     greeter.greet: system;
 
     // fire and forget - we won't wait!
-    @system.out.write: ::Common.GREETING;
+    @system.out.write: Common.GREETING;
 };

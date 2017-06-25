@@ -61,7 +61,13 @@ __.prototype.resolve = function (registry) {
 
         acquires.push(this.acquire(moduleId).then(module => {
             this.modules[moduleId] = module;
-            this.jsModules[moduleId] = module.compile(registry).renderJs();
+
+            try {
+                this.jsModules[moduleId] = module.compile(registry).renderJs();
+            }
+            catch (err) {
+                console.log(err);
+            }
         }));
 
         // delete after acquiring in case there was a cycle

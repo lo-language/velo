@@ -96,6 +96,18 @@ loVisitor.prototype.visitDefinition = function(ctx) {
 };
 
 
+// Visit a parse tree produced by loParser#dependency.
+loVisitor.prototype.visitDependency = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by loParser#locator.
+loVisitor.prototype.visitLocator = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by loParser#handlers.
 loVisitor.prototype.visitHandlers = function(ctx) {
   return this.visitChildren(ctx);

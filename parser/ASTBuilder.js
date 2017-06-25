@@ -40,12 +40,16 @@ __.prototype.parse = function (input) {
 
 
 // Visit a parse tree produced by exaParser#module.
+
 __.prototype.visitModule = function(ctx) {
 
     return new Lo.module(
-        ctx.definition().map(def => def.accept(this))
+        ctx.definition().map(def => def.accept(this)),
+        ctx.dependency().map(def => def.accept(this))
     );
 };
+
+
 
 __.prototype.visitStatementList = function(ctx) {
 
@@ -59,6 +63,14 @@ __.prototype.visitStatementList = function(ctx) {
 
 
 
+__.prototype.visitDependency = function(ctx) {
+
+    return new Lo.constant(
+        ctx.ID().getText(),
+        ctx.locator().accept(this)
+    );
+};
+
 // statements
 
 
@@ -69,14 +81,20 @@ __.prototype.visitDefStmt = function(ctx) {
 
 __.prototype.visitDefinition = function(ctx) {
 
+    // if (ctx.locator()) {
+    //     return new Lo.constant(
+    //         ctx.ID().getText(),
+    //         ctx.locator().accept(this)
+    //     );
+    // }
+
     return new Lo.constant(
         ctx.ID().getText(),
         ctx.expr().accept(this)
     );
 };
 
-
-__.prototype.visitModuleRef = function (ctx) {
+__.prototype.visitLocator = function(ctx) {
 
     var ids = ctx.ID().map(id => id.getText());
 

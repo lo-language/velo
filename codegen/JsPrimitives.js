@@ -20,6 +20,12 @@
 
 const JS = {};
 
+JS.NOOP = {
+
+    renderTree: () => ['no-op'],
+    renderJs: () => ''
+};
+
 JS.NULL = {
 
     renderTree: () => ['null'],

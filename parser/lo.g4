@@ -16,7 +16,7 @@ fragment ID_LETTER  : 'a'..'z'|'A'..'Z'|'_' ;
 NIL         : 'nil';
 BOOL        : 'true'|'false';
 PAIR_SEP    : '=>';
-FIELD_SEP   : ':';
+FIELD_SEP   : ':';  // IDEA: use 'is' here?? that might make modules and records consistent
 
 NUMBER
     : '-'? INT '.' DIGIT+ EXP?
@@ -38,21 +38,11 @@ INTER_END   : '`' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1); this.inS
 // should a module just be a record def?
 // but records normally can't refer to their own parts...
 
-// should module definitions be captured as a linked list like statements? they are statements, after all
-
+// note: we only have deps separate from defs because the compiler compiles tails before heads
+// (so we can't swap in module refs)
 module
-    : definition+ EOF   // had alias* at beginning
+    : dependency* definition+ EOF
     ;
-
-// declarative, not imperative
-//alias
-//    : 'alias' modref 'to' ID ';'
-//    ;
-
-//modref
-//    : ID
-//    | modref ':' ID
-//    ;
 
 // we do this the old-fashioned way because that's what the compiler wants
 statementList
@@ -76,6 +66,14 @@ statement
 
 definition
     : ID ('is'|'are') expr ';'
+    ;
+
+dependency
+    : ID 'is' 'module' locator ';'
+    ;
+
+locator
+    : ID ('::' ID)*
     ;
 
 handlers

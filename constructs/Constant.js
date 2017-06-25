@@ -14,7 +14,7 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const Procedure = require('./Procedure');
+const ModuleRef = require('./ModuleRef');
 
 /**
  * A constant definition
@@ -57,6 +57,14 @@ __.prototype.getTree = function () {
 __.prototype.compile = function (context) {
 
     var value = this.value.compile(context);
+
+    if (this.value instanceof ModuleRef) {
+
+        console.log('defining', this.name);
+
+        context.define(this.name, value, true);
+        return JS.NOOP;
+    }
 
     // register with the symbol table
     context.define(this.name, value);

@@ -1,8 +1,13 @@
+Moon is module Moon;
+HTTP is module NPM::HTTP;
+
 name is "Bigfoot Bjornsen";
 
-game is getGame();  // this is grammatical but a compile error
+game is getGame();  // todo this is grammatical but should be a compile error
 
 test is <-> {
+
+    // a set constant
 
     crew is {
 
@@ -13,7 +18,5 @@ test is <-> {
 
     timeStep is env.clock.interval(UPDATE_INTERVAL);
 
-    moon is ::Moon.create();
-
-    http is NPM::HTTP;
+    moon is Moon.create();
 };
