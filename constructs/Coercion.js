@@ -9,25 +9,19 @@
 
 "use strict";
 
-/*
- * todo this isn't properly a language construct, but just a syntactic helper
- * (the semantic primitive is string concatenation)
- */
-
 const JS = require('../codegen/JsPrimitives');
 
 
 /**
+ * Coerces the given expression to the given type.
  *
- * @param prefix
  * @param expr
- * @param suffix
+ * @param type
  */
-var __ = function (prefix, expr, suffix) {
+var __ = function (expr, type) {
 
-    this.prefix = prefix;
     this.expr = expr;
-    this.suffix = suffix;
+    this.type = type || 'string';
 };
 
 /**
@@ -36,10 +30,9 @@ var __ = function (prefix, expr, suffix) {
 __.prototype.getAst = function () {
 
     return {
-        type: 'interpolation',
-        left: this.prefix,
-        middle: this.expr.getAst(),
-        right: this.suffix
+        type: 'coercion',
+        expr: this.expr.getAst(),
+        coerce: this.type
     };
 };
 
@@ -49,11 +42,18 @@ __.prototype.getAst = function () {
 __.prototype.getTree = function () {
 
     return [
-        'interpolation',
-        this.prefix,
+        'coercion',
         this.expr.getTree(),
-        this.suffix
+        this.type
     ];
+};
+
+/**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.hasType = function (type) {
+
+    return type == this.type;
 };
 
 /**
@@ -63,9 +63,11 @@ __.prototype.getTree = function () {
  */
 __.prototype.compile = function (context) {
 
-    return JS.add(
-        JS.add(JS.string(this.prefix), this.expr.compile(context)),
-        JS.string(this.suffix));
+    if (this.type == 'string') {
+        return JS.fnCall(JS.ID('String'), [this.expr.compile(context)]);
+    }
+
+    throw new Error('we only coerce to strings at the moment, baby');
 };
 
 module.exports = __;

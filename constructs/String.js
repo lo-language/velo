@@ -54,6 +54,14 @@ __.prototype.getTree = function () {
 };
 
 /**
+ *
+ */
+__.prototype.hasType = function (type) {
+
+    return type == 'string';
+};
+
+/**
  * Compiles this node to JS in the given context.
  *
  * todo break these out into their own classes?

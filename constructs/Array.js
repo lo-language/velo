@@ -46,14 +46,6 @@ __.prototype.getTree = function () {
 };
 
 /**
- * Returns the Lo AST for this node.
- */
-__.prototype.toJSON = function () {
-
-    return ['array', this.elements.map(elem => elem.getTree())];
-};
-
-/**
  * Compiles this node to JS in the given context.
  *
  * @param context

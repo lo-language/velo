@@ -63,7 +63,7 @@ statementList
 statement
     : definition                                            # defStmt
     | channel=('reply'|'fail'|'substitute') exprList? ';'   # response
-    | expr assignment_op expr ';'                           # assignment
+    | expr op=('='|'+='|'-='|'*='|'/='|'%=') expr ';'       # assignment
     | expr op=('++'|'--') ';'                               # incDec
     | conditional                                           # condStmt
     | expr op=('+>'|'<+') expr ';'                          # push
@@ -90,21 +90,6 @@ replyHandler
 
 failHandler
     : 'on' 'fail' sink
-    ;
-
-
-// assignments are statements, not expressions!
-// todo multiple lvalues separated by commas for destructuring
-
-// assignments are NOT expressions
-// all but = should be considered combined operators instead of assignments
-assignment_op
-    : '='
-    | '+='
-    | '-='
-    | '*='
-    | '/='
-    | '%='
     ;
 
 // might want to refactor this
@@ -139,7 +124,7 @@ expr
     | '(' expr ')'                                              # wrap
     | '`' expr '`'                                              # stringify
     | '(' ID (',' ID)+ ')'                                      # destructure   // lvalue
-    | INTER_BEGIN interpolated INTER_END                        # dynastring
+    | INTER_BEGIN interpolated INTER_END                        # mixedString
     | literal                                                   # literalExpr
     | expr '?' expr ':' expr                                    # condExpr      // we want this before concat
     | expr '><' expr                                            # concat

@@ -98,7 +98,7 @@ __.prototype.visitAssignment = function(ctx) {
 
     // desugar compound assignment operators
 
-    switch (ctx.assignment_op().getText()) {
+    switch (ctx.op.text) {
 
         case '+=':
             right = new Lo.binaryOpExpr('+', left, right);
@@ -413,31 +413,29 @@ __.prototype.visitInterpolated = function(ctx) {
 
     if (mid) {
 
-        return new Lo.dynaString(
-            ctx.expr().accept(this),
-            mid.getText(),
+        return new Lo.concat(
+            new Lo.concat(
+                new Lo.coercion(ctx.expr().accept(this)),
+                new Lo.string(mid.getText())),
             ctx.interpolated().accept(this)
         );
     }
 
-    return ctx.expr().accept(this);
+    return new Lo.coercion(ctx.expr().accept(this));
 };
 
 __.prototype.visitStringify = function(ctx) {
 
-    return new Lo.interpolation(
-        '',
-        ctx.expr().accept(this),
-        ''
-    );
+    return new Lo.coercion(ctx.expr().accept(this));
 };
 
-__.prototype.visitDynastring = function(ctx) {
+__.prototype.visitMixedString = function(ctx) {
 
-    return new Lo.interpolation(
-        ctx.INTER_BEGIN().getText(),
-        ctx.interpolated().accept(this),
-        ctx.INTER_END().getText()
+    return new Lo.concat(
+        new Lo.concat(
+            new Lo.string(ctx.INTER_BEGIN().getText()),
+            new Lo.coercion(ctx.interpolated().accept(this))),
+        new Lo.string(ctx.INTER_END().getText())
     );
 };
 
