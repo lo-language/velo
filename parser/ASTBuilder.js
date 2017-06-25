@@ -322,7 +322,7 @@ __.prototype.visitSyncRequest = function(ctx) {
     );
 };
 
-__.prototype.visitSendMessage = function(ctx) {
+__.prototype.visitInvocation = function(ctx) {
 
     var args = ctx.exprList();
     var handlers = ctx.handlers() ? ctx.handlers().accept(this) : null;
@@ -561,8 +561,7 @@ __.prototype.visitCardinality = function(ctx) {
 
 __.prototype.visitConcat = function(ctx) {
 
-    return new Lo.binaryOpExpr(
-        'concat',
+    return new Lo.concat(
         ctx.expr(0).accept(this),
         ctx.expr(1).accept(this)
     );

@@ -1,54 +1,62 @@
 test is <-> {
 
-    // sync calls
+    ///////////////////
+    // general form (branch statement)
+
+
+    // sync with no handlers (one-way message)
 
     foo;        // how it's supposed to work in Lo
     foo.bar();  // only supported for backwards-compatibility with programmers; should emit warning
 
-    x = foo();
-    (x, y) = foo();
+    // with params
+    foo: 18;
 
-    // todo?
-    // x, y = foo();
+    // sync with fail handler only
 
-    // async calls
+    foo on fail -> (error) {
+        substitute "ok";
+    };
 
-    @foo << (18);
+    // sync with both handlers
+    user.login: password -> (result) {
+        reply "ok";
+    }
+    on fail -> (error) {
+        substitute "ok";
+    };
 
-    async sessionStore.getByID << (sessionID);
+    // async with no handlers
+    @foo;
 
-    (bar, baz) = @foo(47);  // destructuring
-    //47 >> foo => (bar, baz);  // destructuring
+    async sessionStore.getByID: sessionID;
+
+    // async with handlers
 
     // handle success only
-    @bar << (48) -> {
+    @bar: 48 -> {
         reply "hello";
     };
 
     // handle failure only
-    @baz << (128) -> (result) {
-    }
+    @baz: 128
     on fail -> (err) {
         reply "bummer";
     };
 
-    // todo
-    // after baz(12) mute;
-
     // handle both success and failure
-    async foo << (42) -> (a, b) {
+    async foo: 42 -> (a, b) {
         reply "yay";
     }
     on fail -> {
         reply "darn";
     };
 
-
     // nested requests
     // should we support pipes like 42 -> foo -> bar -> baz?
-    @foo << (42) -> {
+    @foo: 42 -> (result) {
 
-        @bar << (result) -> {
+        @bar: result -> {
 
             yarp = @baz(result);
         }
@@ -60,23 +68,26 @@ test is <-> {
         reply "darn";
     };
 
-    // sync form in expressions
+    ///////////////////
+    //special form (function-application expression)
+
+    x = foo();
+    (x, y) = foo();
+
+    // in expressions
 
     foo(bar());
 
     x = foo() + 7;
 
-    // async with fail handler only
+    // todo?
+    // x, y = foo();
 
-    foo on fail -> (error) {
-        substitute "ok";
-    };
+    // async calls in expressions
 
-    // both handlers
-    bar -> (result) {
-        reply "ok";
-    }
-    on fail -> (error) {
-        substitute "ok";
-    };
+    (bar, baz) = @foo(47);  // destructuring
+
+
+    // todo
+    // after baz(12) mute;
 };

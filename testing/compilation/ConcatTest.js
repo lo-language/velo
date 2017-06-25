@@ -68,8 +68,6 @@ module.exports = {
                                     new Lo.coercion(new Lo.identifier('c')),
                                     new Lo.string('.')))))));
 
-        console.log(node.compile(new Context()).renderJs());
-
         test.deepEqual(node.compile(new Context()).renderTree(),
             [ 'add',
                 [ 'string', 'A = ' ],

@@ -69,7 +69,7 @@ statement
     | expr op=('+>'|'<+') expr ';'                          # push
     | expr '(' exprList? ')' ';'                            # syncRequest   // this permits foo(); which would otherwise be caught by sendMessage and wouldn't do what people expect
     | 'on' expr sink ';'                                    # subscribe
-    | ASYNC? expr ('<<' '(' exprList? ')')? handlers? ';'   # sendMessage
+    | ASYNC? expr (':' exprList)? handlers? ';'             # invocation
     | 'while' expr block                                    # iteration
     | 'scan' expr expr                                      # scan
     ;
@@ -143,14 +143,14 @@ exprList
 
 // literals
 
-// are arrays and forms immutable?
+// are arrays and records immutable?
 literal
     : 'nil'                                     # nil
     | BOOL                                      # bool
     | NUMBER                                    # number
     | STRING                                    # string
     | '[' exprList? ']'                         # array
-    | '(' fieldList ')'                         # record // form? compound? composite? frame?
+    | '(' fieldList ')'                         # record // form? compound? composite? frame? struct?
     | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
     | sink                                      # handler
     | '<->' procedure                           # service

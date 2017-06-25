@@ -188,8 +188,7 @@
                           "name": "doghouse"
                         },
                         "right": {
-                          "type": "op",
-                          "op": "concat",
+                          "type": "concat",
                           "left": {
                             "type": "string",
                             "val": "dog"
@@ -257,8 +256,7 @@
                                   "name": "result"
                                 },
                                 "right": {
-                                  "type": "op",
-                                  "op": "concat",
+                                  "type": "concat",
                                   "left": {
                                     "type": "id",
                                     "name": "base"

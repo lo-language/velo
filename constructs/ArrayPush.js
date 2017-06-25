@@ -18,7 +18,7 @@ const Identifier = require('./Identifier');
 
 
 /**
- * An assignment statement.
+ * An array push statement.
  *
  * @param op
  * @param left      expr
