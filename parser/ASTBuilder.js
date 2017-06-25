@@ -65,9 +65,11 @@ __.prototype.visitStatementList = function(ctx) {
 
 __.prototype.visitDependency = function(ctx) {
 
+    var moduleId = ctx.ID().getText();
+
     return new Lo.constant(
-        ctx.ID().getText(),
-        ctx.locator().accept(this)
+        moduleId,
+        ctx.locator() ? ctx.locator().accept(this) : new Lo.moduleRef(null, moduleId)
     );
 };
 

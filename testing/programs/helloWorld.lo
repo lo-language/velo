@@ -1,4 +1,4 @@
-Common is module Common;
+Common is module;
 
 main is <-> (args, system) {
 

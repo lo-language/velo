@@ -163,10 +163,10 @@ module.exports['helloWorld'] = {
             }
         };
 
-        this.harness.dumpModules().then(() => {
+        // this.harness.dumpModules().then(() => {
 
         this.harness.testSuccess(test, [[], system, {}]);
-        });
+        // });
     }
 };
 

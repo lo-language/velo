@@ -1,4 +1,4 @@
-Moon is module Moon;
+Moon is module;
 HTTP is module NPM::HTTP;
 
 name is "Bigfoot Bjornsen";

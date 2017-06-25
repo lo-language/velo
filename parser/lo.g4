@@ -69,7 +69,7 @@ definition
     ;
 
 dependency
-    : ID 'is' 'module' locator ';'
+    : ID 'is' 'module' locator? ';'
     ;
 
 locator

@@ -60,8 +60,6 @@ __.prototype.compile = function (context) {
 
     if (this.value instanceof ModuleRef) {
 
-        console.log('defining', this.name);
-
         context.define(this.name, value, true);
         return JS.NOOP;
     }
