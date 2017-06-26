@@ -11,96 +11,172 @@
           "type": "stmt_list",
           "head": {
             "type": "assign",
-            "op": "=",
             "left": {
               "type": "id",
               "name": "message"
             },
             "right": {
-              "type": "interpolation",
-              "left": "hello, ",
-              "middle": {
-                "type": "id",
-                "name": "name"
+              "type": "concat",
+              "left": {
+                "type": "concat",
+                "left": {
+                  "type": "string",
+                  "val": "hello, "
+                },
+                "right": {
+                  "type": "coercion",
+                  "expr": {
+                    "type": "coercion",
+                    "expr": {
+                      "type": "id",
+                      "name": "name"
+                    },
+                    "coerce": "string"
+                  },
+                  "coerce": "string"
+                }
               },
-              "right": "!"
+              "right": {
+                "type": "string",
+                "val": "!"
+              }
             }
           },
           "tail": {
             "type": "stmt_list",
             "head": {
               "type": "assign",
-              "op": "=",
               "left": {
                 "type": "id",
                 "name": "message2"
               },
               "right": {
-                "type": "interpolation",
-                "left": "I'm sorry, ",
-                "middle": {
-                  "type": "dynastring",
+                "type": "concat",
+                "left": {
+                  "type": "concat",
                   "left": {
-                    "type": "id",
-                    "name": "name"
+                    "type": "string",
+                    "val": "I'm sorry, "
                   },
-                  "middle": ", I can't do ",
                   "right": {
-                    "type": "id",
-                    "name": "action"
+                    "type": "coercion",
+                    "expr": {
+                      "type": "concat",
+                      "left": {
+                        "type": "concat",
+                        "left": {
+                          "type": "coercion",
+                          "expr": {
+                            "type": "id",
+                            "name": "name"
+                          },
+                          "coerce": "string"
+                        },
+                        "right": {
+                          "type": "string",
+                          "val": ", I can't do "
+                        }
+                      },
+                      "right": {
+                        "type": "coercion",
+                        "expr": {
+                          "type": "id",
+                          "name": "action"
+                        },
+                        "coerce": "string"
+                      }
+                    },
+                    "coerce": "string"
                   }
                 },
-                "right": "."
+                "right": {
+                  "type": "string",
+                  "val": "."
+                }
               }
             },
             "tail": {
               "type": "stmt_list",
               "head": {
                 "type": "assign",
-                "op": "=",
                 "left": {
                   "type": "id",
                   "name": "message3"
                 },
                 "right": {
-                  "type": "interpolation",
-                  "left": "A = ",
-                  "middle": {
-                    "type": "dynastring",
+                  "type": "concat",
+                  "left": {
+                    "type": "concat",
                     "left": {
-                      "type": "id",
-                      "name": "a"
+                      "type": "string",
+                      "val": "A = "
                     },
-                    "middle": ", B = ",
                     "right": {
-                      "type": "dynastring",
-                      "left": {
-                        "type": "id",
-                        "name": "b"
+                      "type": "coercion",
+                      "expr": {
+                        "type": "concat",
+                        "left": {
+                          "type": "concat",
+                          "left": {
+                            "type": "coercion",
+                            "expr": {
+                              "type": "id",
+                              "name": "a"
+                            },
+                            "coerce": "string"
+                          },
+                          "right": {
+                            "type": "string",
+                            "val": ", B = "
+                          }
+                        },
+                        "right": {
+                          "type": "concat",
+                          "left": {
+                            "type": "concat",
+                            "left": {
+                              "type": "coercion",
+                              "expr": {
+                                "type": "id",
+                                "name": "b"
+                              },
+                              "coerce": "string"
+                            },
+                            "right": {
+                              "type": "string",
+                              "val": ", C = "
+                            }
+                          },
+                          "right": {
+                            "type": "coercion",
+                            "expr": {
+                              "type": "id",
+                              "name": "c"
+                            },
+                            "coerce": "string"
+                          }
+                        }
                       },
-                      "middle": ", C = ",
-                      "right": {
-                        "type": "id",
-                        "name": "c"
-                      }
+                      "coerce": "string"
                     }
                   },
-                  "right": "."
+                  "right": {
+                    "type": "string",
+                    "val": "."
+                  }
                 }
               },
               "tail": {
                 "type": "stmt_list",
                 "head": {
                   "type": "assign",
-                  "op": "=",
                   "left": {
                     "type": "id",
                     "name": "foo"
                   },
                   "right": {
-                    "type": "interpolation",
-                    "left": "",
-                    "middle": {
+                    "type": "coercion",
+                    "expr": {
                       "type": "op",
                       "op": "+",
                       "left": {
@@ -112,7 +188,7 @@
                         "name": "baz"
                       }
                     },
-                    "right": ""
+                    "coerce": "string"
                   }
                 },
                 "tail": null

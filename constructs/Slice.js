@@ -48,6 +48,19 @@ __.prototype.getAst = function () {
 };
 
 /**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return [
+        'slice',
+        this.array.getTree(),
+        this.start ? this.start.getTree() : null,
+        this.end ? this.end.getTree() : null
+    ];
+};
+
+/**
  * Compiles this node to JS in the given context.
  *
  * @param context

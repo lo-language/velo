@@ -18,10 +18,11 @@ const vm = require('vm');
 /**
  * A module definition; the root of an AST. Called by the ASTBuilder
  */
-var __ = function (defs) {
+var __ = function (defs, deps) {
 
     this.deps = [];
     this.defs = defs;
+    this.deps = deps || [];
     this.exports = {};
     this.name = 'UNK';
     this.path = 'UNK';
@@ -41,10 +42,24 @@ __.prototype.setInfo = function (id, path) {
  */
 __.prototype.getAst = function () {
 
-    return {
+    return this.deps.length > 0 ? {
+        type: 'module',
+        deps: this.deps,
+        definitions: this.defs.map(def => def.getAst()),
+    } : {
         type: 'module',
         definitions: this.defs.map(def => def.getAst()),
     };
+
+
+};
+
+/**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return ['module'].concat(this.defs.map(def => def.getTree()));
 };
 
 /**
@@ -58,6 +73,14 @@ __.prototype.compile = function (registry) {
     var context = new Context();
 
     context.setRegistry(registry);
+
+    // OK, THIS IS A HACK
+    // compile all the deps right here
+    this.deps.forEach(function (dep) {
+
+        // ignore the return value, which is just a no-op
+        dep.compile(context);
+    });
 
     var stmts = null;
 

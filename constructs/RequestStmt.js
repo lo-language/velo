@@ -47,6 +47,21 @@ __.prototype.getAst = function () {
 };
 
 /**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return [
+        'request',
+        this.address.getTree(),
+        this.args.map(arg => arg.getTree()),
+        this.replyHandler ? this.replyHandler.getTree() : null,
+        this.failHandler ? this.failHandler.getTree() : null,
+        this.blocking
+    ];
+};
+
+/**
  * Compiles this node to JS in the given context.
  *
  * @param context

@@ -19,8 +19,7 @@ module.exports["blocking"] = {
                 new Lo.procedure(
                     [],
                     new Lo.stmtList(
-                        new Lo.assignment(
-                            '=',
+                        new Lo.assign(
                             new Lo.identifier('baz'),
                             new Lo.number('42')
                         )
@@ -59,8 +58,7 @@ module.exports["blocking"] = {
                 new Lo.procedure(
                     [],
                     new Lo.stmtList(
-                        new Lo.assignment(
-                            '=',
+                        new Lo.assign(
                             new Lo.identifier('baz'),
                             new Lo.number('42')
                         )
@@ -70,7 +68,7 @@ module.exports["blocking"] = {
                 true
             ),
             new Lo.stmtList(
-                new Lo.assignment('=', new Lo.identifier('bazball'), new Lo.number('42'))));
+                new Lo.assign(new Lo.identifier('bazball'), new Lo.number('42'))));
 
         test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -108,8 +106,7 @@ module.exports["blocking"] = {
                 new Lo.procedure(
                     [],
                     new Lo.stmtList(
-                        new Lo.assignment(
-                            '=',
+                        new Lo.assign(
                             new Lo.identifier('foo'),
                             new Lo.number('42')
                         )
@@ -146,8 +143,7 @@ module.exports["blocking"] = {
                 new Lo.procedure(
                     [],
                     new Lo.stmtList(
-                        new Lo.assignment(
-                            '=',
+                        new Lo.assign(
                             new Lo.identifier('baz'),
                             new Lo.number('42')
                         )
@@ -156,7 +152,7 @@ module.exports["blocking"] = {
                 true
             ),
             new Lo.stmtList(
-                new Lo.assignment('=', new Lo.identifier('bazball'), new Lo.number('42'))));
+                new Lo.assign(new Lo.identifier('bazball'), new Lo.number('42'))));
 
         test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -193,8 +189,7 @@ module.exports["blocking"] = {
                 new Lo.procedure(
                     [],
                     new Lo.stmtList(
-                        new Lo.assignment(
-                            '=',
+                        new Lo.assign(
                             new Lo.identifier('foo'),
                             new Lo.number('42')
                         )
@@ -203,8 +198,7 @@ module.exports["blocking"] = {
                 new Lo.procedure(
                     [],
                     new Lo.stmtList(
-                        new Lo.assignment(
-                            '=',
+                        new Lo.assign(
                             new Lo.identifier('bar'),
                             new Lo.number('57')
                         )
@@ -237,7 +231,7 @@ module.exports["blocking"] = {
 
         var node = new Lo.stmtList(reqStmt,
             new Lo.stmtList(
-                new Lo.assignment('=', new Lo.identifier('bazball'), new Lo.number('42'))));
+                new Lo.assign(new Lo.identifier('bazball'), new Lo.number('42'))));
 
         test.deepEqual(node.compile(new Context()).renderTree(),
             [ 'stmtList',
@@ -294,7 +288,7 @@ module.exports["blocking"] = {
 
         // attach a statement - should be tucked inside the replyhandler
         result = new Lo.stmtList(reqStmt,
-            new Lo.stmtList(new Lo.assignment('=', new Lo.identifier('foo'), new Lo.identifier('bar')))).compile(new Context());
+            new Lo.stmtList(new Lo.assign(new Lo.identifier('foo'), new Lo.identifier('bar')))).compile(new Context());
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -366,8 +360,7 @@ module.exports["blocking"] = {
                         [ 'null' ] ] ] ] ]);
 
         node.append(new Lo.stmtList(
-            new Lo.assignment(
-                '=',
+            new Lo.assign(
                 new Lo.identifier('bazball'),
                 new Lo.number(12)
             )
@@ -494,8 +487,7 @@ module.exports["non-blocking"] = {
             new Lo.procedure(
                 [],
                 new Lo.stmtList(
-                    new Lo.assignment(
-                        '=',
+                    new Lo.assign(
                         new Lo.identifier('foo'),
                         new Lo.number('42')
                     )
@@ -524,8 +516,7 @@ module.exports["non-blocking"] = {
 
 
         result = new Lo.stmtList(node,
-            new Lo.stmtList(new Lo.assignment(
-                '=',
+            new Lo.stmtList(new Lo.assign(
                 new Lo.identifier('bazball'),
                 new Lo.number('42')
             ))).compile(new Context());
@@ -560,8 +551,7 @@ module.exports["non-blocking"] = {
             new Lo.procedure(
                 [],
                 new Lo.stmtList(
-                    new Lo.assignment(
-                        '=',
+                    new Lo.assign(
                         new Lo.identifier('foo'),
                         new Lo.number('42')
                     )
@@ -596,8 +586,7 @@ module.exports["non-blocking"] = {
             new Lo.procedure(
                 [],
                 new Lo.stmtList(
-                    new Lo.assignment(
-                        '=',
+                    new Lo.assign(
                         new Lo.identifier('foo'),
                         new Lo.number('42')
                     )
@@ -606,8 +595,7 @@ module.exports["non-blocking"] = {
             new Lo.procedure(
                 [],
                 new Lo.stmtList(
-                    new Lo.assignment(
-                        '=',
+                    new Lo.assign(
                         new Lo.identifier('bar'),
                         new Lo.number('57')
                     )

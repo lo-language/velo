@@ -55,10 +55,22 @@
               "consequent": {
                 "type": "stmt_list",
                 "head": {
-                  "type": "increment",
-                  "operand": {
+                  "type": "assign",
+                  "left": {
                     "type": "id",
                     "name": "x"
+                  },
+                  "right": {
+                    "type": "op",
+                    "op": "+",
+                    "left": {
+                      "type": "id",
+                      "name": "x"
+                    },
+                    "right": {
+                      "type": "number",
+                      "val": "1"
+                    }
                   }
                 },
                 "tail": null
@@ -83,10 +95,22 @@
                 "consequent": {
                   "type": "stmt_list",
                   "head": {
-                    "type": "decrement",
-                    "operand": {
+                    "type": "assign",
+                    "left": {
                       "type": "id",
                       "name": "x"
+                    },
+                    "right": {
+                      "type": "op",
+                      "op": "-",
+                      "left": {
+                        "type": "id",
+                        "name": "x"
+                      },
+                      "right": {
+                        "type": "number",
+                        "val": "1"
+                      }
                     }
                   },
                   "tail": null
@@ -94,10 +118,22 @@
                 "alternate": {
                   "type": "stmt_list",
                   "head": {
-                    "type": "increment",
-                    "operand": {
+                    "type": "assign",
+                    "left": {
                       "type": "id",
                       "name": "x"
+                    },
+                    "right": {
+                      "type": "op",
+                      "op": "+",
+                      "left": {
+                        "type": "id",
+                        "name": "x"
+                      },
+                      "right": {
+                        "type": "number",
+                        "val": "1"
+                      }
                     }
                   },
                   "tail": null
@@ -122,10 +158,22 @@
                   "consequent": {
                     "type": "stmt_list",
                     "head": {
-                      "type": "increment",
-                      "operand": {
+                      "type": "assign",
+                      "left": {
                         "type": "id",
                         "name": "x"
+                      },
+                      "right": {
+                        "type": "op",
+                        "op": "+",
+                        "left": {
+                          "type": "id",
+                          "name": "x"
+                        },
+                        "right": {
+                          "type": "number",
+                          "val": "1"
+                        }
                       }
                     },
                     "tail": null
@@ -170,10 +218,22 @@
                     "consequent": {
                       "type": "stmt_list",
                       "head": {
-                        "type": "increment",
-                        "operand": {
+                        "type": "assign",
+                        "left": {
                           "type": "id",
                           "name": "x"
+                        },
+                        "right": {
+                          "type": "op",
+                          "op": "+",
+                          "left": {
+                            "type": "id",
+                            "name": "x"
+                          },
+                          "right": {
+                            "type": "number",
+                            "val": "1"
+                          }
                         }
                       },
                       "tail": null

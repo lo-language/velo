@@ -39,12 +39,26 @@ __.prototype.getValue = function () {
  */
 __.prototype.getAst = function () {
 
-    // ??? might not want to return an actual bool here - number literals are kept as strings
-
     return {
         type: 'string',
         val: this.value
     };
+};
+
+/**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return ['string', this.value];
+};
+
+/**
+ *
+ */
+__.prototype.hasType = function (type) {
+
+    return type == 'string';
 };
 
 /**

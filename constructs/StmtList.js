@@ -51,7 +51,6 @@ __.prototype.attach = function (stmtList) {
     }
 };
 
-
 /**
  * Returns the Lo AST for this node.
  */
@@ -62,6 +61,18 @@ __.prototype.getAst = function () {
         head: this.head ? this.head.getAst() : null,
         tail: this.tail ? this.tail.getAst() : null
     };
+};
+
+/**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return [
+        'stmt_list',
+        this.head ? this.head.getTree() : null,
+        this.tail ? this.tail.getTree() : null
+    ];
 };
 
 /**

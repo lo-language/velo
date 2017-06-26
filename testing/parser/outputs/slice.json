@@ -11,7 +11,6 @@
           "type": "stmt_list",
           "head": {
             "type": "assign",
-            "op": "=",
             "left": {
               "type": "id",
               "name": "x"
@@ -36,7 +35,6 @@
             "type": "stmt_list",
             "head": {
               "type": "assign",
-              "op": "=",
               "left": {
                 "type": "id",
                 "name": "y"

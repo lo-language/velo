@@ -7,9 +7,4 @@ test is <-> {
     _qux = foo[i].bar;
     quux = foo.bar[i];
     moi = __;
-
-    method = Node::HTTP.GET;
-    server = Node::HTTP.createServer();
-
-    PI is JS::Math.PI;
 };

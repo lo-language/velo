@@ -3,7 +3,9 @@
  * 12/25/14
  */
 
+Math is module JS::Math;
+
 main is <-> {
 
-    reply JS::Math.cos(JS::Math.PI);
+    reply Math.cos(Math.PI);
 };

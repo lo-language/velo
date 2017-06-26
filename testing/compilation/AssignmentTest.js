@@ -13,7 +13,7 @@ module.exports["assignment"] = {
 
     "assign literal to id": function (test) {
 
-        var node = new Lo.assignment('=',
+        var node = new Lo.assign(
             new Lo.identifier('foo'), new Lo.number('57'));
 
         var context = new Context().createInner();
@@ -29,7 +29,7 @@ module.exports["assignment"] = {
 
     "assign literal to lvalue expression": function (test) {
 
-        var node = new Lo.assignment('*=',
+        var node = new Lo.assign(
             new Lo.subscript(new Lo.identifier('foo'), new Lo.identifier('bar')),
             new Lo.number('57'));
 
@@ -39,14 +39,13 @@ module.exports["assignment"] = {
                 [ 'expr-stmt',
                     [ 'assign',
                         [ 'subscript', [ 'id', '$foo' ], [ 'id', '$bar' ] ],
-                        [ 'num', '57' ], '*=' ] ]);
+                        [ 'num', '57' ] ] ]);
         test.done();
     },
 
     "assign id to id": function (test) {
 
-        var node = new Lo.assignment(
-            '=',
+        var node = new Lo.assign(
             new Lo.identifier('foo'),
             new Lo.identifier('bar'));
 
@@ -64,8 +63,7 @@ module.exports["assignment"] = {
 
         // this is more of an integration test
 
-        var node = new Lo.assignment(
-            '=',
+        var node = new Lo.assign(
             new Lo.identifier('foo'),
             new Lo.requestExpr(new Lo.identifier('bar'), [])
         );
@@ -86,7 +84,7 @@ module.exports["assignment"] = {
 
     "doesn't declare if in parent context": function (test) {
 
-        var node = new Lo.assignment('=',
+        var node = new Lo.assign(
             new Lo.identifier('foo'), new Lo.number('57'));
 
         var parent = new Context().createInner();
@@ -109,35 +107,36 @@ module.exports["assignment"] = {
     }
 };
 
+// this is all sugar now
 
-module.exports["combined assignment"] = {
-
-    "increment ID": function (test) {
-
-        var node = new Lo.incrDecr('increment', new Lo.identifier('bar'));
-
-        test.deepEqual(node.compile(new Context()).renderTree(),
-            [ 'expr-stmt', [ 'inc', [ 'id', '$bar' ] ] ]);
-        test.done();
-    },
-
-    "decrement ID": function (test) {
-
-        var node = new Lo.incrDecr('decrement', new Lo.identifier('bar'));
-
-        test.deepEqual(node.compile(new Context()).renderTree(), [ 'expr-stmt', [ 'dec', [ 'id', '$bar' ] ] ]);
-        test.done();
-    },
-
-    "increment subscript": function (test) {
-
-        var node = new Lo.incrDecr('increment',
-            new Lo.subscript(
-                new Lo.identifier('bar'), new Lo.number("1")));
-
-        test.deepEqual(node.compile(new Context()).renderTree(),
-            [ 'expr-stmt',
-                [ 'inc', [ 'subscript', [ 'id', '$bar' ], [ 'num', '1' ] ] ] ]);
-        test.done();
-    },
-};
+// module.exports["combined assignment"] = {
+//
+//     "increment ID": function (test) {
+//
+//         var node = new Lo.incrDecr('increment', new Lo.identifier('bar'));
+//
+//         test.deepEqual(node.compile(new Context()).renderTree(),
+//             [ 'expr-stmt', [ 'inc', [ 'id', '$bar' ] ] ]);
+//         test.done();
+//     },
+//
+//     "decrement ID": function (test) {
+//
+//         var node = new Lo.incrDecr('decrement', new Lo.identifier('bar'));
+//
+//         test.deepEqual(node.compile(new Context()).renderTree(), [ 'expr-stmt', [ 'dec', [ 'id', '$bar' ] ] ]);
+//         test.done();
+//     },
+//
+//     "increment subscript": function (test) {
+//
+//         var node = new Lo.incrDecr('increment',
+//             new Lo.subscript(
+//                 new Lo.identifier('bar'), new Lo.number("1")));
+//
+//         test.deepEqual(node.compile(new Context()).renderTree(),
+//             [ 'expr-stmt',
+//                 [ 'inc', [ 'subscript', [ 'id', '$bar' ], [ 'num', '1' ] ] ] ]);
+//         test.done();
+//     },
+// };

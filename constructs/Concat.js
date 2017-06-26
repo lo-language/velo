@@ -7,9 +7,6 @@
  *
  =============================================================================*/
 
-/**
- * Created by seth on 11/12/16.
- */
 
 "use strict";
 
@@ -17,15 +14,14 @@ const JS = require('../codegen/JsPrimitives');
 
 
 /**
+ * An array concatenation expression (including strings)
  *
  * @param left
- * @param infix
  * @param right
  */
-var __ = function (left, infix, right) {
+var __ = function (left, right) {
 
     this.left = left;
-    this.infix = infix;
     this.right = right;
 };
 
@@ -35,11 +31,30 @@ var __ = function (left, infix, right) {
 __.prototype.getAst = function () {
 
     return {
-        type: 'dynastring',
+        type: 'concat',
         left: this.left.getAst(),
-        middle: this.infix,
         right: this.right.getAst()
     };
+};
+
+/**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return [
+        'concat',
+        this.left.getTree(),
+        this.right.getTree(),
+    ];
+};
+
+/**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.hasType = function (type) {
+
+    return this.left.hasType(type) && this.right.hasType(type);
 };
 
 /**
@@ -49,9 +64,16 @@ __.prototype.getAst = function () {
  */
 __.prototype.compile = function (context) {
 
-    return JS.add(
-        JS.add(this.left.compile(context), JS.string(this.infix)),
-        this.right.compile(context));
+    const left = this.left.compile(context);
+    const right = this.right.compile(context);
+
+    // see if we know the type at compile time
+    if (this.left.hasType('string') && this.right.hasType('string')) {
+        return JS.add(left, right);
+    }
+
+    // kick it to the runtime
+    return JS.runtimeCall('concat', [left, right]);
 };
 
 module.exports = __;

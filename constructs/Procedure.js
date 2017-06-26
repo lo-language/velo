@@ -26,7 +26,7 @@ var __ = function (params, body, isService) {
 
     this.params = params;
     this.body = body;
-    this.isService = isService;
+    this.isService = isService; // nice hack! thanks!
 };
 
 /**
@@ -40,6 +40,19 @@ __.prototype.getAst = function () {
         body: this.body ? this.body.getAst() : null,
         isService: this.isService
     };
+};
+
+/**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return [
+        'procedure',
+        this.params,
+        this.body ? this.body.getTree() : null,
+        this.isService
+    ];
 };
 
 /**

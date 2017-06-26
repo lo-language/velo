@@ -38,6 +38,14 @@ __.prototype.getAst = function () {
 };
 
 /**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return ['array'].concat(this.elements.map(elem => elem.getTree()));
+};
+
+/**
  * Compiles this node to JS in the given context.
  *
  * @param context

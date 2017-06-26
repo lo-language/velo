@@ -18,7 +18,7 @@ const Identifier = require('./Identifier');
 
 
 /**
- * An assignment statement.
+ * An array push statement.
  *
  * @param op
  * @param left      expr
@@ -41,6 +41,14 @@ __.prototype.getAst = function () {
         left: this.left.getAst(),
         right: this.right.getAst()
     };
+};
+
+/**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return [this.op, this.left.getTree(), this.right.getTree()];
 };
 
 /**

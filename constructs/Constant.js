@@ -14,7 +14,7 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const Procedure = require('./Procedure');
+const ModuleRef = require('./ModuleRef');
 
 /**
  * A constant definition
@@ -38,6 +38,18 @@ __.prototype.getAst = function () {
 };
 
 /**
+ * Returns the Lo AST for this node.
+ */
+__.prototype.getTree = function () {
+
+    return [
+        'def',
+        this.name,
+        this.value.getTree()
+    ];
+};
+
+/**
  * Compiles this node to JS in the given context.
  *
  * @param context
@@ -45,6 +57,12 @@ __.prototype.getAst = function () {
 __.prototype.compile = function (context) {
 
     var value = this.value.compile(context);
+
+    if (this.value instanceof ModuleRef) {
+
+        context.define(this.name, value, true);
+        return JS.NOOP;
+    }
 
     // register with the symbol table
     context.define(this.name, value);

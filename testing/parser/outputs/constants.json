@@ -1,5 +1,21 @@
 {
   "type": "module",
+  "deps": [
+    {
+      "name": "Moon",
+      "value": {
+        "namespace": null,
+        "id": "Moon"
+      }
+    },
+    {
+      "name": "HTTP",
+      "value": {
+        "namespace": "NPM",
+        "id": "HTTP"
+      }
+    }
+  ],
   "definitions": [
     {
       "type": "constant",
@@ -89,9 +105,8 @@
                   "address": {
                     "type": "select",
                     "record": {
-                      "type": "modref",
-                      "namespace": null,
-                      "id": "Moon"
+                      "type": "id",
+                      "name": "Moon"
                     },
                     "field": "create"
                   },
@@ -99,19 +114,7 @@
                   "blocking": true
                 }
               },
-              "tail": {
-                "type": "stmt_list",
-                "head": {
-                  "type": "constant",
-                  "name": "http",
-                  "value": {
-                    "type": "modref",
-                    "namespace": "NPM",
-                    "id": "HTTP"
-                  }
-                },
-                "tail": null
-              }
+              "tail": null
             }
           }
         },

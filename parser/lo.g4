@@ -16,7 +16,7 @@ fragment ID_LETTER  : 'a'..'z'|'A'..'Z'|'_' ;
 NIL         : 'nil';
 BOOL        : 'true'|'false';
 PAIR_SEP    : '=>';
-FIELD_SEP   : ':';
+FIELD_SEP   : ':';  // IDEA: use 'is' here?? that might make modules and records consistent
 
 NUMBER
     : '-'? INT '.' DIGIT+ EXP?
@@ -38,21 +38,11 @@ INTER_END   : '`' (ESC|~[`"])* '"' {this.text = this.text.slice(1, -1); this.inS
 // should a module just be a record def?
 // but records normally can't refer to their own parts...
 
-// should module definitions be captured as a linked list like statements? they are statements, after all
-
+// note: we only have deps separate from defs because the compiler compiles tails before heads
+// (so we can't swap in module refs)
 module
-    : definition+ EOF   // had alias* at beginning
+    : dependency* definition+ EOF
     ;
-
-// declarative, not imperative
-//alias
-//    : 'alias' modref 'to' ID ';'
-//    ;
-
-//modref
-//    : ID
-//    | modref ':' ID
-//    ;
 
 // we do this the old-fashioned way because that's what the compiler wants
 statementList
@@ -63,19 +53,27 @@ statementList
 statement
     : definition                                            # defStmt
     | channel=('reply'|'fail'|'substitute') exprList? ';'   # response
-    | expr assignment_op expr ';'                           # assignment
+    | expr op=('='|'+='|'-='|'*='|'/='|'%=') expr ';'       # assignment
     | expr op=('++'|'--') ';'                               # incDec
     | conditional                                           # condStmt
     | expr op=('+>'|'<+') expr ';'                          # push
     | expr '(' exprList? ')' ';'                            # syncRequest   // this permits foo(); which would otherwise be caught by sendMessage and wouldn't do what people expect
     | 'on' expr sink ';'                                    # subscribe
-    | ASYNC? expr ('<<' '(' exprList? ')')? handlers? ';'   # sendMessage
+    | ASYNC? expr (':' exprList)? handlers? ';'             # invocation
     | 'while' expr block                                    # iteration
     | 'scan' expr expr                                      # scan
     ;
 
 definition
     : ID ('is'|'are') expr ';'
+    ;
+
+dependency
+    : ID 'is' 'module' locator? ';'
+    ;
+
+locator
+    : ID ('::' ID)*
     ;
 
 handlers
@@ -90,21 +88,6 @@ replyHandler
 
 failHandler
     : 'on' 'fail' sink
-    ;
-
-
-// assignments are statements, not expressions!
-// todo multiple lvalues separated by commas for destructuring
-
-// assignments are NOT expressions
-// all but = should be considered combined operators instead of assignments
-assignment_op
-    : '='
-    | '+='
-    | '-='
-    | '*='
-    | '/='
-    | '%='
     ;
 
 // might want to refactor this
@@ -139,7 +122,7 @@ expr
     | '(' expr ')'                                              # wrap
     | '`' expr '`'                                              # stringify
     | '(' ID (',' ID)+ ')'                                      # destructure   // lvalue
-    | INTER_BEGIN interpolated INTER_END                        # dynastring
+    | INTER_BEGIN interpolated INTER_END                        # mixedString
     | literal                                                   # literalExpr
     | expr '?' expr ':' expr                                    # condExpr      // we want this before concat
     | expr '><' expr                                            # concat
@@ -158,14 +141,14 @@ exprList
 
 // literals
 
-// are arrays and forms immutable?
+// are arrays and records immutable?
 literal
     : 'nil'                                     # nil
     | BOOL                                      # bool
     | NUMBER                                    # number
     | STRING                                    # string
     | '[' exprList? ']'                         # array
-    | '(' fieldList ')'                         # record // form? compound? composite? frame?
+    | '(' fieldList ')'                         # record // form? compound? composite? frame? struct?
     | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
     | sink                                      # handler
     | '<->' procedure                           # service

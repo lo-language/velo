@@ -93,8 +93,7 @@ module.exports["non-root constants"] = {
             new Lo.procedure(
                 ['next'],
                 new Lo.stmtList(
-                    new Lo.assignment(
-                        '*=',
+                    new Lo.assign(
                         new Lo.identifier('result'),
                         new Lo.number('10')
                     )
@@ -125,7 +124,7 @@ module.exports["non-root constants"] = {
                                         [ 'num', '0' ] ] ] ],
                             [ 'stmtList',
                                 [ 'expr-stmt',
-                                    [ 'assign', [ 'id', '$result' ], [ 'num', '10' ], '*=' ] ] ] ] ] ] ]);
+                                    [ 'assign', [ 'id', '$result' ], [ 'num', '10' ] ] ] ] ] ] ] ]);
 
         test.equal(context.has('main'), true);
         test.ok(context.isConstant('main'));

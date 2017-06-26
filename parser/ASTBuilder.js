@@ -40,12 +40,16 @@ __.prototype.parse = function (input) {
 
 
 // Visit a parse tree produced by exaParser#module.
+
 __.prototype.visitModule = function(ctx) {
 
     return new Lo.module(
-        ctx.definition().map(def => def.accept(this))
+        ctx.definition().map(def => def.accept(this)),
+        ctx.dependency().map(def => def.accept(this))
     );
 };
+
+
 
 __.prototype.visitStatementList = function(ctx) {
 
@@ -59,6 +63,16 @@ __.prototype.visitStatementList = function(ctx) {
 
 
 
+__.prototype.visitDependency = function(ctx) {
+
+    var moduleId = ctx.ID().getText();
+
+    return new Lo.constant(
+        moduleId,
+        ctx.locator() ? ctx.locator().accept(this) : new Lo.moduleRef(null, moduleId)
+    );
+};
+
 // statements
 
 
@@ -69,14 +83,20 @@ __.prototype.visitDefStmt = function(ctx) {
 
 __.prototype.visitDefinition = function(ctx) {
 
+    // if (ctx.locator()) {
+    //     return new Lo.constant(
+    //         ctx.ID().getText(),
+    //         ctx.locator().accept(this)
+    //     );
+    // }
+
     return new Lo.constant(
         ctx.ID().getText(),
         ctx.expr().accept(this)
     );
 };
 
-
-__.prototype.visitModuleRef = function (ctx) {
+__.prototype.visitLocator = function(ctx) {
 
     var ids = ctx.ID().map(id => id.getText());
 
@@ -93,19 +113,46 @@ __.prototype.visitLiteralExpr = function(ctx) {
 
 __.prototype.visitAssignment = function(ctx) {
 
-    return new Lo.assignment(
-        ctx.assignment_op().getText(),
-        ctx.expr(0).accept(this),   // l-value
-        ctx.expr(1).accept(this)    // r-value
-    );
+    const left = ctx.expr(0).accept(this);
+    var right = ctx.expr(1).accept(this);
+
+    // desugar compound assignment operators
+
+    switch (ctx.op.text) {
+
+        case '+=':
+            right = new Lo.binaryOpExpr('+', left, right);
+            break;
+
+        case '-=':
+            right = new Lo.binaryOpExpr('-', left, right);
+            break;
+
+        case '*=':
+            right = new Lo.binaryOpExpr('*', left, right);
+            break;
+
+        case '/=':
+            right = new Lo.binaryOpExpr('/', left, right);
+            break;
+
+        case '%=':
+            right = new Lo.binaryOpExpr('%', left, right);
+            break;
+    }
+
+    return new Lo.assign(left, right);
 };
 
 __.prototype.visitIncDec = function(ctx) {
 
-    return new Lo.incrDecr(
-        ctx.op.text == '++' ? 'increment' : 'decrement',
-        ctx.expr().accept(this)
-    );
+    // desugar increment/decrement operators
+
+    const left = ctx.expr().accept(this);
+    const right = new Lo.binaryOpExpr(
+        ctx.op.text == '++' ? '+' : '-', left, new Lo.number('1'));
+
+    return new Lo.assign(left, right);
 };
 
 // conditional statement
@@ -295,7 +342,7 @@ __.prototype.visitSyncRequest = function(ctx) {
     );
 };
 
-__.prototype.visitSendMessage = function(ctx) {
+__.prototype.visitInvocation = function(ctx) {
 
     var args = ctx.exprList();
     var handlers = ctx.handlers() ? ctx.handlers().accept(this) : null;
@@ -386,31 +433,29 @@ __.prototype.visitInterpolated = function(ctx) {
 
     if (mid) {
 
-        return new Lo.dynaString(
-            ctx.expr().accept(this),
-            mid.getText(),
+        return new Lo.concat(
+            new Lo.concat(
+                new Lo.coercion(ctx.expr().accept(this)),
+                new Lo.string(mid.getText())),
             ctx.interpolated().accept(this)
         );
     }
 
-    return ctx.expr().accept(this);
+    return new Lo.coercion(ctx.expr().accept(this));
 };
 
 __.prototype.visitStringify = function(ctx) {
 
-    return new Lo.interpolation(
-        '',
-        ctx.expr().accept(this),
-        ''
-    );
+    return new Lo.coercion(ctx.expr().accept(this));
 };
 
-__.prototype.visitDynastring = function(ctx) {
+__.prototype.visitMixedString = function(ctx) {
 
-    return new Lo.interpolation(
-        ctx.INTER_BEGIN().getText(),
-        ctx.interpolated().accept(this),
-        ctx.INTER_END().getText()
+    return new Lo.concat(
+        new Lo.concat(
+            new Lo.string(ctx.INTER_BEGIN().getText()),
+            new Lo.coercion(ctx.interpolated().accept(this))),
+        new Lo.string(ctx.INTER_END().getText())
     );
 };
 
@@ -536,8 +581,7 @@ __.prototype.visitCardinality = function(ctx) {
 
 __.prototype.visitConcat = function(ctx) {
 
-    return new Lo.binaryOpExpr(
-        'concat',
+    return new Lo.concat(
         ctx.expr(0).accept(this),
         ctx.expr(1).accept(this)
     );

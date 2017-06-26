@@ -119,9 +119,11 @@ __.prototype.concat = function (left, right) {
     if (typeof left == 'string' && typeof right == 'string') {
         return left + right;
     }
+
     if (Array.isArray(left)) {
         return left.concat(right);
     }
+
     if (Array.isArray(right)) {
         return [left].concat(right);
     }

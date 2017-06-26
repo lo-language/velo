@@ -72,8 +72,8 @@ loVisitor.prototype.visitSubscribe = function(ctx) {
 };
 
 
-// Visit a parse tree produced by loParser#sendMessage.
-loVisitor.prototype.visitSendMessage = function(ctx) {
+// Visit a parse tree produced by loParser#invocation.
+loVisitor.prototype.visitInvocation = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -96,6 +96,18 @@ loVisitor.prototype.visitDefinition = function(ctx) {
 };
 
 
+// Visit a parse tree produced by loParser#dependency.
+loVisitor.prototype.visitDependency = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by loParser#locator.
+loVisitor.prototype.visitLocator = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by loParser#handlers.
 loVisitor.prototype.visitHandlers = function(ctx) {
   return this.visitChildren(ctx);
@@ -110,12 +122,6 @@ loVisitor.prototype.visitReplyHandler = function(ctx) {
 
 // Visit a parse tree produced by loParser#failHandler.
 loVisitor.prototype.visitFailHandler = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by loParser#assignment_op.
-loVisitor.prototype.visitAssignment_op = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -146,12 +152,6 @@ loVisitor.prototype.visitBlock = function(ctx) {
 
 // Visit a parse tree produced by loParser#negation.
 loVisitor.prototype.visitNegation = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
-// Visit a parse tree produced by loParser#dynastring.
-loVisitor.prototype.visitDynastring = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -278,6 +278,12 @@ loVisitor.prototype.visitWrap = function(ctx) {
 
 // Visit a parse tree produced by loParser#destructure.
 loVisitor.prototype.visitDestructure = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by loParser#mixedString.
+loVisitor.prototype.visitMixedString = function(ctx) {
   return this.visitChildren(ctx);
 };
 
