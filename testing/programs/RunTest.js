@@ -305,18 +305,21 @@ module.exports['reply handling'] = {
         // both functions just reply immediately
         // todo add a test that does this experiment within a reply handler
 
-        this.harness.run([
-            function (task) {
-                task.respond("reply", []);
-            },
-            function (task) {
-                task.respond("reply", [33]);
-            }
-        ]).then(
-            function (res) {
-                test.equal(res, 42);
-                test.done();
-            });
+        // this.harness.dumpModules().then(() => {
+
+            this.harness.run([
+                function (task) {
+                    task.respond("reply", []);
+                },
+                function (task) {
+                    task.respond("reply", [33]);
+                }
+            ]).then(
+                function (res) {
+                    test.equal(res, 42);
+                    test.done();
+                });
+        // });
     }
 };
 

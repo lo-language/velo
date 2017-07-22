@@ -46,6 +46,14 @@ __.prototype.await = function (cont) {
     }
 };
 
+/**
+ *
+ * @param service
+ * @param args
+ * @param replyHandler  success continuation
+ * @param failHandler   failure continuation
+ * @returns {__}
+ */
 __.prototype.sendMessage = function (service, args, replyHandler, failHandler) {
 
     // wrap replyHandler and failHandler to do some bookkeeping

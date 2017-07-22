@@ -59,7 +59,7 @@ statement
     | expr op=('+>'|'<+') expr ';'                          # push
     | expr '(' exprList? ')' ';'                            # syncRequest   // this permits foo(); which would otherwise be caught by sendMessage and wouldn't do what people expect
     | 'on' expr sink ';'                                    # subscribe
-    | ASYNC? expr (':' exprList)? handlers? ';'             # invocation
+    | ASYNC? expr ('<-' exprList)? handlers? ';'             # invocation
     | 'while' expr block                                    # iteration
     | 'scan' expr expr                                      # scan
     ;

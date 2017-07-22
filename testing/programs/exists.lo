@@ -5,7 +5,7 @@
 main is <-> (log) {
 
     if log exists {
-        log: "hooray!";
+        log <- "hooray!";
     }
     else {
         fail "no log!";
