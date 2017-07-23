@@ -86,6 +86,19 @@ __.prototype.sendMessage = function (service, args, replyHandler, failHandler) {
     return task;
 };
 
+
+__.prototype.sendAsync = function (service, args, replyHandler, failHandler) {
+
+    return this.sendMessage(service, args, replyHandler, failHandler);
+};
+
+
+__.prototype.sendAndBlock = function (service, args, replyHandler, failHandler) {
+
+    return this.sendMessage(service, args, replyHandler, failHandler);
+};
+
+
 __.prototype.deactivate = function () {
 
     this.active = false;

@@ -72,15 +72,24 @@ __.prototype.compile = function (context) {
         return arg.compile(context);
     });
 
-    var nonBlocking = JS.exprStmt(
-        JS.runtimeCall('sendMessage', [
-            this.address.compile(context), JS.arrayLiteral(args),
-            this.replyHandler ? this.replyHandler.compile(context) : JS.NULL,
-            this.failHandler ? this.failHandler.compile(context) : JS.NULL
-        ]));
+    if (this.blocking == false) {
 
-    if (this.blocking == false || context.getFollowing() == null) {
-        return nonBlocking;
+        return JS.exprStmt(
+            JS.runtimeCall('sendAsync', [
+                this.address.compile(context), JS.arrayLiteral(args),
+                this.replyHandler ? this.replyHandler.compile(context) : JS.NULL,
+                this.failHandler ? this.failHandler.compile(context) : JS.NULL
+            ]));
+    }
+
+    if (context.getFollowing() == null) {
+
+        return JS.exprStmt(
+            JS.runtimeCall('sendAndBlock', [
+                this.address.compile(context), JS.arrayLiteral(args),
+                this.replyHandler ? this.replyHandler.compile(context) : JS.NULL,
+                this.failHandler ? this.failHandler.compile(context) : JS.NULL
+            ]));
     }
 
     // add the continuation to each handler or if there's no
@@ -110,7 +119,7 @@ __.prototype.compile = function (context) {
     }
 
     return JS.exprStmt(
-            JS.runtimeCall('sendMessage', [
+            JS.runtimeCall('sendAndBlock', [
                 this.address.compile(context), JS.arrayLiteral(args), replyHandler, failHandler]));
 };
 
