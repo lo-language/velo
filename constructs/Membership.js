@@ -55,7 +55,7 @@ __.prototype.getTree = function () {
  */
 __.prototype.compile = function (context) {
 
-    return JS.runtimeCall(
+    return JS.utilCall(
         'in', [
             this.member.compile(context),
             this.set.compile(context)

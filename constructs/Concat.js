@@ -74,7 +74,7 @@ __.prototype.compile = function (context) {
     }
 
     // kick it to the runtime
-    return JS.runtimeCall('concat', [left, right]);
+    return JS.utilCall('concat', [left, right]);
 };
 
 module.exports = __;

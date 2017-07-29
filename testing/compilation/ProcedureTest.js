@@ -142,7 +142,7 @@ module.exports["service"] = {
                     [ 'stmtList',
                         [ 'expr-stmt',
                             [ 'call',
-                                [ 'select', [ 'id', 'task' ], 'scan' ],
+                                [ 'select', [ 'id', 'Util' ], 'scan' ],
                                 [ [ 'id', '$tests' ],
                                     [ 'function',
                                         null,

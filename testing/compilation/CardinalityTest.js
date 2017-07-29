@@ -19,7 +19,7 @@ module.exports["cardinality"] = {
         // todo can get rid of function call here with conditional operator
 
         test.deepEqual(node.compile(new Context()).renderTree(), JS.fnCall(
-            JS.select(JS.ID('task'), 'cardinality'),
+            JS.select(JS.ID('Util'), 'cardinality'),
             [JS.ID('$foo')]).renderTree());
 
         test.done();

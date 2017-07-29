@@ -417,5 +417,11 @@ JS.runtimeCall = (fnName, args) => {
         JS.select(JS.ID('task'), fnName), args);
 };
 
+JS.utilCall = (fnName, args) => {
+
+    return JS.fnCall(
+        JS.select(JS.ID('Util'), fnName), args);
+};
+
 
 module.exports = JS;

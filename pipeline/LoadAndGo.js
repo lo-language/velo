@@ -15,6 +15,7 @@
 
 const JsModuleSpace = require('./JsModuleSpace');
 const Task = require('../runtime/Task');
+const Util = require('../runtime/Util');
 const LoSystem = require('../runtime/System');
 const Q = require('q');
 
@@ -32,7 +33,8 @@ var __ = function (localSpace, rootModuleId) {
     this.sandbox = {
         setImmediate: setImmediate,
         '__local': localSpace.getModules(),
-        'JS': this.namespaces['JS'].getModules()
+        'JS': this.namespaces['JS'].getModules(),
+        'Util': Util
     };
 
     localSpace.register(rootModuleId);
