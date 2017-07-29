@@ -3,7 +3,7 @@
  */
 
 
-const LMS = require('../../pipeline/LocalModuleSpace');
+const LMS = require('../../linker/LocalModuleSpace');
 const util = require('util');
 
 module.exports['acquire'] = {

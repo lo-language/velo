@@ -52,13 +52,19 @@ var foo = function (args, succ, fail) {
 
 // do some I/O in this one
 
-var bar = function (args, succ, fail) {
+var readFile = function (args, succ, fail) {
 
     var task = new Task();
 
     fs.readFile('../../' + args[0], args[1], function (err, res) {
         succ(res);
     });
+};
+
+// hangs by never calling either continuation
+
+var hang = function (args, succ, fail) {
+
 };
 
 module.exports['responses'] = {
@@ -103,6 +109,11 @@ module.exports['responses'] = {
 
     "implicit reply on finish with no messages": function (test) {
 
+        /*
+         if we hit the end of a procedure and haven't fired off any messages, we need some other way to trigger
+         the auto-reply
+         */
+
         test.expect(1);
 
         var task = new Task(
@@ -111,8 +122,54 @@ module.exports['responses'] = {
                 test.done();
             }, null);
 
-
+        task.deactivate();
     },
+
+    "no implicit reply after sync reply": function (test) {
+
+        test.expect(1);
+
+        var task = new Task(
+            function (resp) {
+                test.deepEqual(resp, ["foo"]);
+                test.done();
+            }, function (resp) {
+                test.fail();
+            });
+
+        task.succ(["foo"]);
+        task.deactivate();
+    },
+
+    "no implicit reply after sync fail": function (test) {
+
+        test.expect(1);
+
+        var task = new Task(
+            function (resp) {
+                test.fail();
+            }, function (resp) {
+                test.deepEqual(resp, ["boo"]);
+                test.done();
+            });
+
+        task.fail(["boo"]);
+        task.deactivate();
+    },
+
+    "no implicit reply while blocked": function (test) {
+
+        var task = new Task(
+            function (resp) {
+                test.fail();
+            }, function (resp) {
+                test.fail();
+            });
+
+        task.sendAndBlock(hang, ["boo"]);
+        task.deactivate();
+        test.done();
+    }
 };
 
 // experiment 1
@@ -149,11 +206,11 @@ module.exports['sequencing'] = {
             order = order.concat('B');
         });
 
-        root.sendAsync(bar, [".travis.yml", 'utf8'], function (result) {
+        root.sendAsync(readFile, [".travis.yml", 'utf8'], function (result) {
             order = order.concat('C');
         });
 
-        root.sendAndBlock(bar, ["vancleve.png", ''], function (result) {
+        root.sendAndBlock(readFile, ["vancleve.png", ''], function (result) {
             order = order.concat('D');
         });
     }

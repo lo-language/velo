@@ -4,7 +4,7 @@
  * Created by spurcell on 12/5/15.
  */
 
-const Program = require('../../pipeline/LoadAndGo');
+const Program = require('../../linker/LoadAndGo');
 const MockModuleSpace = require('../MockModuleSpace');
 const util = require('util');
 

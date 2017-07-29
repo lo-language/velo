@@ -10,9 +10,10 @@
 /**
  * Models a Lo task
  *
- * @param succ
- * @param fail
- * @private
+ * open questions: what happens to pending responses after a task responds?
+ *
+ * @param succ  success continuation
+ * @param fail  failure continuation
  */
 var __ = function (succ, fail) {
 
@@ -179,5 +180,22 @@ __.prototype.fail = function (resp) {
     this.failureCont(resp);
 };
 
+
+/**
+ * On exit from a procedure function we call this to see if we need to auto-reply.
+ *
+ * This would be a perfect job for a scope guard destructor.
+ *
+ * todo rename this checkStatus? autoReply? better yet, inline it
+ */
+__.prototype.deactivate = function () {
+
+    // make sure there are zero outstanding requests
+
+    if (this.blocked == false && this.pendingReqs == 0 && this.hasResponded == false) {
+        console.error("auto-respond");
+        this.succ();
+    }
+};
 
 module.exports = __;
