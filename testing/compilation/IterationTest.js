@@ -93,7 +93,7 @@ module.exports["basics"] = {
                                 [ 'stmtList',
                                     [ 'expr-stmt',
                                         [ 'call',
-                                            [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                                            [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
                                             [ [ 'id', '$bar' ],
                                                 [ 'arrayLiteral', [ [ 'num', '57' ] ] ],
                                                 [ 'id', 'c0' ],
@@ -196,7 +196,7 @@ module.exports["basics"] = {
                                                     [ 'stmtList', [
                                                         "expr-stmt",
                                                         [ "call",
-                                                            [ "select", [ "id", "task" ], "sendMessage" ],
+                                                            [ "select", [ "id", "task" ], "sendAndBlock" ],
                                                             [
                                                                 [ "id", "$log" ],
                                                                 [ "arrayLiteral", [ [ "id", "$count" ] ] ],

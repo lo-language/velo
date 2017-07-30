@@ -9,7 +9,7 @@
 
 "use strict";
 
-const Task = require('./Task');
+const Task = require('./Task2');
 
 // any provided ports should be stuffed into this
 
@@ -19,15 +19,15 @@ module.exports = {
 
         $isTTY: process.stdin.isTTY,
 
-        $setRawMode: function (task) {
+        $setRawMode: function (args, succ, fail) {
 
             process.stdin.setRawMode(task.args[0]);
-            task.respond("reply");
+            succ();
         },
 
-        $listen: function (task) {
+        $listen: function (args, succ, fail) {
 
-            var service = task.args[0];
+            var service = args[0];
 
             process.stdin.setRawMode(true);
 
@@ -42,37 +42,37 @@ module.exports = {
                 }
             });
 
-            task.respond("reply");
+            succ();
         }
     },
 
     $out: {
 
-        $write: function (task) {
+        $write: function (args, succ, fail) {
 
-            process.stdout.write.apply(process.stdout, task.args);
-            task.respond("reply");
+            process.stdout.write.apply(process.stdout, args);
+            succ();
         },
 
-        $writeln: function (task) {
+        $writeln: function (args, succ, fail) {
 
-            process.stdout.write(task.args + '\n');
-            task.respond("reply");
+            process.stdout.write(args + '\n');
+            succ();
         }
     },
 
     $err: {
 
-        $write: function (task) {
+        $write: function (args, succ, fail) {
 
-            process.stderr.write.apply(process.stderr, task.args);
-            task.respond("reply");
+            process.stderr.write.apply(process.stderr, args);
+            succ();
         },
 
-        $writeln: function (task) {
+        $writeln: function (args, succ, fail) {
 
-            process.stderr.write(task.args + '\n');
-            task.respond("reply");
+            process.stderr.write(args + '\n');
+            succ();
         }
     }
 };

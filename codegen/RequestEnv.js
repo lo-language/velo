@@ -47,7 +47,7 @@ __.prototype.wrap = function (stmtList) {
     // todo we need access to the context here so we can grab the following stmts
 
     return JS.exprStmt(
-            JS.runtimeCall('sendMessage', [
+            JS.runtimeCall('sendAndBlock', [
                 this.target, JS.arrayLiteral(this.args),
                 JS.fnDef([this.placeholderName], stmtList),
                 JS.NULL

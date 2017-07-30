@@ -22,8 +22,8 @@ const util = require('util');
 const path = require('path');
 const argv = require('minimist')(process.argv.slice(2));
 
-const LocalModuleSpace = require('../pipeline/LocalModuleSpace');
-const LoadAndGo = require('../pipeline/LoadAndGo');
+const LocalModuleSpace = require('../linker/LocalModuleSpace');
+const LoadAndGo = require('../linker/LoadAndGo');
 
 // const NodeBuilder = require('../pipeline/NodeBuilder');
 

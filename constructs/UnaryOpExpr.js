@@ -56,7 +56,7 @@ __.prototype.compile = function (context) {
     if (this.op == 'cardinality') {
 
         // offload to the runtime lib
-        return JS.runtimeCall('cardinality', [this.operand.compile(context)]);
+        return JS.utilCall('cardinality', [this.operand.compile(context)]);
     }
 
 

@@ -18,7 +18,7 @@
     "jison": "0.4.x"
   },
   "scripts": {
-    "test": "nodeunit testing/codegen testing/compilation testing/parser testing/pipeline testing/programs testing/runtime"
+    "test": "nodeunit testing/codegen testing/compilation testing/parsing testing/linking testing/programs testing/runtime"
   },
   "bin": {
     "velo": "./bin/velo"

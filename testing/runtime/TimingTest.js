@@ -4,7 +4,7 @@
  * Created by spurcell on 12/5/15.
  */
 
-const Program = require('../../pipeline/LoadAndGo');
+const Program = require('../../linker/LoadAndGo');
 const MockModuleSpace = require('../MockModuleSpace');
 const util = require('util');
 
@@ -92,9 +92,9 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var write = function (task) {
-            test.equal(task.args[0], "hi there!");
-            task.respond("reply");
+        var write = function (args, succ, fail) {
+            test.equal(args[0], "hi there!");
+            succ();
         };
 
         var modSpace = new MockModuleSpace(

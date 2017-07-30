@@ -2,8 +2,8 @@
  * Created by spurcell on 5/28/16.
  */
 
-const LoadAndGo = require('../../pipeline/LoadAndGo');
-const LMS = require('../../pipeline/LocalModuleSpace');
+const LoadAndGo = require('../../linker/LoadAndGo');
+const LMS = require('../../linker/LocalModuleSpace');
 const util = require('util');
 
 module.exports['basics'] = {

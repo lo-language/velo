@@ -11,6 +11,7 @@
 "use strict";
 
 const Harness = require('../Harness');
+const Task = require('../../runtime/Task2');
 const util = require('util');
 
 
@@ -24,8 +25,8 @@ module.exports['exists'] = {
 
     'obj exists': function (test) {
 
-        var log = function (task) {
-            task.respond("reply");
+        var log = function (args, succ, fail) {
+            succ();
         };
 
         this.harness.testSuccess(test, [log]);
@@ -48,8 +49,8 @@ module.exports['nestedLoops'] = {
 
     'success': function (test) {
 
-        var log = function (task) {
-            task.respond("reply");
+        var log = function (args, succ, fail) {
+            succ();
         };
 
         // this.harness.dumpModules().then(() => {
@@ -72,14 +73,18 @@ module.exports['fail'] = {
 
         test.expect(2);
 
-        this.harness.run([{
-            $ok: function (task) {
-                test.ok(task.args[0]);
-            }
-        }]).then(
-            function (res) {
-                test.done();
-            }).done();
+        // this.harness.dumpModules().then(() => {
+
+            this.harness.run([{
+                $ok: function (args, succ, fail) {
+                    test.ok(args[0]);
+                    succ();
+                }
+            }]).then(
+                function (res) {
+                    test.done();
+                }).done();
+        // });
     }
 };
 
@@ -116,9 +121,9 @@ module.exports['factorial2'] = {
 
         var io = {
             $stdout: {
-                $write: function (task) {
-                    test.equal(task.args[0], '3628800\n');
-                    task.respond("reply");
+                $write: function (args, succ, fail) {
+                    test.equal(args[0], '3628800\n');
+                    succ();
                 }
             }
         };
@@ -155,10 +160,10 @@ module.exports['helloWorld'] = {
 
         var system = {
             $out: {
-                $write: function (task) {
-                    console.log(task.args);
-                    test.equal(task.args[0], "hello, world!");
-                    task.respond("reply");
+                $write: function (args, succ, fail) {
+                    console.log(args);
+                    test.equal(args[0], "hello, world!");
+                    succ();
                 }
             }
         };
@@ -250,15 +255,22 @@ module.exports['conditional in loop'] = {
 
         var logMessages = [];
 
-        this.harness.testSuccess(test, [
-            function (task) {
+        this.harness.run([
 
-                logMessages.push(task.args[0]);
-                task.respond("reply");
+            function (args, succ, fail) {
+                logMessages.push(args[0]);
+                succ();
             }
-        ], 5).then(function () {
+        ]).then(function (resp) {
 
-            test.deepEqual(logMessages, [ 'howdy!\n', 'howdy!\n', 'hello hello!\n', 'ok.\n', 'ok.\n' ]);
+            test.equal(resp, 5);
+
+            // give the async calls a chance to get through
+            setImmediate(function () {
+
+                test.deepEqual(logMessages, [ 'howdy!\n', 'howdy!\n', 'hello hello!\n', 'ok.\n', 'ok.\n' ]);
+                test.done();
+            });
         });
     }
 };
@@ -279,9 +291,10 @@ module.exports['reply arity'] = {
         // todo add a test that does this experiment within a reply handler
 
         this.harness.run([{
-            $equal: function (task) {
+            $equal: function (args, succ, fail) {
 
-                test.deepEqual(task.args[0], task.args[1]);
+                test.deepEqual(args[0], args[1]);
+                succ();
             }
         }]).then(
             function (res) {
@@ -305,18 +318,21 @@ module.exports['reply handling'] = {
         // both functions just reply immediately
         // todo add a test that does this experiment within a reply handler
 
-        this.harness.run([
-            function (task) {
-                task.respond("reply", []);
-            },
-            function (task) {
-                task.respond("reply", [33]);
-            }
-        ]).then(
-            function (res) {
-                test.equal(res, 42);
-                test.done();
-            });
+        // this.harness.dumpModules().then(() => {
+
+            this.harness.run([
+                function (args, succ, fail) {
+                    succ([]);
+                },
+                function (args, succ, fail) {
+                    setImmediate(succ, [42]);
+                }
+            ]).then(
+                function (res) {
+                    test.equal(res, 42);
+                    test.done();
+                });
+        // });
     }
 };
 

@@ -138,7 +138,7 @@ module.exports["async"] = {
                 [ 'stmtList',
                     [ 'expr-stmt',
                         [ 'call',
-                            [ 'select', [ 'id', 'task' ], 'sendMessage' ],
+                            [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
                             [ [ 'id', '$foo' ],
                                 [ 'arrayLiteral', [] ],
                                 [ 'function',

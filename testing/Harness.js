@@ -7,8 +7,8 @@
 
 "use strict";
 
-const LocalModuleSpace = require('../pipeline/LocalModuleSpace');
-const LoadAndGo = require('../pipeline/LoadAndGo');
+const LocalModuleSpace = require('../linker/LocalModuleSpace');
+const LoadAndGo = require('../linker/LoadAndGo');
 
 
 var __ = function (sourceDir, mainModName) {

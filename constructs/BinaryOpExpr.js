@@ -83,7 +83,7 @@ __.prototype.compile = function (context) {
     switch (op) {
 
         case 'concat':
-            return JS.runtimeCall('concat', [left, right]);
+            return JS.utilCall('concat', [left, right]);
 
         case 'and':
             return JS.logicalAnd(left, right);

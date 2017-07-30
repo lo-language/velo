@@ -46,6 +46,14 @@ __.prototype.await = function (cont) {
     }
 };
 
+/**
+ *
+ * @param service
+ * @param args
+ * @param replyHandler  success continuation
+ * @param failHandler   failure continuation
+ * @returns {__}
+ */
 __.prototype.sendMessage = function (service, args, replyHandler, failHandler) {
 
     // wrap replyHandler and failHandler to do some bookkeeping
@@ -77,6 +85,19 @@ __.prototype.sendMessage = function (service, args, replyHandler, failHandler) {
 
     return task;
 };
+
+
+__.prototype.sendAsync = function (service, args, replyHandler, failHandler) {
+
+    return this.sendMessage(service, args, replyHandler, failHandler);
+};
+
+
+__.prototype.sendAndBlock = function (service, args, replyHandler, failHandler) {
+
+    return this.sendMessage(service, args, replyHandler, failHandler);
+};
+
 
 __.prototype.deactivate = function () {
 
@@ -110,64 +131,6 @@ __.prototype.doAsync = function (cb) {
         t.pendingRequests--;
         cb();
     };
-};
-
-// utility methods, probably shouldn't be in here but rather somewhere else in runtime
-
-__.prototype.concat = function (left, right) {
-
-    if (typeof left == 'string' && typeof right == 'string') {
-        return left + right;
-    }
-
-    if (Array.isArray(left)) {
-        return left.concat(right);
-    }
-
-    if (Array.isArray(right)) {
-        return [left].concat(right);
-    }
-
-    return [left, right];
-};
-
-__.prototype.cardinality = function (val) {
-
-    if (typeof val === 'string') {
-        return val.length;
-    }
-    else if (Array.isArray(val)) {
-        return val.length;
-    }
-    else if (typeof val === 'object') {
-        return Object.keys(val).length;
-    }
-};
-
-__.prototype.in = function (item, collection) {
-
-    if (Array.isArray(collection)) {
-        return collection.indexOf(item) >= 0;
-    }
-    else if (typeof collection === 'object') {
-        return collection.hasOwnProperty(item);
-    }
-};
-
-__.prototype.scan = function (collection, handler) {
-
-    // handler is a proc fn that takes an args array
-
-    // todo we probably need to make this async-safe by waiting for each task to complete
-    // and registering each call with our bookkeeping
-
-    return Array.isArray(collection) ?
-        collection.forEach(function (elem) {
-            return handler([elem]);
-        }) :
-        Object.keys(collection).forEach(function (key) {
-            return handler([key, collection[key]]);
-        });
 };
 
 __.sendRootRequest = function (service, args, onReply, onFail) {

@@ -61,7 +61,10 @@ __.prototype.compile = function (context) {
     }
 
     var args = JS.arrayLiteral(this.args.map(arg => arg.compile(context)));
-    var response = JS.exprStmt(JS.runtimeCall('respond', [JS.string(this.type), args]));
+
+    var response = this.type == 'reply' ?
+        JS.exprStmt(JS.runtimeCall('succ', [args])) :
+        JS.exprStmt(JS.runtimeCall('fail', [args]));
 
     // a response should compile to a non-appendable JS stmt list
 

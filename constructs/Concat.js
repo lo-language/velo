@@ -68,12 +68,13 @@ __.prototype.compile = function (context) {
     const right = this.right.compile(context);
 
     // see if we know the type at compile time
-    if (this.left.hasType('string') && this.right.hasType('string')) {
+    if (this.left.hasType && this.left.hasType('string')
+        && this.right.hasType && this.right.hasType('string')) {
         return JS.add(left, right);
     }
 
     // kick it to the runtime
-    return JS.runtimeCall('concat', [left, right]);
+    return JS.utilCall('concat', [left, right]);
 };
 
 module.exports = __;

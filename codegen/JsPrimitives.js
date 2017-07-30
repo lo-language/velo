@@ -398,7 +398,7 @@ JS.cond = (predicate, consequent, alt) => {
         renderTree: () => ['if', predicate.renderTree(), consequent.renderTree()].concat(alt ? [alt.renderTree()] : []),
         renderJs: () => 'if (' + predicate.renderJs() + ') {\n' + consequent.renderJs() + '}' +
         (alt ? ' else {\n' + alt.renderJs() + '}' : '')
-    }
+    };
 };
 
 JS.while = (condition, body) => {
@@ -406,7 +406,15 @@ JS.while = (condition, body) => {
     return {
         renderTree: () => ['while', condition.renderTree(), body.renderTree()],
         renderJs: () => 'while (' + condition.renderJs() + ') {\n' + body.renderJs() + '\n}'
-    }
+    };
+};
+
+JS.new = (name, args) => {
+
+    return {
+        renderTree: () => ['new', name, args.map(arg => arg.renderTree())],
+        renderJs: () => 'new ' + name + '(' + args.map(arg => arg.renderJs()).join(', ') + ')'
+    };
 };
 
 // not-quite-primitives
@@ -415,6 +423,12 @@ JS.runtimeCall = (fnName, args) => {
 
     return JS.fnCall(
         JS.select(JS.ID('task'), fnName), args);
+};
+
+JS.utilCall = (fnName, args) => {
+
+    return JS.fnCall(
+        JS.select(JS.ID('Util'), fnName), args);
 };
 
 

@@ -71,7 +71,7 @@ module.exports["op"] = {
             new Lo.string('trillian'));
 
         test.deepEqual(node.compile(new Context()).renderTree(), [ 'call',
-            [ 'select', [ 'id', 'task' ], 'in' ],
+            [ 'select', [ 'id', 'Util' ], 'in' ],
             [ [ 'string', 'trillian' ], [ 'id', '$dudes' ] ] ]);
         test.done();
     },
@@ -100,7 +100,7 @@ module.exports["op"] = {
             new Lo.identifier('bar'));
 
         test.deepEqual(node.compile(new Context()).renderTree(), [ 'call',
-            [ 'select', [ 'id', 'task' ], 'concat' ],
+            [ 'select', [ 'id', 'Util' ], 'concat' ],
             [ [ 'id', '$foo' ], [ 'id', '$bar' ] ] ]);
         test.done();
     }

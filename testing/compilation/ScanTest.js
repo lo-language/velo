@@ -23,7 +23,7 @@ module.exports["basics"] = {
         test.deepEqual(node.compile(new Context()).renderTree(),
             [ 'expr-stmt',
                 [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'scan' ],
+                    [ 'select', [ 'id', 'Util' ], 'scan' ],
                     [ [ 'id', '$foo' ],
                         [ 'function',
                             null,
