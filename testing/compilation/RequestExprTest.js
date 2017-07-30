@@ -40,8 +40,8 @@ module.exports["blocking calls"] = {
                             [ 'stmtList',
                                 [ 'expr-stmt',
                                     [ 'call',
-                                        [ 'select', [ 'id', 'task' ], 'respond' ],
-                                        [ [ 'string', 'reply' ],
+                                        [ 'select', [ 'id', 'task' ], 'succ' ],
+                                        [
                                             [ 'arrayLiteral', [ [ 'mul', [
                                                 "id",
                                                 "$num"

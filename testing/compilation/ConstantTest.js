@@ -112,19 +112,24 @@ module.exports["non-root constants"] = {
                 '$main',
                 [ 'function',
                     null,
-                    [ 'task' ],
+                    [ 'args', 'succ', 'fail' ],
                     [ 'stmtList',
-                        [ 'var', [ '$next', '$result' ] ],
+                        [ 'var',
+                            'task',
+                            [ 'new', 'Task', [ [ 'id', 'succ' ], [ 'id', 'fail' ] ] ] ],
                         [ 'stmtList',
-                            [ 'expr-stmt',
-                                [ 'assign',
-                                    [ 'id', '$next' ],
-                                    [ 'subscript',
-                                        [ 'select', [ 'id', 'task' ], 'args' ],
-                                        [ 'num', '0' ] ] ] ],
+                            [ 'var', [ '$next', '$result' ] ],
                             [ 'stmtList',
                                 [ 'expr-stmt',
-                                    [ 'assign', [ 'id', '$result' ], [ 'num', '10' ] ] ] ] ] ] ] ]);
+                                    [ 'assign',
+                                        [ 'id', '$next' ],
+                                        [ 'subscript', [ 'id', 'args' ], [ 'num', '0' ] ] ] ],
+                                [ 'stmtList',
+                                    [ 'expr-stmt',
+                                        [ 'assign', [ 'id', '$result' ], [ 'num', '10' ] ] ],
+                                    [ 'stmtList',
+                                        [ 'expr-stmt',
+                                            [ 'call', [ 'select', [ 'id', 'task' ], 'deactivate' ], [] ] ] ] ] ] ] ] ] ]);
 
         test.equal(context.has('main'), true);
         test.ok(context.isConstant('main'));

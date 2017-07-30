@@ -16,6 +16,10 @@
 const Task = require('../../runtime/Task2');
 const fs = require('fs');
 
+/**
+ * we're changing the signature of proc functions from fn(task) to fn(args, succ, fail)?
+ */
+
 
 /*
 

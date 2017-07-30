@@ -44,16 +44,16 @@ __.prototype.getModules = function () {
 
             $PI: Math.PI,
 
-            $sin: function (task) {
-                task.respond('reply', [Math.sin(task.args[0])]);
+            $sin: function (args, succ, fail) {
+                succ([Math.sin(args[0])]);
             },
 
-            $cos: function (task) {
-                task.respond('reply', [Math.cos(task.args[0])]);
+            $cos: function (args, succ, fail) {
+                succ([Math.cos(args[0])]);
             },
 
-            $random: function (task) {
-                task.respond('fail', ["naughty!"]);
+            $random: function (args, succ, fail) {
+                fail(["naughty!"]);
             }
         }
     };

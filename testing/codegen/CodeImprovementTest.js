@@ -65,8 +65,8 @@ module.exports["basics"] = {
         test.deepEqual(node.compile(new Context().createInner(true)).renderTree(),
             [ 'expr-stmt',
                 [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'respond' ],
-                    [ [ 'string', 'reply' ], [ 'arrayLiteral', [] ] ] ] ]);
+                    [ 'select', [ 'id', 'task' ], 'succ' ],
+                    [ [ 'arrayLiteral', [] ] ] ] ]);
         test.done();
     },
 
@@ -168,8 +168,8 @@ module.exports["basics"] = {
                                     [ 'stmtList',
                                         [ 'expr-stmt',
                                             [ 'call',
-                                                [ 'select', [ "id", "task" ], 'respond' ],
-                                                [ [ "string", "reply" ], [ "arrayLiteral", [ [ "id", "$word" ] ] ] ] ] ],
+                                                [ 'select', [ "id", "task" ], 'succ' ],
+                                                [ [ "arrayLiteral", [ [ "id", "$word" ] ] ] ] ] ],
                                         [ 'stmtList',
                                             [ 'return' ] ] ] ] ] ],
                         [ 'id', 'c0' ] ] ] ],

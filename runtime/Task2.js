@@ -62,11 +62,10 @@ __.prototype.sendAsync = function (address, args, succ, fail) {
                 this.responses.push(succ.bind(null, resp));
             }
             else {
-                succ(resp);
+                if (succ) succ(resp);
 
                 // see if we've now completed and should auto-respond; not factored out for perf
                 if (this.pendingReqs == 0 && this.responses.length == 0 && this.hasResponded == false) {
-                    console.error("auto-respond");
                     this.succ();
                 }
             }
@@ -80,11 +79,10 @@ __.prototype.sendAsync = function (address, args, succ, fail) {
                 this.responses.push(fail.bind(null, resp));
             }
             else {
-                fail(resp);
+                if (fail) fail(resp);
 
                 // see if we've now completed and should auto-respond; not factored out for perf
                 if (this.pendingReqs == 0 && this.responses.length == 0 && this.hasResponded == false) {
-                    console.error("auto-respond");
                     this.succ();
                 }
             }
@@ -111,14 +109,14 @@ __.prototype.sendAndBlock = function (address, args, succ, fail) {
         (resp) => {
 
             this.blocked = false;
-            succ(resp);
+            if (succ) succ(resp);
             this.processResponses();
         },
 
         (resp) => {
 
             this.blocked = false;
-            fail(resp);
+            if (fail) fail(resp);
             this.processResponses();
         });
 };
@@ -138,7 +136,6 @@ __.prototype.processResponses = function () {
 
     // see if we've now completed and should auto-respond; not factored out for perf
     if (this.pendingReqs == 0 && this.responses.length == 0 && this.hasResponded == false) {
-        console.error("auto-respond");
         this.succ();
     }
 
@@ -193,9 +190,40 @@ __.prototype.deactivate = function () {
     // make sure there are zero outstanding requests
 
     if (this.blocked == false && this.pendingReqs == 0 && this.hasResponded == false) {
-        console.error("auto-respond");
         this.succ();
     }
+};
+
+/**
+ * Attaches an external async call to this task and returns a wrapped callback to take care
+ * of the bookkeeping.
+ *
+ * Produces a callback that handles the bookkeeping.
+ * Weaves a request into this task.
+ *
+ * todo how does this interact with blocking/non-blocking calls/auto-reply?
+ *
+ * todo rename attach? await? waitFor? register? callAndWait? weave? insert?
+ *
+ * @param cb    callback
+ * @returns {function()}
+ */
+__.prototype.doAsync = function (cb) {
+
+    this.pendingReqs++;
+
+    var t = this;
+
+    return function () {
+        t.pendingRequests--;
+        cb();
+    };
+};
+
+
+__.sendRootRequest = function (service, args, succ, fail) {
+
+    service(args, succ, fail);
 };
 
 module.exports = __;

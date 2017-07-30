@@ -14,7 +14,7 @@
 "use strict";
 
 const JsModuleSpace = require('./JsModuleSpace');
-const Task = require('../runtime/Task');
+const Task = require('../runtime/Task2');
 const Util = require('../runtime/Util');
 const LoSystem = require('../runtime/System');
 const Q = require('q');
@@ -31,7 +31,8 @@ var __ = function (localSpace, rootModuleId) {
     };
 
     this.sandbox = {
-        setImmediate: setImmediate,
+        setImmediate: setImmediate, // todo do we still need this?
+        'Task': Task,
         '__local': localSpace.getModules(),
         'JS': this.namespaces['JS'].getModules(),
         'Util': Util

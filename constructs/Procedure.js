@@ -65,13 +65,6 @@ __.prototype.compile = function (context) {
     // push a new scope onto the scope stack
     var local = context.createInner(this.isService);
 
-    // -- we're already discriminating between handler and service below!
-    // maybe split these up?
-    // if we have a channel we're a handler with args instead of a task
-    // todo could drop this if services took an 'args' arg rather than putting them in the task
-
-    var argList = this.isService ? JS.select(JS.ID('task'), 'args') : JS.ID('args');
-
     // load params into symbol table
     this.params.forEach(name => local.declare(name));
 
@@ -79,8 +72,9 @@ __.prototype.compile = function (context) {
     var body = this.body.compile(local);
 
     // bind values to our params
+    // todo unpacking args like this might be a significant perf hit
     for (var i = this.params.length - 1; i >= 0; i--) {
-        body = JS.stmtList(JS.exprStmt(JS.assign(JS.ID('$' + this.params[i]), JS.subscript(argList, JS.num(String(i))))), body);
+        body = JS.stmtList(JS.exprStmt(JS.assign(JS.ID('$' + this.params[i]), JS.subscript(JS.ID('args'), JS.num(String(i))))), body);
     }
 
     // declare our local vars
@@ -90,7 +84,16 @@ __.prototype.compile = function (context) {
         body = JS.stmtList(JS.varDeclMulti(localVars), body);
     }
 
-    return JS.fnDef([(this.isService ? 'task' : 'args')], body);
+    if (this.isService) {
+
+        // define the task object var task = new Task();
+        body = JS.stmtList(JS.varDecl('task', JS.new('Task', [JS.ID('succ'), JS.ID('fail')])), body);
+
+        // decide if we need to exit -- doesn't matter in handlers
+        body.attach(JS.stmtList(JS.exprStmt(JS.runtimeCall('deactivate', []))));
+    }
+
+    return JS.fnDef(this.isService ? ['args', 'succ', 'fail'] : ['args'], body);
 };
 
 module.exports = __;
