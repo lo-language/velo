@@ -1,15 +1,75 @@
-/*
- * Author: Seth Purcell
- * 6/20/15
- */
+/**=============================================================================
+ *
+ * Copyright (c) 2013 - 2017 Seth Purcell
+ * Licensed under Apache License v2.0 with Runtime Library Exception
+ *
+ * See LICENSE.txt in the project root for license information.
+ *
+ =============================================================================*/
 
+/**
+ * Created by seth on 7/23/17.
+ */
 
 "use strict";
 
-var Task = require('../../runtime/Task');
-var util = require('util');
+const Task = require('../../runtime/Task');
+const fs = require('fs');
 
-// todo make sure all these tests work with setImmediate in here
+/**
+ * we're changing the signature of proc functions from fn(task) to fn(args, succ, fail)?
+ */
+
+
+/*
+
+ 1. there's always a task in scope. even a one-way message gets a task.
+ 2. a handler should thus get its own task? that makes sense
+ 3. here's the bug: a handler defined in a task attaches its requests to its parent task. bad.
+ */
+
+
+/*
+
+test case:
+
+- we have an async response handler that does a blocking call
+- there might be other responses queued when we call that handler
+- we need to make sure that they don't get run while the task is blocked!
+
+
+
+
+ */
+
+
+
+// immediately succeeds
+
+var foo = function (args, succ, fail) {
+
+    var task = new Task(succ, fail);
+
+    task.succ(args);
+};
+
+
+// do some I/O in this one
+
+var readFile = function (args, succ, fail) {
+
+    var task = new Task();
+
+    fs.readFile('../../' + args[0], args[1], function (err, res) {
+        succ(res);
+    });
+};
+
+// hangs by never calling either continuation
+
+var hang = function (args, succ, fail) {
+
+};
 
 module.exports['responses'] = {
 
@@ -17,45 +77,50 @@ module.exports['responses'] = {
 
         test.expect(1);
 
-        var task = new Task(null, null,
-            function (args) {
-                test.deepEqual(args, ["foo"]);
+        var task = new Task(
+            function (resp) {
+                test.deepEqual(resp, ["foo"]);
                 test.done();
-            }, function (args) {
+            }, function (resp) {
                 test.fail();
             });
 
-        task.respond("reply", ["foo"]);
-        task.respond("reply", ["boo"]);
-        task.respond("fail", ["boo"]);
-        task.respond("fail", ["foo"]);
-        task.respond("reply", ["foo"]);
+        task.succ(["foo"]);
+        task.succ(["boo"]);
+        task.fail(["foo"]);
+        task.fail(["boo"]);
+        task.succ(["foo"]);
     },
 
     "fail kills further response": function (test) {
 
         test.expect(1);
 
-        var task = new Task(null, null,
-            function (args) {
+        var task = new Task(
+            function (resp) {
                 test.fail();
-            }, function (args) {
-                test.deepEqual(args, ["foo"]);
+            }, function (resp) {
+                test.deepEqual(resp, ["foo"]);
                 test.done();
             });
 
-        task.respond("fail", ["foo"]);
-        task.respond("reply", ["foo"]);
-        task.respond("reply", ["boo"]);
-        task.respond("fail", ["foo"]);
-        task.respond("reply", ["foo"]);
+        task.fail(["foo"]);
+        task.succ(["foo"]);
+        task.succ(["boo"]);
+        task.fail(["foo"]);
+        task.succ(["foo"]);
     },
 
-    "implicit reply on finish": function (test) {
+    "implicit reply on finish with no messages": function (test) {
+
+        /*
+         if we hit the end of a procedure and haven't fired off any messages, we need some other way to trigger
+         the auto-reply
+         */
 
         test.expect(1);
 
-        var task = new Task(null, null,
+        var task = new Task(
             function (args) {
                 test.ok(args === undefined);
                 test.done();
@@ -64,38 +129,53 @@ module.exports['responses'] = {
         task.deactivate();
     },
 
-    "no implicit reply after reply": function (test) {
+    "no implicit reply after sync reply": function (test) {
 
         test.expect(1);
 
-        var task = new Task(null, null,
-            function (args) {
-                test.deepEqual(args, ["foo"]);
+        var task = new Task(
+            function (resp) {
+                test.deepEqual(resp, ["foo"]);
                 test.done();
-            }, function (args) {
+            }, function (resp) {
                 test.fail();
             });
 
-        task.respond("reply", ["foo"]);
+        task.succ(["foo"]);
         task.deactivate();
     },
 
-    "no implicit reply after fail": function (test) {
+    "no implicit reply after sync fail": function (test) {
 
         test.expect(1);
 
-        var task = new Task(null, null,
-            function (args) {
+        var task = new Task(
+            function (resp) {
                 test.fail();
-            }, function (args) {
-                test.deepEqual(args, ["boo"]);
+            }, function (resp) {
+                test.deepEqual(resp, ["boo"]);
                 test.done();
             });
 
-        task.respond("fail", ["boo"]);
+        task.fail(["boo"]);
         task.deactivate();
+    },
+
+    "no implicit reply while blocked": function (test) {
+
+        var task = new Task(
+            function (resp) {
+                test.fail();
+            }, function (resp) {
+                test.fail();
+            });
+
+        task.sendAndBlock(hang, ["boo"]);
+        task.deactivate();
+        test.done();
     }
 };
+
 
 module.exports['finishing'] = {
 
@@ -106,28 +186,32 @@ module.exports['finishing'] = {
         var collector = '';
 
         // create an async service
-        var service = function (task) {
+        var service = function (args, succ, fail) {
 
-            test.equal(task.args, 'foo');
+            var task = new Task(succ, fail);
+
+            test.equal(args, 'foo');
             test.equal(collector, '');
-            collector += task.args;
+            collector += args;
 
             setImmediate(task.doAsync(function () {
-                task.respond("reply", ['bar']);
+                succ(['bar']);
             }));
         };
 
-        Task.sendRootRequest(function (task) {
+        Task.sendRootRequest(function (args, succ, fail) {
 
-            task.sendMessage(service, 'foo', function (result) {
+            var task = new Task(succ, fail);
+
+            task.sendAsync(service, 'foo', function (result) {
 
                 test.deepEqual(result, ["bar"]);
                 test.equal(collector, 'foo');
                 collector += result;
             });
 
-        }, null, function (args) {
-            test.equal(args, undefined); // implicit reply sends no args
+        }, null, function (resp) {
+            test.equal(resp, undefined); // implicit reply sends no args
             test.equal(collector, 'foobar');
             test.done();
         }, function () {
@@ -138,12 +222,14 @@ module.exports['finishing'] = {
     "finish doesn't wait for message with no handlers": function (test) {
 
         // model the message receiver
-        var service = function (task) {
+        var service = function (args, succ, fail) {
+
+            var task = new Task(succ, fail);
 
             // send a message from this task
-            task.sendMessage(function (task) {
+            task.sendAsync(function (args, succ, fail) {
 
-                task.respond("reply", []);
+                succ([]);
 
             }, ['foo'], null, null);
         };
@@ -163,37 +249,39 @@ module.exports['finishing'] = {
         // blocking and non-blocking messages
 
         // model the message receiver
-        var service = function (task) {
+        var service = function (args, succ, fail) {
+
+            var task = new Task(succ, fail);
 
             // send a non-blocking message from this task
-            task.sendMessage(task.args[0], null,
+            task.sendAsync(args[0], null,
                 function (args) {
 
-                    task.respond("reply", [42]);
+                    task.succ([42]);
 
                 }, null);
 
             // send a blocking message from this task
-            task.sendMessage(task.args[1], null,
+            task.sendAndBlock(args[1], null,
                 function (args) {
 
                 }, null);
         };
 
         Task.sendRootRequest(service, [
-            function (task) {
-                task.respond("reply", []);
-            },
-            function (task) {
-                task.respond("reply", [33]);
-            }
-        ],
-        function (res) {
-            test.deepEqual(res, [42]);
-            test.done();
-        }, function () {
-            test.fail();
-        });
+                function (args, succ, fail) {
+                    succ([]);
+                },
+                function (args, succ, fail) {
+                    succ([33]);
+                }
+            ],
+            function (resp) {
+                test.deepEqual(resp, [42]);
+                test.done();
+            }, function () {
+                test.fail();
+            });
     },
 
     "implicit reply waits for multiple subtasks": function (test) {
@@ -203,128 +291,135 @@ module.exports['finishing'] = {
         var expected = ['foo', 'bar', 'baz'];
         var replies = ['boo', 'zar', 'maz'];
 
-        var transmogrify = function (task) {
+        var transmogrify = function (args, succ, fail) {
 
-            test.equal(task.args, expected.shift());
-            task.respond("reply", [replies.shift()]);
+            test.equal(args, expected.shift());
+            succ([replies.shift()]);
         };
 
-        var main = function (task) {
+        var main = function (args, succ, fail) {
 
-            task.sendMessage(transmogrify, 'foo', function (args) {
+            var task = new Task(succ, fail);
+
+            task.sendAsync(transmogrify, 'foo', function (args) {
                 test.deepEqual(args, ["boo"]);
             });
 
-            task.sendMessage(transmogrify, 'bar', function (args) {
+            task.sendAsync(transmogrify, 'bar', function (args) {
                 test.deepEqual(args, ["zar"]);
             });
 
-            task.sendMessage(transmogrify, 'baz', function (args) {
+            task.sendAsync(transmogrify, 'baz', function (args) {
                 test.deepEqual(args, ["maz"]);
             });
         };
 
 
         Task.sendRootRequest(main, null,
-            function (args) {
+            function (resp) {
                 test.equal(expected.length, 0);
                 test.done();
-            }, function (args) {
+            }, function (resp) {
                 test.fail();
             });
     },
 
     "finish waits for subtasks": function (test) {
 
+        // traces a path through a few tasks
+
+        // this tests imposes a total ordering on a sequence of async events for which
+        // we only have a partial ordering, so there are multiple valid sequences
+
         test.expect(1);
 
         var results = [];
 
-        var passTheBuck = function (task) {
+        var passTheBuck = function (args, succ, fail) {
 
             //console.error('task handler B for ' + task.name);
 
             // send a submessage
 
-            results.push(task.args[0] + ':pre');
+            results.push(args[0] + ':pre');
+
+            var task = new Task(succ, fail);
 
             // send a message from this task - root:child2:child1
-            task.sendMessage(buckStopsHere, [task.args + ':subcall'], function (response) {
+            task.sendAsync(buckStopsHere, [args + ':subcall'], function (response) {
 
                 //console.error('response handler Z for ' + task.name);
                 results.push(response + ':handler');
 
-                task.respond("reply", task.args);
+                task.succ(args);
             });
 
-            results.push(task.args[0] + ':post');
+            results.push(args[0] + ':post');
 
             // this is a weird and tricky case! because we're scheduling a reply before we hear back
             // from the message we just sent, but which has a handler!!
 //            this.reply(args);
         };
 
-        var buckStopsHere = function (task) {
+        var buckStopsHere = function (args, succ, fail) {
 
-            //console.error('task handler A for ' + task.name);
+            var task = new Task(succ, fail);
 
-            results.push(task.args[0]);
+            results.push(args[0]);
 
-            task.respond("reply", task.args);
+            task.succ(args);
         };
 
-        var main = function (task) {
+        var main = function (args, succ, fail) {
+
+            var task = new Task(succ, fail);
 
             // send a message from this task - root:child1
-            task.sendMessage(buckStopsHere, ['call1'], function (result) {
+            task.sendAsync(buckStopsHere, ['call1'], function (result) {
 
                 //console.error('response handler X for ' + task.name);
                 results.push(result + ':handler');
             });
 
             // send a message from this task - root:child2
-            task.sendMessage(passTheBuck, ['call2'], function (result) {
+            task.sendAsync(passTheBuck, ['call2'], function (result) {
 
                 //console.error('response handler Y for ' + task.name);
                 results.push(result + ':handler');
             });
 
             // send a message from this task
-            task.sendMessage(passTheBuck, ['call3'], function (result) {
+            task.sendAsync(passTheBuck, ['call3'], function (result) {
 
                 results.push(result + ':handler');
             });
 
             // send a message from this task
-            task.sendMessage(buckStopsHere, ['call4'], function (result) {
+            task.sendAsync(buckStopsHere, ['call4'], function (result) {
 
                 results.push(result + ':handler');
             });
         };
 
         Task.sendRootRequest(main, [],
-            function (args) {
-
-                // this test enforces a particular (expected) ordering of tasks, but
-                // there are actually *several* valid orderings of the tasks in this test because
-                // the calls are all supposed to be concurrent
-                // an also-valid, previously-expected ordering is commented out below
+            function (args, succ, fail) {
 
                 test.deepEqual(results, [
-                    'call1',
-                    'call1:handler',
-                    'call2:pre',
-                    'call2:subcall',
-                    'call2:subcall:handler',
-                    'call2:handler',
-                    'call2:post',
-                    'call3:pre',
-                    'call3:subcall',
-                    'call3:subcall:handler',
-                    'call3:handler',
-                    'call3:post',
-                    'call4',
-                    'call4:handler' ]);
+                    "call1",
+                    "call1:handler",
+                    "call2:pre",
+                    "call2:post",
+                    "call3:pre",
+                    "call3:post",
+                    "call4",
+                    "call4:handler",
+                    "call2:subcall",
+                    "call2:subcall:handler",
+                    "call2:handler",
+                    "call3:subcall",
+                    "call3:subcall:handler",
+                    "call3:handler"
+                ]);
 
                 test.done();
             }, function (args) {
@@ -332,31 +427,25 @@ module.exports['finishing'] = {
             }, true);
     },
 
-    "implicit fail handler": function (test) {
-
-        // todo
-        test.done();
-    },
-
     "mockup of implicit reply with subtasks and failure": function (test) {
 
         // mock up a task handler - this would be generated by the compiler
 
-        var service = function (task) {
+        var service = function (args, succ, fail) {
 
-            // here's how we make a task
+            var task = new Task(succ, fail);
 
-            task.sendMessage(foo, task.args, function (result) { // a response handler doesn't need an envelope
+            task.sendAsync(foo, args, function (result) { // a response handler doesn't need an envelope
 
                 // make another task - with no reply handler
 
-                task.sendMessage(bar, result, null, function () {  // an error handler
+                task.sendAsync(bar, result, null, function () {  // an error handler
 
                     //console.log("what?! a failure?!");
                 });
 
                 // send a message with an empty handler
-                task.sendMessage(baz, result, function () {  // a response handler doesn't need an envelope
+                task.sendAsync(baz, result, function () {  // a response handler doesn't need an envelope
                 });
             });
 
@@ -366,19 +455,19 @@ module.exports['finishing'] = {
 
         // set up some stub services for our task handler to send messages to
 
-        var foo = function (task) {
+        var foo = function (args, succ, fail) {
             //console.log("i am foo");
-            task.respond("reply", []);
+            succ([]);
         };
 
-        var bar = function (task) {
+        var bar = function (args, succ, fail) {
             //console.log("i am bar!");
-            task.respond("fail", []);
+            fail([]);
         };
 
-        var baz = function (task) {
+        var baz = function (args, succ, fail) {
             //console.log("I am a BANANA!");
-            task.respond("reply", []);
+            succ([]);
         };
 
         Task.sendRootRequest(service, [], function () {
@@ -388,25 +477,27 @@ module.exports['finishing'] = {
         });
     },
 
+
     "implicit reply with nested sync calls": function (test) {
 
         test.expect(1);
 
-        var syncService = function (task) {
-            // don't do much
-        };
+        var main = function (args, succ, fail) {
 
-        var main = function (task) {
+            var task = new Task(succ, fail);
 
-            // task is deactivated after sending this request
+            // bug was: task is deactivated after sending this request
             // so when the response comes back and the sync sendMessage fires,
             // it erroneously sees no more work left to do and fires a default reply
-            task.sendMessage(syncService, 'foo', function (result) {
 
-                task.sendMessage(syncService);
+            task.sendAndBlock(foo, 'foo', function (result) {
 
-                task.respond("reply", ["leeloo"]);
+                task.sendAndBlock(foo);
+
+                task.succ(["leeloo"]);
             });
+
+            task.deactivate();
         };
 
         Task.sendRootRequest(main, null,
@@ -420,27 +511,27 @@ module.exports['finishing'] = {
 
     "implicit reply with mixed sync async": function (test) {
 
-        var asyncService = function (task) {
+        var asyncService = function (args, succ, fail) {
+
+            var task = new Task(succ, fail);
 
             setImmediate(task.doAsync(function () {
-                task.respond("reply", []);
+                task.succ([]);
             }));
         };
 
-        var syncService = function (task) {
-            // don't do much
-        };
+        var main = function (args, succ, fail) {
 
-        var main = function (task) {
+            var task = new Task(succ, fail);
 
             // task is deactivated after sending this request
             // so when the response comes back and the sync sendMessage fires,
             // it erroneously sees no more work left to do and fires a default reply
-            task.sendMessage(asyncService, 'foo', function (result) {
+            task.sendAsync(asyncService, 'foo', function (result) {
 
-                task.sendMessage(syncService);
+                task.sendAndBlock(foo);
 
-                task.respond("reply", ["leeloo"]);
+                task.succ(["leeloo"]);
             });
         };
 
@@ -454,113 +545,214 @@ module.exports['finishing'] = {
     }
 };
 
+// experiment 1
+// send async, send sync, verify sync is handled before async response
 
-module.exports['await'] = {
+// send a async message
+// does it matter when the targets actually *run*? or just the order their responses are handled in?
+// because we can't make any guarantees about when the targets get their messages, it's a race
+// so we could run the async function to completion and then queue up its response
 
-    "await before response, no handler": function (test) {
+module.exports['sequencing'] = {
 
-        test.expect(1);
+    "correctly sequences async and sync responses": function (test) {
 
-        var main = function (task) {
 
-            var future = task.sendMessage(function (task) {
+        var order = '';
 
-                setImmediate(task.doAsync(function () {
-                    task.respond("reply", ["snooks"]);
-                }));
-            });
+        var root = new Task(function () {
 
-            future.await(function (result) {
-                test.equal(result, "snooks");
-            });
-        };
+            // valid orderings: BDAC, BDCA
 
-        Task.sendRootRequest(main, [], function () {
+            test.equal(order, 'BDAC');
             test.done();
+
         }, function () {
             test.fail();
         });
-    },
 
-    "await after response, no handler": function (test) {
-
-        test.expect(1);
-
-        var main = function (task) {
-
-            var future = task.sendMessage(function (task) {
-                task.respond("reply", ["snooks"]);
-            });
-
-            future.await(function (result) {
-                test.equal(result, "snooks");
-            });
-        };
-
-        Task.sendRootRequest(main, [], function () {
-            test.done();
-        }, function () {
-            test.fail();
+        root.sendAsync(foo, ["42"], function () {
+            order = order.concat('A');
         });
-    },
 
-    "await before response, runs after handler": function (test) {
-
-        test.expect(2);
-
-        var gotR = false;
-
-        var main = function (task) {
-
-            var future = task.sendMessage(function (task) {
-
-                setImmediate(task.doAsync(function () {
-                    task.respond("reply", ["snooks"]);
-                }));
-            }, [], function (reply) {
-                gotR = true;
-            });
-
-            future.await(function (result) {
-                test.equal(result, "snooks");
-                test.ok(gotR);
-            });
-        };
-
-        Task.sendRootRequest(main, [], function () {
-            test.done();
-        }, function () {
-            test.fail();
+        root.sendAndBlock(foo, ["57"], function () {
+            order = order.concat('B');
         });
-    },
 
-    "await after response, runs after handler": function (test) {
+        root.sendAsync(readFile, [".travis.yml", 'utf8'], function (result) {
+            order = order.concat('C');
+        });
 
-        // this test is a bit silly since we're attaching the listener
-        // after the response, it damn well *better* run after the handler!
-
-        test.expect(2);
-
-        var gotR = false;
-
-        var main = function (task) {
-
-            var future = task.sendMessage(function (task) {
-                task.respond("reply", ["snooks"]);
-            }, [], function (reply) {
-                gotR = true;
-            });
-
-            future.await(function (result) {
-                test.equal(result, "snooks");
-                test.ok(gotR);
-            });
-        };
-
-        Task.sendRootRequest(main, [], function () {
-            test.done();
-        }, function () {
-            test.fail();
+        root.sendAndBlock(readFile, ["vancleve.png", ''], function (result) {
+            order = order.concat('D');
         });
     }
 };
+
+
+
+// experiment 2
+// send async, send sync, verify sync is handled before async response
+// but now they include I/O!
+
+// this one doesn't work, there's some race in it because the
+// IO system loses the priority signal; we need some way to enforce order
+// of response handling
+
+
+
+
+/*
+
+ so when you send an async message:
+
+ the message should be put on the queue of its service
+ we implement this by using setImmediate()
+
+
+ when you send a sync message:
+
+ the message should take priority; we implement this using nextTick()
+
+
+ we need to make sure this works with IO!
+
+ experiments/tests:
+
+ send async
+ send sync
+ verify sync is handled before async response
+
+
+ send async with IO
+ send sync
+ verify sync is handled before async response
+
+
+ send async
+ send sync with IO
+ verify sync is handled before async response
+
+
+ send async with IO
+ send sync with IO
+ verify sync is handled before async response
+
+
+ so sendAsync calls setImmediate() AND registers the pending response,
+ whereas sendSync calls nextTick()
+
+ */
+
+
+// tests for futures
+
+// module.exports['await'] = {
+//
+//     "await before response, no handler": function (test) {
+//
+//         test.expect(1);
+//
+//         var main = function (task) {
+//
+//             var future = task.sendMessage(function (task) {
+//
+//                 setImmediate(task.doAsync(function () {
+//                     task.respond("reply", ["snooks"]);
+//                 }));
+//             });
+//
+//             future.await(function (result) {
+//                 test.equal(result, "snooks");
+//             });
+//         };
+//
+//         Task.sendRootRequest(main, [], function () {
+//             test.done();
+//         }, function () {
+//             test.fail();
+//         });
+//     },
+//
+//     "await after response, no handler": function (test) {
+//
+//         test.expect(1);
+//
+//         var main = function (task) {
+//
+//             var future = task.sendMessage(function (task) {
+//                 task.respond("reply", ["snooks"]);
+//             });
+//
+//             future.await(function (result) {
+//                 test.equal(result, "snooks");
+//             });
+//         };
+//
+//         Task.sendRootRequest(main, [], function () {
+//             test.done();
+//         }, function () {
+//             test.fail();
+//         });
+//     },
+//
+//     "await before response, runs after handler": function (test) {
+//
+//         test.expect(2);
+//
+//         var gotR = false;
+//
+//         var main = function (task) {
+//
+//             var future = task.sendMessage(function (task) {
+//
+//                 setImmediate(task.doAsync(function () {
+//                     task.respond("reply", ["snooks"]);
+//                 }));
+//             }, [], function (reply) {
+//                 gotR = true;
+//             });
+//
+//             future.await(function (result) {
+//                 test.equal(result, "snooks");
+//                 test.ok(gotR);
+//             });
+//         };
+//
+//         Task.sendRootRequest(main, [], function () {
+//             test.done();
+//         }, function () {
+//             test.fail();
+//         });
+//     },
+//
+//     "await after response, runs after handler": function (test) {
+//
+//         // this test is a bit silly since we're attaching the listener
+//         // after the response, it damn well *better* run after the handler!
+//
+//         test.expect(2);
+//
+//         var gotR = false;
+//
+//         var main = function (task) {
+//
+//             var future = task.sendMessage(function (task) {
+//                 task.respond("reply", ["snooks"]);
+//             }, [], function (reply) {
+//                 gotR = true;
+//             });
+//
+//             future.await(function (result) {
+//                 test.equal(result, "snooks");
+//                 test.ok(gotR);
+//             });
+//         };
+//
+//         Task.sendRootRequest(main, [], function () {
+//             test.done();
+//         }, function () {
+//             test.fail();
+//         });
+//     }
+// };

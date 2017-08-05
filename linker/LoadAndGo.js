@@ -14,7 +14,7 @@
 "use strict";
 
 const JsModuleSpace = require('./JsModuleSpace');
-const Task = require('../runtime/Task2');
+const Task = require('../runtime/Task');
 const Util = require('../runtime/Util');
 const LoSystem = require('../runtime/System');
 const Q = require('q');

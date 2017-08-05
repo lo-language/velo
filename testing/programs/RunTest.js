@@ -11,7 +11,7 @@
 "use strict";
 
 const Harness = require('../Harness');
-const Task = require('../../runtime/Task2');
+const Task = require('../../runtime/Task');
 const util = require('util');
 
 

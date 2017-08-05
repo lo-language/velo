@@ -381,7 +381,7 @@ __.prototype.wrapFollowing = function () {
 
     if (this.following) {
 
-        var contName = 'c' + this.getNextLabel();
+        var contName = 'k' + this.getNextLabel();
 
         var contDef = JS.fnDef([], this.following, contName);
 
