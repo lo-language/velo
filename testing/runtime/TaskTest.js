@@ -328,8 +328,9 @@ module.exports['finishing'] = {
 
         // traces a path through a few tasks
 
-        // this tests imposes a total ordering on a sequence of async events for which
-        // we only have a partial ordering, so there are multiple valid sequences
+        // this is a lazy test becaause it imposes a total ordering on a sequence of async events for which
+        // we only have a partial ordering, so there are multiple valid sequences, but we just assert against
+        // the particular valid sequence we're expecting. so the test is over-specific.
 
         test.expect(1);
 

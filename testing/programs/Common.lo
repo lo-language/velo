@@ -3,11 +3,11 @@ E   is 2.71828;
 
 GREETING is "hello, world!";
 
-createGreeter is <-> (name) {
+createGreeter is (name) {
 
     reply (
 
-        greet: <-> (io) {
+        greet: (io) {
 
             io.out.write("hello, `name`!");
         }

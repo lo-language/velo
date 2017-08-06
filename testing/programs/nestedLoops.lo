@@ -1,6 +1,6 @@
 MAX is 3;
 
-main is <-> (log) {
+main is (log) {
 
     count = 0;
 

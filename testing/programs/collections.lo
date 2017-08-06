@@ -3,7 +3,7 @@
  * 12/25/14
  */
 
-main is <-> {
+main is {
 
     // Array literal (including empty), access, and cardinality
     empty = [];

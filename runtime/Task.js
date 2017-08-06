@@ -11,6 +11,8 @@
  * Models a Lo task
  *
  * open questions: what happens to pending responses after a task responds?
+ * should they be dropped on the floor, or should their handlers run?
+ * a response is a combination message and control flow construct
  *
  * @param succ  success continuation
  * @param fail  failure continuation

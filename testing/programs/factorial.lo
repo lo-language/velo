@@ -2,7 +2,7 @@
  * recursive factorial calculator
  */
 
-main is <-> (num) {
+main is (num) {
 
     if num undefined {
         fail "c'mon!";
