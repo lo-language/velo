@@ -9,7 +9,7 @@
 
 "use strict";
 
-const Task = require('./Task2');
+const Task = require('./Task');
 
 // any provided ports should be stuffed into this
 

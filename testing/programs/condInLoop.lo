@@ -1,4 +1,12 @@
-main is <-> (log) {
+/**
+
+ This test is exercising an open question in the runtime spec -- the reply is sent before the
+ async calls have returned; how do we feel about that? we could have the reply hold off until
+ all responses are collected, but for now, we do not.
+
+ */
+
+main is (log) {
 
     num = 0;
     val = 0;
@@ -6,10 +14,10 @@ main is <-> (log) {
     while num < 3 {
 
         if num > 1 {
-            @log <- "hello hello!\n";
+            @log <- ("hello hello!\n");
         }
         else {
-            @log <- "howdy!\n";
+            @log <- ("howdy!\n");
         }
 
         num++;
@@ -17,7 +25,7 @@ main is <-> (log) {
 
     while num < 5 {
 
-        @log <- "ok.\n";
+        @log <- ("ok.\n");
         num++;
     }
 

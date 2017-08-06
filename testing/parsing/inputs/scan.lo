@@ -1,4 +1,4 @@
-test is <-> (log) {
+test is (log) {
 
     scan foo -> (item) {
 

@@ -198,8 +198,8 @@ __.prototype.visitIteration = function(ctx) {
 __.prototype.visitScan = function(ctx) {
 
     return new Lo.scan(
-        ctx.expr(0).accept(this),
-        ctx.expr(1).accept(this)
+        ctx.expr().accept(this),
+        ctx.proc().accept(this)
     );
 };
 
@@ -358,7 +358,7 @@ __.prototype.visitInvocation = function(ctx) {
 
 __.prototype.visitSink = function (ctx) {
 
-    return ctx.procedure().accept(this);
+    return ctx.proc().accept(this);
 };
 
 __.prototype.visitEvent = function (ctx) {
@@ -388,13 +388,15 @@ __.prototype.visitHandlers = function (ctx) {
 
 __.prototype.visitReplyHandler = function(ctx) {
 
-    return ctx.sink().accept(this);
+    // todo mark the proc as a replyhandler
+    return ctx.proc().accept(this);
 };
 
 
 __.prototype.visitFailHandler = function(ctx) {
 
-    return ctx.sink().accept(this);
+    // todo mark the proc as a failhandler
+    return ctx.proc().accept(this);
 };
 
 
@@ -461,14 +463,14 @@ __.prototype.visitMixedString = function(ctx) {
 
 __.prototype.visitService = function(ctx) {
 
-    var proc = ctx.procedure().accept(this);
+    var proc = ctx.proc().accept(this);
 
     proc.isService = true;
 
     return proc;
 };
 
-__.prototype.visitProcedure = function(ctx) {
+__.prototype.visitProc = function(ctx) {
 
     return new Lo.procedure(
         ctx.paramList() ? ctx.paramList().accept(this) : [],
@@ -499,9 +501,9 @@ __.prototype.visitRecord = function(ctx) {
 
 __.prototype.visitSet = function (ctx) {
 
-    if (ctx.exprList()) {
+    if (ctx.memberList()) {
 
-        return new Lo.setLiteral(ctx.exprList().accept(this));
+        return new Lo.setLiteral(ctx.memberList().accept(this));
     }
 
     if (ctx.pairList()) {
@@ -515,6 +517,16 @@ __.prototype.visitSet = function (ctx) {
     }
 
     return new Lo.setLiteral([]);
+};
+
+
+__.prototype.visitMemberList = function(ctx) {
+
+    var _this = this;
+
+    return ctx.expr().map(function (item) {
+        return item.accept(_this);
+    });
 };
 
 

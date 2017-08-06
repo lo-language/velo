@@ -2,14 +2,14 @@
  * tests the semantics of fail handlers: omission means ignore
  */
 
-main is <-> (test) {
+main is (test) {
 
     // fail handler only
 
-    mightFail on fail -> {
+    mightFail ~> {
 
         test.ok(true);
-    };
+    }
 
     // both handlers
 
@@ -17,14 +17,14 @@ main is <-> (test) {
 
         test.ok(false);
     }
-    on fail -> {
+    ~> {
 
         test.ok(true);
-    };
+    }
 };
 
 
-mightFail is <-> {
+mightFail is {
 
     fail "d'oh!";
 };

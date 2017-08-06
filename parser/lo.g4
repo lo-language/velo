@@ -25,7 +25,6 @@ NUMBER
     ;
 
 ASYNC   : 'async'|'@';
-AWAIT   : 'await';
 
 ID      : ID_LETTER (ID_LETTER | DIGIT)* ;
 
@@ -58,10 +57,10 @@ statement
     | conditional                                           # condStmt
     | expr op=('+>'|'<+') expr ';'                          # push
     | expr '(' exprList? ')' ';'                            # syncRequest   // this permits foo(); which would otherwise be caught by sendMessage and wouldn't do what people expect
-    | 'on' expr sink ';'                                    # subscribe
-    | ASYNC? expr ('<-' exprList)? handlers? ';'             # invocation
+    | 'on' expr '->' proc ';'                               # subscribe
+    | ASYNC? expr ('<-' '(' exprList ')')? (';' | handlers) # invocation
     | 'while' expr block                                    # iteration
-    | 'scan' expr expr                                      # scan
+    | 'scan' expr '->' proc                                 # scan  // proc is not a replyHandler because of different semantics!
     ;
 
 definition
@@ -83,11 +82,11 @@ handlers
     ;
 
 replyHandler
-    : sink
+    : '->' proc
     ;
 
 failHandler
-    : 'on' 'fail' sink
+    : '~>' proc
     ;
 
 // might want to refactor this
@@ -149,22 +148,22 @@ literal
     | STRING                                    # string
     | '[' exprList? ']'                         # array
     | '(' fieldList ')'                         # record // form? compound? composite? frame? struct?
-    | '{' (sep=PAIR_SEP|exprList|pairList)? '}' # set
-    | sink                                      # handler
-    | '<->' procedure                           # service
+    | '{' (sep=PAIR_SEP|memberList|pairList)? '}' # set
+    | proc                                      # service
     | '-<' paramList?                           # event
     ;
 
-sink
-    : '->' procedure
-    ;
-
-procedure
+proc
     : paramList? block
     ;
 
+memberList
+    : (expr ','?)+
+    ;
+
 paramList
-    : '(' ID (',' ID)* ')'
+    : '(' ')'
+    | '(' ID (',' ID)* ')'
     ;
 
 fieldList

@@ -1,4 +1,4 @@
-test is <-> {
+test is {
 
     if foo == 1 {
         reply;

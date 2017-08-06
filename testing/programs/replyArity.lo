@@ -1,15 +1,15 @@
 
 // optimization opportunity here to not write unnecessary continuations
 
-main is <-> (test) {
+main is (test) {
 
     foo -> (result) {
 
         test.equal(result, ["Voigt", "Kampff", "machine"]);
-    };
+    }
 };
 
-foo is <-> {
+foo is {
 
     reply ["Voigt", "Kampff", "machine"];
 };

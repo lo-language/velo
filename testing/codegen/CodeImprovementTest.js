@@ -114,13 +114,13 @@ module.exports["basics"] = {
                                                 [ 'expr-stmt', ["assign",
                                                     [ "id", "$found" ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ] ],
                                                 [ 'stmtList', [ "expr-stmt",
-                                                    [ "call", [ "id", "c0" ], [] ] ] ] ] ],
+                                                    [ "call", [ "id", "k0" ], [] ] ] ] ] ],
                                         [ 'null' ] ] ] ] ],
-                        [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'c0' ], [] ] ] ] ] ],
-                [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'c0' ], [] ] ] ] ],
+                        [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'k0' ], [] ] ] ] ] ],
+                [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'k0' ], [] ] ] ] ],
             [ 'stmtList',
                 [ 'function',
-                    'c0',
+                    'k0',
                     [],
                     [ 'stmtList', [ 'expr-stmt', [ 'assign', [ 'id', '$point' ], [ "num", "2" ] ] ] ] ] ] ]);
 
@@ -172,10 +172,10 @@ module.exports["basics"] = {
                                                 [ [ "arrayLiteral", [ [ "id", "$word" ] ] ] ] ] ],
                                         [ 'stmtList',
                                             [ 'return' ] ] ] ] ] ],
-                        [ 'id', 'c0' ] ] ] ],
+                        [ 'id', 'k0' ] ] ] ],
             [ 'stmtList',
                 [ 'function',
-                    'c0',
+                    'k0',
                     [],
                     [ 'stmtList', [ 'expr-stmt', [ 'assign', [ 'id', '$i' ], ['num', '2' ] ] ] ] ] ] ]);
 
@@ -239,10 +239,10 @@ module.exports["basics"] = {
     //                                             [ 'select', [ "id", "task" ], 'respond' ],
     //                                             [ [ "string", "reply" ], [ "arrayLiteral", [ [ "id", "$word" ] ] ] ] ] ],
     //                                      ] ] ] ],
-    //                     [ 'id', 'c0' ] ] ] ],
+    //                     [ 'id', 'k0' ] ] ] ],
     //         [ 'stmtList',
     //             [ 'function',
-    //                 'c0',
+    //                 'k0',
     //                 [],
     //                 [ 'stmtList', [ 'expr-stmt', [ 'inc', [ 'id', '$i' ] ] ] ] ] ] ]);
     //

@@ -342,12 +342,6 @@ loVisitor.prototype.visitSet = function(ctx) {
 };
 
 
-// Visit a parse tree produced by loParser#handler.
-loVisitor.prototype.visitHandler = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
 // Visit a parse tree produced by loParser#service.
 loVisitor.prototype.visitService = function(ctx) {
   return this.visitChildren(ctx);
@@ -360,14 +354,14 @@ loVisitor.prototype.visitEvent = function(ctx) {
 };
 
 
-// Visit a parse tree produced by loParser#sink.
-loVisitor.prototype.visitSink = function(ctx) {
+// Visit a parse tree produced by loParser#proc.
+loVisitor.prototype.visitProc = function(ctx) {
   return this.visitChildren(ctx);
 };
 
 
-// Visit a parse tree produced by loParser#procedure.
-loVisitor.prototype.visitProcedure = function(ctx) {
+// Visit a parse tree produced by loParser#memberList.
+loVisitor.prototype.visitMemberList = function(ctx) {
   return this.visitChildren(ctx);
 };
 

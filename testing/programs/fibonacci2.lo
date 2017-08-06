@@ -2,7 +2,7 @@
  * iterative fibonacci number calculator
  */
 
-main is <-> (n) {
+main is (n) {
 
     if n < 0 {
         fail "Whatsamatta, you?";
