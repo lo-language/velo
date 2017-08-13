@@ -126,7 +126,7 @@ expr
     | expr '?' expr ':' expr                                    # condExpr      // we want this before concat
     | expr '><' expr                                            # concat
     | ID? '::' ID                                               # moduleRef
-    | ID                                                        # id            // lvalue
+    | ID                                                        # id
     ;
 
 interpolated

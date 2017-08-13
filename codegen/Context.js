@@ -59,7 +59,6 @@ var __ = function (parent, isService) {
     this.errors = [];
 };
 
-
 /**
  *
  */
@@ -103,6 +102,14 @@ __.prototype.setRegistry = function (registry) {
     this.registry = registry;
 };
 
+/**
+ * Sets the module registry for this context.
+ */
+__.prototype.setErrorListener = function (listener) {
+
+    this.errorListener = listener;
+};
+
 
 /**
  * Declares a variable in this context.
@@ -131,6 +138,18 @@ __.prototype.define = function (name, value, isModule) {
     if (this.has(name)) {
         throw new Error(name + " is a constant or variable in this context");
     }
+
+    this._setValue(name, value, isModule);
+};
+
+/**
+ * Defines a constant in this context.
+ *
+ * @param name
+ * @param value
+ * @param isModule   bind at load-time, not compile-time
+ */
+__.prototype._setValue = function (name, value, isModule) {
 
     this.symbols['@' + name] = {
         type: 'const',
@@ -439,14 +458,27 @@ __.prototype.isRValue = function () {
     return false;
 };
 
-__.prototype.pushError = function (line, message) {
+/**
+ * Attaches a compilation error to the given node.
+ *
+ * @param node
+ * @param message
+ */
+__.prototype.attachError = function (node, message) {
 
-    this.errors.push(new Error(this.getModulePath() + ':' + line + ' ' + message));
+    if (this.parent) {
+        this.parent.attachError(node, message);
+        return;
+    }
+
+    this.errorListener && this.errorListener(node, message);
+
+    this.errors.push(node, message);
 };
 
-__.prototype.getErrors = function () {
+__.prototype.hasErrors = function () {
 
-    return this.errors;
+    return this.errors.length > 0;
 };
 
 

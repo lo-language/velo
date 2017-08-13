@@ -50,8 +50,6 @@ __.prototype.getAst = function () {
         type: 'module',
         definitions: this.defs.map(def => def.getAst()),
     };
-
-
 };
 
 /**
@@ -67,31 +65,42 @@ __.prototype.getTree = function () {
  *
  * Compiling a module discovers its dependencies.
  */
-__.prototype.compile = function (registry) {
+__.prototype.compile = function (registry, errorListener) {
 
     // create a root context
     var context = new Context();
 
     context.setRegistry(registry);
+    context.setErrorListener(errorListener);
 
-    // OK, THIS IS A HACK
+    // todo another compensating hack because of compiling tail-first
     // compile all the deps right here
+
     this.deps.forEach(function (dep) {
 
         // ignore the return value, which is just a no-op
         dep.compile(context);
     });
 
-    var stmts = null;
+    var t = this;
 
-    for (var i = this.defs.length - 1; i >= 0; i--) {
-        stmts = JS.stmtList(this.defs[i].compile(context), stmts);
+    function compileDefs (idx) {
+
+        if (idx < t.defs.length) {
+
+            return JS.stmtList(
+                t.defs[idx].compile(context),
+                compileDefs(idx + 1));
+        }
+
+        return null;
     }
 
-    var errors = context.getErrors();
+    var stmts = compileDefs(0);
 
-    if (errors.length > 0) {
-        console.error(errors);
+    // bail if we had errors
+    if (context.hasErrors()) {
+        throw new Error("compilation failed");
     }
 
     var exports = context.getConstants().map(c => {

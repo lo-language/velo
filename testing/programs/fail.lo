@@ -2,6 +2,13 @@
  * tests the semantics of fail handlers: omission means ignore
  */
 
+
+mightFail is {
+
+    fail "d'oh!";
+};
+
+
 main is (test) {
 
     // fail handler only
@@ -21,10 +28,4 @@ main is (test) {
 
         test.ok(true);
     }
-};
-
-
-mightFail is {
-
-    fail "d'oh!";
 };

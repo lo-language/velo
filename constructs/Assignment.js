@@ -27,6 +27,10 @@ var __ = function (left, right) {
 
     this.left = left;
     this.right = right;
+
+    if (typeof left.setLvalue == 'function') {
+        left.setLvalue();
+    }
 };
 
 /**

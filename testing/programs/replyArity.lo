@@ -1,15 +1,16 @@
 
 // optimization opportunity here to not write unnecessary continuations
 
+
+foo is {
+
+    reply ["Voigt", "Kampff", "machine"];
+};
+
 main is (test) {
 
     foo -> (result) {
 
         test.equal(result, ["Voigt", "Kampff", "machine"]);
     }
-};
-
-foo is {
-
-    reply ["Voigt", "Kampff", "machine"];
 };

@@ -56,7 +56,8 @@ __.prototype.getTree = function () {
  */
 __.prototype.compile = function (context) {
 
-    var value = this.value.compile(context);
+    // we need to define the symbol in the context before compiling the value
+    // in case it's recursive
 
     if (this.value instanceof ModuleRef) {
 
@@ -66,6 +67,10 @@ __.prototype.compile = function (context) {
 
     // register with the symbol table
     context.define(this.name, value);
+
+    var value = this.value.compile(context);
+
+    context._setValue(this.name, value);
 
     return JS.constDecl('$' + this.name, value);
 };

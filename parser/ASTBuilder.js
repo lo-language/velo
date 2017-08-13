@@ -5,6 +5,11 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
+ * e to the u, du dx, e to the x, dx;
+ * cosine, secant, tangent, sine, 3.14159;
+ * integral, radical, mu, dv;
+ * slipstick, sliderule, MIT!
+ *
  =============================================================================*/
 
 const antlr4 = require('antlr4');

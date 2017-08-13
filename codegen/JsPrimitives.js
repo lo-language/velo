@@ -341,7 +341,7 @@ JS.stmtList = (head, tail) => {
                 var headTree = head.renderTree();
             }
             catch (e) {
-                headTree = ['ERROR RENDERING HEAD', e.stack];
+                headTree = ['ERROR RENDERING HEAD: ' + e.message, e.stack];
             }
 
             return tailTree ? ['stmtList', headTree, tailTree] : ['stmtList', headTree];
@@ -364,7 +364,7 @@ JS.stmtList = (head, tail) => {
                 var headJs = head.renderJs();
             }
             catch (e) {
-                headJs = 'ERROR RENDERING HEAD';
+                headJs = 'ERROR RENDERING HEAD: ' + e.message;
             }
 
             return headJs + '\n' + (tailJs || '');

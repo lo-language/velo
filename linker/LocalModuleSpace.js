@@ -13,6 +13,7 @@ const fs = require('fs');
 const Q = require('q');
 const ASTBuilder = require('./../parser/ASTBuilder');
 const vm = require('vm');
+const EventEmitter = require('events');
 
 
 /**
@@ -23,6 +24,8 @@ const vm = require('vm');
 
 var __ = function (baseDir) {
 
+    EventEmitter.call(this);
+
     this.baseDir = baseDir;
     this.pending = {};
     this.modules = {};
@@ -30,6 +33,7 @@ var __ = function (baseDir) {
     this.loaded = {};
 };
 
+__.prototype = new EventEmitter();
 
 /**
  * Registers the given module ID as a dependency.
@@ -48,7 +52,8 @@ __.prototype.register = function (id) {
 /**
  * Resolves all pending modules, which entails acquiring and compiling the source.
  *
- * @param registry  the module registry to use during compilation
+ * @param registry      the module registry to use during compilation
+ *
  * @return a promise
  */
 __.prototype.resolve = function (registry) {
@@ -63,7 +68,7 @@ __.prototype.resolve = function (registry) {
             this.modules[moduleId] = module;
 
             try {
-                this.jsModules[moduleId] = module.compile(registry).renderJs();
+                this.jsModules[moduleId] = module.compile(registry, (node, error) => {this.emit("error", moduleId, node, error);}).renderJs();
             }
             catch (err) {
                 console.log(err);

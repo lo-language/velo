@@ -146,34 +146,34 @@ module.exports['collections'] = {
     }
 };
 
-module.exports['helloWorld'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(__dirname, 'helloWorld');
-        cb();
-    },
-
-    'success': function (test) {
-
-        test.expect(2);
-
-        var system = {
-            $out: {
-                $write: function (args, succ, fail) {
-                    console.log(args);
-                    test.equal(args[0], "hello, world!");
-                    succ();
-                }
-            }
-        };
-
-        // this.harness.dumpModules().then(() => {
-
-        this.harness.testSuccess(test, [[], system, {}]);
-        // });
-    }
-};
+// module.exports['helloWorld'] = {
+//
+//     "setUp": function (cb) {
+//
+//         this.harness = new Harness(__dirname, 'helloWorld');
+//         cb();
+//     },
+//
+//     'success': function (test) {
+//
+//         test.expect(2);
+//
+//         var system = {
+//             $out: {
+//                 $write: function (args, succ, fail) {
+//                     console.log(args);
+//                     test.equal(args[0], "hello, world!");
+//                     succ();
+//                 }
+//             }
+//         };
+//
+//         this.harness.dumpModules().then(() => {
+//
+//             this.harness.testSuccess(test, [[], system, {}]);
+//         });
+//     }
+// };
 
 module.exports['fibonacci'] = {
 
@@ -337,19 +337,19 @@ module.exports['reply handling'] = {
 };
 
 
-module.exports['built-ins'] = {
-
-   "setUp": function (cb) {
-
-       this.harness = new Harness(__dirname, 'built-ins');
-       cb();
-   },
-
-   'success': function (test) {
-
-       this.harness.testSuccess(test, [], -1);
-   }
-};
+// module.exports['built-ins'] = {
+//
+//    "setUp": function (cb) {
+//
+//        this.harness = new Harness(__dirname, 'built-ins');
+//        cb();
+//    },
+//
+//    'success': function (test) {
+//
+//        this.harness.testSuccess(test, [], -1);
+//    }
+// };
 
 
 module.exports['fibonacci2'] = {
