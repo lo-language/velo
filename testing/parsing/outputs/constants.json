@@ -2,15 +2,19 @@
   "type": "module",
   "deps": [
     {
+      "type": "constant",
       "name": "Moon",
       "value": {
+        "type": "modref",
         "namespace": null,
         "id": "Moon"
       }
     },
     {
+      "type": "constant",
       "name": "HTTP",
       "value": {
+        "type": "modref",
         "namespace": "NPM",
         "id": "HTTP"
       }

@@ -17,5 +17,14 @@ module.exports["identifiers"] = {
         test.deepEqual(node.compile(new Context()).renderTree(),
             ['id', '$foo']);
         test.done();
+    },
+
+    "error when undefined": function (test) {
+
+        var node = new Lo.identifier('foo');
+
+        test.deepEqual(node.compile(new Context()).renderTree(),
+            ['id', '$foo']);
+        test.done();
     }
 };

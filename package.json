@@ -9,7 +9,7 @@
     "node": ">=6.1.0"
   },
   "dependencies": {
-    "antlr4": "^4.5.2",
+    "antlr4": "^4.7.0",
     "minimist": "^1.2.0",
     "q": ""
   },
@@ -18,7 +18,7 @@
     "jison": "0.4.x"
   },
   "scripts": {
-    "test": "nodeunit testing/codegen testing/compilation testing/parsing testing/linking testing/programs testing/runtime"
+    "test": "nodeunit testing/codegen testing/compilation testing/feature testing/parsing testing/linking testing/programs testing/runtime"
   },
   "bin": {
     "velo": "./bin/velo"

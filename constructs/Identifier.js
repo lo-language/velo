@@ -18,12 +18,18 @@ const Future = require('../codegen/Future');
 
 
 /**
- * An identifer
+ * An identifier
  */
 var __ = function (name, line) {
 
     this.name = name;
     this.line = line || '??';
+    this.isLvalue = false;
+};
+
+
+__.prototype.setLvalue = function () {
+    this.isLvalue = true;
 };
 
 /**
@@ -69,7 +75,10 @@ __.prototype.compile = function (context) {
     }
 
     // of course, we need to see inside a conditional to know if it's been defined...
-    context.pushError(this.line, "unbound identifier '" + this.name + "' used as reference");
+    if (this.isLvalue == false) {
+        context.attachError(this, "reference to unbound identifier \"" + this.name + "\"");
+    }
+
     return JS.ID('$' + this.name);
 };
 

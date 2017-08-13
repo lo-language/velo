@@ -3,16 +3,6 @@
  * 2/7/15
  */
 
-main is {
-    reply foo(5);
-};
-
-
-foo is (x) {
-
-    reply factorial(x) / 2;
-};
-
 
 factorial is (num) {
 
@@ -23,4 +13,13 @@ factorial is (num) {
     }
 
     reply num * again(num - 1);
+};
+
+foo is (x) {
+
+    reply factorial(x) / 2;
+};
+
+main is {
+    reply foo(5);
 };

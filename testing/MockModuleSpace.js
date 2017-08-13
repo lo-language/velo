@@ -12,6 +12,7 @@
 const Q = require('q');
 const ASTBuilder = require('./../parser/ASTBuilder');
 const vm = require('vm');
+const EventEmitter = require('events');
 
 
 /**
@@ -22,12 +23,16 @@ const vm = require('vm');
 
 var __ = function (source) {
 
+    EventEmitter.call(this);
+
     this.modules = {
         'ROOT': new ASTBuilder().parse(source)
     };
 
     this.loaded = {};
 };
+
+__.prototype = new EventEmitter();
 
 
 /**
@@ -42,16 +47,22 @@ __.prototype.register = function (id) {
 /**
  * Resolves all pending modules, which entails acquiring and compiling the source.
  *
- * @param registry  the module registry to use during compilation
+ * @param registry      the module registry to use during compilation
+ *
  * @return a promise
  */
 __.prototype.resolve = function (registry) {
 
-    this.jsModules = {
-        'ROOT': this.modules['ROOT'].compile(registry).renderJs()
-    };
+    return Q().then(
+        () => {
 
-    return Q(this.modules);
+            this.jsModules = {
+                'ROOT': this.modules['ROOT'].compile(registry, (line, error) => {this.emit("error", line, error);}).renderJs()
+            };
+
+            return this.modules;
+        }
+    );
 };
 
 

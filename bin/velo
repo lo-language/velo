@@ -43,6 +43,10 @@ if (sourceFile == null) {
 var localSpace = new LocalModuleSpace(path.dirname(sourceFile));
 var program = new LoadAndGo(localSpace, path.basename(sourceFile, '.lo'));
 
+localSpace.on('error', function (file, node, message) {
+
+    console.error(`Error compiling ${file}, line ${node.line}:`, message);
+});
 
 switch (cmd) {
 

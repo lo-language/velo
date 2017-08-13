@@ -170,7 +170,7 @@ module.exports['helloWorld'] = {
 
         // this.harness.dumpModules().then(() => {
 
-        this.harness.testSuccess(test, [[], system, {}]);
+            this.harness.testSuccess(test, [[], system, {}]);
         // });
     }
 };

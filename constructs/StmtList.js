@@ -15,6 +15,7 @@ const JS = require('../codegen/JsPrimitives');
 const BranchContext = require('../codegen/BranchContext');
 const Assignment = require('./Assignment');
 const Identifier = require('./Identifier');
+const Constant = require('./Constant');
 
 
 
@@ -90,6 +91,7 @@ __.prototype.compile = function (context) {
     // var branch = context.getBranchContext();
     var connector = context.getConnector();
 
+    // todo this is a big fat hack due to compiling tail-first
     // look for a defacto declaration
     if (this.head instanceof Assignment &&
         this.head.left instanceof Identifier) {
@@ -105,6 +107,10 @@ __.prototype.compile = function (context) {
         if (context.has(name) == false) {
             context.declare(name);
         }
+    }
+
+    if (this.head instanceof Constant) {
+        head = this.head.compile(context);
     }
 
     // if there's a tail, compile it first
@@ -125,7 +131,7 @@ __.prototype.compile = function (context) {
     // todo if we compile the head first, we'd have to push a context to wrap the tail?
     context.setFollowing(tail);
 
-    var head = this.head ? this.head.compile(context) : null;
+    var head = head || (this.head ? this.head.compile(context) : null);
     var result;
 
     // some Lo statements compile to multiple JS stmts;
