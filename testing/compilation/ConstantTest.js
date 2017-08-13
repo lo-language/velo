@@ -13,6 +13,36 @@ const rootContext = new Context();
 
 module.exports["root constants"] = {
 
+    "module constant": function (test) {
+
+        var module = new Lo.module([
+                new Lo.constant('main', new Lo.procedure([], new Lo.stmtList(
+                    new Lo.response('reply', [new Lo.select(new Lo.identifier('Math'), 'PI')]),
+                null), true))
+            ],[
+                new Lo.constant('Math', new Lo.moduleRef('JS', 'Math'))
+            ]
+        );
+
+        // need to provide a mock registry
+        var mockRegistry = {
+            include: function () {
+            },
+            getModules: function () {
+            }
+        };
+
+        test.equal(module.compile(mockRegistry).renderJs(), '' +
+            'const $main = function (args, succ, fail) {\n\n' +
+            'var task = new Task(succ, fail);\n' +
+            'task.succ([JS.Math.$PI]);\n' +
+            'task.deactivate();\n' +
+            '};\n' +
+            'return {\'$main\': $main};\n');
+
+        test.done();
+    },
+
     "numeric": function (test) {
 
         var node = new Lo.constant('port', new Lo.number('443'));

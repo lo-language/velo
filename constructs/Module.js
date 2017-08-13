@@ -44,7 +44,7 @@ __.prototype.getAst = function () {
 
     return this.deps.length > 0 ? {
         type: 'module',
-        deps: this.deps,
+        deps: this.deps.map(def => def.getAst()),
         definitions: this.defs.map(def => def.getAst()),
     } : {
         type: 'module',
