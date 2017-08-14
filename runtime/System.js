@@ -43,6 +43,29 @@ module.exports = {
             });
 
             succ();
+        },
+
+        $read: function (args, succ, fail) {
+
+            var task = new Task(succ, fail);
+
+            // process.stdin.setEncoding('utf8');
+
+            var handler = () => {
+
+                process.stdin.removeListener('readable', handler);
+
+                const chunk = process.stdin.read();
+
+                if (chunk !== null) {
+                    task.succ([chunk]);
+                }
+                else {
+                    task.fail();
+                }
+            };
+
+            process.stdin.on('readable', handler);
         }
     },
 
