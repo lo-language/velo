@@ -78,6 +78,12 @@ loVisitor.prototype.visitInvocation = function(ctx) {
 };
 
 
+// Visit a parse tree produced by loParser#invocation2.
+loVisitor.prototype.visitInvocation2 = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by loParser#iteration.
 loVisitor.prototype.visitIteration = function(ctx) {
   return this.visitChildren(ctx);

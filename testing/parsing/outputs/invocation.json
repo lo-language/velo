@@ -57,27 +57,12 @@
                     "type": "id",
                     "name": "foo"
                   },
-                  "args": [],
-                  "contingency": {
-                    "type": "procedure",
-                    "params": [
-                      "error"
-                    ],
-                    "body": {
-                      "type": "stmt_list",
-                      "head": {
-                        "type": "response",
-                        "channel": "substitute",
-                        "args": [
-                          {
-                            "type": "string",
-                            "val": "ok"
-                          }
-                        ]
-                      },
-                      "tail": null
+                  "args": [
+                    {
+                      "type": "number",
+                      "val": "18"
                     }
-                  },
+                  ],
                   "blocking": true
                 },
                 "tail": {
@@ -85,39 +70,10 @@
                   "head": {
                     "type": "request_stmt",
                     "address": {
-                      "type": "select",
-                      "record": {
-                        "type": "id",
-                        "name": "user"
-                      },
-                      "field": "login"
+                      "type": "id",
+                      "name": "foo"
                     },
-                    "args": [
-                      {
-                        "type": "id",
-                        "name": "password"
-                      }
-                    ],
-                    "subsequent": {
-                      "type": "procedure",
-                      "params": [
-                        "result"
-                      ],
-                      "body": {
-                        "type": "stmt_list",
-                        "head": {
-                          "type": "response",
-                          "channel": "reply",
-                          "args": [
-                            {
-                              "type": "string",
-                              "val": "ok"
-                            }
-                          ]
-                        },
-                        "tail": null
-                      }
-                    },
+                    "args": [],
                     "contingency": {
                       "type": "procedure",
                       "params": [
@@ -145,30 +101,70 @@
                     "head": {
                       "type": "request_stmt",
                       "address": {
-                        "type": "id",
-                        "name": "foo"
+                        "type": "select",
+                        "record": {
+                          "type": "id",
+                          "name": "user"
+                        },
+                        "field": "login"
                       },
-                      "args": [],
-                      "blocking": false
+                      "args": [
+                        {
+                          "type": "id",
+                          "name": "password"
+                        }
+                      ],
+                      "subsequent": {
+                        "type": "procedure",
+                        "params": [
+                          "result"
+                        ],
+                        "body": {
+                          "type": "stmt_list",
+                          "head": {
+                            "type": "response",
+                            "channel": "reply",
+                            "args": [
+                              {
+                                "type": "string",
+                                "val": "ok"
+                              }
+                            ]
+                          },
+                          "tail": null
+                        }
+                      },
+                      "contingency": {
+                        "type": "procedure",
+                        "params": [
+                          "error"
+                        ],
+                        "body": {
+                          "type": "stmt_list",
+                          "head": {
+                            "type": "response",
+                            "channel": "substitute",
+                            "args": [
+                              {
+                                "type": "string",
+                                "val": "ok"
+                              }
+                            ]
+                          },
+                          "tail": null
+                        }
+                      },
+                      "blocking": true
                     },
                     "tail": {
                       "type": "stmt_list",
                       "head": {
                         "type": "request_stmt",
                         "address": {
-                          "type": "select",
-                          "record": {
-                            "type": "id",
-                            "name": "sessionStore"
-                          },
-                          "field": "getByID"
+                          "type": "id",
+                          "name": "foo"
                         },
-                        "args": [
-                          {
-                            "type": "id",
-                            "name": "sessionID"
-                          }
-                        ],
+                        "args": [],
                         "blocking": false
                       },
                       "tail": {
@@ -176,33 +172,19 @@
                         "head": {
                           "type": "request_stmt",
                           "address": {
-                            "type": "id",
-                            "name": "bar"
+                            "type": "select",
+                            "record": {
+                              "type": "id",
+                              "name": "sessionStore"
+                            },
+                            "field": "getByID"
                           },
                           "args": [
                             {
-                              "type": "number",
-                              "val": "48"
+                              "type": "id",
+                              "name": "sessionID"
                             }
                           ],
-                          "subsequent": {
-                            "type": "procedure",
-                            "params": [],
-                            "body": {
-                              "type": "stmt_list",
-                              "head": {
-                                "type": "response",
-                                "channel": "reply",
-                                "args": [
-                                  {
-                                    "type": "string",
-                                    "val": "hello"
-                                  }
-                                ]
-                              },
-                              "tail": null
-                            }
-                          },
                           "blocking": false
                         },
                         "tail": {
@@ -211,19 +193,17 @@
                             "type": "request_stmt",
                             "address": {
                               "type": "id",
-                              "name": "baz"
+                              "name": "bar"
                             },
                             "args": [
                               {
                                 "type": "number",
-                                "val": "128"
+                                "val": "48"
                               }
                             ],
-                            "contingency": {
+                            "subsequent": {
                               "type": "procedure",
-                              "params": [
-                                "err"
-                              ],
+                              "params": [],
                               "body": {
                                 "type": "stmt_list",
                                 "head": {
@@ -232,7 +212,7 @@
                                   "args": [
                                     {
                                       "type": "string",
-                                      "val": "bummer"
+                                      "val": "hello"
                                     }
                                   ]
                                 },
@@ -247,36 +227,15 @@
                               "type": "request_stmt",
                               "address": {
                                 "type": "id",
-                                "name": "foo"
+                                "name": "bar"
                               },
                               "args": [
                                 {
                                   "type": "number",
-                                  "val": "42"
+                                  "val": "48"
                                 }
                               ],
                               "subsequent": {
-                                "type": "procedure",
-                                "params": [
-                                  "a",
-                                  "b"
-                                ],
-                                "body": {
-                                  "type": "stmt_list",
-                                  "head": {
-                                    "type": "response",
-                                    "channel": "reply",
-                                    "args": [
-                                      {
-                                        "type": "string",
-                                        "val": "yay"
-                                      }
-                                    ]
-                                  },
-                                  "tail": null
-                                }
-                              },
-                              "contingency": {
                                 "type": "procedure",
                                 "params": [],
                                 "body": {
@@ -287,7 +246,7 @@
                                     "args": [
                                       {
                                         "type": "string",
-                                        "val": "darn"
+                                        "val": "hello"
                                       }
                                     ]
                                   },
@@ -302,88 +261,19 @@
                                 "type": "request_stmt",
                                 "address": {
                                   "type": "id",
-                                  "name": "foo"
+                                  "name": "baz"
                                 },
                                 "args": [
                                   {
                                     "type": "number",
-                                    "val": "42"
+                                    "val": "128"
                                   }
                                 ],
-                                "subsequent": {
-                                  "type": "procedure",
-                                  "params": [
-                                    "result"
-                                  ],
-                                  "body": {
-                                    "type": "stmt_list",
-                                    "head": {
-                                      "type": "request_stmt",
-                                      "address": {
-                                        "type": "id",
-                                        "name": "bar"
-                                      },
-                                      "args": [
-                                        {
-                                          "type": "id",
-                                          "name": "result"
-                                        }
-                                      ],
-                                      "subsequent": {
-                                        "type": "procedure",
-                                        "params": [],
-                                        "body": {
-                                          "type": "stmt_list",
-                                          "head": {
-                                            "type": "assign",
-                                            "left": {
-                                              "type": "id",
-                                              "name": "yarp"
-                                            },
-                                            "right": {
-                                              "type": "request_expr",
-                                              "address": {
-                                                "type": "id",
-                                                "name": "baz"
-                                              },
-                                              "args": [
-                                                {
-                                                  "type": "id",
-                                                  "name": "result"
-                                                }
-                                              ],
-                                              "blocking": false
-                                            }
-                                          },
-                                          "tail": null
-                                        }
-                                      },
-                                      "contingency": {
-                                        "type": "procedure",
-                                        "params": [],
-                                        "body": {
-                                          "type": "stmt_list",
-                                          "head": {
-                                            "type": "response",
-                                            "channel": "fail",
-                                            "args": [
-                                              {
-                                                "type": "string",
-                                                "val": "narp"
-                                              }
-                                            ]
-                                          },
-                                          "tail": null
-                                        }
-                                      },
-                                      "blocking": false
-                                    },
-                                    "tail": null
-                                  }
-                                },
                                 "contingency": {
                                   "type": "procedure",
-                                  "params": [],
+                                  "params": [
+                                    "err"
+                                  ],
                                   "body": {
                                     "type": "stmt_list",
                                     "head": {
@@ -392,7 +282,7 @@
                                       "args": [
                                         {
                                           "type": "string",
-                                          "val": "darn"
+                                          "val": "bummer"
                                         }
                                       ]
                                     },
@@ -404,116 +294,278 @@
                               "tail": {
                                 "type": "stmt_list",
                                 "head": {
-                                  "type": "assign",
-                                  "left": {
+                                  "type": "request_stmt",
+                                  "address": {
                                     "type": "id",
-                                    "name": "x"
+                                    "name": "foo"
                                   },
-                                  "right": {
-                                    "type": "request_expr",
-                                    "address": {
-                                      "type": "id",
-                                      "name": "foo"
-                                    },
-                                    "args": [],
-                                    "blocking": true
-                                  }
+                                  "args": [
+                                    {
+                                      "type": "number",
+                                      "val": "42"
+                                    }
+                                  ],
+                                  "subsequent": {
+                                    "type": "procedure",
+                                    "params": [
+                                      "a",
+                                      "b"
+                                    ],
+                                    "body": {
+                                      "type": "stmt_list",
+                                      "head": {
+                                        "type": "response",
+                                        "channel": "reply",
+                                        "args": [
+                                          {
+                                            "type": "string",
+                                            "val": "yay"
+                                          }
+                                        ]
+                                      },
+                                      "tail": null
+                                    }
+                                  },
+                                  "contingency": {
+                                    "type": "procedure",
+                                    "params": [],
+                                    "body": {
+                                      "type": "stmt_list",
+                                      "head": {
+                                        "type": "response",
+                                        "channel": "reply",
+                                        "args": [
+                                          {
+                                            "type": "string",
+                                            "val": "darn"
+                                          }
+                                        ]
+                                      },
+                                      "tail": null
+                                    }
+                                  },
+                                  "blocking": false
                                 },
                                 "tail": {
                                   "type": "stmt_list",
                                   "head": {
-                                    "type": "assign",
-                                    "left": {
-                                      "type": "destructure",
-                                      "fields": [
-                                        "x",
-                                        "y"
-                                      ]
+                                    "type": "request_stmt",
+                                    "address": {
+                                      "type": "id",
+                                      "name": "foo"
                                     },
-                                    "right": {
-                                      "type": "request_expr",
-                                      "address": {
-                                        "type": "id",
-                                        "name": "foo"
-                                      },
-                                      "args": [],
-                                      "blocking": true
-                                    }
-                                  },
-                                  "tail": {
-                                    "type": "stmt_list",
-                                    "head": {
-                                      "type": "request_stmt",
-                                      "address": {
-                                        "type": "id",
-                                        "name": "foo"
-                                      },
-                                      "args": [
-                                        {
-                                          "type": "request_expr",
+                                    "args": [
+                                      {
+                                        "type": "number",
+                                        "val": "42"
+                                      }
+                                    ],
+                                    "subsequent": {
+                                      "type": "procedure",
+                                      "params": [
+                                        "result"
+                                      ],
+                                      "body": {
+                                        "type": "stmt_list",
+                                        "head": {
+                                          "type": "request_stmt",
                                           "address": {
                                             "type": "id",
                                             "name": "bar"
                                           },
-                                          "args": [],
-                                          "blocking": true
-                                        }
-                                      ],
-                                      "blocking": true
+                                          "args": [
+                                            {
+                                              "type": "id",
+                                              "name": "result"
+                                            }
+                                          ],
+                                          "subsequent": {
+                                            "type": "procedure",
+                                            "params": [],
+                                            "body": {
+                                              "type": "stmt_list",
+                                              "head": {
+                                                "type": "assign",
+                                                "left": {
+                                                  "type": "id",
+                                                  "name": "yarp"
+                                                },
+                                                "right": {
+                                                  "type": "request_expr",
+                                                  "address": {
+                                                    "type": "id",
+                                                    "name": "baz"
+                                                  },
+                                                  "args": [
+                                                    {
+                                                      "type": "id",
+                                                      "name": "result"
+                                                    }
+                                                  ],
+                                                  "blocking": false
+                                                }
+                                              },
+                                              "tail": null
+                                            }
+                                          },
+                                          "contingency": {
+                                            "type": "procedure",
+                                            "params": [],
+                                            "body": {
+                                              "type": "stmt_list",
+                                              "head": {
+                                                "type": "response",
+                                                "channel": "fail",
+                                                "args": [
+                                                  {
+                                                    "type": "string",
+                                                    "val": "narp"
+                                                  }
+                                                ]
+                                              },
+                                              "tail": null
+                                            }
+                                          },
+                                          "blocking": false
+                                        },
+                                        "tail": null
+                                      }
+                                    },
+                                    "contingency": {
+                                      "type": "procedure",
+                                      "params": [],
+                                      "body": {
+                                        "type": "stmt_list",
+                                        "head": {
+                                          "type": "response",
+                                          "channel": "reply",
+                                          "args": [
+                                            {
+                                              "type": "string",
+                                              "val": "darn"
+                                            }
+                                          ]
+                                        },
+                                        "tail": null
+                                      }
+                                    },
+                                    "blocking": false
+                                  },
+                                  "tail": {
+                                    "type": "stmt_list",
+                                    "head": {
+                                      "type": "assign",
+                                      "left": {
+                                        "type": "id",
+                                        "name": "x"
+                                      },
+                                      "right": {
+                                        "type": "request_expr",
+                                        "address": {
+                                          "type": "id",
+                                          "name": "foo"
+                                        },
+                                        "args": [],
+                                        "blocking": true
+                                      }
                                     },
                                     "tail": {
                                       "type": "stmt_list",
                                       "head": {
                                         "type": "assign",
                                         "left": {
-                                          "type": "id",
-                                          "name": "x"
+                                          "type": "destructure",
+                                          "fields": [
+                                            "x",
+                                            "y"
+                                          ]
                                         },
                                         "right": {
-                                          "type": "op",
-                                          "op": "+",
-                                          "left": {
-                                            "type": "request_expr",
-                                            "address": {
-                                              "type": "id",
-                                              "name": "foo"
-                                            },
-                                            "args": [],
-                                            "blocking": true
+                                          "type": "request_expr",
+                                          "address": {
+                                            "type": "id",
+                                            "name": "foo"
                                           },
-                                          "right": {
-                                            "type": "number",
-                                            "val": "7"
-                                          }
+                                          "args": [],
+                                          "blocking": true
                                         }
                                       },
                                       "tail": {
                                         "type": "stmt_list",
                                         "head": {
-                                          "type": "assign",
-                                          "left": {
-                                            "type": "destructure",
-                                            "fields": [
-                                              "bar",
-                                              "baz"
-                                            ]
+                                          "type": "request_stmt",
+                                          "address": {
+                                            "type": "id",
+                                            "name": "foo"
                                           },
-                                          "right": {
-                                            "type": "request_expr",
-                                            "address": {
-                                              "type": "id",
-                                              "name": "foo"
-                                            },
-                                            "args": [
-                                              {
-                                                "type": "number",
-                                                "val": "47"
-                                              }
-                                            ],
-                                            "blocking": false
-                                          }
+                                          "args": [
+                                            {
+                                              "type": "request_expr",
+                                              "address": {
+                                                "type": "id",
+                                                "name": "bar"
+                                              },
+                                              "args": [],
+                                              "blocking": true
+                                            }
+                                          ],
+                                          "blocking": true
                                         },
-                                        "tail": null
+                                        "tail": {
+                                          "type": "stmt_list",
+                                          "head": {
+                                            "type": "assign",
+                                            "left": {
+                                              "type": "id",
+                                              "name": "x"
+                                            },
+                                            "right": {
+                                              "type": "op",
+                                              "op": "+",
+                                              "left": {
+                                                "type": "request_expr",
+                                                "address": {
+                                                  "type": "id",
+                                                  "name": "foo"
+                                                },
+                                                "args": [],
+                                                "blocking": true
+                                              },
+                                              "right": {
+                                                "type": "number",
+                                                "val": "7"
+                                              }
+                                            }
+                                          },
+                                          "tail": {
+                                            "type": "stmt_list",
+                                            "head": {
+                                              "type": "assign",
+                                              "left": {
+                                                "type": "destructure",
+                                                "fields": [
+                                                  "bar",
+                                                  "baz"
+                                                ]
+                                              },
+                                              "right": {
+                                                "type": "request_expr",
+                                                "address": {
+                                                  "type": "id",
+                                                  "name": "foo"
+                                                },
+                                                "args": [
+                                                  {
+                                                    "type": "number",
+                                                    "val": "47"
+                                                  }
+                                                ],
+                                                "blocking": false
+                                              }
+                                            },
+                                            "tail": null
+                                          }
+                                        }
                                       }
                                     }
                                   }

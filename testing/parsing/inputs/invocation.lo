@@ -1,7 +1,8 @@
 test is {
 
-    ///////////////////
-    // general form (branch statement)
+    /*
+     * general form (branching construct)
+     */
 
 
     // sync with no handlers (one-way message)
@@ -11,6 +12,7 @@ test is {
 
     // with params
     foo <- (18);
+    foo: 18;    // alternate style
 
     // sync with fail handler only
 
@@ -35,6 +37,10 @@ test is {
 
     // handle success only
     @bar <- (48) -> {
+        reply "hello";
+    }
+
+    @bar: 48 -> {
         reply "hello";
     }
 
@@ -67,8 +73,10 @@ test is {
         reply "darn";
     }
 
-    ///////////////////
-    //special form (function-application expression)
+
+    /*
+     * special form (function-application expression)
+     */
 
     x = foo();
     (x, y) = foo();
