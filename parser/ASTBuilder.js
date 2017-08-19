@@ -361,6 +361,11 @@ __.prototype.visitInvocation = function(ctx) {
     );
 };
 
+__.prototype.visitInvocation2 = function(ctx) {
+
+    return this.visitInvocation(ctx);
+};
+
 __.prototype.visitSink = function (ctx) {
 
     return ctx.proc().accept(this);

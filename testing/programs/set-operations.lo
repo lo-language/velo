@@ -1,0 +1,16 @@
+/*
+ * tests the semantics of set operations
+ */
+
+main is () {
+
+    words = {};
+
+    // add a set
+    words += {"fiat", "lux"};
+
+    // add an array
+    words += ["bark", "hark", "lark"];
+
+    reply words;
+};

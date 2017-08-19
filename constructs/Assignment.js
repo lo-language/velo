@@ -76,7 +76,7 @@ __.prototype.compile = function (context) {
 
         // validate we're not assigning to a constant
         if (context.isConstant(name)) {
-            throw new Error("can't assign to a constant (" + name + ")");
+            context.attachError(this.left, "can't assign to a constant (" + name + ")");
         }
 
         // declare if a new var

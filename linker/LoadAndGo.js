@@ -14,6 +14,7 @@
 "use strict";
 
 const JsModuleSpace = require('./JsModuleSpace');
+const LoModuleSpace = require('./LoModuleSpace');
 const Task = require('../runtime/Task');
 const Util = require('../runtime/Util');
 const LoSystem = require('../runtime/System');
@@ -27,6 +28,7 @@ var __ = function (localSpace, rootModuleId) {
 
     this.namespaces = {
         '__local': localSpace,
+        'Lo': new LoModuleSpace(),
         'JS': new JsModuleSpace()
     };
 
@@ -35,6 +37,7 @@ var __ = function (localSpace, rootModuleId) {
         'Task': Task,
         '__local': localSpace.getModules(),
         'JS': this.namespaces['JS'].getModules(),
+        'Lo': this.namespaces['Lo'].getModules(),
         'Util': Util
     };
 

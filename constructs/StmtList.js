@@ -91,7 +91,7 @@ __.prototype.compile = function (context) {
     // var branch = context.getBranchContext();
     var connector = context.getConnector();
 
-    // todo this is a big fat hack due to compiling tail-first
+    // todo this is a big fat hack due to compiling tail-first so we have to have duplicat logic here
     // look for a defacto declaration
     if (this.head instanceof Assignment &&
         this.head.left instanceof Identifier) {
@@ -99,12 +99,13 @@ __.prototype.compile = function (context) {
         var name = this.head.left.name;
 
         if (context.isConstant(name)) {
-            throw new Error("can't assign to a constant (" + name + ")");
+            context.attachError(this.head.left, "can't assign to a constant (" + name + ")");
         }
+        else if (context.has(name) == false) {
 
-        // declare if a new var
-        // need to check if exists in case defined in outer scope
-        if (context.has(name) == false) {
+            // declare if a new var
+            // need to check if exists in case defined in outer scope
+
             context.declare(name);
         }
     }

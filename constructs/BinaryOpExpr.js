@@ -110,7 +110,7 @@ __.prototype.compile = function (context) {
             return JS.gte(left, right);
 
         case '+':
-            return JS.add(left, right);
+            return JS.utilCall('add', [left, right]);
 
         case '-':
             return JS.sub(left, right);
