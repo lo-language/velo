@@ -58,12 +58,16 @@ module.exports["literals"] = {
             new Lo.string("hum")
         ]);
 
-        test.deepEqual(node.compile(new Context()).renderTree(), JS.objLiteral([
-            [JS.string('foo'), JS.bool(true)],
-            [JS.string('mani'), JS.bool(true)],
-            [JS.string('padme'), JS.bool(true)],
-            [JS.string('hum'), JS.bool(true)]
-        ]).renderTree());
+        test.deepEqual(node.compile(new Context()).renderTree(),
+            [ 'call',
+                [ 'select', [ 'id', 'Object' ], 'defineProperty' ],
+                [ [ 'objLiteral',
+                    [ [ [ 'string', 'foo' ], [ 'bool', true ] ],
+                        [ [ 'string', 'mani' ], [ 'bool', true ] ],
+                        [ [ 'string', 'padme' ], [ 'bool', true ] ],
+                        [ [ 'string', 'hum' ], [ 'bool', true ] ] ] ],
+                    [ 'string', '__LO_SET' ],
+                    [ 'objLiteral', [ [ [ 'id', 'value' ], [ 'bool', 'true' ] ] ] ] ] ]);
         test.done();
     },
 

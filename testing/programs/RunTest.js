@@ -15,6 +15,34 @@ const Task = require('../../runtime/Task');
 const util = require('util');
 
 
+module.exports['set operations'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'set-operations');
+        cb();
+    },
+
+    'success': function (test) {
+
+        this.harness.run([]).then(
+            function (resp) {
+
+                test.deepEqual(resp, [{
+                    'fiat': true,
+                    'lux': true,
+                    'bark': true,
+                    'hark': true,
+                    'lark': true
+                }]);
+
+                test.ok(resp[0].__LO_SET);
+
+                test.done();
+            }).done();
+    }
+};
+
 module.exports['exists'] = {
 
     "setUp": function (cb) {
@@ -370,6 +398,9 @@ module.exports['fibonacci2'] = {
        this.harness.testFailure(test, [-1], "Whatsamatta, you?");
    }
 };
+
+
+
 
 
 // module.exports['futures'] = {

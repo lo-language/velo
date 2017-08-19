@@ -21,7 +21,50 @@ var __ = function (service, args, onReply, onFail) {
     this.pendingRequests = 0;
 };
 
-// utility methods, probably shouldn't be in here but rather somewhere else in runtime
+__.add = function (left, right) {
+
+    if (typeof left == 'number' && typeof right == 'number') {
+        return left + right;
+    }
+
+    // see if left is a set
+
+    if (typeof left == 'object' && left.__LO_SET) {
+
+        var result = {};
+        Object.defineProperty(result, '__LO_SET', {value: true});
+
+        // copy left into result
+        for (var i in left) {
+            result[i] = left[i];
+        }
+
+        // see if right is also a set
+
+        if (typeof right == 'object' && right.__LO_SET) {
+
+            for (var j in right) {
+                result[j] = right[j];
+            }
+
+            return result;
+        }
+
+        // see if right is an array
+
+        if (Array.isArray(right)) {
+
+            // plug the array into the set
+            right.forEach(function (item) {
+                result[item] = true;
+            });
+
+            return result;
+        }
+    }
+
+    return left + right;
+};
 
 __.concat = function (left, right) {
 

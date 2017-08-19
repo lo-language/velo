@@ -11,10 +11,21 @@ const Lo = require('../../constructs');
 
 module.exports["op"] = {
 
+    "add": function (test) {
+
+        var node = new Lo.binaryOpExpr('+', new Lo.number('1'), new Lo.number('2'));
+
+        test.deepEqual(node.compile(new Context()).renderTree(),
+            [ 'call',
+            [ 'select', [ 'id', 'Util' ], 'add' ],
+            [ [ 'num', '1' ], [ 'num', '2' ] ] ]);
+
+        test.done();
+    },
+
     "basic operators": function (test) {
 
         var cases = [
-            ['+', 'add'],
             ['-', 'sub'],
             ['*', 'mul'],
             ['/', 'div'],

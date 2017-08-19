@@ -49,10 +49,21 @@ __.prototype.getTree = function () {
  */
 __.prototype.compile = function (context) {
 
-    return JS.objLiteral(
-        this.elements.map(item => {
+    var elements = this.elements.map(item => {
         return [item.compile(context), JS.bool(true)];
-    }));
+    });
+
+    // tag this object as a Lo set
+    // we can get away with this because Object.defineProperty returns the object we give it :-)
+
+    return JS.fnCall(
+        JS.select(JS.ID('Object'), 'defineProperty'), [
+        JS.objLiteral(elements),
+        JS.string("__LO_SET"),
+        JS.objLiteral([
+            [JS.ID('value'), JS.bool("true")]
+        ])
+    ]);
 };
 
 module.exports = __;
