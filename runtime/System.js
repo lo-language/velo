@@ -97,5 +97,15 @@ module.exports = {
             process.stderr.write(args + '\n');
             succ();
         }
+    },
+
+    // support installation of signal handlers
+    // todo -- should this be the facility that can handle halt-on-error?
+
+    $on: function (args, succ, fail) {
+
+        // just call success on signal? multiple times?
+
+        succ();
     }
 };

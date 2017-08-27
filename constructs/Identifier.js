@@ -76,7 +76,7 @@ __.prototype.compile = function (context) {
 
     // of course, we need to see inside a conditional to know if it's been defined...
     if (this.isLvalue == false) {
-        context.attachError(this, "reference to unbound identifier \"" + this.name + "\"");
+        context.attachError(this, "identifier \"" + this.name + "\" used but not bound in this context");
     }
 
     return JS.ID('$' + this.name);

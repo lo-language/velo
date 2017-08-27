@@ -12,7 +12,7 @@ test is {
 
     // with params
     foo <- (18);
-    foo: 18;    // alternate style
+    foo 18;    // alternate style
 
     // sync with fail handler only
 
@@ -40,7 +40,7 @@ test is {
         reply "hello";
     }
 
-    @bar: 48 -> {
+    @bar 48 -> {
         reply "hello";
     }
 
