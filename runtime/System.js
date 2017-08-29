@@ -10,6 +10,7 @@
 "use strict";
 
 const Task = require('./Task');
+const net = require('net');
 
 // any provided ports should be stuffed into this
 
@@ -97,6 +98,27 @@ module.exports = {
             process.stderr.write(args + '\n');
             succ();
         }
+    },
+
+    $listen: function (args, succ, fail) {
+
+
+        var task = new Task(succ, fail);
+        var server = new net.Server();
+
+        var handler;
+
+        server.on('error', handler = function (err) {
+
+            task.fail([err.message]);
+        });
+
+        server.listen(args[0], function () {
+
+            server.removeListener('error', handler);
+
+            succ([server]);
+        });
     },
 
     // support installation of signal handlers

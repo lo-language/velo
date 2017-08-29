@@ -143,15 +143,15 @@ exprList
 
 // are arrays and records immutable?
 literal
-    : 'nil'                                     # nil
-    | BOOL                                      # bool
-    | NUMBER                                    # number
-    | STRING                                    # string
-    | '[' exprList? ']'                         # array
-    | '(' fieldList ')'                         # record // form? compound? composite? frame? struct?
-    | '{' (sep=PAIR_SEP|memberList|pairList)? '}' # set
-    | proc                                      # service
-    | '-<' paramList?                           # event
+    : 'nil'                                         # nil
+    | BOOL                                          # bool
+    | NUMBER                                        # number
+    | STRING                                        # string
+    | '[' exprList? ']'                             # array
+    | '(' fieldList ')'                             # compound
+    | '{' (sep=PAIR_SEP|memberList|pairList)? '}'   # set
+    | proc                                          # service
+    | '-<' paramList?                               # event
     ;
 
 proc

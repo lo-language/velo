@@ -3349,29 +3349,6 @@ ServiceContext.prototype.accept = function(visitor) {
 };
 
 
-function RecordContext(parser, ctx) {
-	LiteralContext.call(this, parser);
-    LiteralContext.prototype.copyFrom.call(this, ctx);
-    return this;
-}
-
-RecordContext.prototype = Object.create(LiteralContext.prototype);
-RecordContext.prototype.constructor = RecordContext;
-
-loParser.RecordContext = RecordContext;
-
-RecordContext.prototype.fieldList = function() {
-    return this.getTypedRuleContext(FieldListContext,0);
-};
-RecordContext.prototype.accept = function(visitor) {
-    if ( visitor instanceof loVisitor ) {
-        return visitor.visitRecord(this);
-    } else {
-        return visitor.visitChildren(this);
-    }
-};
-
-
 function EventContext(parser, ctx) {
 	LiteralContext.call(this, parser);
     LiteralContext.prototype.copyFrom.call(this, ctx);
@@ -3389,6 +3366,29 @@ EventContext.prototype.paramList = function() {
 EventContext.prototype.accept = function(visitor) {
     if ( visitor instanceof loVisitor ) {
         return visitor.visitEvent(this);
+    } else {
+        return visitor.visitChildren(this);
+    }
+};
+
+
+function CompoundContext(parser, ctx) {
+	LiteralContext.call(this, parser);
+    LiteralContext.prototype.copyFrom.call(this, ctx);
+    return this;
+}
+
+CompoundContext.prototype = Object.create(LiteralContext.prototype);
+CompoundContext.prototype.constructor = CompoundContext;
+
+loParser.CompoundContext = CompoundContext;
+
+CompoundContext.prototype.fieldList = function() {
+    return this.getTypedRuleContext(FieldListContext,0);
+};
+CompoundContext.prototype.accept = function(visitor) {
+    if ( visitor instanceof loVisitor ) {
+        return visitor.visitCompound(this);
     } else {
         return visitor.visitChildren(this);
     }
@@ -3454,7 +3454,7 @@ loParser.prototype.literal = function() {
             break;
 
         case 6:
-            localctx = new RecordContext(this, localctx);
+            localctx = new CompoundContext(this, localctx);
             this.enterOuterAlt(localctx, 6);
             this.state = 315;
             this.match(loParser.T__14);

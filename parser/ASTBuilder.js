@@ -500,13 +500,13 @@ __.prototype.visitArray = function(ctx) {
     return new Lo.array([]);
 };
 
-__.prototype.visitRecord = function(ctx) {
+__.prototype.visitCompound = function(ctx) {
 
     if (ctx.fieldList()) {
-        return new Lo.record(ctx.fieldList().accept(this));
+        return new Lo.compound(ctx.fieldList().accept(this));
     }
 
-    return new Lo.record(ctx.exprList().accept(this));
+    return new Lo.compound(ctx.exprList().accept(this));
 };
 
 __.prototype.visitSet = function (ctx) {
