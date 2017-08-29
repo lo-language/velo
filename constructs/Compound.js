@@ -13,7 +13,7 @@ const JS = require('../codegen/JsPrimitives');
 
 
 /**
- * A record literal
+ * A compound literal
  *
  * @param fields
  */
@@ -28,7 +28,7 @@ var __ = function (fields) {
 __.prototype.getAst = function () {
 
     return {
-        type: 'record',
+        type: 'compound',
         fields: this.fields.map(field => field.getAst())
     };
 };
@@ -38,7 +38,7 @@ __.prototype.getAst = function () {
  */
 __.prototype.getTree = function () {
 
-    return ['record'].concat(
+    return ['compound'].concat(
         this.fields.map(field => field.getTree()));
 };
 

@@ -195,13 +195,13 @@
       "type": "constant",
       "name": "student",
       "value": {
-        "type": "record",
+        "type": "compound",
         "fields": [
           {
             "type": "field",
             "label": "name",
             "value": {
-              "type": "record",
+              "type": "compound",
               "fields": [
                 {
                   "type": "field",

@@ -34,7 +34,7 @@ module.exports = {
     number: require("./Number"),
     pair: require("./Pair"),
     procedure: require("./Procedure"),
-    record: require("./Record"),
+    compound: require("./Compound"),
     requestExpr: require("./RequestExpr"),
     requestStmt: require("./RequestStmt"),
     response: require("./Response"),

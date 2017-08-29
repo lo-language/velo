@@ -9,6 +9,9 @@
 
 "use strict";
 
+const Task = require('../runtime/Task');
+const http = require('http');
+
 /**
  * The Lo standard library
  *
@@ -47,6 +50,48 @@ __.prototype.getModules = function () {
 
                 // we want to return an array of one element, which is an array of strings
                 succ([String(args[0]).split("\n")]);
+            }
+        },
+
+        HTTP: {
+
+            // params: string, delimiter
+            // returns: array
+
+            $createServer: function (args, succ, fail) {
+
+                var task = new Task(succ, fail);
+
+                var server = new http.Server();
+
+                server.listen(args[0]);
+
+                var result = {
+
+                    $onRequest: function (args, succ, fail) {
+
+                        // here's a fun abuse
+                        server.on('request', function (req, res) {
+
+                            var newReq = {
+
+                                $method: req.method,
+
+                                $url: req.url,
+
+                                $respond: function (args, succ, fail) {
+
+                                    res.writeHead(args[0]);
+                                    res.end(args[1]);
+                                }
+                            };
+
+                            succ([newReq]);
+                        });
+                    }
+                };
+
+                task.succ([result]);
             }
         }
     };

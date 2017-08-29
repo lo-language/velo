@@ -58,8 +58,8 @@ statement
     | expr op=('+>'|'<+') expr ';'                          # push
     | expr '(' exprList? ')' ';'                            # syncRequest   // this permits foo(); which would otherwise be caught by sendMessage and wouldn't do what people expect
     | 'on' expr '->' proc ';'                               # subscribe
-    | ASYNC? expr ('<-' '(' exprList ')')? (';' | handlers) # invocation
-    | ASYNC? expr (':' exprList)? (';' | handlers)          # invocation2   // alternate style for a man who can't make up his mind
+    | ASYNC? expr ('<-' '(' exprList ')')? (handlers | ';') # invocation
+    | ASYNC? expr (exprList)? (handlers | ';')              # invocation2   // alternate style for a man who can't make up his mind
     | 'while' expr block                                    # iteration
     | 'scan' expr '->' proc                                 # scan  // proc is not a replyHandler because of different semantics!
     ;
@@ -143,15 +143,15 @@ exprList
 
 // are arrays and records immutable?
 literal
-    : 'nil'                                     # nil
-    | BOOL                                      # bool
-    | NUMBER                                    # number
-    | STRING                                    # string
-    | '[' exprList? ']'                         # array
-    | '(' fieldList ')'                         # record // form? compound? composite? frame? struct?
-    | '{' (sep=PAIR_SEP|memberList|pairList)? '}' # set
-    | proc                                      # service
-    | '-<' paramList?                           # event
+    : 'nil'                                         # nil
+    | BOOL                                          # bool
+    | NUMBER                                        # number
+    | STRING                                        # string
+    | '[' exprList? ']'                             # array
+    | '(' fieldList ')'                             # compound
+    | '{' (sep=PAIR_SEP|memberList|pairList)? '}'   # set
+    | proc                                          # service
+    | '-<' paramList?                               # event
     ;
 
 proc

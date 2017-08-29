@@ -336,8 +336,8 @@ loVisitor.prototype.visitArray = function(ctx) {
 };
 
 
-// Visit a parse tree produced by loParser#record.
-loVisitor.prototype.visitRecord = function(ctx) {
+// Visit a parse tree produced by loParser#compound.
+loVisitor.prototype.visitCompound = function(ctx) {
   return this.visitChildren(ctx);
 };
 
