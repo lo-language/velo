@@ -40,19 +40,19 @@ __.prototype.getModules = function () {
 
         Math: {
 
-            $E: Math.E,
+            E: Math.E,
 
-            $PI: Math.PI,
+            PI: Math.PI,
 
-            $sin: function (args, succ, fail) {
+            sin: function (args, succ, fail) {
                 succ([Math.sin(args[0])]);
             },
 
-            $cos: function (args, succ, fail) {
+            cos: function (args, succ, fail) {
                 succ([Math.cos(args[0])]);
             },
 
-            $random: function (args, succ, fail) {
+            random: function (args, succ, fail) {
                 fail(["naughty!"]);
             }
         }

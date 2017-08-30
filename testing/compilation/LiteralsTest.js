@@ -100,10 +100,10 @@ module.exports["literals"] = {
 
         test.deepEqual(node.compile(new Context()).renderTree(),
             [ 'objLiteral',
-                [ [ [ 'string', '$Zaphod' ], [ 'string', 'Betelgeuse' ] ],
-                    [ [ 'string', '$Ford' ], [ 'string', 'Betelgeuse' ] ],
-                    [ [ 'string', '$Arthur' ], [ 'string', 'Earth' ] ],
-                    [ [ 'string', '$Trillian' ], [ 'string', 'Earth' ] ] ] ]);
+                [ [ [ 'string', 'Zaphod' ], [ 'string', 'Betelgeuse' ] ],
+                    [ [ 'string', 'Ford' ], [ 'string', 'Betelgeuse' ] ],
+                    [ [ 'string', 'Arthur' ], [ 'string', 'Earth' ] ],
+                    [ [ 'string', 'Trillian' ], [ 'string', 'Earth' ] ] ] ]);
 
         test.done();
     }

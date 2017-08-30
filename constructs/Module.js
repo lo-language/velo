@@ -104,7 +104,7 @@ __.prototype.compile = function (registry, errorListener) {
     }
 
     var exports = context.getConstants().map(c => {
-        return [JS.string('$' + c.name), JS.ID('$' + c.name)];
+        return [JS.string(c.name), JS.ID('$' + c.name)];
     });
 
     // try a return here, see if it works

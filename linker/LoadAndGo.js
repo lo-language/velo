@@ -55,7 +55,7 @@ __.prototype.run = function (args) {
 
         this.localSpace.loadModules(this.sandbox);
 
-        var mainService = this.localSpace.getModules()[this.rootModuleId].$main;
+        var mainService = this.localSpace.getModules()[this.rootModuleId].main;
 
         // launch the program
 

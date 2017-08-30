@@ -60,7 +60,7 @@ __.prototype.getTree = function () {
 __.prototype.compile = function (context) {
 
     // we don't qualify field labels
-    return [JS.string('$' + this.label), this.value.compile(context)];
+    return [JS.string(this.label), this.value.compile(context)];
 };
 
 module.exports = __;
