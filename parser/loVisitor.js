@@ -258,12 +258,6 @@ loVisitor.prototype.visitSyncCall = function(ctx) {
 };
 
 
-// Visit a parse tree produced by loParser#moduleRef.
-loVisitor.prototype.visitModuleRef = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
 // Visit a parse tree produced by loParser#id.
 loVisitor.prototype.visitId = function(ctx) {
   return this.visitChildren(ctx);

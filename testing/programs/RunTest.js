@@ -25,21 +25,24 @@ module.exports['set operations'] = {
 
     'success': function (test) {
 
-        this.harness.run([]).then(
-            function (resp) {
+        // this.harness.dumpModules().then(() => {
 
-                test.deepEqual(resp, [{
-                    'fiat': true,
-                    'lux': true,
-                    'bark': true,
-                    'hark': true,
-                    'lark': true
-                }]);
+            this.harness.run([]).then(
+                function (resp) {
 
-                test.ok(resp[0].__LO_SET);
+                    test.deepEqual(resp, [{
+                        'fiat': true,
+                        'lux': true,
+                        'bark': true,
+                        'hark': true,
+                        'lark': true
+                    }]);
 
-                test.done();
-            }).done();
+                    test.ok(resp[0].__LO_SET);
+
+                    test.done();
+                }).done();
+        // });
     }
 };
 
@@ -87,7 +90,6 @@ module.exports['nestedLoops'] = {
         // });
     }
 };
-
 
 module.exports['fail'] = {
 
@@ -189,17 +191,17 @@ module.exports['helloWorld'] = {
         var system = {
             out: {
                 write: function (args, succ, fail) {
-                    console.log(args);
+                    // console.log(args);
                     test.equal(args[0], "hello, world!");
                     succ();
                 }
             }
         };
 
-        this.harness.dumpModules().then(() => {
+        // this.harness.dumpModules().then(() => {
 
             this.harness.testSuccess(test, [[], system, {}]);
-        });
+        // });
     }
 };
 

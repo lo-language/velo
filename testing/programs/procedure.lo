@@ -20,6 +20,6 @@ foo is (x) {
     reply factorial(x) / 2;
 };
 
-main is {
+main is () {
     reply foo(5);
 };

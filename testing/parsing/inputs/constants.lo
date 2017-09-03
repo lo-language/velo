@@ -5,7 +5,7 @@ name is "Bigfoot Bjornsen";
 
 game is getGame();  // todo this is grammatical but should be a compile error
 
-test is {
+test is () {
 
     // a set constant
 

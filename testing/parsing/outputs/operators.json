@@ -305,61 +305,7 @@
                                     }
                                   }
                                 },
-                                "tail": {
-                                  "type": "stmt_list",
-                                  "head": {
-                                    "type": "conditional",
-                                    "predicate": {
-                                      "type": "defined",
-                                      "expr": {
-                                        "type": "id",
-                                        "name": "bar"
-                                      }
-                                    },
-                                    "consequent": {
-                                      "type": "stmt_list",
-                                      "head": null,
-                                      "tail": null
-                                    }
-                                  },
-                                  "tail": {
-                                    "type": "stmt_list",
-                                    "head": {
-                                      "type": "conditional",
-                                      "predicate": {
-                                        "type": "undefined",
-                                        "expr": {
-                                          "type": "id",
-                                          "name": "foo"
-                                        }
-                                      },
-                                      "consequent": {
-                                        "type": "stmt_list",
-                                        "head": null,
-                                        "tail": null
-                                      }
-                                    },
-                                    "tail": {
-                                      "type": "stmt_list",
-                                      "head": {
-                                        "type": "conditional",
-                                        "predicate": {
-                                          "type": "defined",
-                                          "expr": {
-                                            "type": "id",
-                                            "name": "foo"
-                                          }
-                                        },
-                                        "consequent": {
-                                          "type": "stmt_list",
-                                          "head": null,
-                                          "tail": null
-                                        }
-                                      },
-                                      "tail": null
-                                    }
-                                  }
-                                }
+                                "tail": null
                               }
                             }
                           }

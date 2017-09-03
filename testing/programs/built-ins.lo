@@ -5,7 +5,7 @@
 
 Math is module JS::Math;
 
-main is {
+main is () {
 
     reply Math.cos(Math.PI);
 };

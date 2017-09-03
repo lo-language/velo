@@ -2,7 +2,7 @@
 // optimization opportunity here to not write unnecessary continuations
 
 
-foo is {
+foo is () {
 
     reply ["Voigt", "Kampff", "machine"];
 };
@@ -11,6 +11,6 @@ main is (test) {
 
     foo -> (result) {
 
-        test.equal(result, ["Voigt", "Kampff", "machine"]);
+        test.equal <- (result, ["Voigt", "Kampff", "machine"]);
     }
 };

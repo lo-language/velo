@@ -26,12 +26,8 @@
                 "right": {
                   "type": "coercion",
                   "expr": {
-                    "type": "coercion",
-                    "expr": {
-                      "type": "id",
-                      "name": "name"
-                    },
-                    "coerce": "string"
+                    "type": "id",
+                    "name": "name"
                   },
                   "coerce": "string"
                 }
@@ -61,37 +57,33 @@
                   "right": {
                     "type": "coercion",
                     "expr": {
-                      "type": "concat",
-                      "left": {
-                        "type": "concat",
-                        "left": {
-                          "type": "coercion",
-                          "expr": {
-                            "type": "id",
-                            "name": "name"
-                          },
-                          "coerce": "string"
-                        },
-                        "right": {
-                          "type": "string",
-                          "val": ", I can't do "
-                        }
-                      },
-                      "right": {
-                        "type": "coercion",
-                        "expr": {
-                          "type": "id",
-                          "name": "action"
-                        },
-                        "coerce": "string"
-                      }
+                      "type": "id",
+                      "name": "name"
                     },
                     "coerce": "string"
                   }
                 },
                 "right": {
-                  "type": "string",
-                  "val": "."
+                  "type": "concat",
+                  "left": {
+                    "type": "concat",
+                    "left": {
+                      "type": "string",
+                      "val": ", I can't do "
+                    },
+                    "right": {
+                      "type": "coercion",
+                      "expr": {
+                        "type": "id",
+                        "name": "action"
+                      },
+                      "coerce": "string"
+                    }
+                  },
+                  "right": {
+                    "type": "string",
+                    "val": "."
+                  }
                 }
               }
             },
@@ -114,55 +106,51 @@
                     "right": {
                       "type": "coercion",
                       "expr": {
-                        "type": "concat",
-                        "left": {
-                          "type": "concat",
-                          "left": {
-                            "type": "coercion",
-                            "expr": {
-                              "type": "id",
-                              "name": "a"
-                            },
-                            "coerce": "string"
-                          },
-                          "right": {
-                            "type": "string",
-                            "val": ", B = "
-                          }
-                        },
-                        "right": {
-                          "type": "concat",
-                          "left": {
-                            "type": "concat",
-                            "left": {
-                              "type": "coercion",
-                              "expr": {
-                                "type": "id",
-                                "name": "b"
-                              },
-                              "coerce": "string"
-                            },
-                            "right": {
-                              "type": "string",
-                              "val": ", C = "
-                            }
-                          },
-                          "right": {
-                            "type": "coercion",
-                            "expr": {
-                              "type": "id",
-                              "name": "c"
-                            },
-                            "coerce": "string"
-                          }
-                        }
+                        "type": "id",
+                        "name": "a"
                       },
                       "coerce": "string"
                     }
                   },
                   "right": {
-                    "type": "string",
-                    "val": "."
+                    "type": "concat",
+                    "left": {
+                      "type": "concat",
+                      "left": {
+                        "type": "string",
+                        "val": ", B = "
+                      },
+                      "right": {
+                        "type": "coercion",
+                        "expr": {
+                          "type": "id",
+                          "name": "b"
+                        },
+                        "coerce": "string"
+                      }
+                    },
+                    "right": {
+                      "type": "concat",
+                      "left": {
+                        "type": "concat",
+                        "left": {
+                          "type": "string",
+                          "val": ", C = "
+                        },
+                        "right": {
+                          "type": "coercion",
+                          "expr": {
+                            "type": "id",
+                            "name": "c"
+                          },
+                          "coerce": "string"
+                        }
+                      },
+                      "right": {
+                        "type": "string",
+                        "val": "."
+                      }
+                    }
                   }
                 }
               },
@@ -172,26 +160,58 @@
                   "type": "assign",
                   "left": {
                     "type": "id",
-                    "name": "foo"
+                    "name": "message4"
                   },
                   "right": {
-                    "type": "coercion",
-                    "expr": {
-                      "type": "op",
-                      "op": "+",
+                    "type": "concat",
+                    "left": {
+                      "type": "concat",
                       "left": {
-                        "type": "id",
-                        "name": "bar"
+                        "type": "string",
+                        "val": ""
                       },
                       "right": {
-                        "type": "id",
-                        "name": "baz"
+                        "type": "coercion",
+                        "expr": {
+                          "type": "id",
+                          "name": "name"
+                        },
+                        "coerce": "string"
                       }
                     },
-                    "coerce": "string"
+                    "right": {
+                      "type": "string",
+                      "val": ""
+                    }
                   }
                 },
-                "tail": null
+                "tail": {
+                  "type": "stmt_list",
+                  "head": {
+                    "type": "assign",
+                    "left": {
+                      "type": "id",
+                      "name": "foo"
+                    },
+                    "right": {
+                      "type": "coercion",
+                      "expr": {
+                        "type": "op",
+                        "op": "+",
+                        "left": {
+                          "type": "id",
+                          "name": "bar"
+                        },
+                        "right": {
+                          "type": "id",
+                          "name": "baz"
+                        }
+                      },
+                      "coerce": "string"
+                    }
+                  },
+                  "tail": null
+                }
               }
             }
           }

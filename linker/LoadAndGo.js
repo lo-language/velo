@@ -63,7 +63,6 @@ __.prototype.run = function (args) {
 
             var d = Q.defer();
 
-            console.error('RUNNING   ' + this.rootModuleId);
             Task.sendRootRequest(mainService, args, d.resolve.bind(d), d.reject.bind(d));
 
             return d.promise;

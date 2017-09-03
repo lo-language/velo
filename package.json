@@ -11,6 +11,8 @@
   "dependencies": {
     "antlr4": "^4.7.0",
     "minimist": "^1.2.0",
+    "moo": "^0.4.1",
+    "nearley": "^2.11.0",
     "q": ""
   },
   "devDependencies": {

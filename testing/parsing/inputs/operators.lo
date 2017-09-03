@@ -1,4 +1,4 @@
-test is {
+test is () {
 
     qux = 2 + foo * bar / -2 + baz % ((age - 4));
     num++;
@@ -19,13 +19,4 @@ test is {
     result = base >< person.getName();
 
     bar = assertions.passed + assertions.failed;
-
-    if bar exists {
-    }
-
-    if foo undefined {
-    }
-
-    if foo defined {
-    }
 };
