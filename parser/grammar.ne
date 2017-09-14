@@ -66,12 +66,6 @@
 
         if (tok) {
 
-            // hack around a lexer bug?
-            if (tok.type == 'interp_begin' && tok.value == '`' ||
-                tok.type == 'string' && tok.value == '"') {
-                    tok.value = '';
-            }
-
             switch (tok.type) {
 
                 case 'ws':
@@ -234,7 +228,6 @@ exprList -> expr ("," expr):*                           {% function (d) {
                                                             return [d[0]].concat(d[1].map(function (item) {return item[1];}));
                                                         } %}
 
-# if we wanted to make commas optional everywhere we could just drop them, like whitespace
 literal
     ->  %bool                                       {% function (d) { return new Lo.boolean(d[0].value === 'true'); } %}
     |   %number                                     {% function (d) { return new Lo.number(d[0].value); } %}

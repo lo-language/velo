@@ -70,12 +70,6 @@ function id(x) {return x[0]; }
 
         if (tok) {
 
-            // hack around a lexer bug?
-            if (tok.type == 'interp_begin' && tok.value == '`' ||
-                tok.type == 'string' && tok.value == '"') {
-                    tok.value = '';
-            }
-
             switch (tok.type) {
 
                 case 'ws':
