@@ -18,6 +18,8 @@ const JS = require('../codegen/JsPrimitives');
 
 /**
  * A literal number
+ *
+ * @param value     a string representation of the number
  */
 var __ = function (value) {
 

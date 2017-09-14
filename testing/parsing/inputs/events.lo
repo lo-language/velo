@@ -1,8 +1,0 @@
-test is {
-
-    timeStep = -<;
-
-    click is -< (x, y);
-
-    myEvent is -<;
-};

@@ -22,7 +22,7 @@ homes is {
 };
 
 // service literal
-HardyRamanujan is {
+HardyRamanujan is () {
     reply 1729;
 };
 

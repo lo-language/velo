@@ -12,6 +12,7 @@
 const fs = require('fs');
 const Q = require('q');
 const ASTBuilder = require('./../parser/ASTBuilder');
+const Parser = require('./../parser/Parser');
 const vm = require('vm');
 const EventEmitter = require('events');
 
@@ -160,14 +161,14 @@ __.prototype.acquire = function (id) {
     // read the file
     return Q.denodeify(fs.readFile)(path, 'utf8').then(source => {
 
-        process.stderr.write("PARSING   " + id);
+        // process.stderr.write("PARSING   " + id);
 
         var start = new Date();
-        var module = new ASTBuilder().parse(source);
+        var module = new Parser().parse(source);
 
         module.setInfo(id, path);
 
-        process.stderr.write(" [" + (new Date().getTime() - start.getTime()) + "ms]\n");
+        // process.stderr.write(" [" + (new Date().getTime() - start.getTime()) + "ms]\n");
 
         return module;
     },

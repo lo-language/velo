@@ -7,9 +7,9 @@
 
 var fs = require('fs');
 var path = require('path');
-//var parser = require('../../parser/Parser');
-var ASTBulder = require('../../parser/ASTBuilder');
-var parser = new ASTBulder();
+var Parser = require('../../parser/Parser');
+// var ASTBulder = require('../../parser/ASTBuilder');
+// var parser = new ASTBulder();
 
 var EXT = '.lo';
 
@@ -28,7 +28,7 @@ files.forEach(function (filename) {
 
         var source = fs.readFileSync(__dirname + '/inputs/' + filename, 'utf8');
         var expected = fs.readFileSync(__dirname + '/outputs/' + name + '.json', 'utf8');
-        var result = parser.parse(source).getAst();
+        var result = new Parser().parse(source).getAst();
 
 
         var treeToString = function (tree) {

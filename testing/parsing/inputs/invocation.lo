@@ -1,4 +1,4 @@
-test is {
+test is () {
 
     /*
      * general form (branching construct)
@@ -8,7 +8,10 @@ test is {
     // sync with no handlers (one-way message)
 
     foo;        // how it's supposed to work in Lo
-    foo.bar();  // only supported for backwards-compatibility with programmers; should emit warning
+    foo.bar;
+
+    // todo catch instances like the below and WARN
+    //foo.bar(x);   // only supported for backwards-compatibility with programmers; should emit warning
 
     // with params
     foo <- (18);
@@ -36,11 +39,11 @@ test is {
     // async with handlers
 
     // handle success only
-    @bar <- (48) -> {
+    @bar <- (48) -> () {
         reply "hello";
     }
 
-    @bar 48 -> {
+    @bar 48 -> () {
         reply "hello";
     }
 
@@ -53,7 +56,7 @@ test is {
     async foo <- (42) -> (a, b) {
         reply "yay";
     }
-    ~> {
+    ~> () {
         reply "darn";
     }
 
@@ -61,15 +64,15 @@ test is {
     // should we support pipes like 42 -> foo -> bar -> baz?
     @foo <- (42) -> (result) {
 
-        @bar <- (result) -> {
+        @bar <- (result) -> () {
 
             yarp = @baz(result);
         }
-        ~> {
+        ~> () {
             fail "narp";
         }
     }
-    ~> {
+    ~> () {
         reply "darn";
     }
 
@@ -83,7 +86,7 @@ test is {
 
     // in expressions
 
-    foo(bar());
+    foo <- (bar());
 
     x = foo() + 7;
 

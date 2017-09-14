@@ -92,7 +92,8 @@
                           ]
                         },
                         "tail": null
-                      }
+                      },
+                      "isService": false
                     },
                     "blocking": true
                   },
@@ -132,7 +133,8 @@
                             ]
                           },
                           "tail": null
-                        }
+                        },
+                        "isService": false
                       },
                       "contingency": {
                         "type": "procedure",
@@ -152,7 +154,8 @@
                             ]
                           },
                           "tail": null
-                        }
+                        },
+                        "isService": false
                       },
                       "blocking": true
                     },
@@ -217,7 +220,8 @@
                                   ]
                                 },
                                 "tail": null
-                              }
+                              },
+                              "isService": false
                             },
                             "blocking": false
                           },
@@ -251,7 +255,8 @@
                                     ]
                                   },
                                   "tail": null
-                                }
+                                },
+                                "isService": false
                               },
                               "blocking": false
                             },
@@ -287,7 +292,8 @@
                                       ]
                                     },
                                     "tail": null
-                                  }
+                                  },
+                                  "isService": false
                                 },
                                 "blocking": false
                               },
@@ -324,7 +330,8 @@
                                         ]
                                       },
                                       "tail": null
-                                    }
+                                    },
+                                    "isService": false
                                   },
                                   "contingency": {
                                     "type": "procedure",
@@ -342,7 +349,8 @@
                                         ]
                                       },
                                       "tail": null
-                                    }
+                                    },
+                                    "isService": false
                                   },
                                   "blocking": false
                                 },
@@ -406,7 +414,8 @@
                                                 }
                                               },
                                               "tail": null
-                                            }
+                                            },
+                                            "isService": false
                                           },
                                           "contingency": {
                                             "type": "procedure",
@@ -424,12 +433,14 @@
                                                 ]
                                               },
                                               "tail": null
-                                            }
+                                            },
+                                            "isService": false
                                           },
                                           "blocking": false
                                         },
                                         "tail": null
-                                      }
+                                      },
+                                      "isService": false
                                     },
                                     "contingency": {
                                       "type": "procedure",
@@ -447,7 +458,8 @@
                                           ]
                                         },
                                         "tail": null
-                                      }
+                                      },
+                                      "isService": false
                                     },
                                     "blocking": false
                                   },

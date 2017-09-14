@@ -16,17 +16,17 @@ const net = require('net');
 
 module.exports = {
 
-    $in: {
+    in: {
 
-        $isTTY: process.stdin.isTTY,
+        isTTY: process.stdin.isTTY,
 
-        $setRawMode: function (args, succ, fail) {
+        setRawMode: function (args, succ, fail) {
 
             process.stdin.setRawMode(task.args[0]);
             succ();
         },
 
-        $listen: function (args, succ, fail) {
+        listen: function (args, succ, fail) {
 
             var service = args[0];
 
@@ -46,7 +46,7 @@ module.exports = {
             succ();
         },
 
-        $read: function (args, succ, fail) {
+        read: function (args, succ, fail) {
 
             var task = new Task(succ, fail);
 
@@ -70,37 +70,37 @@ module.exports = {
         }
     },
 
-    $out: {
+    out: {
 
-        $write: function (args, succ, fail) {
+        write: function (args, succ, fail) {
 
             process.stdout.write.apply(process.stdout, args);
             succ();
         },
 
-        $writeln: function (args, succ, fail) {
+        writeln: function (args, succ, fail) {
 
             process.stdout.write(args + '\n');
             succ();
         }
     },
 
-    $err: {
+    err: {
 
-        $write: function (args, succ, fail) {
+        write: function (args, succ, fail) {
 
             process.stderr.write.apply(process.stderr, args);
             succ();
         },
 
-        $writeln: function (args, succ, fail) {
+        writeln: function (args, succ, fail) {
 
             process.stderr.write(args + '\n');
             succ();
         }
     },
 
-    $listen: function (args, succ, fail) {
+    listen: function (args, succ, fail) {
 
 
         var task = new Task(succ, fail);
@@ -124,7 +124,7 @@ module.exports = {
     // support installation of signal handlers
     // todo -- should this be the facility that can handle halt-on-error?
 
-    $on: function (args, succ, fail) {
+    on: function (args, succ, fail) {
 
         // just call success on signal? multiple times?
 

@@ -26,7 +26,7 @@ var __ = function (params, body, isService) {
 
     this.params = params;
     this.body = body;
-    this.isService = isService; // nice hack! thanks!
+    this.isService = isService || false; // nice hack! thanks!
 };
 
 /**

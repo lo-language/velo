@@ -9,7 +9,7 @@ createGreeter is (name) {
 
         greet: (io) {
 
-            io.out.write("hello, `name`!");
+            io.out.write <- ("hello, `name`!");
         }
     );
 };

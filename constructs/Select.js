@@ -55,7 +55,7 @@ __.prototype.getTree = function () {
  */
 __.prototype.compile = function (context) {
 
-    return JS.select(this.recordExpr.compile(context), '$' + this.field);
+    return JS.select(this.recordExpr.compile(context), this.field);
 };
 
 module.exports = __;

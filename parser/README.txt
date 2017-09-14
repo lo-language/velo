@@ -1,4 +1,4 @@
-To generate the parser, configure ANTLR as follows:
+To generate the ANTLR parser, configure ANTLR as follows:
 
 - output directory: parser
 - language: JavaScript
