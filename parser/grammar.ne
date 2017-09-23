@@ -86,16 +86,23 @@
 # Pass your lexer object using the @lexer option:
 @lexer lexer
 
-module -> using:? definition:+                                      {% function (d) { return new Lo.module(d[1], d[0]); } %}
+module -> using:* definition:+                                      {% function (d) { return new Lo.module(d[1], d[0]); } %}
 
-using -> "using" dep:+ ";"                                          {% function (d) { return d[1]; } %}
+using -> "using" dep ";"                                            {% function (d) { return d[1]; } %}
 
-dep -> locator "as" %ID ",":?                                       {% function (d) {
+dep
+    ->  %ID                                                         {% function (d) {
+                                                                        return new Lo.constant(d[0].value,
+                                                                            new Lo.moduleRef(null, d[0].value));
+                                                                    } %}
+    |   locator "as" %ID                                            {% function (d) {
                                                                         return new Lo.constant(d[2].value, d[0]);
                                                                     } %}
 
 # only supports a single-step namespace for now
-locator -> (%ID "::"):? %ID                                         {% function (d) {
+locator
+    ->  %string                                                     {% function (d) { return new Lo.moduleRef(null, d[0].value); } %}
+    |   (%ID "::"):? %ID                                            {% function (d) {
                                                     return new Lo.moduleRef(d[0] ? d[0][0].value : null, d[1].value); } %}
 
 statementList

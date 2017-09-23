@@ -361,10 +361,10 @@ module.exports["modules"] = {
                 name: 'Math',
                 value: { type: 'modref', namespace: null, id: 'Math' } });
 
-        test.deepEqual(new Parser("dep").parse('Math as Math').getAst(),
+        test.deepEqual(new Parser("dep").parse('"./Math.lo" as Math').getAst(),
             { type: 'constant',
                 name: 'Math',
-                value: { type: 'modref', namespace: null, id: 'Math' } });
+                value: { type: 'modref', namespace: null, id: './Math.lo' } });
 
         test.deepEqual(new Parser("dep").parse('JS::Math as Math').getAst(),
             { type: 'constant',

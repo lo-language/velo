@@ -87,19 +87,20 @@ function id(x) {return x[0]; }
 var grammar = {
     Lexer: lexer,
     ParserRules: [
-    {"name": "module$ebnf$1", "symbols": ["using"], "postprocess": id},
-    {"name": "module$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "module$ebnf$1", "symbols": []},
+    {"name": "module$ebnf$1", "symbols": ["module$ebnf$1", "using"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "module$ebnf$2", "symbols": ["definition"]},
     {"name": "module$ebnf$2", "symbols": ["module$ebnf$2", "definition"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "module", "symbols": ["module$ebnf$1", "module$ebnf$2"], "postprocess": function (d) { return new Lo.module(d[1], d[0]); }},
-    {"name": "using$ebnf$1", "symbols": ["dep"]},
-    {"name": "using$ebnf$1", "symbols": ["using$ebnf$1", "dep"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "using", "symbols": [{"literal":"using"}, "using$ebnf$1", {"literal":";"}], "postprocess": function (d) { return d[1]; }},
-    {"name": "dep$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
-    {"name": "dep$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "dep", "symbols": ["locator", {"literal":"as"}, (lexer.has("ID") ? {type: "ID"} : ID), "dep$ebnf$1"], "postprocess":  function (d) {
+    {"name": "using", "symbols": [{"literal":"using"}, "dep", {"literal":";"}], "postprocess": function (d) { return d[1]; }},
+    {"name": "dep", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID)], "postprocess":  function (d) {
+            return new Lo.constant(d[0].value,
+                new Lo.moduleRef(null, d[0].value));
+        } },
+    {"name": "dep", "symbols": ["locator", {"literal":"as"}, (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess":  function (d) {
             return new Lo.constant(d[2].value, d[0]);
         } },
+    {"name": "locator", "symbols": [(lexer.has("string") ? {type: "string"} : string)], "postprocess": function (d) { return new Lo.moduleRef(null, d[0].value); }},
     {"name": "locator$ebnf$1$subexpression$1", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID), {"literal":"::"}]},
     {"name": "locator$ebnf$1", "symbols": ["locator$ebnf$1$subexpression$1"], "postprocess": id},
     {"name": "locator$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},

@@ -1,6 +1,5 @@
-using
-Moon as Moon,
-NPM::HTTP as HTTP;
+using Moon;
+using NPM::HTTP as HTTP;
 
 name is "Bigfoot Bjornsen";
 
