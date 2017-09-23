@@ -1,5 +1,6 @@
-Moon is module;
-HTTP is module NPM::HTTP;
+using
+Moon as Moon,
+NPM::HTTP as HTTP;
 
 name is "Bigfoot Bjornsen";
 

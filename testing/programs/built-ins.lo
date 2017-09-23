@@ -3,7 +3,7 @@
  * 12/25/14
  */
 
-Math is module JS::Math;
+using JS::Math as Math;
 
 main is () {
 

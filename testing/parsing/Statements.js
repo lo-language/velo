@@ -356,17 +356,17 @@ module.exports["modules"] = {
 
     "module deps": function (test) {
 
-        test.deepEqual(new Parser("dependency").parse('Math is module;').getAst(),
+        test.deepEqual(new Parser("dep").parse('Math as Math').getAst(),
             { type: 'constant',
                 name: 'Math',
                 value: { type: 'modref', namespace: null, id: 'Math' } });
 
-        test.deepEqual(new Parser("dependency").parse('Math is module Math;').getAst(),
+        test.deepEqual(new Parser("dep").parse('Math as Math').getAst(),
             { type: 'constant',
                 name: 'Math',
                 value: { type: 'modref', namespace: null, id: 'Math' } });
 
-        test.deepEqual(new Parser("dependency").parse('Math is module JS::Math;').getAst(),
+        test.deepEqual(new Parser("dep").parse('JS::Math as Math').getAst(),
             { type: 'constant',
                 name: 'Math',
                 value: { type: 'modref', namespace: 'JS', id: 'Math' } });

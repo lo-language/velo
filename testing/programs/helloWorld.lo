@@ -1,4 +1,4 @@
-Common is module;
+using Common as Common;
 
 main is (args, system) {
 
