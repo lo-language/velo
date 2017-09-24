@@ -20,11 +20,11 @@ const Future = require('../codegen/Future');
 /**
  * An identifier
  */
-var __ = function (name, line) {
+var __ = function (name, line, isLvalue) {
 
     this.name = name;
     this.line = line || '??';
-    this.isLvalue = false;
+    this.isLvalue = isLvalue || false;
 };
 
 

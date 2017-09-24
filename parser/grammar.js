@@ -29,7 +29,7 @@ function id(x) {return x[0]; }
           right_arrow:  '->',
           tilde_arrow:  '~>',
           concat:       '><',
-          PAIR_SEP:     '=>',
+          yields:       '=>',
           push_front:   '+>',
           push_back:    '<+',
           equality:     /==|!=/,
@@ -135,21 +135,17 @@ var grammar = {
         } },
     {"name": "statement$ebnf$1", "symbols": ["async"], "postprocess": id},
     {"name": "statement$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "statement$subexpression$2", "symbols": ["handlers"]},
-    {"name": "statement$subexpression$2", "symbols": [{"literal":";"}]},
-    {"name": "statement", "symbols": ["statement$ebnf$1", "expr", {"literal":"<-"}, {"literal":"("}, "exprList", {"literal":")"}, "statement$subexpression$2"], "postprocess":  function (d) {
+    {"name": "statement", "symbols": ["statement$ebnf$1", "expr", {"literal":"<-"}, {"literal":"("}, "exprList", {"literal":")"}, "handlers"], "postprocess":  function (d) {
             return new Lo.requestStmt(d[1], d[4],
-                d[6][0][0], d[6][0][1], d[0] == null);
+                d[6][0], d[6][1], d[0] == null);
         } },
     {"name": "statement$ebnf$2", "symbols": ["async"], "postprocess": id},
     {"name": "statement$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "statement$ebnf$3", "symbols": ["exprList"], "postprocess": id},
     {"name": "statement$ebnf$3", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "statement$subexpression$3", "symbols": ["handlers"]},
-    {"name": "statement$subexpression$3", "symbols": [{"literal":";"}]},
-    {"name": "statement", "symbols": ["statement$ebnf$2", "expr", "statement$ebnf$3", "statement$subexpression$3"], "postprocess":  function (d) {
+    {"name": "statement", "symbols": ["statement$ebnf$2", "expr", "statement$ebnf$3", "handlers"], "postprocess":  function (d) {
             return new Lo.requestStmt(d[1], d[2] || [],
-                d[3][0][0], d[3][0][1], d[0] == null);
+                d[3][0], d[3][1], d[0] == null);
         } },
     {"name": "statement", "symbols": [{"literal":"while"}, "expr", "block"], "postprocess": function (d) {return new Lo.while(d[1], d[2]);}},
     {"name": "statement", "symbols": [{"literal":"scan"}, "expr", {"literal":"->"}, "proc"], "postprocess": function (d) {return new Lo.scan(d[1], d[3]);}},
@@ -172,9 +168,13 @@ var grammar = {
     {"name": "definition$subexpression$1", "symbols": [{"literal":"is"}]},
     {"name": "definition$subexpression$1", "symbols": [{"literal":"are"}]},
     {"name": "definition", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID), "definition$subexpression$1", "expr", {"literal":";"}], "postprocess": function (d) {return new Lo.constant(d[0].value, d[2]);}},
+    {"name": "handlers", "symbols": [{"literal":";"}], "postprocess": function (d) { return [null, null]; }},
+    {"name": "handlers", "symbols": ["assignHandler", {"literal":";"}], "postprocess": function (d) { return [d[0], null]; }},
+    {"name": "handlers", "symbols": ["assignHandler", "failHandler"]},
     {"name": "handlers", "symbols": ["replyHandler"], "postprocess": function (d) { return [d[0], null]; }},
     {"name": "handlers", "symbols": ["failHandler"], "postprocess": function (d) { return [null, d[0]]; }},
     {"name": "handlers", "symbols": ["replyHandler", "failHandler"]},
+    {"name": "assignHandler", "symbols": [{"literal":"=>"}, (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess": function (d) { return new Lo.yields(new Lo.identifier(d[1].value)); }},
     {"name": "replyHandler", "symbols": [{"literal":"->"}, "proc"], "postprocess": function (d) { return d[1]; }},
     {"name": "failHandler", "symbols": [{"literal":"~>"}, "proc"], "postprocess": function (d) { return d[1]; }},
     {"name": "conditional", "symbols": [{"literal":"if"}, "expr", "block"], "postprocess": function (d) { return new Lo.conditional(d[1], d[2]); }},
@@ -253,7 +253,7 @@ var grammar = {
     {"name": "literal$ebnf$2$subexpression$2", "symbols": ["field", "literal$ebnf$2$subexpression$2$ebnf$1"]},
     {"name": "literal$ebnf$2", "symbols": ["literal$ebnf$2", "literal$ebnf$2$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "literal", "symbols": [{"literal":"("}, "literal$ebnf$2", {"literal":")"}], "postprocess": function (d) { return new Lo.compound(d[1].map(function (field) {return field[0];})); }},
-    {"name": "literal", "symbols": [{"literal":"{"}, (lexer.has("PAIR_SEP") ? {type: "PAIR_SEP"} : PAIR_SEP), {"literal":"}"}], "postprocess": function (d) { return new Lo.mapLiteral([]); }},
+    {"name": "literal", "symbols": [{"literal":"{"}, {"literal":"=>"}, {"literal":"}"}], "postprocess": function (d) { return new Lo.mapLiteral([]); }},
     {"name": "literal$ebnf$3$subexpression$1$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
     {"name": "literal$ebnf$3$subexpression$1$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "literal$ebnf$3$subexpression$1", "symbols": ["pair", "literal$ebnf$3$subexpression$1$ebnf$1"]},
@@ -280,7 +280,7 @@ var grammar = {
                 d[3]);
         } },
     {"name": "field", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID), {"literal":":"}, "expr"], "postprocess": function (d) { return new Lo.field(d[0].value, d[2]); }},
-    {"name": "pair", "symbols": ["expr", (lexer.has("PAIR_SEP") ? {type: "PAIR_SEP"} : PAIR_SEP), "expr"], "postprocess": function (d) { return new Lo.pair(d[0], d[2]); }},
+    {"name": "pair", "symbols": ["expr", {"literal":"=>"}, "expr"], "postprocess": function (d) { return new Lo.pair(d[0], d[2]); }},
     {"name": "proc$ebnf$1", "symbols": ["paramList"], "postprocess": id},
     {"name": "proc$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "proc", "symbols": [{"literal":"("}, "proc$ebnf$1", {"literal":")"}, "block"], "postprocess": function (d) { return new Lo.procedure(d[1] ? d[1] : [], d[3]); }},

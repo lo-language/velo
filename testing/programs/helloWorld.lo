@@ -2,6 +2,8 @@ using Common as Common;
 
 main is (args, system) {
 
+    //     Common.createGreeter <- ("world") => greeter;
+
     greeter = Common.createGreeter("world");
 
     greeter.greet system;

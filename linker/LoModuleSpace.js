@@ -46,7 +46,7 @@ __.prototype.getModules = function () {
             // params: string, delimiter
             // returns: array
 
-            $split: function (args, succ, fail) {
+            split: function (args, succ, fail) {
 
                 // we want to return an array of one element, which is an array of strings
                 succ([String(args[0]).split("\n")]);
@@ -58,7 +58,7 @@ __.prototype.getModules = function () {
             // params: string, delimiter
             // returns: array
 
-            $createServer: function (args, succ, fail) {
+            createServer: function (args, succ, fail) {
 
                 var task = new Task(succ, fail);
 
@@ -68,18 +68,18 @@ __.prototype.getModules = function () {
 
                 var result = {
 
-                    $onRequest: function (args, succ, fail) {
+                    onRequest: function (args, succ, fail) {
 
                         // here's a fun abuse
                         server.on('request', function (req, res) {
 
                             var newReq = {
 
-                                $method: req.method,
+                                method: req.method,
 
-                                $url: req.url,
+                                url: req.url,
 
-                                $respond: function (args, succ, fail) {
+                                respond: function (args, succ, fail) {
 
                                     res.writeHead(args[0]);
                                     res.end(args[1]);

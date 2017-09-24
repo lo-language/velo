@@ -217,26 +217,26 @@ module.exports["iteration"] = {
 
 module.exports["requests"] = {
 
-    // "plain style, no handlers": function (test) {
-    //
-    //     test.deepEqual(new Parser("statement").parse('foo bar;').getAst(),
-    //         { type: 'request_stmt',
-    //             address: { type: 'id', name: 'foo' },
-    //             args: [ { type: 'id', name: 'bar' } ],
-    //             subsequent: undefined,
-    //             contingency: undefined,
-    //             blocking: true });
-    //
-    //     test.deepEqual(new Parser("statement").parse('@foo bar;').getAst(),
-    //         { type: 'request_stmt',
-    //             address: { type: 'id', name: 'foo' },
-    //             args: [ { type: 'id', name: 'bar' } ],
-    //             subsequent: undefined,
-    //             contingency: undefined,
-    //             blocking: false });
-    //
-    //     test.done();
-    // },
+    "plain style, no handlers": function (test) {
+
+        test.deepEqual(new Parser("statement").parse('foo bar;').getAst(),
+            { type: 'request_stmt',
+                address: { type: 'id', name: 'foo' },
+                args: [ { type: 'id', name: 'bar' } ],
+                subsequent: undefined,
+                contingency: undefined,
+                blocking: true });
+
+        test.deepEqual(new Parser("statement").parse('@foo bar;').getAst(),
+            { type: 'request_stmt',
+                address: { type: 'id', name: 'foo' },
+                args: [ { type: 'id', name: 'bar' } ],
+                subsequent: undefined,
+                contingency: undefined,
+                blocking: false });
+
+        test.done();
+    },
 
     "arrow style, no handlers": function (test) {
 
@@ -254,6 +254,70 @@ module.exports["requests"] = {
                 args: [ { type: 'id', name: 'bar' } ],
                 subsequent: undefined,
                 contingency: undefined,
+                blocking: false });
+
+        test.done();
+    },
+
+    "arrow style with yields": function (test) {
+
+        test.deepEqual(new Parser("statement").parse('foo <- (bar) => baz;').getAst(),
+            { type: 'request_stmt',
+                address: { type: 'id', name: 'foo' },
+                args: [ { type: 'id', name: 'bar' } ],
+                subsequent: { type: 'yields', target: { type: 'id', name: 'baz' } },
+                contingency: undefined,
+                blocking: true });
+
+        test.deepEqual(new Parser("statement").parse('@foo <- (bar) => baz;').getAst(),
+            { type: 'request_stmt',
+                address: { type: 'id', name: 'foo' },
+                args: [ { type: 'id', name: 'bar' } ],
+                subsequent: { type: 'yields', target: { type: 'id', name: 'baz' } },
+                contingency: undefined,
+                blocking: false });
+
+        test.done();
+    },
+
+    "arrow style with yields and fail handler": function (test) {
+
+        test.deepEqual(new Parser("statement").parse('foo <- (bar) => baz ~> (error) {}').getAst(),
+            { type: 'request_stmt',
+                address: { type: 'id', name: 'foo' },
+                args: [ { type: 'id', name: 'bar' } ],
+                subsequent: { type: 'yields', target: { type: 'id', name: 'baz' } },
+                contingency: {
+                    "body": {
+                        "type": "stmt_list",
+                        "head": null,
+                        "tail": null
+                    },
+                    "isService": false,
+                    "params": [
+                        "error"
+                    ],
+                    "type": "procedure"
+                },
+                blocking: true });
+
+        test.deepEqual(new Parser("statement").parse('@foo <- (bar) => baz ~> (error) {}').getAst(),
+            { type: 'request_stmt',
+                address: { type: 'id', name: 'foo' },
+                args: [ { type: 'id', name: 'bar' } ],
+                subsequent: { type: 'yields', target: { type: 'id', name: 'baz' } },
+                contingency: {
+                    "body": {
+                        "type": "stmt_list",
+                        "head": null,
+                        "tail": null
+                    },
+                    "isService": false,
+                    "params": [
+                        "error"
+                    ],
+                    "type": "procedure"
+                },
                 blocking: false });
 
         test.done();

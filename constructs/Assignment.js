@@ -28,6 +28,7 @@ var __ = function (left, right) {
     this.left = left;
     this.right = right;
 
+    // todo now this is an ugly hack, right here
     if (typeof left.setLvalue == 'function') {
         left.setLvalue();
     }

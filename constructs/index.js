@@ -46,5 +46,6 @@ module.exports = {
     string: require("./String"),
     subscript: require("./Subscript"),
     unaryOpExpr: require("./UnaryOpExpr"),
-    while: require("./While")
+    while: require("./While"),
+    yields: require("./Yields")
 };

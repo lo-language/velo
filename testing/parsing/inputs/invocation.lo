@@ -23,6 +23,11 @@ test is () {
         substitute "ok";
     }
 
+    // yields operator
+    foo => bar ~> (err) {
+        fail "d'oh!";
+    }
+
     // sync with both handlers
     user.login <- (password) -> (result) {
         reply "ok";
