@@ -76,6 +76,23 @@ __.prototype.getTree = function () {
     ];
 };
 
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param context
+ */
+__.prototype.compileHeadFirst = function (context) {
+
+    // why do we compile tail-first?
+    // it's so we know what's coming, right?
+
+    var head = this.head ? this.head.compile(context) : null;
+    var tail = this.tail ? this.tail.compile(context) : null;
+
+    var result = JS.stmtList(head, context.getFollowing());
+};
+
 /**
  * Compiles this node to JS in the given context.
  *

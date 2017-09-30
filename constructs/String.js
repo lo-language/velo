@@ -73,4 +73,20 @@ __.prototype.compile = function (context) {
     return JS.string(this.value);
 };
 
+
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * todo break these out into their own classes?
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    return JS.string(this.value);
+};
+
 module.exports = __;

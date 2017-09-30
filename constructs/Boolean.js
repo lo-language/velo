@@ -58,11 +58,22 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * todo break these out into their own classes?
- *
  * @param context
  */
 __.prototype.compile = function (context) {
+
+    return JS.bool(this.value ? 'true' : 'false');
+};
+
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
 
     return JS.bool(this.value ? 'true' : 'false');
 };

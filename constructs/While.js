@@ -83,4 +83,44 @@ __.prototype.compile = function (context) {
 };
 
 
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    var condition = this.cond.compile2(sourceCtx, targetCtx);
+
+    // create a branch context here for the loop body
+
+    var bc = new BranchContext(sourceCtx);
+    var body = this.body.compile2(bc, targetCtx);
+
+    // test both the current context and the loop-body context for discontinuities
+    // in either the loop condition or the loop body, respectively
+
+    if (sourceCtx.isContinuous() && bc.isContinuous()) {
+
+        // no discontinuities in the loop at all, compile to a target language loop
+        return JS.while(condition, body);
+    }
+
+    // gotta do it the hard way
+
+    var loop = sourceCtx.createAsyncLoop(condition, body);
+
+    var loopCall = JS.stmtList(JS.exprStmt(
+        JS.fnCall(JS.ID("setImmediate"), [JS.runtimeCall('doAsync', [loop.id])])));
+
+    // connect the body to the loop entry point to create the loop
+    bc.connect(loopCall);
+
+    return JS.stmtList(loop.def, JS.stmtList(JS.exprStmt(JS.fnCall(loop.id, []))));
+};
+
+
 module.exports = __;

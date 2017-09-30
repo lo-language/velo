@@ -71,4 +71,26 @@ __.prototype.compile = function (context) {
     }
 };
 
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    var left = this.left.compile2(sourceCtx, targetCtx);
+    var right = this.right.compile2(sourceCtx, targetCtx);
+
+    // todo probably want to add some runtime checks
+
+    if (this.op == 'push-front') {
+        return JS.exprStmt(JS.fnCall(JS.select(right, 'unshift'), [left]));
+    }
+    else {
+        return JS.exprStmt(JS.fnCall(JS.select(left, 'push'), [right]));
+    }
+};
+
 module.exports = __;

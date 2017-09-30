@@ -77,4 +77,27 @@ __.prototype.compile = function (context) {
     return JS.utilCall('concat', [left, right]);
 };
 
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    const left = this.left.compile2(sourceCtx, targetCtx);
+    const right = this.right.compile2(sourceCtx, targetCtx);
+
+    // see if we know the type at compile time
+    if (this.left.hasType && this.left.hasType('string')
+        && this.right.hasType && this.right.hasType('string')) {
+        return JS.add(left, right);
+    }
+
+    // kick it to the runtime
+    return JS.utilCall('concat', [left, right]);
+};
+
 module.exports = __;

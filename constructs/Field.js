@@ -63,4 +63,19 @@ __.prototype.compile = function (context) {
     return [JS.string(this.label), this.value.compile(context)];
 };
 
+
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    // we don't qualify field labels
+    return [JS.string(this.label), this.value.compile2(sourceCtx, targetCtx)];
+};
+
 module.exports = __;

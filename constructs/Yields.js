@@ -84,4 +84,36 @@ __.prototype.compile = function (context) {
         JS.assign(target, JS.subscript(JS.ID('res'), JS.num('0')), '=')));
 };
 
+
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    var target = this.target.compile2(sourceCtx, targetCtx);
+
+    // not DRY -- duplicates logic from Assignment...
+    // if the LHS is a bare ID...
+
+    var name = this.target.name;
+
+    // validate we're not assigning to a constant
+    if (sourceCtx.isConstant(name)) {
+        sourceCtx.attachError(this.left, "can't assign to a constant (" + name + ")");
+    }
+
+    // declare if a new var
+    if (sourceCtx.has(name) == false) {
+        sourceCtx.declare(name);
+    }
+
+    return JS.fnDef(['res'], JS.stmtList(
+        JS.assign(target, JS.subscript(JS.ID('res'), JS.num('0')), '=')));
+};
+
 module.exports = __;

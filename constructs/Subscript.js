@@ -72,4 +72,30 @@ __.prototype.compile = function (context) {
     return JS.subscript(array, index);
 };
 
+
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    var array = this.array.compile2(sourceCtx, targetCtx);
+    var index = this.index.compile2(sourceCtx, targetCtx);
+
+    // support negative subscripts if the subscript is a literal
+    // to do this more generally we'd have to catch it at runtime, probably with splice
+    if (this.index instanceof Number && parseInt(this.index.getValue()) < 0) {
+        index = JS.add(JS.select(array, 'length'), index);
+    }
+
+    // todo - what if the list expression is a request or somesuch? can't resolve it twice
+    // wrap it in a helper function?
+
+    return JS.subscript(array, index);
+};
+
 module.exports = __;

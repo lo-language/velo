@@ -82,4 +82,37 @@ __.prototype.compile = function (context) {
     return JS.ID('$' + this.name);
 };
 
+
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    // see if the identifier is defined
+
+    if (sourceCtx.has(this.name)) {
+
+        // if we're a constant, do the old switcheroo
+        if (sourceCtx.isModule(this.name)) {
+
+            // console.log('compiling', this.name, context.resolve(this.name).renderJs());
+            return sourceCtx.resolve(this.name);
+        }
+
+        return JS.ID('$' + this.name);
+    }
+
+    // of course, we need to see inside a conditional to know if it's been defined...
+    if (this.isLvalue == false) {
+        sourceCtx.attachError(this, "identifier \"" + this.name + "\" used but not bound in this context");
+    }
+
+    return JS.ID('$' + this.name);
+};
+
 module.exports = __;

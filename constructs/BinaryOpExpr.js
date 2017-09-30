@@ -66,17 +66,68 @@ __.prototype.compile = function (context) {
     var left = this.left.compile(context);
     var right = this.right.compile(context);
 
-//    todo - make sure both sides are defined
-//    could relax this if we want to allow declaration after usage
-//    should also factor this out into a getValue() maybe
+    var op = this.op;
 
-//    if (node.left.jsVal === undefined) {
-//        throw new Error("left operand not defined");
-//    }
-//
-//    if (node.right.jsVal === undefined) {
-//        throw new Error("right operand not defined");
-//    }
+    switch (op) {
+
+        case 'concat':
+            return JS.utilCall('concat', [left, right]);
+
+        case 'and':
+            return JS.logicalAnd(left, right);
+
+        case 'or':
+            return JS.logicalOr(left, right);
+
+        case '==':
+            return JS.strictEqual(left, right);
+
+        case '!=':
+            return JS.notEqual(left, right);
+
+        case '<':
+            return JS.lt(left, right);
+
+        case '>':
+            return JS.gt(left, right);
+
+        case '<=':
+            return JS.lte(left, right);
+
+        case '>=':
+            return JS.gte(left, right);
+
+        case '+':
+            return JS.utilCall('add', [left, right]);
+
+        case '-':
+            return JS.sub(left, right);
+
+        case '*':
+            return JS.mul(left, right);
+
+        case '/':
+            return JS.div(left, right);
+
+        case '%':
+            return JS.mod(left, right);
+    }
+
+    throw new Error("unknown operator: " + op);
+};
+
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    var left = this.left.compile2(sourceCtx, targetCtx);
+    var right = this.right.compile2(sourceCtx, targetCtx);
 
     var op = this.op;
 

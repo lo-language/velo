@@ -13,6 +13,8 @@
 
 const JS = require('../codegen/JsPrimitives');
 const Context = require('../codegen/Context');
+const SourceContext = require('../codegen/SourceContext');
+const JsContext = require('../codegen/JsContext');
 const vm = require('vm');
 
 /**
@@ -104,6 +106,66 @@ __.prototype.compile = function (registry, errorListener) {
     }
 
     var exports = context.getConstants().map(c => {
+        return [JS.string(c.name), JS.ID('$' + c.name)];
+    });
+
+    // try a return here, see if it works
+    stmts.attach(JS.stmtList(
+        JS.return(
+            JS.objLiteral(exports)
+        )
+    ));
+
+    return stmts;
+};
+
+
+
+
+/**
+ * Compiles this module to JS.
+ *
+ * Compiling a module discovers its dependencies.
+ */
+__.prototype.compile2 = function (registry, errorListener) {
+
+    var loContext = new SourceContext();
+    var jsContext = new JsContext();
+
+    loContext.setRegistry(registry);
+    loContext.setErrorListener(errorListener);
+
+    // todo another compensating hack because of compiling tail-first
+    // compile all the deps right here
+
+    this.deps.forEach(function (dep) {
+
+        // ignore the return value, which is just a no-op
+        dep.compile2(loContext, jsContext);
+    });
+
+    var t = this;
+
+    function compileDefs (idx) {
+
+        if (idx < t.defs.length) {
+
+            return JS.stmtList(
+                t.defs[idx].compile2(loContext, jsContext),
+                compileDefs(idx + 1));
+        }
+
+        return null;
+    }
+
+    var stmts = compileDefs(0);
+
+    // bail if we had errors
+    if (loContext.hasErrors()) {
+        throw new Error("compilation failed");
+    }
+
+    var exports = loContext.getConstants().map(c => {
         return [JS.string(c.name), JS.ID('$' + c.name)];
     });
 

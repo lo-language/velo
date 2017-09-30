@@ -70,4 +70,21 @@ __.prototype.compile = function (context) {
     throw new Error('we only coerce to strings at the moment, baby');
 };
 
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    if (this.type == 'string') {
+        return JS.fnCall(JS.ID('String'), [this.expr.compile2(sourceCtx, targetCtx)]);
+    }
+
+    throw new Error('we only coerce to strings at the moment, baby');
+};
+
 module.exports = __;

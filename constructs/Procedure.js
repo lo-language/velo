@@ -96,4 +96,49 @@ __.prototype.compile = function (context) {
     return JS.fnDef(this.isService ? ['args', 'succ', 'fail'] : ['args'], body);
 };
 
+
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    // push a new scope onto the scope stack
+    var localCtx = sourceCtx.createInner(this.isService);
+
+    // load params into symbol table
+    this.params.forEach(name => localCtx.declare(name));
+
+    // compile the statement(s) in the context of the local scope
+    var body = this.body.compile2(localCtx, targetCtx);
+
+    // bind values to our params
+    // todo unpacking args like this might be a significant perf hit
+    for (var i = this.params.length - 1; i >= 0; i--) {
+        body = JS.stmtList(JS.exprStmt(JS.assign(JS.ID('$' + this.params[i]), JS.subscript(JS.ID('args'), JS.num(String(i))))), body);
+    }
+
+    // declare our local vars
+    var localVars = localCtx.getJsVars();
+
+    if (localVars.length > 0) {
+        body = JS.stmtList(JS.varDeclMulti(localVars), body);
+    }
+
+    if (this.isService) {
+
+        // define the task object var task = new Task();
+        body = JS.stmtList(JS.varDecl('task', JS.new('Task', [JS.ID('succ'), JS.ID('fail')])), body);
+
+        // decide if we need to exit -- doesn't matter in handlers
+        body.attach(JS.stmtList(JS.exprStmt(JS.runtimeCall('deactivate', []))));
+    }
+
+    return JS.fnDef(this.isService ? ['args', 'succ', 'fail'] : ['args'], body);
+};
+
 module.exports = __;

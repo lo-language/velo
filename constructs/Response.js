@@ -83,4 +83,43 @@ __.prototype.compile = function (context) {
     return JS.stmtList(response, JS.stmtList(JS.return()));
 };
 
+
+
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    if (sourceCtx.canRespond() == false) {
+        throw new Error("can't respond from this context");
+    }
+
+    var args = JS.arrayLiteral(this.args.map(arg => arg.compile2(sourceCtx, targetCtx)));
+
+    var response = this.type == 'reply' ?
+        JS.exprStmt(JS.runtimeCall('succ', [args])) :
+        JS.exprStmt(JS.runtimeCall('fail', [args]));
+
+    // a response should compile to a non-appendable JS stmt list
+
+    var following = sourceCtx.getFollowing();
+
+    // if the following is a connector, include it, otherwise we can drop it
+    sourceCtx.setFollowing(null);
+
+    if (following == null) {
+        return response;
+    }
+
+    // only if we're in a non-async branch context do we need the return
+    // if the following is an async connector, we don't need the return
+
+    return JS.stmtList(response, JS.stmtList(JS.return()));
+};
+
 module.exports = __;

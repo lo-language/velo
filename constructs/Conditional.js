@@ -101,4 +101,43 @@ __.prototype.compile = function (context) {
     return JS.cond(predicate, consequent, alternate);
 };
 
+
+
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    // if one branch is async we need to make a continuation and call it from both branches
+
+    var predicate = this.predicate.compile2(sourceCtx, targetCtx);
+
+    var bc = new BranchContext(sourceCtx);
+    var consequent = this.consequent.compile2(bc, targetCtx);
+
+    // we can use the same branch context for both branches
+    if (this.alternate) {
+        var alternate = this.alternate.compile2(bc, targetCtx);
+    }
+    else if (bc.isDiscontinuous()) {
+
+        // we've wrapped our tail in a continuation so
+        // it needs to be called in the alternate branch as well
+
+        alternate = bc.getConnector();
+    }
+
+    // todo - push into BC?
+    if (bc.isDiscontinuous()) {
+        bc.connect();
+    }
+
+    return JS.cond(predicate, consequent, alternate);
+};
+
 module.exports = __;

@@ -59,4 +59,22 @@ __.prototype.compile = function (context) {
 };
 
 
+
+
+/**
+ * Compiles this module reference to JS.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile = function (sourceCtx, targetCtx) {
+
+    // will throw if namespace is unknown
+    sourceCtx.registry.include(this.namespace || '__local', this.id);
+
+    // module namespaces are injected as globals at load-time
+    // todo revisit in terms of target context manipulation
+    return JS.select(JS.ID(this.namespace || '__local'), this.id);
+};
+
 module.exports = __;

@@ -123,4 +123,72 @@ __.prototype.compile = function (context) {
                 this.address.compile(context), JS.arrayLiteral(args), replyHandler, failHandler]));
 };
 
+
+
+
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    var args = this.args.map(arg => {
+        return arg.compile2(sourceCtx, targetCtx);
+    });
+
+    if (this.blocking == false) {
+
+        return JS.exprStmt(
+            JS.runtimeCall('sendAsync', [
+                this.address.compile2(sourceCtx, targetCtx), JS.arrayLiteral(args),
+                this.replyHandler ? this.replyHandler.compile2(sourceCtx, targetCtx) : JS.NULL,
+                this.failHandler ? this.failHandler.compile2(sourceCtx, targetCtx) : JS.NULL
+            ]));
+    }
+
+    if (sourceCtx.getFollowing() == null) {
+
+        return JS.exprStmt(
+            JS.runtimeCall('sendAndBlock', [
+                this.address.compile2(sourceCtx, targetCtx), JS.arrayLiteral(args),
+                this.replyHandler ? this.replyHandler.compile2(sourceCtx, targetCtx) : JS.NULL,
+                this.failHandler ? this.failHandler.compile2(sourceCtx, targetCtx) : JS.NULL
+            ]));
+    }
+
+    // add the continuation to each handler or if there's no
+    // handler, just use the continuation as the branch
+
+    var replyHandler, failHandler;
+
+    var contRef = sourceCtx.wrapFollowing();
+
+    var contCall = contRef ? JS.stmtList(JS.exprStmt(JS.fnCall(contRef, []))) : null;
+
+    // we just drop in the call as the connector since we know the branches are async
+    var bc = new BranchContext(sourceCtx, contCall);
+
+    if (this.replyHandler) {
+        replyHandler = this.replyHandler.compile2(bc, targetCtx);
+    }
+    else {
+        replyHandler = contRef || JS.NULL;
+    }
+
+    if (this.failHandler) {
+        failHandler = this.failHandler.compile2(bc, targetCtx);
+    }
+    else {
+        failHandler = contRef || JS.NULL;
+    }
+
+    return JS.exprStmt(
+        JS.runtimeCall('sendAndBlock', [
+            this.address.compile2(sourceCtx, targetCtx), JS.arrayLiteral(args), replyHandler, failHandler]));
+};
+
 module.exports = __;

@@ -58,4 +58,18 @@ __.prototype.compile = function (context) {
     return [this.key.compile(context), this.value.compile(context)];
 };
 
+
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    return [this.key.compile2(sourceCtx, targetCtx), this.value.compile2(sourceCtx, targetCtx)];
+};
+
 module.exports = __;

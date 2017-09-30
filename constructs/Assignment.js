@@ -98,4 +98,49 @@ __.prototype.compile = function (context) {
 
 };
 
+
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    var left = this.left.compile2(sourceCtx, targetCtx);
+    var right = this.right.compile2(sourceCtx, targetCtx);
+
+    // todo this implies block-level scoping
+
+    // if the LHS is a bare ID...
+    if (this.left instanceof Identifier) {
+
+        var name = this.left.name;
+
+        // validate we're not assigning to a constant
+        if (sourceCtx.isConstant(name)) {
+            sourceCtx.attachError(this.left, "can't assign to a constant (" + name + ")");
+        }
+
+        // declare if a new var
+        if (sourceCtx.has(name) == false) {
+            sourceCtx.declare(name);
+            targetCtx.declare(name);
+        }
+
+        // see if the RHS is a dispatch
+        // if (this.right.type == 'message') {
+        //     context.setFuture(name);
+        // }
+    }
+
+    return JS.exprStmt(JS.assign(left, right));
+
+    // this was genius
+    // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP
+
+};
+
 module.exports = __;

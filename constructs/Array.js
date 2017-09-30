@@ -58,4 +58,18 @@ __.prototype.compile = function (context) {
     }));
 };
 
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    return JS.arrayLiteral(
+        this.elements.map(item => {
+            return item.compile2(sourceCtx, targetCtx);
+        }));
+};
+
 module.exports = __;

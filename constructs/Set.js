@@ -66,4 +66,31 @@ __.prototype.compile = function (context) {
     ]);
 };
 
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    var elements = this.elements.map(item => {
+        return [item.compile2(sourceCtx, targetCtx), JS.bool(true)];
+    });
+
+    // tag this object as a Lo set
+    // we can get away with this because Object.defineProperty returns the object we give it :-)
+
+    return JS.fnCall(
+        JS.select(JS.ID('Object'), 'defineProperty'), [
+            JS.objLiteral(elements),
+            JS.string("__LO_SET"),
+            JS.objLiteral([
+                [JS.ID('value'), JS.bool("true")]
+            ])
+        ]);
+};
+
 module.exports = __;

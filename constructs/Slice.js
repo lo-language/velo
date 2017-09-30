@@ -79,4 +79,27 @@ __.prototype.compile = function (context) {
     );
 };
 
+
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    // lean on JS slice since it has the same semantics
+
+    var list = this.array.compile2(sourceCtx, targetCtx);
+    var start = this.start ? this.start.compile2(sourceCtx, targetCtx) : JS.num('0');
+    var end = this.end ? this.end.compile2(sourceCtx, targetCtx) : null;
+
+    return JS.fnCall(
+        JS.select(list, 'slice'),
+        end ? [start, JS.add(end, JS.num('1'))] : [start]
+    );
+};
+
 module.exports = __;

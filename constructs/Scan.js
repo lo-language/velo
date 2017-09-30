@@ -60,4 +60,20 @@ __.prototype.compile = function (context) {
     return JS.exprStmt(JS.utilCall('scan', [this.over.compile(context), this.into.compile(context)]));
 };
 
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    return JS.exprStmt(JS.utilCall('scan', [
+        this.over.compile2(sourceCtx, targetCtx),
+        this.into.compile2(sourceCtx, targetCtx)
+    ]));
+};
+
 module.exports = __;

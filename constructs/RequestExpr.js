@@ -76,4 +76,30 @@ __.prototype.compile = function (context) {
     return reqEnv.getRef();
 };
 
+
+
+
+/**
+ * Compiles this node to JS in the given context, injecting a wrapper into the context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    var target = this.address.compile2(sourceCtx, targetCtx);
+
+    var args = this.args.map(arg => {
+        return arg.compile2(sourceCtx, targetCtx);
+    });
+
+    // get a placeholder
+    // we push a request into the context whether sync or async
+    var reqEnv = new RequestEnv(target, args, this.blocking);
+
+    sourceCtx.pushEnv(reqEnv);
+
+    return reqEnv.getRef();
+};
+
 module.exports = __;

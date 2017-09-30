@@ -81,4 +81,21 @@ __.prototype.compile = function (context) {
         this.alternate.compile(context));
 };
 
+
+
+
+/**
+ * Compiles this node to JS in the given context.
+ *
+ * @param sourceCtx
+ * @param targetCtx
+ */
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
+
+    return JS.condExpr(
+        this.predicate.compile2(sourceCtx, targetCtx),
+        this.consequent.compile2(sourceCtx, targetCtx),
+        this.alternate.compile2(sourceCtx, targetCtx));
+};
+
 module.exports = __;
