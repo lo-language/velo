@@ -5,9 +5,9 @@
 
 "use strict";
 
+const LoContext = require('../../codegen/LoContext');
+const JsContext = require('../../codegen/JsContext');
 const Lo = require('../../constructs');
-const Context = require('../../codegen/Context');
-const JS = require('../../codegen/JsPrimitives');
 
 module.exports = {
 
@@ -18,7 +18,7 @@ module.exports = {
                 new Lo.string('hello, '),
                 new Lo.coercion(new Lo.identifier('name'))), new Lo.string('!'));
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext(), new JsContext()).renderTree(),
             [ 'add',
                 [ 'add',
                     [ 'string', 'hello, ' ],
@@ -38,7 +38,7 @@ module.exports = {
             new Lo.coercion(new Lo.identifier('action'))),
             new Lo.string('.'));
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext(), new JsContext()).renderTree(),
             [ 'add',
                 [ 'add',
                     [ 'add',
@@ -68,7 +68,7 @@ module.exports = {
                                     new Lo.coercion(new Lo.identifier('c')),
                                     new Lo.string('.')))))));
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext(), new JsContext()).renderTree(),
             [ 'add',
                 [ 'string', 'A = ' ],
                 [ 'add',

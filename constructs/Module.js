@@ -13,7 +13,7 @@
 
 const JS = require('../codegen/JsPrimitives');
 const Context = require('../codegen/Context');
-const SourceContext = require('../codegen/SourceContext');
+const LoContext = require('../codegen/LoContext');
 const JsContext = require('../codegen/JsContext');
 const vm = require('vm');
 
@@ -129,7 +129,7 @@ __.prototype.compile = function (registry, errorListener) {
  */
 __.prototype.compile2 = function (registry, errorListener) {
 
-    var loContext = new SourceContext();
+    var loContext = new LoContext();
     var jsContext = new JsContext();
 
     loContext.setRegistry(registry);

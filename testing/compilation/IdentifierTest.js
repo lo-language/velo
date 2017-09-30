@@ -6,7 +6,8 @@
 "use strict";
 
 const Lo = require('../../constructs');
-var Context = require('../../codegen/Context');
+const LoContext = require('../../codegen/LoContext');
+const JsContext = require('../../codegen/JsContext');
 
 module.exports["identifiers"] = {
 
@@ -14,7 +15,7 @@ module.exports["identifiers"] = {
 
         var node = new Lo.identifier('foo');
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext(), new JsContext()).renderTree(),
             ['id', '$foo']);
         test.done();
     },
@@ -23,7 +24,7 @@ module.exports["identifiers"] = {
 
         var node = new Lo.identifier('foo');
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext(), new JsContext()).renderTree(),
             ['id', '$foo']);
         test.done();
     }

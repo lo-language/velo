@@ -6,7 +6,9 @@
 "use strict";
 
 const Lo = require('../../constructs');
-var Context = require('../../codegen/Context');
+const LoContext = require('../../codegen/LoContext');
+const JsContext = require('../../codegen/JsContext');
+
 
 module.exports["identifiers"] = {
 
@@ -16,7 +18,7 @@ module.exports["identifiers"] = {
 
         var node = new Lo.moduleRef('Node', 'HTTP');
 
-        var context = new Context();
+        var context = new LoContext();
 
         var registry = {
             include: function (ns, id) {
@@ -28,7 +30,7 @@ module.exports["identifiers"] = {
 
         context.setRegistry(registry);
 
-        test.deepEqual(node.compile(context).renderTree(),
+        test.deepEqual(node.compile2(context, new JsContext()).renderTree(),
                     [ 'select', [ 'id', 'Node' ], 'HTTP' ]);
         test.done();
     },
@@ -39,7 +41,7 @@ module.exports["identifiers"] = {
 
         var node = new Lo.moduleRef(null, 'Moon');
 
-        var context = new Context();
+        var context = new LoContext();
 
         var registry = {
             include: function (ns, id) {
@@ -53,7 +55,7 @@ module.exports["identifiers"] = {
 
         context.define("Moon", 42);
 
-        test.deepEqual(node.compile(context).renderTree(),
+        test.deepEqual(node.compile2(context, new JsContext()).renderTree(),
                     [ 'select', [ 'id', '__local' ], 'Moon' ]);
 
         test.done();

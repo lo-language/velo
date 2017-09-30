@@ -5,8 +5,8 @@
 
 "use strict";
 
-const Context = require('../../codegen/Context');
-const JS = require('../../codegen/JsPrimitives');
+const LoContext = require('../../codegen/LoContext');
+const JsContext = require('../../codegen/JsContext');
 const Lo = require('../../constructs');
 
 module.exports["assignment"] = {
@@ -16,11 +16,11 @@ module.exports["assignment"] = {
         var node = new Lo.assign(
             new Lo.identifier('foo'), new Lo.number('57'));
 
-        var context = new Context().createInner();
+        var context = new LoContext().createInner();
 
         test.equal(context.has('foo'), false);
 
-        test.deepEqual(node.compile(context).renderTree(),
+        test.deepEqual(node.compile2(context, new JsContext()).renderTree(),
             [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ]);
 
         test.equal(context.has('foo'), true);
@@ -33,9 +33,9 @@ module.exports["assignment"] = {
             new Lo.subscript(new Lo.identifier('foo'), new Lo.identifier('bar')),
             new Lo.number('57'));
 
-        var context = new Context().createInner();
+        var context = new LoContext().createInner();
 
-        test.deepEqual(node.compile(context).renderTree(),
+        test.deepEqual(node.compile2(context, new JsContext()).renderTree(),
                 [ 'expr-stmt',
                     [ 'assign',
                         [ 'subscript', [ 'id', '$foo' ], [ 'id', '$bar' ] ],
@@ -49,10 +49,10 @@ module.exports["assignment"] = {
             new Lo.identifier('foo'),
             new Lo.identifier('bar'));
 
-        var context = new Context().createInner();
+        var context = new LoContext().createInner();
 
         test.equal(context.has('foo'), false);
-        test.deepEqual(node.compile(context).renderTree(),
+        test.deepEqual(node.compile2(context, new JsContext()).renderTree(),
             [ 'expr-stmt',
                 [ 'assign', [ 'id', '$foo' ], [ 'id', '$bar' ] ] ]);
         test.equal(context.has('foo'), true);
@@ -68,11 +68,11 @@ module.exports["assignment"] = {
             new Lo.requestExpr(new Lo.identifier('bar'), [])
         );
 
-        var context = new Context().createInner();
+        var context = new LoContext().createInner();
 
         test.equal(context.has('foo'), false);
 
-        test.deepEqual(node.compile(context).renderTree(),
+        test.deepEqual(node.compile2(context, new JsContext()).renderTree(),
             [ 'expr-stmt',
                 [ 'assign',
                     [ 'id', '$foo' ],
@@ -87,7 +87,7 @@ module.exports["assignment"] = {
         var node = new Lo.assign(
             new Lo.identifier('foo'), new Lo.number('57'));
 
-        var parent = new Context().createInner();
+        var parent = new LoContext().createInner();
 
         parent.declare('foo');
 
@@ -95,7 +95,7 @@ module.exports["assignment"] = {
 
         test.equal(context.has('foo'), true);
 
-        test.deepEqual(node.compile(context).renderTree(),
+        test.deepEqual(node.compile2(context, new JsContext()).renderTree(),
                 [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ]);
         test.deepEqual(context.getJsVars(), []);
         test.done();
@@ -106,37 +106,3 @@ module.exports["assignment"] = {
         test.done();
     }
 };
-
-// this is all sugar now
-
-// module.exports["combined assignment"] = {
-//
-//     "increment ID": function (test) {
-//
-//         var node = new Lo.incrDecr('increment', new Lo.identifier('bar'));
-//
-//         test.deepEqual(node.compile(new Context()).renderTree(),
-//             [ 'expr-stmt', [ 'inc', [ 'id', '$bar' ] ] ]);
-//         test.done();
-//     },
-//
-//     "decrement ID": function (test) {
-//
-//         var node = new Lo.incrDecr('decrement', new Lo.identifier('bar'));
-//
-//         test.deepEqual(node.compile(new Context()).renderTree(), [ 'expr-stmt', [ 'dec', [ 'id', '$bar' ] ] ]);
-//         test.done();
-//     },
-//
-//     "increment subscript": function (test) {
-//
-//         var node = new Lo.incrDecr('increment',
-//             new Lo.subscript(
-//                 new Lo.identifier('bar'), new Lo.number("1")));
-//
-//         test.deepEqual(node.compile(new Context()).renderTree(),
-//             [ 'expr-stmt',
-//                 [ 'inc', [ 'subscript', [ 'id', '$bar' ], [ 'num', '1' ] ] ] ]);
-//         test.done();
-//     },
-// };

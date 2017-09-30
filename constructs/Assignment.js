@@ -127,7 +127,7 @@ __.prototype.compile2 = function (sourceCtx, targetCtx) {
         // declare if a new var
         if (sourceCtx.has(name) == false) {
             sourceCtx.declare(name);
-            targetCtx.declare(name);
+            targetCtx.declareVar(name);
         }
 
         // see if the RHS is a dispatch

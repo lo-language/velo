@@ -5,8 +5,8 @@
 
 "use strict";
 
-const Context = require('../../codegen/Context');
-const JS = require('../../codegen/JsPrimitives');
+const LoContext = require('../../codegen/LoContext');
+const JsContext = require('../../codegen/JsContext');
 const Lo = require('../../constructs');
 
 module.exports["basics"] = {
@@ -16,9 +16,9 @@ module.exports["basics"] = {
         var node = new Lo.arrayPush('push-front',
             new Lo.string('kiwi'), new Lo.identifier('foo'));
 
-        var context = new Context().createInner();
+        var context = new LoContext().createInner();
 
-        test.deepEqual(node.compile(context).renderTree(),
+        test.deepEqual(node.compile2(context, new JsContext()).renderTree(),
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', '$foo' ], 'unshift' ],
@@ -32,9 +32,9 @@ module.exports["basics"] = {
         var node = new Lo.arrayPush('push-back',
             new Lo.identifier('foo'), new Lo.number('57'));
 
-        var context = new Context().createInner();
+        var context = new LoContext().createInner();
 
-        test.deepEqual(node.compile(context).renderTree(),
+        test.deepEqual(node.compile2(context, new JsContext()).renderTree(),
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', '$foo' ], 'push' ],

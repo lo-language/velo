@@ -5,8 +5,8 @@
 
 "use strict";
 
-const Context = require('../../codegen/Context');
-const JS = require('../../codegen/JsPrimitives');
+const LoContext = require('../../codegen/LoContext');
+const JsContext = require('../../codegen/JsContext');
 const Lo = require('../../constructs');
 
 module.exports["basics"] = {
@@ -14,11 +14,11 @@ module.exports["basics"] = {
     "simple": function (test) {
 
         var node = new Lo.yields(new Lo.identifier('foo'));
-        var context = new Context().createInner();
+        var context = new LoContext().createInner();
 
         test.equal(context.has('foo'), false);
 
-        test.deepEqual(node.compile(context).renderTree(),
+        test.deepEqual(node.compile2(context, new JsContext()).renderTree(),
             [ 'function',
                 null,
                 [ 'res' ],

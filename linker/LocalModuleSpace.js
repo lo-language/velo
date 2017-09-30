@@ -69,7 +69,7 @@ __.prototype.resolve = function (registry) {
             this.modules[moduleId] = module;
 
             try {
-                this.jsModules[moduleId] = module.compile(registry, (node, error) => {this.emit("error", moduleId, node, error);}).renderJs();
+                this.jsModules[moduleId] = module.compile2(registry, (node, error) => {this.emit("error", moduleId, node, error);}).renderJs();
             }
             catch (err) {
                 console.log(err);

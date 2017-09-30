@@ -109,7 +109,7 @@ __.prototype.compile2 = function (sourceCtx, targetCtx) {
 
     // of course, we need to see inside a conditional to know if it's been defined...
     if (this.isLvalue == false) {
-        sourceCtx.attachError(this, "identifier \"" + this.name + "\" used but not bound in this context");
+        sourceCtx.reportError(this, "identifier \"" + this.name + "\" used but not bound in this context");
     }
 
     return JS.ID('$' + this.name);

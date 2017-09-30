@@ -99,7 +99,7 @@ __.prototype.compile2 = function (sourceCtx, targetCtx) {
 
         value = this.value.compile2(sourceCtx, targetCtx);
 
-        context.define(this.name, value, true);
+        sourceCtx.define(this.name, value, true);
         return JS.NOOP;
     }
 

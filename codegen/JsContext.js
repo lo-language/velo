@@ -39,13 +39,9 @@ var __ = function (parent) {
  *
  * @param name
  */
-__.prototype.declare = function (name) {
+__.prototype.declareVar = function (name) {
 
-    if (this.isConstant(name)) {
-        throw new Error(name + " is a constant in this context");
-    }
-
-    this.symbols['@' + name] = {type: 'var', name: name};
+    this.symbols['$' + name] = {type: 'var', name: name};
 };
 
 

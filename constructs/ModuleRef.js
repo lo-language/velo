@@ -67,7 +67,7 @@ __.prototype.compile = function (context) {
  * @param sourceCtx
  * @param targetCtx
  */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
 
     // will throw if namespace is unknown
     sourceCtx.registry.include(this.namespace || '__local', this.id);
