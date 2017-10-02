@@ -6,8 +6,8 @@
 "use strict";
 
 const Lo = require('../../constructs');
-const Context = require('../../codegen/Context');
-const JS = require('../../codegen/JsPrimitives');
+const LoContext = require('../../codegen/LoContext');
+const JsContext = require('../../codegen/JsContext');
 const util = require('util');
 
 module.exports["blocking calls"] = {
@@ -24,7 +24,7 @@ module.exports["blocking calls"] = {
                 true))]);
 
         // compile with a nice service context
-        var result = new Lo.stmtList(node).compile(new Context().createInner(true));
+        var result = new Lo.stmtList(node).compile2(new LoContext().createInner(true), new JsContext());
 
         test.deepEqual(result.renderTree(),
             [ 'stmtList',
@@ -60,7 +60,7 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile(new Context()).renderTree(),
+        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsContext()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -89,7 +89,7 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile(new Context()).renderTree(),
+        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsContext()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -120,7 +120,7 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile(new Context()).renderTree(),
+        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsContext()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -177,7 +177,7 @@ module.exports["blocking calls"] = {
                             [ 'arrayLiteral', [ [ 'id', 'res0' ], [ 'id', 'res1' ] ] ], [ 'null' ] ] ] ] ],
         ];
 
-        test.deepEqual(new Lo.stmtList(node).compile(new Context()).renderTree(),
+        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsContext()).renderTree(),
             [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',

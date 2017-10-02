@@ -87,19 +87,16 @@ __.prototype.compile = function (context) {
  */
 __.prototype.compile2 = function (sourceCtx, targetCtx) {
 
-    var target = this.address.compile2(sourceCtx, targetCtx);
+    var address = this.address.compile2(sourceCtx, targetCtx);
 
     var args = this.args.map(arg => {
         return arg.compile2(sourceCtx, targetCtx);
     });
 
     // get a placeholder
-    // we push a request into the context whether sync or async
-    var reqEnv = new RequestEnv(target, args, this.blocking);
+    var tempVar = targetCtx.pushRequest(address, args);
 
-    sourceCtx.pushEnv(reqEnv);
-
-    return reqEnv.getRef();
+    return tempVar;
 };
 
 module.exports = __;

@@ -13,6 +13,8 @@
 
 const JS = require('../codegen/JsPrimitives');
 const BranchContext = require('../codegen/BranchContext');
+const JsContext = require('../codegen/JsContext');
+
 const Assignment = require('./Assignment');
 const Identifier = require('./Identifier');
 const Constant = require('./Constant');
@@ -207,75 +209,13 @@ __.prototype.compile2 = function (sourceCtx, targetCtx) {
     // so compiling the tail is recursive iteration and compiling the head is the base case
     // hooray for Lisp!
 
-    var tail = null;
-    var connector = sourceCtx.getConnector();
+    // create a nested target context here for the head
+    var stmtCtx = new JsContext(targetCtx);
 
-    // todo this is a big fat hack due to compiling tail-first so we have to have duplicat logic here
-    // look for a defacto declaration
-    if (this.head instanceof Assignment &&
-        this.head.left instanceof Identifier) {
+    var head = this.head ? this.head.compile2(sourceCtx, stmtCtx) : null;
+    var tail = this.tail ? this.tail.compile2(sourceCtx, targetCtx) : null;
 
-        var name = this.head.left.name;
-
-        if (sourceCtx.isConstant(name)) {
-            sourceCtx.attachError(this.head.left, "can't assign to a constant (" + name + ")");
-        }
-        else if (sourceCtx.has(name) == false) {
-
-            // declare if a new var
-            // need to check if exists in case defined in outer scope
-
-            sourceCtx.declare(name);
-        }
-    }
-
-    if (this.head instanceof Constant) {
-        head = this.head.compile2(sourceCtx, targetCtx);
-    }
-
-    // if there's a tail, compile it first
-    // todo this creates a bug because var declarations aren't seen yet
-    if (this.tail) {
-        tail = this.tail.compile2(sourceCtx, targetCtx);
-    }
-    else if (connector) {
-
-        // a connector is a chunk of code that carries control flow from one stack to another
-        // it can be a function call or a no-op to just let statements flow naturally
-
-        // a connector is already a stmt list so it doesn't need to be wrapped in one
-        tail = connector;
-    }
-
-    // tell the context about the following statements, in case the head statement wants to wrap them in a continuation
-    // todo if we compile the head first, we'd have to push a context to wrap the tail?
-    sourceCtx.setFollowing(tail);
-
-    var head = head || (this.head ? this.head.compile2(sourceCtx, targetCtx) : null);
-    var result;
-
-    // some Lo statements compile to multiple JS stmts;
-    // we assume they'll grab the tail and attach it to themselves
-
-    if (head && head.isStmtList) {
-        result = head;
-    }
-    else {
-        result = JS.stmtList(head, sourceCtx.getFollowing());
-    }
-
-    // pop any wrapping environments off
-
-    var popEnv = function (stmtList) {
-
-        if (sourceCtx.envs.length == 0) {
-            return stmtList;
-        }
-
-        return popEnv(JS.stmtList(sourceCtx.envs.pop().wrap(stmtList)));
-    };
-
-    return popEnv(result);
+    return stmtCtx.popRequests(JS.stmtList(head, tail));
 };
 
 module.exports = __;
