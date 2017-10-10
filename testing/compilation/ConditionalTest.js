@@ -5,8 +5,8 @@
 
 "use strict";
 
-var Context = require('../../codegen/Context');
-var JS = require('../../codegen/JsPrimitives');
+var LoContext = require('../../codegen/LoContext');
+var JsContext = require('../../codegen/JsContext');
 var util = require('util');
 const Lo = require('../../constructs');
 
@@ -28,7 +28,7 @@ module.exports["sync"] = {
             )
         );
 
-        test.deepEqual(node.compile(new Context().createInner()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext().createInner(), new JsContext()).renderTree(),
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
@@ -57,7 +57,7 @@ module.exports["sync"] = {
             )
         );
 
-        test.deepEqual(node.compile(new Context().createInner()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext().createInner(), new JsContext()).renderTree(),
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
@@ -97,7 +97,7 @@ module.exports["sync"] = {
             )
         );
 
-        test.deepEqual(node.compile(new Context().createInner()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext().createInner(), new JsContext()).renderTree(),
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
@@ -128,11 +128,11 @@ module.exports["async"] = {
                     new Lo.assign( new Lo.identifier('bar'), new Lo.requestExpr(new Lo.identifier('foo'), []))
                 )
             ),
-        new Lo.stmtList(
-            new Lo.assign( new Lo.identifier('baz'), new Lo.identifier('ball'))
-        ));
+            new Lo.stmtList(
+                new Lo.assign( new Lo.identifier('baz'), new Lo.identifier('ball'))
+            ));
 
-        test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList',
+        test.deepEqual(node.compile2(new LoContext(), new JsContext()).renderTree(), [ 'stmtList',
             [ 'if',
                 [ 'id', '$foo' ],
                 [ 'stmtList',
@@ -160,7 +160,7 @@ module.exports["async"] = {
                         [ 'expr-stmt',
                             [ 'assign', [ 'id', '$baz' ], [ 'id', '$ball' ] ] ] ] ] ] ]);
 
-        // test.equal(new Context().createInner().compile(node).renderTree(),
+        // test.equal(new Context().createInner().compile2(node).renderTree(),
         //     "var cont0 = function () {};if ($foo) {task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\n$bar = P0;\ncont0();}, null);\n\n}\n\nelse {cont0();}\n\n");
         test.done();
     },
@@ -184,7 +184,7 @@ module.exports["async"] = {
     //         true
     //     );
     //
-    //     test.deepEqual(node.compile(new Context().createInner()).renderJs(), "");
+    //     test.deepEqual(node.compile2(new Context().createInner()).renderJs(), "");
     //     test.done();
     // }
 
@@ -217,7 +217,7 @@ module.exports["async"] = {
 //                 tail: null}
 //         };
 //
-//         test.equal(new Context().createInner().compile(node).renderTree(),
+//         test.equal(new Context().createInner().compile2(node).renderTree(),
 //             'if ($foo) {task.respond("reply", [42]);\nreturn;}\n\n');
 //         test.done();
 //     }

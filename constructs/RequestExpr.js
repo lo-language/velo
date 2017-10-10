@@ -13,7 +13,6 @@
 
 const RequestEnv = require('../codegen/RequestEnv');
 
-
 /**
  * A "function call" (request) expression
  *
@@ -69,7 +68,7 @@ __.prototype.compile = function (context) {
 
     // get a placeholder
     // we push a request into the context whether sync or async
-    var reqEnv = new RequestEnv(target, args, this.blocking);
+    var reqEnv = new RequestEnv(target, args, this.block);
 
     context.pushEnv(reqEnv);
 
@@ -93,10 +92,8 @@ __.prototype.compile2 = function (sourceCtx, targetCtx) {
         return arg.compile2(sourceCtx, targetCtx);
     });
 
-    // get a placeholder
-    var tempVar = targetCtx.pushRequest(address, args);
-
-    return tempVar;
+    // gets a temp var and returns it
+    return targetCtx.pushRequest(address, args, this.block);
 };
 
 module.exports = __;

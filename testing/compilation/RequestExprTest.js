@@ -142,7 +142,6 @@ module.exports["blocking calls"] = {
 
     "with nested requests": function (test) {
 
-
         var node = new Lo.assign(
             new Lo.identifier('baz'),
             new Lo.requestExpr(

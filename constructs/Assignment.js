@@ -127,13 +127,8 @@ __.prototype.compile2 = function (sourceCtx, targetCtx) {
         // declare if a new var
         if (sourceCtx.has(name) == false) {
             sourceCtx.declare(name);
-            targetCtx.declareVar(name);
+            // targetCtx.declareVar(name); // todo - get JS vars from target ctx, not source ctx
         }
-
-        // see if the RHS is a dispatch
-        // if (this.right.type == 'message') {
-        //     context.setFuture(name);
-        // }
     }
 
     return JS.exprStmt(JS.assign(left, right));

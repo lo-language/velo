@@ -78,23 +78,6 @@ __.prototype.getTree = function () {
     ];
 };
 
-
-/**
- * Compiles this node to JS in the given context.
- *
- * @param context
- */
-// __.prototype.compileHeadFirst = function (context) {
-//
-//     // why do we compile tail-first?
-//     // it's so we know what's coming, right?
-//
-//     var head = this.head ? this.head.compile(context) : null;
-//     var tail = this.tail ? this.tail.compile(context) : null;
-//
-//     var result = JS.stmtList(head, context.getFollowing());
-// };
-
 /**
  * Compiles this node to JS in the given context.
  *
@@ -196,7 +179,6 @@ __.prototype.append = function (stmtList) {
 
 
 
-
 /**
  * Compiles this node to JS in the given context.
  *
@@ -205,17 +187,20 @@ __.prototype.append = function (stmtList) {
  */
 __.prototype.compile2 = function (sourceCtx, targetCtx) {
 
-    // this is a recursive iteration on a recursive data structure: stmtlist -> (stmt, stmtlist)
-    // so compiling the tail is recursive iteration and compiling the head is the base case
-    // hooray for Lisp!
+    var localCtx = new JsContext(targetCtx);
 
-    // create a nested target context here for the head
-    var stmtCtx = new JsContext(targetCtx);
+    var head = this.head ? this.head.compile2(sourceCtx, localCtx) : null;
+    var tail = null;
 
-    var head = this.head ? this.head.compile2(sourceCtx, stmtCtx) : null;
-    var tail = this.tail ? this.tail.compile2(sourceCtx, targetCtx) : null;
+    if (this.tail) {
 
-    return stmtCtx.popRequests(JS.stmtList(head, tail));
+        // if there were branches created by the head and control flow is broken,
+        // we'll need to create a continuation
+
+        tail = localCtx.joinBranches(this.tail.compile2(sourceCtx, localCtx));
+    }
+
+    return localCtx.popRequests(JS.stmtList(head, tail));
 };
 
 module.exports = __;

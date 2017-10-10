@@ -14,6 +14,8 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const JsContext = require('../codegen/JsContext');
+
 const BranchContext = require('../codegen/BranchContext');
 
 
@@ -113,28 +115,18 @@ __.prototype.compile = function (context) {
  */
 __.prototype.compile2 = function (sourceCtx, targetCtx) {
 
-    // if one branch is async we need to make a continuation and call it from both branches
-
     var predicate = this.predicate.compile2(sourceCtx, targetCtx);
 
-    var bc = new BranchContext(sourceCtx);
-    var consequent = this.consequent.compile2(bc, targetCtx);
+    var trueBranch = targetCtx.branch();
+    var consequent = this.consequent.compile2(sourceCtx, trueBranch);
 
-    // we can use the same branch context for both branches
+    trueBranch.setContent(consequent);
+
     if (this.alternate) {
-        var alternate = this.alternate.compile2(bc, targetCtx);
-    }
-    else if (bc.isDiscontinuous()) {
+        var falseBranch = targetCtx.branch();
+        var alternate = this.alternate.compile2(sourceCtx, falseBranch);
 
-        // we've wrapped our tail in a continuation so
-        // it needs to be called in the alternate branch as well
-
-        alternate = bc.getConnector();
-    }
-
-    // todo - push into BC?
-    if (bc.isDiscontinuous()) {
-        bc.connect();
+        falseBranch.setContent(alternate);
     }
 
     return JS.cond(predicate, consequent, alternate);

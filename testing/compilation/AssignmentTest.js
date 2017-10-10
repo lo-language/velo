@@ -7,6 +7,7 @@
 
 const LoContext = require('../../codegen/LoContext');
 const JsContext = require('../../codegen/JsContext');
+const StmtContext = require('../../codegen/StmtContext');
 const Lo = require('../../constructs');
 
 module.exports["assignment"] = {
@@ -72,7 +73,7 @@ module.exports["assignment"] = {
 
         test.equal(context.has('foo'), false);
 
-        test.deepEqual(node.compile2(context, new JsContext()).renderTree(),
+        test.deepEqual(node.compile2(context, new StmtContext()).renderTree(),
             [ 'expr-stmt',
                 [ 'assign',
                     [ 'id', '$foo' ],

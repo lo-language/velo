@@ -371,7 +371,8 @@ JS.stmtList = (head, tail) => {
         },
 
         isStmtList: true,
-        
+
+        // should this take a stmt instead?
         attach: function (stmtList) {
 
             if (tail) {
