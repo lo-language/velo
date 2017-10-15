@@ -12,8 +12,8 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const JsStmt = require('../codegen/JsStmt');
 const BranchContext = require('../codegen/BranchContext');
-const JsContext = require('../codegen/JsContext');
 
 const Assignment = require('./Assignment');
 const Identifier = require('./Identifier');
@@ -178,29 +178,38 @@ __.prototype.append = function (stmtList) {
 
 
 
-
 /**
  * Compiles this node to JS in the given context.
  *
  * @param sourceCtx
- * @param targetCtx
+ * @param prevStmt
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile2 = function (sourceCtx, prevStmt) {
 
-    var localCtx = new JsContext(targetCtx);
+    var stmt = new JsStmt();
+    prevStmt.setNext(stmt); // do we need to do this, or could we do it with the retval?
 
-    var head = this.head ? this.head.compile2(sourceCtx, localCtx) : null;
+    var head = this.head ? this.head.compile2(sourceCtx, stmt) : null;
     var tail = null;
 
+    stmt.setStatement(head);
+
     if (this.tail) {
+
+        // ignore retval because tail will add itself to the control flow graph
+        this.tail.compile2(sourceCtx, stmt);
 
         // if there were branches created by the head and control flow is broken,
         // we'll need to create a continuation
 
-        tail = localCtx.joinBranches(this.tail.compile2(sourceCtx, localCtx));
+        // tail = stmtNode.joinBranches(this.tail.compile2(sourceCtx, stmtNode));
     }
 
-    return localCtx.popRequests(JS.stmtList(head, tail));
+    // could alternatively wrap the head then attach the tail...
+
+
+    // might be stmtNode, might not (if some wrappers were created)
+    return prevStmt.next;
 };
 
 module.exports = __;

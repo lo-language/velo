@@ -14,7 +14,7 @@
 const JS = require('../codegen/JsPrimitives');
 const Context = require('../codegen/Context');
 const LoContext = require('../codegen/LoContext');
-const JsContext = require('../codegen/JsContext');
+const JsBlock = require('../codegen/JsBlock');
 const vm = require('vm');
 
 /**
@@ -130,7 +130,7 @@ __.prototype.compile = function (registry, errorListener) {
 __.prototype.compile2 = function (registry, errorListener) {
 
     var loContext = new LoContext();
-    var jsContext = new JsContext();
+    var JsStmtList = new JsStmtList();
 
     loContext.setRegistry(registry);
     loContext.setErrorListener(errorListener);
@@ -141,7 +141,7 @@ __.prototype.compile2 = function (registry, errorListener) {
     this.deps.forEach(function (dep) {
 
         // ignore the return value, which is just a no-op
-        dep.compile2(loContext, jsContext);
+        dep.compile2(loContext, JsStmtList);
     });
 
     var t = this;
@@ -151,7 +151,7 @@ __.prototype.compile2 = function (registry, errorListener) {
         if (idx < t.defs.length) {
 
             return JS.stmtList(
-                t.defs[idx].compile2(loContext, jsContext),
+                t.defs[idx].compile2(loContext, JsStmtList),
                 compileDefs(idx + 1));
         }
 

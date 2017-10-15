@@ -7,7 +7,7 @@
 
 const Lo = require('../../constructs');
 const LoContext = require('../../codegen/LoContext');
-const JsContext = require('../../codegen/JsContext');
+const JsBlock = require('../../codegen/JsBlock');
 const util = require('util');
 
 module.exports["blocking calls"] = {
@@ -23,8 +23,9 @@ module.exports["blocking calls"] = {
                 ],
                 true))]);
 
-        // compile with a nice service context
-        var result = new Lo.stmtList(node).compile2(new LoContext().createInner(true), new JsContext());
+        // compiling a stmt list doesn't return anything? just builds out the control flow graph
+        // why? because compilation might actually produce wrapping stmts
+        var result = new Lo.stmtList(node).compile2(new LoContext().createInner(true), new JsBlock());
 
         test.deepEqual(result.renderTree(),
             [ 'stmtList',
@@ -60,7 +61,7 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsContext()).renderTree(),
+        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsBlock()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -89,7 +90,7 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsContext()).renderTree(),
+        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsBlock()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -120,7 +121,7 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsContext()).renderTree(),
+        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsBlock()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -142,8 +143,10 @@ module.exports["blocking calls"] = {
 
     "with nested requests": function (test) {
 
+        // x = baz(foo(), bar());
+
         var node = new Lo.assign(
-            new Lo.identifier('baz'),
+            new Lo.identifier('x'),
             new Lo.requestExpr(
                 new Lo.identifier('baz'), [
                     new Lo.requestExpr(
@@ -156,27 +159,7 @@ module.exports["blocking calls"] = {
             )
         );
 
-        var swaps = [
-            ['res0',
-                [ 'expr-stmt',
-                    [ 'call',
-                        [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
-                        [ [ 'id', '$foo' ],
-                            [ 'arrayLiteral', [ ] ], [ 'null' ] ] ] ] ],
-            ['res1',
-                [ 'expr-stmt',
-                    [ 'call',
-                        [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
-                        [ [ 'id', '$bar' ], [ 'arrayLiteral', [] ], [ 'null' ] ] ] ] ],
-            ['res2',
-                [ 'expr-stmt',
-                    [ 'call',
-                        [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
-                        [ [ 'id', '$baz' ],
-                            [ 'arrayLiteral', [ [ 'id', 'res0' ], [ 'id', 'res1' ] ] ], [ 'null' ] ] ] ] ],
-        ];
-
-        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsContext()).renderTree(),
+        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsBlock()).renderTree(),
             [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
@@ -206,7 +189,7 @@ module.exports["blocking calls"] = {
                                                             "function",
                                                             null,
                                                             [ "res2" ],
-                                                            [ "stmtList", [ "expr-stmt", [ "assign", [ "id", "$baz" ], [ "subscript", [ "id", "res2" ], [ "num", "0" ] ] ] ] ]
+                                                            [ "stmtList", [ "expr-stmt", [ "assign", [ "id", "$x" ], [ "subscript", [ "id", "res2" ], [ "num", "0" ] ] ] ] ]
                                                         ], [ "null" ] ] ] ] ] ],
                                             [ 'null' ] ] ] ] ] ],
                         [ 'null' ] ] ] ] ]);

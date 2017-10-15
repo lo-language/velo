@@ -14,7 +14,6 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const JsContext = require('../codegen/JsContext');
 
 const BranchContext = require('../codegen/BranchContext');
 
@@ -117,13 +116,13 @@ __.prototype.compile2 = function (sourceCtx, targetCtx) {
 
     var predicate = this.predicate.compile2(sourceCtx, targetCtx);
 
-    var trueBranch = targetCtx.branch();
+    var trueBranch = targetCtx.createChild();
     var consequent = this.consequent.compile2(sourceCtx, trueBranch);
 
     trueBranch.setContent(consequent);
 
     if (this.alternate) {
-        var falseBranch = targetCtx.branch();
+        var falseBranch = targetCtx.createChild();
         var alternate = this.alternate.compile2(sourceCtx, falseBranch);
 
         falseBranch.setContent(alternate);
