@@ -1,6 +1,3 @@
-To generate the ANTLR parser, configure ANTLR as follows:
+To generate the nearley parser, run:
 
-- output directory: parser
-- language: JavaScript
-- generate parse tree listener: off
-- generate parse tree visitor: on
+nearleyc grammar.ne -o grammar.js

@@ -217,26 +217,26 @@ module.exports["iteration"] = {
 
 module.exports["requests"] = {
 
-    "plain style, no handlers": function (test) {
-
-        test.deepEqual(new Parser("statement").parse('foo bar;').getAst(),
-            { type: 'request_stmt',
-                address: { type: 'id', name: 'foo' },
-                args: [ { type: 'id', name: 'bar' } ],
-                subsequent: undefined,
-                contingency: undefined,
-                blocking: true });
-
-        test.deepEqual(new Parser("statement").parse('@foo bar;').getAst(),
-            { type: 'request_stmt',
-                address: { type: 'id', name: 'foo' },
-                args: [ { type: 'id', name: 'bar' } ],
-                subsequent: undefined,
-                contingency: undefined,
-                blocking: false });
-
-        test.done();
-    },
+    // "plain style, no handlers": function (test) {
+    //
+    //     test.deepEqual(new Parser("statement").parse('foo bar;').getAst(),
+    //         { type: 'request_stmt',
+    //             address: { type: 'id', name: 'foo' },
+    //             args: [ { type: 'id', name: 'bar' } ],
+    //             subsequent: undefined,
+    //             contingency: undefined,
+    //             blocking: true });
+    //
+    //     test.deepEqual(new Parser("statement").parse('@foo bar;').getAst(),
+    //         { type: 'request_stmt',
+    //             address: { type: 'id', name: 'foo' },
+    //             args: [ { type: 'id', name: 'bar' } ],
+    //             subsequent: undefined,
+    //             contingency: undefined,
+    //             blocking: false });
+    //
+    //     test.done();
+    // },
 
     "arrow style, no handlers": function (test) {
 

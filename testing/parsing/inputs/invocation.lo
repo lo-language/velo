@@ -7,29 +7,28 @@ test is () {
 
     // sync with no handlers (one-way message)
 
-    foo;        // how it's supposed to work in Lo
-    foo.bar;
+    foo <-;        // how it's supposed to work in Lo
+    foo.bar <-;
 
     // todo catch instances like the below and WARN
     //foo.bar(x);   // only supported for backwards-compatibility with programmers; should emit warning
 
     // with params
-    foo <- (18);
-    foo 18;    // alternate style
+    foo <- 18;
 
     // sync with fail handler only
 
-    foo ~> (error) {
+    foo <- ~> (error) {
         substitute "ok";
     }
 
     // yields operator
-    foo => bar ~> (err) {
+    foo <- => bar ~> (err) {
         fail "d'oh!";
     }
 
     // sync with both handlers
-    user.login <- (password) -> (result) {
+    user.login <- password -> (result) {
         reply "ok";
     }
     ~> (error) {
@@ -37,28 +36,28 @@ test is () {
     }
 
     // async with no handlers
-    @foo;
+    @foo <-;
 
-    async sessionStore.getByID <- (sessionID);
+    async sessionStore.getByID <- sessionID;
 
     // async with handlers
 
     // handle success only
-    @bar <- (48) -> () {
+    @bar <- 48 -> () {
         reply "hello";
     }
 
-    @bar 48 -> () {
+    @bar <- 48 -> () {
         reply "hello";
     }
 
     // handle failure only
-    @baz <- (128) ~> (err) {
+    @baz <- 128 ~> (err) {
         reply "bummer";
     }
 
     // handle both success and failure
-    async foo <- (42) -> (a, b) {
+    async foo <- 42 -> (a, b) {
         reply "yay";
     }
     ~> () {
@@ -67,7 +66,7 @@ test is () {
 
     // nested requests
     // should we support pipes like 42 -> foo -> bar -> baz?
-    @foo <- (42) -> (result) {
+    @foo <- 42 -> (result) {
 
         @bar <- (result) -> () {
 
