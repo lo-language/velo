@@ -6,8 +6,7 @@
 "use strict";
 
 const LoContext = require('../../codegen/LoContext');
-const JsContext = require('../../codegen/JsContext');
-const StmtContext = require('../../codegen/StmtContext');
+const JsStmt = require('../../codegen/JsStmt');
 const Lo = require('../../constructs');
 
 module.exports["assignment"] = {
@@ -21,7 +20,7 @@ module.exports["assignment"] = {
 
         test.equal(context.has('foo'), false);
 
-        test.deepEqual(node.compile2(context, new JsContext()).renderTree(),
+        test.deepEqual(node.compile2(context, new JsStmt()).renderTree(),
             [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ]);
 
         test.equal(context.has('foo'), true);
@@ -36,7 +35,7 @@ module.exports["assignment"] = {
 
         var context = new LoContext().createInner();
 
-        test.deepEqual(node.compile2(context, new JsContext()).renderTree(),
+        test.deepEqual(node.compile2(context, new JsStmt()).renderTree(),
                 [ 'expr-stmt',
                     [ 'assign',
                         [ 'subscript', [ 'id', '$foo' ], [ 'id', '$bar' ] ],
@@ -53,7 +52,7 @@ module.exports["assignment"] = {
         var context = new LoContext().createInner();
 
         test.equal(context.has('foo'), false);
-        test.deepEqual(node.compile2(context, new JsContext()).renderTree(),
+        test.deepEqual(node.compile2(context, new JsStmt()).renderTree(),
             [ 'expr-stmt',
                 [ 'assign', [ 'id', '$foo' ], [ 'id', '$bar' ] ] ]);
         test.equal(context.has('foo'), true);
@@ -73,7 +72,7 @@ module.exports["assignment"] = {
 
         test.equal(context.has('foo'), false);
 
-        test.deepEqual(node.compile2(context, new StmtContext()).renderTree(),
+        test.deepEqual(node.compile2(context, new JsStmt()).renderTree(),
             [ 'expr-stmt',
                 [ 'assign',
                     [ 'id', '$foo' ],
@@ -96,7 +95,7 @@ module.exports["assignment"] = {
 
         test.equal(context.has('foo'), true);
 
-        test.deepEqual(node.compile2(context, new JsContext()).renderTree(),
+        test.deepEqual(node.compile2(context, new JsStmt()).renderTree(),
                 [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ]);
         test.deepEqual(context.getJsVars(), []);
         test.done();

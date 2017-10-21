@@ -373,15 +373,15 @@ JS.stmtList = (head, tail) => {
         isStmtList: true,
 
         // should this take a stmt instead?
-        attach: function (stmtList) {
-
-            if (tail) {
-                tail.attach(stmtList);
-                return;
-            }
-
-            tail = stmtList;
-        }
+        // attach: function (stmtList) {
+        //
+        //     if (tail) {
+        //         tail.attach(stmtList);
+        //         return;
+        //     }
+        //
+        //     tail = stmtList;
+        // }
     };
 };
 

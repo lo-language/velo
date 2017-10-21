@@ -5,8 +5,6 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
- * Success is finding something you really like to do and caring enough about it
- * to do it well.
  =============================================================================*/
 
 /**
@@ -25,17 +23,13 @@ const JS = require('./JsPrimitives');
 
 /**
  *
- * @param address
- * @param args
  * @param name
  */
-var __ = function (address, args, name) {
+var __ = function (name) {
 
     this.prev = null;   // previous statement node
     this.next = null;   // next stmt node
 
-    this.address = address;
-    this.args = args;
     this.name = name;
 };
 
@@ -45,6 +39,20 @@ var __ = function (address, args, name) {
  */
 __.prototype.isIntact = function () {
     return false;
+};
+
+
+/**
+ * Sets the next statement node to the given node.
+ *
+ * @param next  ControlFlowNode to follow this one
+ */
+__.prototype.setNext = function (next) {
+
+    this.next = next;
+    next.prev = this;
+
+    return next;
 };
 
 
@@ -66,39 +74,10 @@ __.prototype.append = function (stmt) {
 
 
 /**
- * Sets the next statement node to the given node.
- *
- * @param next  ControlFlowNode to follow this one
- */
-__.prototype.setNext = function (next) {
-
-    this.next = next;
-    next.prev = this;
-
-    return next;
-};
-
-
-
-/**
- * Returns the root of this stmt list (may be this statement).
- */
-__.prototype.getRoot = function () {
-
-    return this.prev ? this.prev.getRoot() : this;
-};
-
-
-
-/**
  */
 __.prototype._getStmt = function () {
 
-    return JS.stmtList(JS.exprStmt(JS.runtimeCall('sendAndBlock', [
-            this.address, JS.arrayLiteral(this.args),
-            JS.fnDef([this.name], this.next),
-            JS.NULL
-        ])));
+    return JS.stmtList(JS.exprStmt(JS.fnCall(JS.fnDef([], this.next, this.name), [])));
 };
 
 

@@ -6,7 +6,7 @@
 "use strict";
 
 const LoContext = require('../../codegen/LoContext');
-const JsContext = require('../../codegen/JsContext');
+const JsStmt = require('../../codegen/JsStmt');
 const Lo = require('../../constructs');
 
 
@@ -20,7 +20,7 @@ module.exports["slice"] = {
             new Lo.number('3')
         );
 
-        test.deepEqual(node.compile2(new LoContext(), new JsContext()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(),
             [ 'call',
                 [ 'select', [ 'id', '$foo' ], 'slice' ],
                 [ [ 'num', '1' ], [ 'add', [ 'num', '3' ], [ 'num', '1' ] ] ] ]);
@@ -34,7 +34,7 @@ module.exports["slice"] = {
             new Lo.identifier('foo')
         );
 
-        test.deepEqual(node.compile2(new LoContext(), new JsContext()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(),
             [ 'call',
                 [ 'select', [ 'id', '$foo' ], 'slice' ],
                 [ [ 'num', '0' ] ] ]);
@@ -50,7 +50,7 @@ module.exports["slice"] = {
             new Lo.number('-1')
         );
 
-        test.deepEqual(node.compile2(new LoContext(), new JsContext()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(),
             [ 'call',
                 [ 'select', [ 'id', '$foo' ], 'slice' ],
                 [ [ 'num', '-3' ], [ 'add', [ 'num', '-1' ], [ 'num', '1' ] ] ] ]);

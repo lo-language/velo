@@ -7,7 +7,7 @@
 
 const Lo = require('../../constructs');
 const LoContext = require('../../codegen/LoContext');
-const JsContext = require('../../codegen/JsContext');
+const JsStmt = require('../../codegen/JsStmt');
 
 module.exports["basics"] = {
 
@@ -19,7 +19,7 @@ module.exports["basics"] = {
             new Lo.identifier('baz')
         );
 
-        test.deepEqual(node.compile2(new LoContext(), new JsContext()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(),
             [ 'cond-expr',
                 [ 'id', '$foo' ],
                 [ 'id', '$bar' ],

@@ -11,7 +11,6 @@
 
 const fs = require('fs');
 const Q = require('q');
-const ASTBuilder = require('./../parser/ASTBuilder');
 const Parser = require('./../parser/Parser');
 const vm = require('vm');
 const EventEmitter = require('events');

@@ -14,7 +14,7 @@
 const JS = require('../codegen/JsPrimitives');
 const Context = require('../codegen/Context');
 const LoContext = require('../codegen/LoContext');
-const JsBlock = require('../codegen/JsBlock');
+const JsStmt = require('../codegen/JsStmt');
 const vm = require('vm');
 
 /**
@@ -130,7 +130,6 @@ __.prototype.compile = function (registry, errorListener) {
 __.prototype.compile2 = function (registry, errorListener) {
 
     var loContext = new LoContext();
-    var JsStmtList = new JsStmtList();
 
     loContext.setRegistry(registry);
     loContext.setErrorListener(errorListener);
@@ -141,24 +140,16 @@ __.prototype.compile2 = function (registry, errorListener) {
     this.deps.forEach(function (dep) {
 
         // ignore the return value, which is just a no-op
-        dep.compile2(loContext, JsStmtList);
+        dep.compile2(loContext);
     });
 
     var t = this;
 
-    function compileDefs (idx) {
+    var lastStmt = new JsStmt();
 
-        if (idx < t.defs.length) {
-
-            return JS.stmtList(
-                t.defs[idx].compile2(loContext, JsStmtList),
-                compileDefs(idx + 1));
-        }
-
-        return null;
-    }
-
-    var stmts = compileDefs(0);
+    this.defs.forEach(def => {
+        lastStmt = lastStmt.setNext(new JsStmt(def.compile2(loContext)));
+    });
 
     // bail if we had errors
     if (loContext.hasErrors()) {
@@ -170,13 +161,13 @@ __.prototype.compile2 = function (registry, errorListener) {
     });
 
     // try a return here, see if it works
-    stmts.attach(JS.stmtList(
+    lastStmt = lastStmt.setNext(new JsStmt(
         JS.return(
             JS.objLiteral(exports)
         )
     ));
 
-    return stmts;
+    return lastStmt.getRoot();
 };
 
 

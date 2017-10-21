@@ -7,7 +7,7 @@
 
 const Lo = require('../../constructs');
 const LoContext = require('../../codegen/LoContext');
-const JsBlock = require('../../codegen/JsBlock');
+const JsStmt = require('../../codegen/JsStmt');
 const util = require('util');
 
 module.exports["blocking calls"] = {
@@ -25,7 +25,7 @@ module.exports["blocking calls"] = {
 
         // compiling a stmt list doesn't return anything? just builds out the control flow graph
         // why? because compilation might actually produce wrapping stmts
-        var result = new Lo.stmtList(node).compile2(new LoContext().createInner(true), new JsBlock());
+        var result = new Lo.stmtList(node).compile2(new LoContext().createInner(true), new JsStmt());
 
         test.deepEqual(result.renderTree(),
             [ 'stmtList',
@@ -61,7 +61,7 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsBlock()).renderTree(),
+        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsStmt()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -90,7 +90,7 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsBlock()).renderTree(),
+        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsStmt()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -121,7 +121,7 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsBlock()).renderTree(),
+        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsStmt()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -159,7 +159,7 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsBlock()).renderTree(),
+        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new JsStmt()).renderTree(),
             [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',

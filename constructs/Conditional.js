@@ -110,22 +110,18 @@ __.prototype.compile = function (context) {
  * Compiles this node to JS in the given context.
  *
  * @param sourceCtx
- * @param targetCtx
+ * @param stmt
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile2 = function (sourceCtx, stmt) {
 
-    var predicate = this.predicate.compile2(sourceCtx, targetCtx);
+    var predicate = this.predicate.compile2(sourceCtx, stmt);
 
-    var trueBranch = targetCtx.createChild();
-    var consequent = this.consequent.compile2(sourceCtx, trueBranch);
-
-    trueBranch.setContent(consequent);
+    var consequent = this.consequent.compile2(sourceCtx, stmt);
+    stmt.addBranch(consequent);
 
     if (this.alternate) {
-        var falseBranch = targetCtx.createChild();
-        var alternate = this.alternate.compile2(sourceCtx, falseBranch);
-
-        falseBranch.setContent(alternate);
+        var alternate = this.alternate.compile2(sourceCtx, stmt);
+        stmt.addBranch(alternate);
     }
 
     return JS.cond(predicate, consequent, alternate);

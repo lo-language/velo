@@ -6,7 +6,7 @@
 "use strict";
 
 var LoContext = require('../../codegen/LoContext');
-var JsContext = require('../../codegen/JsContext');
+var JsStmt = require('../../codegen/JsStmt');
 var util = require('util');
 const Lo = require('../../constructs');
 
@@ -28,7 +28,7 @@ module.exports["sync"] = {
             )
         );
 
-        test.deepEqual(node.compile2(new LoContext().createInner(), new JsContext()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext().createInner(), new JsStmt()).renderTree(),
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
@@ -57,13 +57,18 @@ module.exports["sync"] = {
             )
         );
 
-        test.deepEqual(node.compile2(new LoContext().createInner(), new JsContext()).renderTree(),
+        var stmt = new JsStmt();
+
+        test.deepEqual(node.compile2(new LoContext().createInner(), stmt).renderTree(),
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
                         [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ],
                     [ 'stmtList',
                         [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '32' ] ] ] ] ]);
+
+        test.equal(stmt.branches.length, 2);
+
         test.done();
     },
 
@@ -97,7 +102,7 @@ module.exports["sync"] = {
             )
         );
 
-        test.deepEqual(node.compile2(new LoContext().createInner(), new JsContext()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext().createInner(), new JsStmt()).renderTree(),
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
@@ -132,7 +137,7 @@ module.exports["async"] = {
                 new Lo.assign( new Lo.identifier('baz'), new Lo.identifier('ball'))
             ));
 
-        test.deepEqual(node.compile2(new LoContext(), new JsContext()).renderTree(), [ 'stmtList',
+        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(), [ 'stmtList',
             [ 'if',
                 [ 'id', '$foo' ],
                 [ 'stmtList',

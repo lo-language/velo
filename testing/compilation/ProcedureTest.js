@@ -5,7 +5,7 @@
 
 "use strict";
 
-const Context = require('../../codegen/Context');
+const LoContext = require('../../codegen/LoContext');
 const JS = require('../../codegen/JsPrimitives');
 const Lo = require('../../constructs');
 
@@ -60,7 +60,7 @@ module.exports["service"] = {
                                 [ 'expr-stmt',
                                     [ 'call', [ 'select', [ 'id', 'task' ], 'deactivate' ], [] ] ] ] ] ] ] ] ];
 
-        test.deepEqual(node.compile(new Context()).renderTree(), result);
+        test.deepEqual(node.compile2(new LoContext()).renderTree(), result);
         test.done();
     },
 
@@ -111,7 +111,7 @@ module.exports["service"] = {
                                     [ 'expr-stmt',
                                         [ 'call', [ 'select', [ 'id', 'task' ], 'deactivate' ], [] ] ] ] ] ] ] ] ] ];
 
-        test.deepEqual(node.compile(new Context()).renderTree(), result);
+        test.deepEqual(node.compile2(new LoContext()).renderTree(), result);
         test.done();
     },
 
@@ -139,7 +139,7 @@ module.exports["service"] = {
             ),
             true);
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext()).renderTree(),
             [ 'function',
                 null,
                 [ 'args', 'succ', 'fail' ],

@@ -5,8 +5,7 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
- * Success is finding something you really like to do and caring enough about it
- * to do it well.
+ * Simplify, then add lightness. -- Colin Chapman
  =============================================================================*/
 
 /**
@@ -23,19 +22,19 @@
 
 const JS = require('./JsPrimitives');
 const JsWrapperStmt = require('./JsWrapperStmt');
+const JsContStmt = require('./JsContStmt');
 
 
 /**
  *
- * @param prev    the previous control flow node, if any
  */
-var __ = function (prev) {
+var __ = function (js) {
 
-    this.prev = prev;   // previous statement node
+    this.prev = null;   // previous statement node
     this.next = null;   // next stmt node
-    this.asyncFlow = false;
+    this.intact = true;
 
-    this.statement = null;
+    this.statement = js || null;
 
     this.reqNum = 0;
     this.branches = [];     // any branch nodes
@@ -62,6 +61,70 @@ __.prototype.setNext = function (next) {
 
     this.next = next;
     next.prev = this;
+
+    return next;
+};
+
+
+/**
+ * Returns the root of this stmt list (may be this statement).
+ */
+__.prototype.getRoot = function () {
+
+    return this.prev ? this.prev.getRoot() : this;
+};
+
+
+/**
+ * Returns true if this statement list is intact (not interrupted by an async call).
+ */
+__.prototype.isIntact = function () {
+
+    if (this.intact) {
+        return this.next ? this.next.isIntact() : true;
+    }
+
+    return false;
+};
+
+
+/**
+ * Adds a terminal statement.
+ *
+ * @param stmt
+ */
+__.prototype.append = function (stmt) {
+
+    // todo enforce we can't add to a terminal
+    // if (this.isTerminal) {}
+
+    if (this.next) {
+        return this.next.append(stmt);
+    }
+
+    // if we have any non-intact brances we need to create a continuation to wrap the next stmt
+    // and call it from each branch to unite the control flow
+    if (!this.branches.every(branch => {return branch.isIntact()})) {
+
+        // create the continuation
+        var name = "k0";
+        var cont = new JsContStmt(name);
+
+        // wire it up
+        cont.setNext(stmt);
+        this.setNext(cont);
+
+        // we call it from the mainline by just calling the cont def as an immediate value
+
+        // call it from each branch
+        // we can't share one call stmt across all branches because that messes up the wiring
+
+        this.branches.forEach(branch => {
+            branch.append(new __(JS.exprStmt(JS.fnCall(JS.ID(name), []))))});
+        return;
+    }
+
+    this.setNext(stmt);
 };
 
 
@@ -88,6 +151,32 @@ __.prototype.renderTree = function () {
 
 
 /**
+ *
+ */
+__.prototype.renderJs = function () {
+
+    if (this.statement == null) {
+        return this.next ? this.next.renderJs() : '';
+    }
+
+    try {
+        var headJs = this.statement.renderJs();
+    }
+    catch (e) {
+        headJs = 'ERROR RENDERING HEAD: ' + e.message;
+    }
+
+    try {
+        var tailJs = this.next ? this.next.renderJs() : null;
+    }
+    catch (e) {
+        tailJs = 'ERROR RENDERING TAIL';
+    }
+
+    return headJs + '\n' + (tailJs || '');
+};
+
+/**
  * Inserts a blocking request into the control flow graph between this node and its parent.
  *
  * @param address   the JS expr for the address
@@ -102,55 +191,22 @@ __.prototype.pushRequest = function (address, args) {
 
     // insert the wrapper in the control flow between this node and its parent
     // this allows us to traverse the graph to add connectors inside the wrapper
-    this.prev.setNext(wrapper);
+    if (this.prev) this.prev.setNext(wrapper);
     wrapper.setNext(this);
 
-    // this.asyncFlow = true;
+    this.intact = false;
 
     return JS.subscript(JS.ID(name), JS.num('0'));
 };
 
 
-
 /**
- *
- * @param tail
  */
-__.prototype.joinBranches = function (tail) {
+__.prototype.addBranch = function (stmt) {
 
-    // there's a correspondence between a context and a JS node that I'm not getting
-    // should a context always be a stmtlist? or either a stmtlist or a request?
-    // and should the context always have a ref to its stmts?
-    // we need to be able to travel down through the req wrappers to add joins...
-
-    if (this.branches.length > 0) {
-
-        // see if any of the branches are broken
-        var allIntact = this.branches.every(branch => {
-            return branch.isIntact;
-        });
-
-        if (allIntact) {
-            return tail;
-        }
-
-        // at least one of the branches is broken; we must wrap the tail in a continuation
-
-        var contName = 'k' + '0';
-
-        // attach the join call into all the branches
-        this.branches.forEach(branch => {
-            branch.js.attach(JS.stmtList(JS.exprStmt(JS.fnCall(JS.ID(contName), []))));
-        });
-
-        // we're done with the branches
-        this.branches = [];
-
-        return JS.stmtList(JS.fnDef([], tail, contName));
-    }
-
-    return tail;
+    this.branches.push(stmt);
 };
+
 
 
 module.exports = __;

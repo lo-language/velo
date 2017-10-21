@@ -13,6 +13,8 @@
 
 const JS = require('../codegen/JsPrimitives');
 const JsStmt = require('../codegen/JsStmt');
+const JsContStmt = require('../codegen/JsContStmt');
+
 const BranchContext = require('../codegen/BranchContext');
 
 const Assignment = require('./Assignment');
@@ -187,29 +189,25 @@ __.prototype.append = function (stmtList) {
 __.prototype.compile2 = function (sourceCtx, prevStmt) {
 
     var stmt = new JsStmt();
-    prevStmt.setNext(stmt); // do we need to do this, or could we do it with the retval?
+
+    // wire up the stmts so wrappers can be inserted between them
+    // prevStmt.setNext(stmt); // do we need to do this, or could we do it with the retval?
+
+    // base case
 
     var head = this.head ? this.head.compile2(sourceCtx, stmt) : null;
-    var tail = null;
 
     stmt.setStatement(head);
 
     if (this.tail) {
 
-        // ignore retval because tail will add itself to the control flow graph
-        this.tail.compile2(sourceCtx, stmt);
-
-        // if there were branches created by the head and control flow is broken,
-        // we'll need to create a continuation
-
-        // tail = stmtNode.joinBranches(this.tail.compile2(sourceCtx, stmtNode));
+        // recursive case
+        // call attach in case we have broken branches to fix up
+        stmt.append(this.tail.compile2(sourceCtx, stmt));
     }
 
-    // could alternatively wrap the head then attach the tail...
-
-
-    // might be stmtNode, might not (if some wrappers were created)
-    return prevStmt.next;
+    // might be stmt, might not (if some wrappers were created)
+    return stmt.getRoot();
 };
 
 module.exports = __;
