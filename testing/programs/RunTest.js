@@ -46,28 +46,28 @@ module.exports['set operations'] = {
     }
 };
 
-module.exports['exists'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(__dirname, 'exists');
-        cb();
-    },
-
-    'obj exists': function (test) {
-
-        var log = function (args, succ, fail) {
-            succ();
-        };
-
-        this.harness.testSuccess(test, [log]);
-    },
-
-    'obj not exists': function (test) {
-
-        this.harness.testFailure(test, [], 'no log!');
-    }
-};
+// module.exports['exists'] = {
+//
+//     "setUp": function (cb) {
+//
+//         this.harness = new Harness(__dirname, 'exists');
+//         cb();
+//     },
+//
+//     'obj exists': function (test) {
+//
+//         var log = function (args, succ, fail) {
+//             succ();
+//         };
+//
+//         this.harness.testSuccess(test, [log]);
+//     },
+//
+//     'obj not exists': function (test) {
+//
+//         this.harness.testFailure(test, [], 'no log!');
+//     }
+// };
 
 
 module.exports['nestedLoops'] = {

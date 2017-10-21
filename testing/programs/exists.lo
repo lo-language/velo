@@ -1,5 +1,4 @@
 /*
- * tests the semantics of fail handlers: omission means ignore
  */
 
 main is (log) {

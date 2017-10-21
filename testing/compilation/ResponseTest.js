@@ -23,22 +23,23 @@ module.exports["basics"] = {
         test.done();
     },
 
-    "reply with following stmts should omit them": function (test) {
-
-        var node = new Lo.stmtList(new Lo.response('reply'),
-            new Lo.stmtList(new Lo.assign(new Lo.identifier('x'), new Lo.number('47'))));
-
-        var result = node.compile2(new LoContext().createInner(true), new JsStmt());
-
-        test.deepEqual(result.renderTree(),
-            [ 'stmtList',
-                [ 'expr-stmt',
-                    [ 'call',
-                        [ 'select', [ 'id', 'task' ], 'succ' ],
-                        [ [ 'arrayLiteral', [] ] ] ] ],
-                [ 'stmtList', [ 'return' ] ] ]);
-        test.done();
-    },
+    // todo should also throw a compiler warning here!
+    // "reply with following stmts should omit them": function (test) {
+    //
+    //     var node = new Lo.stmtList(new Lo.response('reply'),
+    //         new Lo.stmtList(new Lo.assign(new Lo.identifier('x'), new Lo.number('47'))));
+    //
+    //     var result = node.compile2(new LoContext().createInner(true), new JsStmt());
+    //
+    //     test.deepEqual(result.renderTree(),
+    //         [ 'stmtList',
+    //             [ 'expr-stmt',
+    //                 [ 'call',
+    //                     [ 'select', [ 'id', 'task' ], 'succ' ],
+    //                     [ [ 'arrayLiteral', [] ] ] ] ],
+    //             [ 'stmtList', [ 'return' ] ] ]);
+    //     test.done();
+    // },
 
     "reply with one arg": function (test) {
 

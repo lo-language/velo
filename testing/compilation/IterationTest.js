@@ -5,9 +5,9 @@
 
 "use strict";
 
-const Context = require('../../codegen/Context');
 const JS = require('../../codegen/JsPrimitives');
 const Lo = require('../../constructs');
+const LoContext = require('../../codegen/LoContext');
 
 module.exports["basics"] = {
 
@@ -23,7 +23,7 @@ module.exports["basics"] = {
             )
         );
 
-        var result = node.compile(new Context());
+        var result = node.compile2(new LoContext());
 
         test.deepEqual(result.renderTree(),
                 [ 'while',
@@ -35,7 +35,7 @@ module.exports["basics"] = {
         node = new Lo.stmtList(node,
             new Lo.stmtList(new Lo.assign(new Lo.identifier('z'), new Lo.number('57'))));
 
-        result = node.compile(new Context());
+        result = node.compile(new LoContext());
 
         test.deepEqual(result.renderTree(),
             [ 'stmtList',
@@ -49,7 +49,7 @@ module.exports["basics"] = {
         // // try attaching another statement
         node.attach(new Lo.stmtList(new Lo.assign(new Lo.identifier('mork'), new Lo.string('ork'))));
 
-        result = node.compile(new Context());
+        result = node.compile(new LoContext());
 
         test.deepEqual(result.renderTree(),
             [ 'stmtList',
@@ -78,7 +78,7 @@ module.exports["basics"] = {
             )
         );
 
-        var a = node.compile(new Context().createInner());
+        var a = node.compile(new LoContext().createInner());
 
         test.deepEqual(a.renderTree(),
             [ 'stmtList',
@@ -172,7 +172,7 @@ module.exports["basics"] = {
             )
         );
 
-        var a = node.compile(new Context().createInner());
+        var a = node.compile(new LoContext().createInner());
 
         test.deepEqual(a.renderTree(),
             [ 'stmtList',
@@ -241,7 +241,7 @@ module.exports["basics"] = {
         //         tail: null}
         // };
         //
-        // var a = new Context().createInner().compileStmt(node);
+        // var a = new LoContext().createInner().compileStmt(node);
         //
         // test.deepEqual(a.renderTree(), [ 'stmtList',
         //     [ 'let',
@@ -323,7 +323,7 @@ module.exports["basics"] = {
     //             tail: null}
     //     };
     //
-    //     var a = new Context().createInner().compileStmt(node);
+    //     var a = new LoContext().createInner().compileStmt(node);
     //
     //     test.done();
     // }

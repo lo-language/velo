@@ -132,6 +132,10 @@ __.prototype.append = function (stmt) {
  */
 __.prototype.renderTree = function () {
 
+    if (this.statement == null) {
+        return this.next ? this.next.renderTree() : ['stmtList'];
+    }
+
     try {
         var headTree = this.statement.renderTree();
     }

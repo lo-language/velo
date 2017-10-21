@@ -15,8 +15,6 @@
 
 const JS = require('../codegen/JsPrimitives');
 
-const BranchContext = require('../codegen/BranchContext');
-
 
 /**
  * A conditional statement.

@@ -11,7 +11,6 @@
 
 "use strict";
 
-const RequestEnv = require('../codegen/RequestEnv');
 
 /**
  * A "function call" (request) expression

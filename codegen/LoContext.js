@@ -21,7 +21,6 @@
 "use strict";
 
 const JS = require('./JsPrimitives');
-const Connector = require('./Connector');
 
 
 /**

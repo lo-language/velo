@@ -5,7 +5,7 @@
 
 "use strict";
 
-const Context = require('../../codegen/Context');
+const Context = require('../../codegen/LoContext');
 const RequestEnv = require('../../codegen/RequestEnv');
 
 module.exports["basics"] = {

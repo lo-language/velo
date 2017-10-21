@@ -14,9 +14,6 @@
 const JS = require('../codegen/JsPrimitives');
 const JsStmt = require('../codegen/JsStmt');
 const JsContStmt = require('../codegen/JsContStmt');
-
-const BranchContext = require('../codegen/BranchContext');
-
 const Assignment = require('./Assignment');
 const Identifier = require('./Identifier');
 const Constant = require('./Constant');

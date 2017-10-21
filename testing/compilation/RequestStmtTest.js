@@ -5,7 +5,9 @@
 
 "use strict";
 
-const Context = require('../../codegen/Context');
+const LoContext = require('../../codegen/LoContext');
+const JsStmt = require('../../codegen/JsStmt');
+
 const JS = require('../../codegen/JsPrimitives');
 const Lo = require('../../constructs');
 
@@ -29,7 +31,7 @@ module.exports["blocking"] = {
                 true
             );
 
-        var result = node.compile(new Context());
+        var result = node.compile2(new LoContext(), new JsStmt());
 
         test.deepEqual(result.renderTree(),
                 [ 'expr-stmt',
@@ -70,7 +72,7 @@ module.exports["blocking"] = {
             new Lo.stmtList(
                 new Lo.assign(new Lo.identifier('bazball'), new Lo.number('42'))));
 
-        test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList',
+        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
@@ -115,7 +117,7 @@ module.exports["blocking"] = {
                 true
             );
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(),
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
@@ -154,7 +156,7 @@ module.exports["blocking"] = {
             new Lo.stmtList(
                 new Lo.assign(new Lo.identifier('bazball'), new Lo.number('42'))));
 
-        test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList',
+        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
@@ -207,7 +209,7 @@ module.exports["blocking"] = {
                 true
             );
 
-        test.deepEqual(reqStmt.compile(new Context()).renderTree(),
+        test.deepEqual(reqStmt.compile2(new LoContext(), new JsStmt()).renderTree(),
                 [ 'expr-stmt',
                     [ 'call',
                         [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
@@ -233,7 +235,7 @@ module.exports["blocking"] = {
             new Lo.stmtList(
                 new Lo.assign(new Lo.identifier('bazball'), new Lo.number('42'))));
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -275,7 +277,7 @@ module.exports["blocking"] = {
             true
         );
 
-        var result = reqStmt.compile(new Context());
+        var result = reqStmt.compile2(new LoContext(), new JsStmt());
 
         test.deepEqual(result.renderTree(),
                 [ 'expr-stmt',
@@ -288,7 +290,7 @@ module.exports["blocking"] = {
 
         // attach a statement - should be tucked inside the replyhandler
         result = new Lo.stmtList(reqStmt,
-            new Lo.stmtList(new Lo.assign(new Lo.identifier('foo'), new Lo.identifier('bar')))).compile(new Context());
+            new Lo.stmtList(new Lo.assign(new Lo.identifier('foo'), new Lo.identifier('bar')))).compile2(new LoContext(), new JsStmt());
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -325,7 +327,7 @@ module.exports["blocking"] = {
                 true
             ));
 
-        test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList',
+        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
@@ -366,7 +368,7 @@ module.exports["blocking"] = {
             )
         ));
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -434,7 +436,7 @@ module.exports["blocking"] = {
                 true
             ));
 
-        test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList',
+        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
             [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
@@ -497,7 +499,7 @@ module.exports["non-blocking"] = {
             false
         );
 
-        var result = node.compile(new Context());
+        var result = node.compile2(new LoContext(), new JsStmt());
 
         test.deepEqual(result.renderTree(),
             [ 'expr-stmt',
@@ -519,7 +521,7 @@ module.exports["non-blocking"] = {
             new Lo.stmtList(new Lo.assign(
                 new Lo.identifier('bazball'),
                 new Lo.number('42')
-            ))).compile(new Context());
+            ))).compile2(new LoContext(), new JsStmt());
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -560,7 +562,7 @@ module.exports["non-blocking"] = {
             false
         );
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(),
             [ 'expr-stmt',
             [ 'call',
                 [ 'select', [ 'id', 'task' ], 'sendAsync' ],
@@ -604,7 +606,7 @@ module.exports["non-blocking"] = {
             false
         );
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(),
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendAsync' ],
@@ -634,7 +636,7 @@ module.exports["non-blocking"] = {
 
         // var node = new Lo.requestStmt();
 
-        // test.deepEqual(node.compile(new Context()).renderTree(),
+        // test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(),
         //     [ 'stmtList',
         //         [ 'expr-stmt',
         //             [ 'call',

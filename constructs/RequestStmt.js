@@ -10,7 +10,6 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const BranchContext = require('../codegen/BranchContext');
 
 
 /**
@@ -143,13 +142,13 @@ __.prototype.compile2 = function (sourceCtx, targetCtx) {
  * Compiles this node to JS in the given context.
  *
  * @param sourceCtx
- * @param targetCtx
+ * @param stmt
  */
-__.prototype.compileSync = function (sourceCtx, targetCtx) {
+__.prototype.compileSync = function (sourceCtx, stmt) {
 
-    var address = this.address.compile2(sourceCtx, targetCtx);
+    var address = this.address.compile2(sourceCtx, stmt);
     var args = this.args.map(arg => {
-        return arg.compile2(sourceCtx, targetCtx);
+        return arg.compile2(sourceCtx, stmt);
     });
     var succHandler = null;
     var failHandler = null;
@@ -161,14 +160,14 @@ __.prototype.compileSync = function (sourceCtx, targetCtx) {
 
         // how do we indicate flow is broken here?
 
-        var succBranch = targetCtx.branch();
-        succHandler = this.replyHandler.compile2(sourceCtx, succBranch);
+        succHandler = this.replyHandler.compile2(sourceCtx, stmt);
+        stmt.addBranch(succHandler);
     }
 
     if (this.failHandler) {
 
-        var failBranch = targetCtx.branch();
-        failHandler = this.failHandler.compile2(sourceCtx, failBranch);
+        failHandler = this.failHandler.compile2(sourceCtx, stmt);
+        stmt.addBranch(failHandler);
     }
 
     return JS.runtimeCall('sendAndBlock', [

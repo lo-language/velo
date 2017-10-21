@@ -10,7 +10,6 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const BranchContext = require('../codegen/BranchContext');
 
 
 /**

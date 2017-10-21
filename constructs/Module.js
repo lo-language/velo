@@ -12,7 +12,6 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const Context = require('../codegen/Context');
 const LoContext = require('../codegen/LoContext');
 const JsStmt = require('../codegen/JsStmt');
 const vm = require('vm');
