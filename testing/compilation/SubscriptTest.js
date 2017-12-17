@@ -5,8 +5,7 @@
 
 "use strict";
 
-const LoContext = require('../../codegen/LoContext');
-const JsStmt = require('../../codegen/JsStmt');
+const LoContext = require('../../compiler/LoContext');
 const Lo = require('../../constructs');
 
 
@@ -16,7 +15,7 @@ module.exports["subscript"] = {
 
         var node = new Lo.subscript(new Lo.identifier('foo'), new Lo.number('1'));
 
-        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext()).renderTree(),
             [ 'subscript', [ 'id', '$foo' ], [ 'num', '1' ] ]);
         test.done();
     },
@@ -25,7 +24,7 @@ module.exports["subscript"] = {
 
         var node = new Lo.subscript(new Lo.identifier('foo'), new Lo.number('-1'));
 
-        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext()).renderTree(),
             [ 'subscript',
                 [ 'id', '$foo' ],
                 [ 'add',

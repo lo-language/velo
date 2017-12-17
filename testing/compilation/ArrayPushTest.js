@@ -5,8 +5,7 @@
 
 "use strict";
 
-const LoContext = require('../../codegen/LoContext');
-const JsStmt = require('../../codegen/JsStmt');
+const LoContext = require('../../compiler/LoContext');
 const Lo = require('../../constructs');
 
 module.exports["basics"] = {
@@ -18,7 +17,7 @@ module.exports["basics"] = {
 
         var context = new LoContext().createInner();
 
-        test.deepEqual(node.compile2(context, new JsStmt()).renderTree(),
+        test.deepEqual(node.compile2(context).renderTree(),
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', '$foo' ], 'unshift' ],
@@ -34,7 +33,7 @@ module.exports["basics"] = {
 
         var context = new LoContext().createInner();
 
-        test.deepEqual(node.compile2(context, new JsStmt()).renderTree(),
+        test.deepEqual(node.compile2(context).renderTree(),
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', '$foo' ], 'push' ],

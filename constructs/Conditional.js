@@ -14,7 +14,8 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-
+const CFNode = require('../compiler/CFNode');
+const BranchNode = require('../compiler/BranchNode');
 
 /**
  * A conditional statement.
@@ -108,21 +109,38 @@ __.prototype.compile = function (context) {
  * Compiles this node to JS in the given context.
  *
  * @param sourceCtx
- * @param stmt
+ * @param targetCtx
  */
-__.prototype.compile2 = function (sourceCtx, stmt) {
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
 
-    var predicate = this.predicate.compile2(sourceCtx, stmt);
+    // hmmm...
+    // if the predicate has a req expr in it, will our node be flagged as non-intact?
+    // todo what should happen there?
 
-    var consequent = this.consequent.compile2(sourceCtx, stmt);
-    stmt.addBranch(consequent);
+    var predicate = this.predicate.compile2(sourceCtx, targetCtx);
 
-    if (this.alternate) {
-        var alternate = this.alternate.compile2(sourceCtx, stmt);
-        stmt.addBranch(alternate);
+    // we could create some kind of branch or block context here
+    var ctx = [];
+    var trueBranch = this.consequent.compile2(sourceCtx, ctx);
+
+    if (ctx.length > 0) {
+        var wrapper = CFNode.makeWrapper(ctx);
+        wrapper.append(trueBranch);
+        trueBranch = wrapper;
     }
 
-    return JS.cond(predicate, consequent, alternate);
+    if (this.alternate) {
+        var falseBranch = this.alternate.compile2(sourceCtx, []);
+    }
+
+    // todo restore this
+    // workaround for the case where alternate is an individual cond stmt rather than a stmtlist
+    // could change the parser to eliminate this case
+    // if (alternate && alternate instanceof CFNode == false) {
+    //     alternate = new CFNode(alternate);
+    // }
+
+    return new BranchNode(predicate, trueBranch, falseBranch);
 };
 
 module.exports = __;

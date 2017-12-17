@@ -5,9 +5,9 @@
 
 "use strict";
 
-var LoContext = require('../../codegen/LoContext');
-var JsStmt = require('../../codegen/JsStmt');
+var LoContext = require('../../compiler/LoContext');
 var Lo = require('../../constructs');
+var CFNode = require('../../compiler/CFNode');
 var util = require('util');
 
 module.exports["statement lists"] = {
@@ -21,7 +21,7 @@ module.exports["statement lists"] = {
             )
         );
 
-        test.equal(node.compile2(new LoContext().createInner(), new JsStmt()).renderJs(),
+        test.equal(node.compile2(new LoContext().createInner(), new CFNode()).renderJs(),
             '$foo = 42;\n$bar = 57;\n');
         test.done();
     },
@@ -38,7 +38,11 @@ module.exports["statement lists"] = {
             )
         );
 
-        test.equal(node.compile2(new LoContext().createInner(), new JsStmt()).renderJs(),
+        var last = new CFNode();
+
+        node.compile2(new LoContext().createInner(), last);
+
+        test.equal(last.renderJs(),
             'task.sendAndBlock($bar, [42], function (res0) {\n\n$foo = res0[0];\n$baz = 57;\n}, null);\n');
         test.done();
     }

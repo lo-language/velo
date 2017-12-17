@@ -5,7 +5,7 @@
 
 "use strict";
 
-const LoContext = require('../../codegen/LoContext');
+const LoContext = require('../../compiler/LoContext');
 const JS = require('../../codegen/JsPrimitives');
 const Lo = require('../../constructs');
 
@@ -55,10 +55,7 @@ module.exports["service"] = {
                                             [ 'res0' ],
                                             [ 'stmtList', [ 'expr-stmt', ["assign",
                                                 [ "id", "$result" ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ] ] ] ],
-                                        [ 'null' ] ] ] ],
-                            [ 'stmtList',
-                                [ 'expr-stmt',
-                                    [ 'call', [ 'select', [ 'id', 'task' ], 'deactivate' ], [] ] ] ] ] ] ] ] ];
+                                        [ 'null' ] ] ] ] ] ] ] ] ];
 
         test.deepEqual(node.compile2(new LoContext()).renderTree(), result);
         test.done();
@@ -67,7 +64,7 @@ module.exports["service"] = {
     "args ordering": function (test) {
 
         // should actually throw an error if result isn't defined in the context
-        // proc is <-> (args, io) { @write("hello"); }
+        // proc is (args, io) { @write <- "hello"; }
 
         var node = new Lo.procedure(
             ['args', 'io'],
@@ -75,6 +72,8 @@ module.exports["service"] = {
                 new Lo.requestStmt(
                     new Lo.identifier('write'),
                     [new Lo.string('hello')],
+                    null,
+                    null,
                     false
                 )
             ),
@@ -102,14 +101,16 @@ module.exports["service"] = {
                             [ 'stmtList',
                                 [ 'expr-stmt',
                                     [ 'call',
-                                        [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
+                                        [ 'select', [ 'id', 'task' ], 'sendAsync' ],
                                         [ [ 'id', '$write' ],
                                             [ 'arrayLiteral', [ [ 'string', 'hello' ] ] ],
                                             [ 'null' ],
                                             [ 'null' ] ] ] ],
                                 [ 'stmtList',
                                     [ 'expr-stmt',
-                                        [ 'call', [ 'select', [ 'id', 'task' ], 'deactivate' ], [] ] ] ] ] ] ] ] ] ];
+                                        [ 'call', [ 'select', [ 'id', 'task' ], 'succ' ], [ [
+                                            "arrayLiteral", []
+                                        ] ] ] ] ] ] ] ] ] ] ];
 
         test.deepEqual(node.compile2(new LoContext()).renderTree(), result);
         test.done();
@@ -172,7 +173,10 @@ module.exports["service"] = {
                                                                 [ "id", "$test" ] ] ] ] ] ] ] ] ] ],
                                 [ 'stmtList',
                                     [ 'expr-stmt',
-                                        [ 'call', [ 'select', [ 'id', 'task' ], 'deactivate' ], [] ] ] ] ] ] ] ] ]);
+                                        [ 'call', [ 'select', [ 'id', 'task' ], 'succ' ], [ [
+                                            "arrayLiteral",
+                                            []
+                                        ] ] ] ] ] ] ] ] ] ]);
         test.done();
     }
 };

@@ -70,26 +70,26 @@ module.exports['set operations'] = {
 // };
 
 
-module.exports['nestedLoops'] = {
-
-    "setUp": function (cb) {
-
-        this.harness = new Harness(__dirname, 'nestedLoops');
-        cb();
-    },
-
-    'success': function (test) {
-
-        var log = function (args, succ, fail) {
-            succ();
-        };
-
-        // this.harness.dumpModules().then(() => {
-
-            this.harness.testSuccess(test, [log], 9);
-        // });
-    }
-};
+// module.exports['nestedLoops'] = {
+//
+//     "setUp": function (cb) {
+//
+//         this.harness = new Harness(__dirname, 'nestedLoops');
+//         cb();
+//     },
+//
+//     'success': function (test) {
+//
+//         var log = function (args, succ, fail) {
+//             succ();
+//         };
+//
+//         // this.harness.dumpModules().then(() => {
+//
+//             this.harness.testSuccess(test, [log], 9);
+//         // });
+//     }
+// };
 
 module.exports['fail'] = {
 

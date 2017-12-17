@@ -5,8 +5,7 @@
 
 "use strict";
 
-const LoContext = require('../../codegen/LoContext');
-const JsStmt = require('../../codegen/JsStmt');
+const LoContext = require('../../compiler/LoContext');
 const Lo = require('../../constructs');
 
 module.exports["basics"] = {
@@ -15,7 +14,7 @@ module.exports["basics"] = {
 
         var node = new Lo.response('reply');
 
-        test.deepEqual(node.compile2(new LoContext().createInner(true), new JsStmt()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext().createInner(true)).renderTree(),
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'succ' ],
@@ -29,7 +28,7 @@ module.exports["basics"] = {
     //     var node = new Lo.stmtList(new Lo.response('reply'),
     //         new Lo.stmtList(new Lo.assign(new Lo.identifier('x'), new Lo.number('47'))));
     //
-    //     var result = node.compile2(new LoContext().createInner(true), new JsStmt());
+    //     var result = node.compile2(new LoContext().createInner(true));
     //
     //     test.deepEqual(result.renderTree(),
     //         [ 'stmtList',
@@ -45,7 +44,7 @@ module.exports["basics"] = {
 
         var node = new Lo.response('reply', [new Lo.number('42')]);
 
-        test.deepEqual(node.compile2(new LoContext().createInner(true), new JsStmt()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext().createInner(true)).renderTree(),
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'succ' ],
@@ -60,7 +59,7 @@ module.exports["basics"] = {
             new Lo.string('hot dog!')
         ]);
 
-        test.deepEqual(node.compile2(new LoContext().createInner(true), new JsStmt()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext().createInner(true)).renderTree(),
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'succ' ],
@@ -73,7 +72,7 @@ module.exports["basics"] = {
 
         var node = new Lo.response('fail', [new Lo.number('42')]);
 
-        test.deepEqual(node.compile2(new LoContext().createInner(true), new JsStmt()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext().createInner(true)).renderTree(),
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'fail' ],
@@ -89,13 +88,13 @@ module.exports["context"] = {
         var node = new Lo.response('fail', [new Lo.number('42')]);
 
         test.throws(function () {
-            node.compile2(new LoContext(), new JsStmt()).renderTree()
+            node.compile2(new LoContext()).renderTree()
         });
 
         node = new Lo.response('reply', [new Lo.number('42')]);
 
         test.throws(function () {
-            node.compile2(new LoContext(), new JsStmt()).renderTree()
+            node.compile2(new LoContext()).renderTree()
         });
 
         test.done();

@@ -11,6 +11,9 @@
 
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+const ReqExprNode = require('../compiler/ReqExprNode');
+
 
 /**
  * A "function call" (request) expression
@@ -81,18 +84,24 @@ __.prototype.compile = function (context) {
  * Compiles this node to JS in the given context, injecting a wrapper into the context.
  *
  * @param sourceCtx
- * @param targetCtx
+ * @param reqStack
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile2 = function (sourceCtx, reqStack) {
 
-    var address = this.address.compile2(sourceCtx, targetCtx);
+    var address = this.address.compile2(sourceCtx, reqStack);
 
     var args = this.args.map(arg => {
-        return arg.compile2(sourceCtx, targetCtx);
+        return arg.compile2(sourceCtx, reqStack);
     });
 
+
+    var label = 'res0';//reqStack.getNextLabel();
+
+    // add a blocking request node to the graph
+    reqStack.push(new ReqExprNode(address, args));
+
     // gets a temp var and returns it
-    return targetCtx.pushRequest(address, args, this.block);
+    return JS.subscript(JS.ID(label), JS.num('0'));
 };
 
 module.exports = __;

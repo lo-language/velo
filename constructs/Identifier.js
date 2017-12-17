@@ -14,7 +14,6 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const Future = require('../codegen/Future');
 
 
 /**

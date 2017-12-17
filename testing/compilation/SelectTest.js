@@ -5,8 +5,7 @@
 
 "use strict";
 
-const LoContext = require('../../codegen/LoContext');
-const JsStmt = require('../../codegen/JsStmt');
+const LoContext = require('../../compiler/LoContext');
 const JS = require('../../codegen/JsPrimitives');
 const Lo = require('../../constructs');
 
@@ -19,7 +18,7 @@ module.exports["select"] = {
             'bar'
         );
 
-        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext()).renderTree(),
             JS.select(JS.ID('$foo'), 'bar').renderTree());
         test.done();
     }

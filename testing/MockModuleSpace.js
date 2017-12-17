@@ -85,6 +85,7 @@ __.prototype.loadModules = function (sandbox) {
     Object.keys(this.modules).forEach(moduleId => {
 
         var body = this.jsModules[moduleId];
+
         var code = "(function() {'use strict';\n\n" + body + '\n\n})';
 
         this.loaded[moduleId] = vm.runInNewContext(code, sandbox)();

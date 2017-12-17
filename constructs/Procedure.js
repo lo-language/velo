@@ -13,14 +13,15 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const JsStmt = require('../codegen/JsStmt');
-
+const CFNode = require('../compiler/CFNode');
+const IRProc = require('../compiler/IRProc');
+const Response = require('../constructs/Response');
 
 /**
  * A procedure definition
  *
  * @param params
- * @param body
+ * @param {CFNode} body
  * @param isService
  */
 var __ = function (params, body, isService) {
@@ -56,98 +57,59 @@ __.prototype.getTree = function () {
     ];
 };
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param context
- */
-__.prototype.compile = function (context) {
-
-    // push a new scope onto the scope stack
-    var local = context.createInner(this.isService);
-
-    // load params into symbol table
-    this.params.forEach(name => local.declare(name));
-
-    // compile the statement(s) in the context of the local scope
-    var body = this.body.compile(local);
-
-    // bind values to our params
-    // todo unpacking args like this might be a significant perf hit
-    for (var i = this.params.length - 1; i >= 0; i--) {
-        body = JS.stmtList(JS.exprStmt(JS.assign(JS.ID('$' + this.params[i]), JS.subscript(JS.ID('args'), JS.num(String(i))))), body);
-    }
-
-    // declare our local vars
-    var localVars = local.getJsVars();
-
-    if (localVars.length > 0) {
-        body = JS.stmtList(JS.varDeclMulti(localVars), body);
-    }
-
-    if (this.isService) {
-
-        // define the task object var task = new Task();
-        body = JS.stmtList(JS.varDecl('task', JS.new('Task', [JS.ID('succ'), JS.ID('fail')])), body);
-
-        // decide if we need to exit -- doesn't matter in handlers
-        body.attach(JS.stmtList(JS.exprStmt(JS.runtimeCall('deactivate', []))));
-    }
-
-    return JS.fnDef(this.isService ? ['args', 'succ', 'fail'] : ['args'], body);
-};
-
-
-
 
 /**
  * Compiles this node to JS in the given context.
  *
  * @param sourceCtx
- * @param targetCtx
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile2 = function (sourceCtx) {
 
-    // push a new context onto the scope stack and load params into its symbol table
-
+    // push a new context onto the scope stack
     var localCtx = sourceCtx.createInner(this.isService);
 
+    // load params into its symbol table
     this.params.forEach(name => localCtx.declare(name));
 
-    // define the task object var task = new Task();
+    // define the task object: var task = new Task();
     var root = this.isService ?
-        new JsStmt(JS.varDecl('task', JS.new('Task', [JS.ID('succ'), JS.ID('fail')]))) :
-        new JsStmt();
+        new CFNode(JS.varDecl('task', JS.new('Task', [JS.ID('succ'), JS.ID('fail')]))) :
+        new CFNode();
 
     var lastStmt = root;
 
-    // compile the statement(s) in the context of the local scope
-    var body = this.body.compile2(localCtx, targetCtx);
+    // compile the statement(s) in the context of the local scope;
+    // this will also populate our symbol table
+    var body = this.body.compile2(localCtx);
 
     // declare our local vars
     var localVars = localCtx.getJsVars();
 
     if (localVars.length > 0) {
-        lastStmt = lastStmt.setNext(new JsStmt(JS.varDeclMulti(localVars)));
+        lastStmt = lastStmt.setNext(new CFNode(JS.varDeclMulti(localVars)));
     }
 
     // bind values to our params
-    // todo unpacking args like this might be a significant perf hit
+    // todo unpacking args like this might be a significant runtime perf hit
     this.params.forEach((param, idx) => {
         lastStmt = lastStmt.setNext(
-            new JsStmt(JS.exprStmt(JS.assign(JS.ID('$' + this.params[idx]), JS.subscript(JS.ID('args'), JS.num(String(idx)))))));
+            new CFNode(JS.exprStmt(JS.assign(JS.ID('$' + this.params[idx]), JS.subscript(JS.ID('args'), JS.num(String(idx)))))));
     });
 
     if (this.isService) {
 
-        // add a statement to see if we need to exit -- doesn't matter in handlers
-        body.append(new JsStmt(JS.exprStmt(JS.runtimeCall('deactivate', []))));
+        // implement auto-reply: if a service doesn't explicitly respond, it should reply <empty>
+
+        if (body.isIntact()) {
+            body.append(new CFNode(new Response('reply').compile(localCtx, body)));
+        }
     }
 
     // connect the body
     lastStmt.setNext(body);
 
-    return JS.fnDef(this.isService ? ['args', 'succ', 'fail'] : ['args'], root);
+    // we need to return an IR proc container, not straight JS, so we can amend handlers later
+    return new IRProc(this.isService ? ['args', 'succ', 'fail'] : ['args'], body);
 };
 
 module.exports = __;

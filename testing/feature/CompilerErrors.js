@@ -24,8 +24,8 @@ module.exports['undefined identifier'] = {
         // test.expect(1);
 
         var modSpace = new MockModuleSpace(
-            'main is {\n' +
-            '    sayHello();\n};\n');
+            'main is () {\n' +
+            '    sayHello <-;\n};\n');
 
         var errorListener = function (line, error) {
             test.equal(line, 2);

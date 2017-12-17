@@ -6,8 +6,7 @@
 "use strict";
 
 const Lo = require('../../constructs');
-const LoContext = require('../../codegen/LoContext');
-const JsStmt = require('../../codegen/JsStmt');
+const LoContext = require('../../compiler/LoContext');
 const JS = require('../../codegen/JsPrimitives');
 const util = require('util');
 const rootContext = new LoContext();
@@ -37,7 +36,7 @@ module.exports["root constants"] = {
             'const $main = function (args, succ, fail) {\n\n' +
             'var task = new Task(succ, fail);\n' +
             'task.succ([JS.Math.PI]);\n' +
-            'task.deactivate();\n' +
+            'task.succ([]);\n' +
             '};\n' +
             'return {\'main\': $main};\n');
 
@@ -53,7 +52,7 @@ module.exports["root constants"] = {
         test.equal(context.has('port'), false);
         test.equal(context.isConstant('port'), false);
 
-        test.equal(node.compile2(context, new JsStmt()).renderJs(), 'const $port = 443;');
+        test.equal(node.compile2(context).renderJs(), 'const $port = 443;');
 
         test.equal(context.has('port'), true);
         test.ok(context.isConstant('port'));
@@ -70,7 +69,7 @@ module.exports["root constants"] = {
         test.equal(context.has('album'), false);
         test.equal(context.isConstant('album'), false);
 
-        test.equal(node.compile2(context, new JsStmt()).renderJs(), "const $album = 'Mellon Collie';");
+        test.equal(node.compile2(context).renderJs(), "const $album = 'Mellon Collie';");
 
         test.equal(context.has('album'), true);
         test.ok(context.isConstant('album'));
@@ -92,7 +91,7 @@ module.exports["non-root constants"] = {
         test.equal(context.has('port'), false);
         test.equal(context.isConstant('port'), false);
 
-        test.equal(node.compile2(context, new JsStmt()).renderJs(), 'const $port = 443;');
+        test.equal(node.compile2(context).renderJs(), 'const $port = 443;');
 
         test.equal(context.has('port'), true);
         test.ok(context.isConstant('port'));
@@ -109,7 +108,7 @@ module.exports["non-root constants"] = {
         test.equal(context.has('album'), false);
         test.equal(context.isConstant('album'), false);
 
-        test.equal(node.compile2(context, new JsStmt()).renderJs(), "const $album = 'Mellon Collie';");
+        test.equal(node.compile2(context).renderJs(), "const $album = 'Mellon Collie';");
 
         test.equal(context.has('album'), true);
         test.ok(context.isConstant('album'));
@@ -138,7 +137,7 @@ module.exports["non-root constants"] = {
         test.equal(context.has('main'), false);
         test.equal(context.isConstant('main'), false);
 
-        test.deepEqual(node.compile2(context, new JsStmt()).renderTree(),
+        test.deepEqual(node.compile2(context).renderTree(),
             [ 'const',
                 '$main',
                 [ 'function',
@@ -160,7 +159,8 @@ module.exports["non-root constants"] = {
                                         [ 'assign', [ 'id', '$result' ], [ 'num', '10' ] ] ],
                                     [ 'stmtList',
                                         [ 'expr-stmt',
-                                            [ 'call', [ 'select', [ 'id', 'task' ], 'deactivate' ], [] ] ] ] ] ] ] ] ] ]);
+                                            [ 'call', [ 'select', [ 'id', 'task' ], 'succ' ], [ [
+                                                'arrayLiteral', [] ] ] ] ] ] ] ] ] ] ] ]);
 
         test.equal(context.has('main'), true);
         test.ok(context.isConstant('main'));
@@ -177,7 +177,7 @@ module.exports["non-root constants"] = {
         test.equal(context.has('constructor'), false);
         test.equal(context.isConstant('constructor'), false);
 
-        test.equal(node.compile2(context, new JsStmt()).renderJs(), "const $constructor = 'Melon Collie';");
+        test.equal(node.compile2(context).renderJs(), "const $constructor = 'Melon Collie';");
 
         test.equal(context.has('constructor'), true);
         test.ok(context.isConstant('constructor'));

@@ -15,7 +15,7 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var modSpace = new MockModuleSpace('main is {reply "hullo!";};');
+        var modSpace = new MockModuleSpace('main is () { reply "hullo!"; };');
 
         var program = new Program(modSpace, 'ROOT');
 
@@ -32,9 +32,9 @@ module.exports['basics'] = {
         test.expect(1);
 
         var modSpace = new MockModuleSpace(
-                    'sayHello is {\n' +
+                    'sayHello is () {\n' +
                     '    reply "hullo!";\n};\n' +
-                    'main is {\n' +
+                    'main is () {\n' +
                     '    reply sayHello();\n};\n');
 
         var program = new Program(modSpace, 'ROOT');
@@ -51,10 +51,10 @@ module.exports['basics'] = {
         test.expect(1);
 
         var modSpace = new MockModuleSpace(
-                    'sayHello is {\n' +
+                    'sayHello is () {\n' +
                     '    reply "hullo!";\n};\n' +
-                    'main is {\n' +
-                    '    sayHello();\n};\n');
+                    'main is () {\n' +
+                    '    sayHello<-;\n};\n');
 
         var program = new Program(modSpace, 'ROOT');
 
@@ -70,10 +70,10 @@ module.exports['basics'] = {
         test.expect(1);
 
         var modSpace = new MockModuleSpace(
-                    'sayHello is {\n' +
+                    'sayHello is () {\n' +
                     '    reply "hullo!";\n};\n' +
-                    'main is {\n' +
-                    '    sayHello();\n' +
+                    'main is () {\n' +
+                    '    sayHello <- 4;\n' +
                     '    reply "howdy!";\n};\n');
 
         var program = new Program(modSpace, 'ROOT');
@@ -99,7 +99,7 @@ module.exports['basics'] = {
 
         var modSpace = new MockModuleSpace(
                     'main is (write) {\n' +
-                    'write("hi there!");\n};\n');
+                    'write <- "hi there!";\n};\n');
 
         var program = new Program(modSpace, 'ROOT');
 

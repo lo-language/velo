@@ -6,8 +6,7 @@
 "use strict";
 
 const Lo = require('../../constructs');
-var LoContext = require('../../codegen/LoContext');
-var JsStmt = require('../../codegen/JsStmt');
+var LoContext = require('../../compiler/LoContext');
 
 module.exports["exists"] = {
 
@@ -15,7 +14,7 @@ module.exports["exists"] = {
 
         var node = new Lo.existence(new Lo.identifier('foo'));
 
-        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext()).renderTree(),
             [ 'strict-ne',
                 [ 'typeof', [ 'id', '$foo' ] ],
                 [ 'string', 'undefined' ] ]);
@@ -26,7 +25,7 @@ module.exports["exists"] = {
 
         var node = new Lo.existence(new Lo.identifier('foo'), true);
 
-        test.deepEqual(node.compile2(new LoContext(), new JsStmt()).renderTree(),
+        test.deepEqual(node.compile2(new LoContext()).renderTree(),
             [ 'strict-eq',
                 [ 'typeof', [ 'id', '$foo' ] ],
                 [ 'string', 'undefined' ] ]);

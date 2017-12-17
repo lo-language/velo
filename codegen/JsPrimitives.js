@@ -306,15 +306,35 @@ JS.assign = (lvalue, rvalue, op) => {
 
 JS.fnCall = (fnExpr, args) => {
 
+    var wrap = false;
+
+    if (args == null) {
+        throw new Error("invalid JS: null args array");
+    }
+
+    args.forEach((arg, idx) => {
+
+        if (arg == null) {
+            throw new Error("invalid JS: null arg " + idx + " to fn:" + fnExpr.renderJs());
+        }
+
+    });
+
+    // see: http://benalman.com/news/2010/11/immediately-invoked-function-expression/
+    if (fnExpr.isFnDef) {
+        wrap = true;
+    }
+
     return {
         renderTree: () => ['call', fnExpr.renderTree(), args.map(arg => arg.renderTree())],
-        renderJs: () => fnExpr.renderJs() + '(' + args.map(arg => arg.renderJs()).join(', ') + ')'
+        renderJs: () => (wrap ? '(' : '') + fnExpr.renderJs() + '(' + args.map(arg => arg.renderJs()).join(', ') + ')' + (wrap ? ')' : '')
     };
 };
 
 JS.fnDef = (params, body, name) => {
 
     return {
+        isFnDef: true,
         renderTree: () => ['function', name || null, params, body.renderTree()],
         renderJs: () => 'function ' + (name ? name + ' ' : '') + '(' + params.join(', ') + ') {\n\n' + body.renderJs() + '}'
     };
@@ -370,8 +390,6 @@ JS.stmtList = (head, tail) => {
             return headJs + '\n' + (tailJs || '');
         },
 
-        isStmtList: true,
-
         // should this take a stmt instead?
         // attach: function (stmtList) {
         //
@@ -418,7 +436,7 @@ JS.new = (name, args) => {
     };
 };
 
-// not-quite-primitives
+// not-quite-primitives; arguably these are a form of IR
 
 JS.runtimeCall = (fnName, args) => {
 

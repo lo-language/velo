@@ -7,7 +7,8 @@
 
 const JS = require('../../codegen/JsPrimitives');
 const Lo = require('../../constructs');
-const LoContext = require('../../codegen/LoContext');
+const LoContext = require('../../compiler/LoContext');
+const JsWriter = require('../../codegen/JsWriter');
 
 module.exports["basics"] = {
 
@@ -23,88 +24,126 @@ module.exports["basics"] = {
             )
         );
 
-        var result = node.compile2(new LoContext());
+        var result = node.compile2(new LoContext()).getJs(new JsWriter());
 
         test.deepEqual(result.renderTree(),
-                [ 'while',
-                    [ 'id', '$foo' ],
-                    [ 'stmtList',
-                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ]);
+            ['while',
+                ['id', '$foo'],
+                ['stmtList',
+                    ['expr-stmt', ['assign', ['id', '$bar'], ['num', '42']]]]]);
 
         // // try attaching a statement – should get stuck on the end
         node = new Lo.stmtList(node,
             new Lo.stmtList(new Lo.assign(new Lo.identifier('z'), new Lo.number('57'))));
 
-        result = node.compile(new LoContext());
+        result = new JsWriter().generateJs(node.compile2(new LoContext()));
 
         test.deepEqual(result.renderTree(),
-            [ 'stmtList',
-                [ 'while',
-                    [ 'id', '$foo' ],
-                    [ 'stmtList',
-                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ],
-                [ 'stmtList',
-                    [ 'expr-stmt', [ 'assign', [ 'id', '$z' ], [ 'num', '57' ] ] ] ] ]);
+            ['stmtList',
+                ['while',
+                    ['id', '$foo'],
+                    ['stmtList',
+                        ['expr-stmt', ['assign', ['id', '$bar'], ['num', '42']]]]],
+                ['stmtList',
+                    ['expr-stmt', ['assign', ['id', '$z'], ['num', '57']]]]]);
 
         // // try attaching another statement
         node.attach(new Lo.stmtList(new Lo.assign(new Lo.identifier('mork'), new Lo.string('ork'))));
 
-        result = node.compile(new LoContext());
+        result = new JsWriter().generateJs(node.compile2(new LoContext()));
 
         test.deepEqual(result.renderTree(),
-            [ 'stmtList',
-                [ 'while',
-                    [ 'id', '$foo' ],
-                    [ 'stmtList',
-                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ],
-                [ 'stmtList',
-                    [ 'expr-stmt', [ 'assign', [ 'id', '$z' ], [ 'num', '57' ] ] ],
-                    [ 'stmtList',
-                        [ 'expr-stmt',
-                            [ 'assign', [ 'id', '$mork' ], [ 'string', 'ork' ] ] ] ] ] ]);
+            ['stmtList',
+                ['while',
+                    ['id', '$foo'],
+                    ['stmtList',
+                        ['expr-stmt', ['assign', ['id', '$bar'], ['num', '42']]]]],
+                ['stmtList',
+                    ['expr-stmt', ['assign', ['id', '$z'], ['num', '57']]],
+                    ['stmtList',
+                        ['expr-stmt',
+                            ['assign', ['id', '$mork'], ['string', 'ork']]]]]]);
 
         test.done();
     },
 
-    "async in body": function (test) {
+    "req in cond": function (test) {
+
+        // while foo() {
+        //  bar = 57;
+        // }
+
+
+        var body = new Lo.stmtList(new Lo.assign(new Lo.identifier('bar'), new Lo.number('57')));
+
+        var loop = new Lo.while(new Lo.requestExpr(new Lo.identifier('foo'), [], true), body);
+        var stack = [];
+
+        // compiling a stmt returns a control flow graph
+        var js = new JsWriter().generateJs(loop.compile2(new LoContext(), stack));
+
+        test.deepEqual(js.renderTree(), ['stmtList',
+            ['expr-stmt',
+                ['call', ['function', 'L1', [], ['stmtList', ['expr-stmt', ['call', ['select', ['id', 'task'], 'sendAndBlock'], [['id', '$foo'], ['arrayLiteral', []], ['function', null, ['res0'], ['stmtList', ['if', ["subscript", ["id", "res0"], ["num", "0"]], ["stmtList", ["expr-stmt", ["assign", ["id", "$bar"], ["num", "57"]]], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]
+                ]]]]],
+                    ['null']]]]]],
+                    []]]]);
+        test.done();
+    },
+
+    "blocking call in body": function (test) {
+
+        // while foo {
+        //   bar <- 57;
+        // }
+
+        // could optimize to:
+        // fn L1 () {
+        // if ($foo) {
+        //  SM (bar, 57, L1, L1);
+        // }}
+
+        // but defeated by branch node seeing it has a follower...
+        // todo optimize this case
 
         var node = new Lo.while(
             new Lo.identifier('foo'),
             new Lo.stmtList(
                 new Lo.requestStmt(
                     new Lo.identifier('bar'),
-                    [new Lo.number('57')]
+                    [new Lo.number('57')],
+                    null,
+                    null,
+                    true
                 )
             )
         );
 
-        var a = node.compile(new LoContext().createInner());
+        var js = new JsWriter().generateJs(node.compile2(new LoContext()));
 
-        test.deepEqual(a.renderTree(),
-            [ 'stmtList',
-                [ 'let',
-                    'l1',
-                    [ 'function',
-                        null,
-                        [],
-                        [ 'stmtList',
-                            [ 'if',
-                                [ 'id', '$foo' ],
-                                [ 'stmtList',
-                                    [ 'expr-stmt',
-                                        [ 'call',
-                                            [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
-                                            [ [ 'id', '$bar' ],
-                                                [ 'arrayLiteral', [ [ 'num', '57' ] ] ],
-                                                [ 'id', 'k0' ],
-                                                [ 'id', 'k0' ] ] ] ],
-                                    [ 'stmtList',
-                                        [ 'function',
-                                            'k0',
-                                            [],
-                                            [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', "setImmediate" ],
-                                                [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "l1" ] ] ] ] ] ] ] ] ] ] ] ] ] ],
-                [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'l1' ], [] ] ] ] ]);
+        test.deepEqual(js.renderTree(), ['stmtList',
+            ['expr-stmt',
+                ['call', ['function', 'L1', [], ['stmtList', ['if', ['id', '$foo'], ['stmtList', ['expr-stmt', ['call', ['select', ['id', 'task'], 'sendAndBlock'], [['id', '$bar'], ['arrayLiteral', [['num', '57']]], ['function', null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]], ['function', null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]]]]]]]]], []]]]);
+
+
+        // todo optimize this case to produce this
+        // test.deepEqual(a.renderTree(), [ 'expr-stmt',
+        //     [ 'call',
+        //         [ 'function',
+        //             'L1',
+        //             [],
+        //             [ 'stmtList',
+        //                 [ 'if',
+        //                     [ 'id', '$foo' ],
+        //                     [ 'stmtList',
+        //                             [ 'expr-stmt',
+        //                                 [ 'call',
+        //                                     [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
+        //                                     [ [ 'id', '$bar' ],
+        //                                         [ 'arrayLiteral', [ [ 'num','57' ] ] ],
+        //                                         [ 'id', 'L1' ],
+        //                                         [ 'id', 'L1' ] ] ] ] ] ] ] ],
+        //         [] ] ]);
 
         // // try attaching a statement
         // a.attach(new JsStmt(JS.exprStmt(JS.assign(JS.ID('z'), JS.num('57')))));
@@ -148,11 +187,12 @@ module.exports["basics"] = {
 
         // while y < MAX {
         //   while x < MAX {
-        //      log(count);
+        //      log <- count;
         //      x++;
         //   }
         //   y++;
         // }
+
 
         var node = new Lo.while(
             new Lo.binaryOpExpr('<', new Lo.identifier('y'), new Lo.identifier('MAX')),
@@ -172,111 +212,57 @@ module.exports["basics"] = {
             )
         );
 
-        var a = node.compile(new LoContext().createInner());
+        var js = new JsWriter().generateJs(node.compile2(new LoContext()));
 
-        test.deepEqual(a.renderTree(),
-            [ 'stmtList',
-                [ 'let',
-                    'l2',
-                    [ 'function',
-                        null,
+        test.deepEqual(js.renderTree(), ['stmtList',
+            ['expr-stmt',
+                ['call',
+                    ['function',
+                        'L2',
                         [],
-                        [ 'stmtList',
-                            [ 'if',
-                                [ 'lt', [ 'id', '$y' ], [ 'id', '$MAX' ] ],
-                                [ 'stmtList',
-                                    [ 'let',
-                                        'l1',
-                                        [ 'function',
-                                            null,
-                                            [],
-                                            [ 'stmtList',
-                                                [ 'if',
-                                                    [ 'lt', [ 'id', '$x' ], [ 'id', '$MAX' ] ],
-                                                    [ 'stmtList', [
-                                                        "expr-stmt",
-                                                        [ "call",
-                                                            [ "select", [ "id", "task" ], "sendAndBlock" ],
-                                                            [
-                                                                [ "id", "$log" ],
-                                                                [ "arrayLiteral", [ [ "id", "$count" ] ] ],
-                                                                [ "id", "k0" ],
-                                                                [ "id", "k0" ] ] ] ],
-                                                        [ "stmtList",
-                                                            [ "function", "k0",
-                                                                [],
-                                                                [ "stmtList", [ "expr-stmt", [ "call", [ "id", "setImmediate" ],
-                                                                            [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "l1" ] ] ] ]
-                                                                        ] ] ] ] ] ],
-                                                    [ 'stmtList', ["expr-stmt",
-                                                        [ "call",
-                                                            [ "id", "setImmediate" ],
-                                                            [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "l2" ] ] ] ]
-                                                        ]
-                                                    ] ] ] ] ] ],
-                                    [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'l1' ], [] ] ] ] ] ] ] ] ],
-                [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'l2' ], [] ] ] ] ]);
+                        ['stmtList',
+                            ['if',
+                                ['lt', ['id', '$y'], ['id', '$MAX']],
+                                ['stmtList', ['expr-stmt', ['call', ['function', 'L1', [], ['stmtList', ["if", ["lt", ["id", "$x"], ["id", "$MAX"]], ["stmtList", ["expr-stmt", ["call", ["select", ["id", "task"], "sendAndBlock"], [["id", "$log"], ["arrayLiteral", [["id", "$count"]]], ["function", null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]], ["function", null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]]]]]], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L2"]]]]]]]]]], []]]]]]], []]]]);
 
         test.done();
     },
 
     "async body and cond": function (test) {
 
-        // var node = {
-        //     type: 'iteration',
-        //     condition: {
-        //         type: 'application',
-        //         address: {type: 'id', name: 'foo'},
-        //         args: []
-        //     },
-        //     statements: {type: 'stmt_list',
-        //         head: {
-        //             type: 'application_stmt',
-        //             application: {
-        //                 type: 'application',
-        //                 address: {type: 'id', name: 'bar'},
-        //                 args: [{type: 'number', val: '57'}]
-        //             }
-        //         },
-        //         tail: null}
-        // };
-        //
-        // var a = new LoContext().createInner().compileStmt(node);
-        //
-        // test.deepEqual(a.renderTree(), [ 'stmtList',
-        //     [ 'let',
-        //         'loop',
-        //         [ 'function',
-        //             null,
-        //             [],
-        //             [ 'stmtList', [ 'expr-stmt',
-        //                 [ 'call',
-        //                     [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-        //                     [ [ 'id', '$foo' ],
-        //                         [ 'arrayLiteral', [] ],
-        //                         [ 'function',
-        //                             null,
-        //                             [ 'res0' ],
-        //                             [ 'stmtList',
-        //                                 [ 'if',
-        //                                     [ "subscript", [ 'id', 'res0' ], [ "num", "0" ] ],
-        //                                     [ 'stmtList', [ 'expr-stmt',
-        //                                         [ 'call',
-        //                                             [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-        //                                             [ [ 'id', '$bar' ],
-        //                                                 [ 'arrayLiteral', [ [ 'num', '57' ] ] ],
-        //                                                 [ 'function',
-        //                                                     null,
-        //                                                     [ 'res0' ],
-        //                                                     [ 'stmtList',
-        //                                                         [ 'expr-stmt',
-        //                                                             [ 'call',
-        //                                                                 [ 'id', 'setImmediate' ],
-        //                                                                 [ [ 'call',
-        //                                                                     [ 'select', [ 'id', 'task' ], 'doAsync' ],
-        //                                                                     [ [ 'id', 'loop' ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ] ],
-        //     [ 'stmtList',
-        //         [ 'expr-stmt', [ 'call', [ 'id', 'loop' ], [] ] ] ] ]);
+
+        // while foo() {
+        //   bar <- 57;
+        // }
+
+        var node = new Lo.while(
+            new Lo.requestExpr(new Lo.identifier('foo'), [], true),
+            new Lo.stmtList(
+                new Lo.requestStmt(
+                    new Lo.identifier('bar'),
+                    [new Lo.number('57')],
+                    null,
+                    null,
+                    true
+                )
+            )
+        );
+
+        var js = new JsWriter().generateJs(node.compile2(new LoContext()));
+
+        test.deepEqual(js.renderTree(), ['stmtList',
+            ['expr-stmt',
+                ['call',
+                    ['function',
+                        'L1',
+                        [],
+                        ['stmtList',
+                            ['expr-stmt',
+                                ['call',
+                                    ['select', ['id', 'task'], 'sendAndBlock'],
+                                    [['id', '$foo'],
+                                        ['arrayLiteral', []],
+                                        ['function', null, ['res0'], ['stmtList', ['if', ["subscript", ["id", "res0"], ["num", "0"]], ["stmtList", ["expr-stmt", ["call", ["select", ["id", "task"], "sendAndBlock"], [["id", "$bar"], ["arrayLiteral", [["num", "57"]]], ["function", null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]], ["function", null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]]]]]]]]], ['null']]]]]], []]]]);
 
         // test.equal(a.render(),
         //     'let loop = function () {if ($foo) {var cont0 = function () {setImmediate(task.doAsync(loop));};' +
@@ -323,7 +309,7 @@ module.exports["basics"] = {
     //             tail: null}
     //     };
     //
-    //     var a = new LoContext().createInner().compileStmt(node);
+    //     var a = new LoContext().createInner().compile2Stmt(node);
     //
     //     test.done();
     // }

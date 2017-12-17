@@ -12,8 +12,7 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const JsStmt = require('../codegen/JsStmt');
-const JsContStmt = require('../codegen/JsContStmt');
+const CFNode = require('../compiler/CFNode');
 const Assignment = require('./Assignment');
 const Identifier = require('./Identifier');
 const Constant = require('./Constant');
@@ -24,7 +23,7 @@ const Constant = require('./Constant');
  * A linked list of statements. Statements are only allowed at the head;
  * the tail is either a nested list or null.
  *
- * @param head  a stmt
+ * @param head  a Lo stmt
  * @param tail  a stmtList || null
  */
 var __ = function (head, tail) {
@@ -181,30 +180,21 @@ __.prototype.append = function (stmtList) {
  * Compiles this node to JS in the given context.
  *
  * @param sourceCtx
- * @param prevStmt
+ * @param last          the last node of the target control flow graph
  */
-__.prototype.compile2 = function (sourceCtx, prevStmt) {
+__.prototype.compile2 = function (sourceCtx, last) {
 
-    var stmt = new JsStmt();
+    // stmts return node lists
+    // reqexprs need to mutate something, because they're returning a JS node,
+    // so they take a list as a param so they can push onto it
 
-    // wire up the stmts so wrappers can be inserted between them
-    // prevStmt.setNext(stmt); // do we need to do this, or could we do it with the retval?
-
-    // base case
-
-    var head = this.head ? this.head.compile2(sourceCtx, stmt) : null;
-
-    stmt.setStatement(head);
+    var head = this.head.compile2(sourceCtx, last);
 
     if (this.tail) {
-
-        // recursive case
-        // call attach in case we have broken branches to fix up
-        stmt.append(this.tail.compile2(sourceCtx, stmt));
+        head.append(this.tail.compile2(sourceCtx, head.getLast()));
     }
 
-    // might be stmt, might not (if some wrappers were created)
-    return stmt.getRoot();
+    return head;
 };
 
 module.exports = __;

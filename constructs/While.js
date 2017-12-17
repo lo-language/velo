@@ -9,6 +9,9 @@
 
 "use strict";
 
+const CFNode = require('../compiler/CFNode');
+const BranchNode = require('../compiler/BranchNode');
+const Connector = require('../codegen/Connector');
 const JS = require('../codegen/JsPrimitives');
 
 
@@ -48,60 +51,58 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param loContext
+ * @param targetCtx
+ * @returns {*}
  */
-__.prototype.compile = function (context) {
+__.prototype.compile2 = function (loContext, targetCtx) {
 
-    var condition = this.cond.compile(context);
+    // we have two strategies at our disposal: native loop and recursive loop
+    // we use the native loop when we can; otherwise must use our recursive loop
 
-    // create a branch context here for the loop body
+    var reqStack = [];
+    var loopCond = this.cond.compile2(loContext, reqStack);
+    var loopBody = this.body.compile2(loContext, reqStack);
 
-    var bc = new BranchContext(context);
-    var body = this.body.compile(bc);
+    // if neither part is broken, can use a native while loop
 
-    // test both the current context and the loop-body context for discontinuities
-    // in either the loop condition or the loop body, respectively
-
-    if (context.isContinuous() && bc.isContinuous()) {
-
-        // no discontinuities in the loop at all, compile to a target language loop
-        return JS.while(condition, body);
+    if (reqStack.length == 0 && loopBody.isIntact()) {
+        return new CFNode(function (writer) {
+            return JS.while(loopCond, writer.branch().generateJs(loopBody))
+        });
     }
 
-    // gotta do it the hard way
+    // can't use a native loop; construct a recursive loop
+    var loopName = loContext.getNextLoopName();
 
-    var loop = context.createAsyncLoop(condition, body);
+    // write the loop predicate as a conditional
+    // any following statements are rendered in the false branch
 
-    var loopCall = JS.stmtList(JS.exprStmt(
-        JS.fnCall(JS.ID("setImmediate"), [JS.runtimeCall('doAsync', [loop.id])])));
+    var fnBody = new CFNode(writer => {
+        return JS.cond(
+            loopCond,
+            writer.branch().generateJs(loopBody),
+            writer.captureTail()
+        );
+    });
 
-    // connect the body to the loop entry point to create the loop
-    bc.connect(loopCall);
+    // wrap the condition in any wrapping reqs
+    if (reqStack.length > 0) {
+        var wrapper = CFNode.makeWrapper(reqStack);
+        wrapper.append(fnBody);
+        fnBody = wrapper;
+    }
 
-    return JS.stmtList(loop.def, JS.stmtList(JS.exprStmt(JS.fnCall(loop.id, []))));
-};
+    // form the loop by adding a recursive call to the loop body
+    // use setImmediate to avoid blowing up the stack
+    // possible optimization lurking here if the loop ends with a request: can use loop fn as handlers
 
+    loopBody.append(new CFNode(JS.exprStmt(
+        JS.fnCall(JS.ID("setImmediate"), [JS.runtimeCall('doAsync', [JS.ID(loopName)])]))));
 
-
-
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
-
-    var condition = this.cond.compile2(sourceCtx, targetCtx);
-
-    // create a branch context here for the loop body
-
-    var bodyCtx = targetCtx.branch();
-    var body = this.body.compile2(sourceCtx, bodyCtx);
-
-
-    // we can't tell what to return here without inspecting the body to see if it's broken
-    // also need to check the predicate
+    return new CFNode(writer => {
+        return JS.exprStmt(JS.fnCall(JS.fnDef([], writer.generateJs(fnBody), loopName), []));
+    }, false);
 };
 
 

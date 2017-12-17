@@ -15,6 +15,7 @@
 
 const JS = require('../codegen/JsPrimitives');
 const Identifier = require('./Identifier');
+const CFNode = require('../compiler/CFNode');
 
 
 /**
@@ -105,12 +106,12 @@ __.prototype.compile = function (context) {
  * Compiles this node to JS in the given context.
  *
  * @param sourceCtx
- * @param targetCtx
+ * @param last
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile2 = function (sourceCtx, last) {
 
-    var left = this.left.compile2(sourceCtx, targetCtx);
-    var right = this.right.compile2(sourceCtx, targetCtx);
+    var left = this.left.compile2(sourceCtx, last);
+    var right = this.right.compile2(sourceCtx, last);
 
     // todo this implies block-level scoping
 
@@ -131,11 +132,10 @@ __.prototype.compile2 = function (sourceCtx, targetCtx) {
         }
     }
 
-    return JS.exprStmt(JS.assign(left, right));
+    return new CFNode(JS.exprStmt(JS.assign(left, right)));
 
     // this was genius
     // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP
-
 };
 
 module.exports = __;

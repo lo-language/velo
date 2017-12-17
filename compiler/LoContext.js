@@ -20,7 +20,7 @@
 
 "use strict";
 
-const JS = require('./JsPrimitives');
+const JS = require('./../codegen/JsPrimitives');
 
 
 /**
@@ -41,6 +41,9 @@ var __ = function (parent, isService) {
 
     // our local symbol table, containing params, locals, constants, futures, etc.
     this.symbols = {};
+
+    // arguably more of a target context concept, but putting in source context for now
+    this.nextLoopNum = 1;
 
     // dependency set
     this.deps = {};
@@ -65,6 +68,8 @@ __.prototype.getModulePath = function () {
 };
 
 
+
+
 /**
  * Returns true if this is a root (module) context.
  */
@@ -80,6 +85,15 @@ __.prototype.isRoot = function () {
 __.prototype.isService = function () {
 
     return this.type == 'service';
+};
+
+
+/**
+ * Returns true if this is a service context.
+ */
+__.prototype.getNextLoopName = function () {
+
+    return 'L' + this.nextLoopNum++;
 };
 
 

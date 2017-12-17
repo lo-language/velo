@@ -5,9 +5,9 @@
 
 "use strict";
 
-const Context = require('../../codegen/LoContext');
-const JS = require('../../codegen/JsPrimitives');
+const Context = require('../../compiler/LoContext');
 const Lo = require('../../constructs');
+const CFNode = require('../../compiler/CFNode');
 
 
 module.exports["basics"] = {
@@ -33,7 +33,7 @@ module.exports["basics"] = {
             true
         );
 
-        var result = node.compile2(new Context());
+        var result = node.compile2(new Context(), new CFNode());
 
         test.deepEqual(result.renderTree(),
             [ 'expr-stmt',
@@ -147,7 +147,7 @@ module.exports["basics"] = {
             new Lo.assign(new Lo.identifier('i'), new Lo.number('2'))
         ));
 
-        var result = node.compile2(new Context().createInner(true));
+        var result = node.compile2(new Context().createInner(true), new CFNode());
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
