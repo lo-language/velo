@@ -190,7 +190,7 @@ __.prototype.compile2 = function (sourceCtx) {
     var head = this.head.compile2(sourceCtx);
 
     // unpack any wrapping requests
-    sourceCtx.unpackAndWrap(head);
+    head = sourceCtx.unpackAndWrap(head);
 
     if (this.tail) {
         head.append(this.tail.compile2(sourceCtx));
