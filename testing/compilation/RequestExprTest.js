@@ -8,11 +8,14 @@
 const Lo = require('../../constructs');
 const LoContext = require('../../compiler/LoContext');
 const CFNode = require('../../compiler/CFNode');
+const JsWriter = require('../../codegen/JsWriter');
 const util = require('util');
 
 module.exports["blocking calls"] = {
 
     "expr args": function (test) {
+
+        // reply num * main(num - 1);
 
         var node = new Lo.response('reply', [new Lo.binaryOpExpr(
             '*',
@@ -23,11 +26,10 @@ module.exports["blocking calls"] = {
                 ],
                 true))]);
 
-        // compiling a stmt list doesn't return anything? just builds out the control flow graph
-        // why? because compilation might actually produce wrapping stmts
-        var result = new Lo.stmtList(node).compile2(new LoContext().createInner(true), new CFNode());
+        var ctx = new LoContext().createInner(true);
+        var result = node.compile2(ctx);
 
-        test.deepEqual(result.renderTree(),
+        test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
             [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
@@ -46,7 +48,8 @@ module.exports["blocking calls"] = {
                                             [ 'arrayLiteral', [ [ 'mul', [
                                                 "id",
                                                 "$num"
-                                            ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ] ] ] ] ] ] ] ],
+                                            ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ] ] ] ] ] ],
+                                [ 'stmtList', [ 'return' ] ] ] ],
                             [ 'null' ] ] ] ] ]);
 
         test.done();
@@ -61,7 +64,10 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new CFNode()).renderTree(),
+        var ctx = new LoContext().createInner(true);
+        var result = node.compile2(ctx);
+
+        test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -90,7 +96,10 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new CFNode()).renderTree(),
+        var ctx = new LoContext().createInner(true);
+        var result = node.compile2(ctx);
+
+        test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -121,7 +130,10 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new CFNode()).renderTree(),
+        var ctx = new LoContext().createInner(true);
+        var result = node.compile2(ctx);
+
+        test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -159,7 +171,10 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile2(new LoContext(), new CFNode()).renderTree(),
+        var ctx = new LoContext().createInner(true);
+        var result = node.compile2(ctx);
+
+        test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
             [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
@@ -196,5 +211,3 @@ module.exports["blocking calls"] = {
         test.done();
     }
 };
-
-

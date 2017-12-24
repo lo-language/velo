@@ -10,6 +10,7 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const CFNode = require('../compiler/CFNode');
 
 
 /**
@@ -48,43 +49,6 @@ __.prototype.getTree = function () {
     ];
 };
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param context
- */
-__.prototype.compile = function (context) {
-
-    if (context.canRespond() == false) {
-        throw new Error("can't respond from this context");
-    }
-
-    var args = JS.arrayLiteral(this.args.map(arg => arg.compile(context)));
-
-    var response = this.type == 'reply' ?
-        JS.exprStmt(JS.runtimeCall('succ', [args])) :
-        JS.exprStmt(JS.runtimeCall('fail', [args]));
-
-    // a response should compile to a non-appendable JS stmt list
-
-    var following = context.getFollowing();
-
-    // if the following is a connector, include it, otherwise we can drop it
-    context.setFollowing(null);
-
-    if (following == null) {
-        return response;
-    }
-
-    // only if we're in a non-async branch context do we need the return
-    // if the following is an async connector, we don't need the return
-
-    return JS.stmtList(response, JS.stmtList(JS.return()));
-};
-
-
-
-
 
 /**
  * Compiles this node to JS in the given context.
@@ -106,19 +70,19 @@ __.prototype.compile2 = function (sourceCtx, targetCtx) {
 
     // a response should compile to a non-appendable JS stmt list
 
-    var following = sourceCtx.getFollowing();
-
-    // if the following is a connector, include it, otherwise we can drop it
-    sourceCtx.setFollowing(null);
-
-    if (following == null) {
-        return response;
-    }
+    // var following = sourceCtx.getFollowing();
+    //
+    // // if the following is a connector, include it, otherwise we can drop it
+    // sourceCtx.setFollowing(null);
+    //
+    // if (following == null) {
+    //     return response;
+    // }
 
     // only if we're in a non-async branch context do we need the return
     // if the following is an async connector, we don't need the return
 
-    return JS.stmtList(response, JS.stmtList(JS.return()));
+    return new CFNode(response).append(new CFNode(JS.return()));
 };
 
 module.exports = __;

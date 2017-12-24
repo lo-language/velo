@@ -29,13 +29,16 @@ class ReqExprNode extends CFNode {
      *
      * @param address
      * @param args
+     * @param resultId
      */
-    constructor(address, args) {
+    constructor(address, args, resultId) {
 
         super();
 
         this.address = address;
         this.args = args;
+        this.resultId = resultId;
+        this.intact = false;
     }
 
     /**
@@ -46,6 +49,7 @@ class ReqExprNode extends CFNode {
     }
 
     /**
+     *
      */
     getJs (writer) {
 
@@ -54,7 +58,7 @@ class ReqExprNode extends CFNode {
 
         return JS.exprStmt(JS.runtimeCall('sendAndBlock', [
             this.address, JS.arrayLiteral(this.args),
-            JS.fnDef(['res0'], writer.captureTail()),
+            JS.fnDef([this.resultId], writer.captureTail()),
             JS.NULL // todo put a ref to a global fail handler here
         ]));
     }

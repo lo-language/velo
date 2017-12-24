@@ -180,18 +180,20 @@ __.prototype.append = function (stmtList) {
  * Compiles this node to JS in the given context.
  *
  * @param sourceCtx
- * @param last          the last node of the target control flow graph
  */
-__.prototype.compile2 = function (sourceCtx, last) {
+__.prototype.compile2 = function (sourceCtx) {
 
     // stmts return node lists
     // reqexprs need to mutate something, because they're returning a JS node,
     // so they take a list as a param so they can push onto it
 
-    var head = this.head.compile2(sourceCtx, last);
+    var head = this.head.compile2(sourceCtx);
+
+    // unpack any wrapping requests
+    sourceCtx.unpackAndWrap(head);
 
     if (this.tail) {
-        head.append(this.tail.compile2(sourceCtx, head.getLast()));
+        head.append(this.tail.compile2(sourceCtx));
     }
 
     return head;

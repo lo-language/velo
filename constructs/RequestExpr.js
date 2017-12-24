@@ -81,24 +81,20 @@ __.prototype.compile = function (context) {
 
 
 /**
- * Compiles this node to JS in the given context, injecting a wrapper into the context.
+ * Pushes a wrapper into the context.
  *
  * @param sourceCtx
- * @param reqStack
+ * @param targetCtx
  */
-__.prototype.compile2 = function (sourceCtx, reqStack) {
+__.prototype.compile2 = function (sourceCtx, targetCtx) {
 
-    var address = this.address.compile2(sourceCtx, reqStack);
+    var address = this.address.compile2(sourceCtx, targetCtx);
 
     var args = this.args.map(arg => {
-        return arg.compile2(sourceCtx, reqStack);
+        return arg.compile2(sourceCtx, targetCtx);
     });
 
-
-    var label = 'res0';//reqStack.getNextLabel();
-
-    // add a blocking request node to the graph
-    reqStack.push(new ReqExprNode(address, args));
+    var label = sourceCtx.pushRequest(address, args);
 
     // gets a temp var and returns it
     return JS.subscript(JS.ID(label), JS.num('0'));

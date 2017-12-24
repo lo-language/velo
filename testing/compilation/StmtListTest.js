@@ -7,7 +7,7 @@
 
 var LoContext = require('../../compiler/LoContext');
 var Lo = require('../../constructs');
-var CFNode = require('../../compiler/CFNode');
+var JsWriter = require('../../codegen/JsWriter');
 var util = require('util');
 
 module.exports["statement lists"] = {
@@ -21,7 +21,7 @@ module.exports["statement lists"] = {
             )
         );
 
-        test.equal(node.compile2(new LoContext().createInner(), new CFNode()).renderJs(),
+        test.equal(new JsWriter().generateJs(node.compile2(new LoContext())).renderJs(),
             '$foo = 42;\n$bar = 57;\n');
         test.done();
     },
@@ -38,11 +38,9 @@ module.exports["statement lists"] = {
             )
         );
 
-        var last = new CFNode();
+        var js = new JsWriter().generateJs(node.compile2(new LoContext(), []));
 
-        node.compile2(new LoContext().createInner(), last);
-
-        test.equal(last.renderJs(),
+        test.equal(js.renderJs(),
             'task.sendAndBlock($bar, [42], function (res0) {\n\n$foo = res0[0];\n$baz = 57;\n}, null);\n');
         test.done();
     }

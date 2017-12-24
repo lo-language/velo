@@ -77,6 +77,7 @@ __.prototype.compile2 = function (loContext, targetCtx) {
 
     // write the loop predicate as a conditional
     // any following statements are rendered in the false branch
+    // note that we don't use our BranchNode here because we want different behavior
 
     var fnBody = new CFNode(writer => {
         return JS.cond(

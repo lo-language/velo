@@ -31,7 +31,7 @@ class CFNode {
      */
     constructor (js, intact = true) {
 
-        this.prev = null;   // previous statement node
+        // this.prev = null;   // previous statement node
         this.next = null;   // next stmt node
         this.intact = intact;
 
@@ -40,21 +40,6 @@ class CFNode {
         this.reqNum = 0;
     }
 
-
-    /**
-     *
-     * @param stack
-     */
-    static makeWrapper (stack) {
-
-        var head = stack[0];
-
-        for (var i = 1; i < stack.length; i++) {
-            head.append(stack[i]);
-        }
-
-        return head;
-    }
 
     /**
      * Gets the statement for this node.
@@ -86,7 +71,7 @@ class CFNode {
     setNext(next) {
 
         this.next = next;
-        next.prev = this;
+        // next.prev = this;
 
         return next;
     }
@@ -94,10 +79,10 @@ class CFNode {
     /**
      * Returns the first node in this graph.
      */
-    getFirst() {
-
-        return this.prev ? this.prev.getFirst() : this;
-    }
+    // getFirst() {
+    //
+    //     return this.prev ? this.prev.getFirst() : this;
+    // }
 
     /**
      * Returns the last node in this graph.
@@ -119,7 +104,7 @@ class CFNode {
      * Appends the given node to the end of this list.
      *
      * @param node  CFNode
-     * @returns
+     * @returns {CFNode}
      */
     append (node) {
 
@@ -127,10 +112,12 @@ class CFNode {
         // if (this.isTerminal) {}
 
         if (this.next) {
-            return this.next.append(node);
+            this.next.append(node);
+            return this;
         }
 
         this.setNext(node);
+        return this;
     }
 
     /**

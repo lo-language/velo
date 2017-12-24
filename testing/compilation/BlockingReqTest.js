@@ -16,6 +16,7 @@
 const BlockingReq = require('../../compiler/BlockingReq');
 const JS = require('../../codegen/JsPrimitives');
 const CFNode = require('../../compiler/CFNode');
+const JsWriter = require('../../codegen/JsWriter');
 
 module.exports = {
 
@@ -23,7 +24,7 @@ module.exports = {
 
         var req = new BlockingReq(JS.ID('foo'), []);
 
-        test.deepEqual(req.renderTree(), [ 'stmtList',
+        test.deepEqual(new JsWriter().generateJs(req).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
@@ -45,7 +46,7 @@ module.exports = {
 
         // let's say the next stmt is a fn call with no args -- we could optimize by detecting that
 
-        test.deepEqual(req.renderTree(), [ 'stmtList',
+        test.deepEqual(new JsWriter().generateJs(req).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
