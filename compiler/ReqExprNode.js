@@ -62,13 +62,6 @@ class ReqExprNode extends CFNode {
             JS.NULL // todo put a ref to a global fail handler here
         ]));
     }
-
-    /**
-     */
-    connectTo(name) {
-
-        throw new Error('to do!');
-    }
 }
 
 module.exports = ReqExprNode;

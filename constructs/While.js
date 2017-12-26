@@ -61,12 +61,14 @@ __.prototype.compile2 = function (loContext, targetCtx) {
     // we use the native loop when we can; otherwise must use our recursive loop
 
     var reqStack = [];
-    var loopCond = this.cond.compile2(loContext, reqStack);
-    var loopBody = this.body.compile2(loContext, reqStack);
+    var loopCond = this.cond.compile2(loContext);
+
+    // we create a child context here just to keep from messing up the cond context -- weak
+    var loopBody = this.body.compile2(loContext.createInner());
 
     // if neither part is broken, can use a native while loop
 
-    if (reqStack.length == 0 && loopBody.isIntact()) {
+    if (loContext.hasWrapper() == false && loopBody.isIntact()) {
         return new CFNode(function (writer) {
             return JS.while(loopCond, writer.branch().generateJs(loopBody))
         });
@@ -88,11 +90,7 @@ __.prototype.compile2 = function (loContext, targetCtx) {
     });
 
     // wrap the condition in any wrapping reqs
-    if (reqStack.length > 0) {
-        var wrapper = CFNode.makeWrapper(reqStack);
-        wrapper.append(fnBody);
-        fnBody = wrapper;
-    }
+    fnBody = loContext.unpackAndWrap(fnBody);
 
     // form the loop by adding a recursive call to the loop body
     // use setImmediate to avoid blowing up the stack

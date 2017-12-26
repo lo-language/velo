@@ -12,6 +12,10 @@ const Lo = require('../../constructs');
 module.exports["basics"] = {
 
     "array scan": function (test) {
+
+        // scan foo -> (item) {
+        //    count = 1;
+        // }
         
         var node = new Lo.scan(
             new Lo.identifier('foo'),

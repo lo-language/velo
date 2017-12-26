@@ -82,6 +82,8 @@ module.exports["basics"] = {
         // compiling a stmt returns a control flow graph
         var js = new JsWriter().generateJs(loop.compile2(new LoContext(), stack));
 
+        console.log(js.renderJs());
+
         test.deepEqual(js.renderTree(), ['stmtList',
             ['expr-stmt',
                 ['call', ['function', 'L1', [], ['stmtList', ['expr-stmt', ['call', ['select', ['id', 'task'], 'sendAndBlock'], [['id', '$foo'], ['arrayLiteral', []], ['function', null, ['res0'], ['stmtList', ['if', ["subscript", ["id", "res0"], ["num", "0"]], ["stmtList", ["expr-stmt", ["assign", ["id", "$bar"], ["num", "57"]]], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]

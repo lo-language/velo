@@ -120,36 +120,6 @@ class CFNode {
         return this;
     }
 
-    /**
-     * Connects this path to the specified function, which could be a continuation or a loop.
-     *
-     * @param name
-     */
-    connectTo(name) {
-
-        var call = new CFNode(JS.exprStmt(JS.fnCall(JS.ID(name), [])));
-
-        // todo mark terminated
-        if (this.next) {
-            return this.next.append(call);
-        }
-
-        this.setNext(call);
-    }
-
-    /**
-     * Inserts a node into the control flow graph between this node and its parent.
-     *
-     * @param node
-     */
-    // prepend(node) {
-    //
-    //     // should we have insertBefore and insertAfter instead?
-    //
-    //     if (this.prev) this.prev.setNext(node);
-    //     node.setNext(this);
-    // }
-
     getNextLabel(node) {
 
         return 'res' + this.reqNum++;

@@ -106,8 +106,15 @@ class JsWriter {
             this.tail = this.generateJs(node.next);
         }
 
+        var head = node.getJs(this);
+
+        // collapse empty nodes
+        if (head == null) {
+            return this.tail;
+        }
+
         // we might have a tail even though we don't have a next node, if we're a child context
-        return JS.stmtList(node.getJs(this), this.tail);
+        return JS.stmtList(head, this.tail);
     }
 }
 

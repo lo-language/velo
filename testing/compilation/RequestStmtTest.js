@@ -8,6 +8,7 @@
 const LoContext = require('../../compiler/LoContext');
 const Lo = require('../../constructs');
 const CFNode = require('../../compiler/CFNode');
+const JsWriter = require('../../codegen/JsWriter');
 
 module.exports["blocking"] = {
 
@@ -31,7 +32,7 @@ module.exports["blocking"] = {
                 true
             );
 
-        var result = node.compile2(new LoContext());
+        var result = new JsWriter().generateJs(node.compile2(new LoContext()));
 
         test.deepEqual(result.renderTree(), ['stmtList',
                 [ 'expr-stmt',
@@ -75,7 +76,9 @@ module.exports["blocking"] = {
             new Lo.stmtList(
                 new Lo.assign(new Lo.identifier('bazball'), new Lo.number('42'))));
 
-        test.deepEqual(node.compile2(new LoContext()).renderTree(), [ 'stmtList',
+        var result = new JsWriter().generateJs(node.compile2(new LoContext()));
+
+        test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],

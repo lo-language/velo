@@ -62,6 +62,10 @@ class ReqNode extends CFNode {
             // our cute little optimization here (connector-as-handler) could break the stack
             // if the handler calls aren't detached from the stack
 
+            // todo we need to add the tail, or a call to a cont, to the handler, correct?
+
+            console.log('ho no');
+
             return JS.exprStmt(JS.runtimeCall('sendAndBlock', [
                 this.address, JS.arrayLiteral(this.args),
                 connect ? JS.ID(tail.name) : JS.fnDef([], tail),
@@ -71,8 +75,8 @@ class ReqNode extends CFNode {
 
         return JS.exprStmt(JS.runtimeCall('sendAndBlock', [
             this.address, JS.arrayLiteral(this.args),
-            this.succHandler || JS.NULL,
-            this.failHandler || JS.NULL
+            this.succHandler ? this.succHandler : JS.NULL,
+            this.failHandler ? this.failHandler : JS.NULL
         ]));
     }
 }

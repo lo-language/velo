@@ -7,6 +7,7 @@
 
 const LoContext = require('../../compiler/LoContext');
 const Lo = require('../../constructs');
+const JsWriter = require('../../codegen/JsWriter');
 
 module.exports["basics"] = {
 
@@ -14,11 +15,13 @@ module.exports["basics"] = {
 
         var node = new Lo.response('reply');
 
-        test.deepEqual(node.compile2(new LoContext().createInner(true)).renderTree(),
-            [ 'expr-stmt',
-                [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'succ' ],
-                    [ [ 'arrayLiteral', [] ] ] ] ]);
+        test.deepEqual(new JsWriter().generateJs(node.compile2(new LoContext().createInner(true))).renderTree(),
+            [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'succ' ],
+                        [ [ 'arrayLiteral', [] ] ] ] ],
+                [ 'stmtList', [ 'return' ] ] ]);
         test.done();
     },
 
@@ -44,11 +47,13 @@ module.exports["basics"] = {
 
         var node = new Lo.response('reply', [new Lo.number('42')]);
 
-        test.deepEqual(node.compile2(new LoContext().createInner(true)).renderTree(),
-            [ 'expr-stmt',
-                [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'succ' ],
-                    [ [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ]);
+        test.deepEqual(new JsWriter().generateJs(node.compile2(new LoContext().createInner(true))).renderTree(),
+            [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'succ' ],
+                        [ [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ],
+                [ 'stmtList', [ 'return' ] ] ]);
         test.done();
     },
 
@@ -59,12 +64,14 @@ module.exports["basics"] = {
             new Lo.string('hot dog!')
         ]);
 
-        test.deepEqual(node.compile2(new LoContext().createInner(true)).renderTree(),
-            [ 'expr-stmt',
-                [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'succ' ],
-                    [ [ 'arrayLiteral',
-                        [ [ 'num', '42' ], [ 'string', 'hot dog!' ] ] ] ] ] ]);
+        test.deepEqual(new JsWriter().generateJs(node.compile2(new LoContext().createInner(true))).renderTree(),
+            [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'succ' ],
+                        [ [ 'arrayLiteral',
+                            [ [ 'num', '42' ], [ 'string', 'hot dog!' ] ] ] ] ] ],
+                [ 'stmtList', [ 'return' ] ] ]);
         test.done();
     },
 
@@ -72,11 +79,13 @@ module.exports["basics"] = {
 
         var node = new Lo.response('fail', [new Lo.number('42')]);
 
-        test.deepEqual(node.compile2(new LoContext().createInner(true)).renderTree(),
-            [ 'expr-stmt',
-                [ 'call',
-                    [ 'select', [ 'id', 'task' ], 'fail' ],
-                    [ [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ]);
+        test.deepEqual(new JsWriter().generateJs(node.compile2(new LoContext().createInner(true))).renderTree(),
+            [ 'stmtList',
+                [ 'expr-stmt',
+                    [ 'call',
+                        [ 'select', [ 'id', 'task' ], 'fail' ],
+                        [ [ 'arrayLiteral', [ [ 'num', '42' ] ] ] ] ] ],
+                [ 'stmtList', [ 'return' ] ] ]);
         test.done();
     }
 };

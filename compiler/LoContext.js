@@ -51,9 +51,6 @@ var __ = function (parent, isService) {
     this.wrapper = null;
     this.reqId = 0;
 
-    this.connector = null;
-    this.continuous = true; // continuous until proven async
-    this.contId = 0;
     this.registry = parent ? parent.registry : null;
 
     this.errors = [];
@@ -92,6 +89,10 @@ __.prototype.isService = function () {
  * Returns true if this is a service context.
  */
 __.prototype.getNextLoopName = function () {
+
+    if (this.parent) {
+        return this.parent.getNextLoopName();
+    }
 
     return 'L' + this.nextLoopNum++;
 };
@@ -350,6 +351,11 @@ __.prototype.unpackAndWrap = function (node) {
 };
 
 
+__.prototype.hasWrapper = function () {
+
+    return this.wrapper ? true : false;
+};
+
 /**
  * Returns true if a response can be issued in this context (for it or a parent).
  *
@@ -370,14 +376,14 @@ __.prototype.canRespond = function () {
 
 
 
-__.prototype.getNextLabel = function () {
-
-    if (this.parent) {
-        return this.parent.getNextLabel();
-    }
-
-    return this.contId++;
-};
+// __.prototype.getNextLabel = function () {
+//
+//     if (this.parent) {
+//         return this.parent.getNextLabel();
+//     }
+//
+//     return this.contId++;
+// };
 
 
 __.prototype.isRValue = function () {

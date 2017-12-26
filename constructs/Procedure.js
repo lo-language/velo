@@ -14,8 +14,8 @@
 
 const JS = require('../codegen/JsPrimitives');
 const CFNode = require('../compiler/CFNode');
-const IRProc = require('../compiler/IRProc');
 const Response = require('../constructs/Response');
+const JsWriter = require('../codegen/JsWriter');
 
 /**
  * A procedure definition
@@ -72,11 +72,11 @@ __.prototype.compile2 = function (sourceCtx) {
     this.params.forEach(name => localCtx.declare(name));
 
     // define the task object: var task = new Task();
-    var root = this.isService ?
+    var firstStmt = this.isService ?
         new CFNode(JS.varDecl('task', JS.new('Task', [JS.ID('succ'), JS.ID('fail')]))) :
         new CFNode();
 
-    var lastStmt = root;
+    var lastStmt = firstStmt;
 
     // compile the statement(s) in the context of the local scope;
     // this will also populate our symbol table
@@ -101,15 +101,15 @@ __.prototype.compile2 = function (sourceCtx) {
         // implement auto-reply: if a service doesn't explicitly respond, it should reply <empty>
 
         if (body.isIntact()) {
-            body.append(new CFNode(new Response('reply').compile(localCtx, body)));
+            body.append(new CFNode(new Response('reply').compile2(localCtx, body)));
         }
     }
 
     // connect the body
     lastStmt.setNext(body);
 
-    // we need to return an IR proc container, not straight JS, so we can amend handlers later
-    return new IRProc(this.isService ? ['args', 'succ', 'fail'] : ['args'], body);
+    return JS.fnDef(this.isService ? ['args', 'succ', 'fail'] : ['args'],
+            new JsWriter().generateJs(firstStmt));
 };
 
 module.exports = __;
