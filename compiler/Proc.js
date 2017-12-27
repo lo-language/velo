@@ -10,6 +10,7 @@
  =============================================================================*/
 
 /**
+ * Packages up an IR procedure, but isn't a control flow node.
  *
  * Created by: spurcell
  * 12/25/14
@@ -17,32 +18,29 @@
 
 "use strict";
 
-const JS = require('./JsPrimitives');
+const JS = require('./../codegen/JsPrimitives');
 
-
-class Connector {
+class Proc {
 
     /**
      *
-     * @param name
+     * @param args
+     * @param body
      */
-    constructor(name) {
+    constructor(args, body) {
 
-        this.name = name;
-        this.stmt = JS.stmtList(JS.exprStmt(JS.fnCall(JS.ID(this.name), [])));
+        this.args = args;
+        this.body = body;
     }
 
-    renderTree () {
-
-        return this.stmt.renderTree();
-    }
 
     /**
      */
-    renderJs () {
+    getJs (writer) {
 
-        return this.stmt.renderJs();
+        return JS.fnDef(this.args, writer.generateJs(this.body));
     }
 }
 
-module.exports = Connector;
+module.exports = Proc;
+

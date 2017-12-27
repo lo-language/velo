@@ -8,6 +8,7 @@
 const LoContext = require('../../compiler/LoContext');
 const JS = require('../../codegen/JsPrimitives');
 const Lo = require('../../constructs');
+const JsWriter = require('../../codegen/JsWriter');
 
 module.exports["service"] = {
 
@@ -57,7 +58,7 @@ module.exports["service"] = {
                                                 [ "id", "$result" ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ] ] ] ],
                                         [ 'null' ] ] ] ] ] ] ] ] ];
 
-        test.deepEqual(node.compile2(new LoContext()).renderTree(), result);
+        test.deepEqual(node.compile2(new LoContext()).getJs(new JsWriter()).renderTree(), result);
         test.done();
     },
 
@@ -110,13 +111,21 @@ module.exports["service"] = {
                                     [ 'expr-stmt',
                                         [ 'call', [ 'select', [ 'id', 'task' ], 'succ' ], [ [
                                             "arrayLiteral", []
-                                        ] ] ] ] ] ] ] ] ] ] ];
+                                        ] ] ] ],
+                                    [ 'stmtList', [ 'return' ] ] ] ] ] ] ] ] ];
 
-        test.deepEqual(node.compile2(new LoContext()).renderTree(), result);
+        test.deepEqual(node.compile2(new LoContext()).getJs(new JsWriter()).renderTree(), result);
         test.done();
     },
 
     "nested procs doesn't duplicate var declarations": function (test) {
+
+        // () {
+        //   report = '';
+        //   scan tests -> (test) {
+        //     report = test;
+        //   }
+        // }
 
         var node = new Lo.procedure(
             [],
@@ -140,7 +149,10 @@ module.exports["service"] = {
             ),
             true);
 
-        test.deepEqual(node.compile2(new LoContext()).renderTree(),
+        var base = node.compile2(new LoContext());
+        var result = node.compile2(new LoContext()).getJs(new JsWriter());
+
+        test.deepEqual(result.renderTree(),
             [ 'function',
                 null,
                 [ 'args', 'succ', 'fail' ],
@@ -176,7 +188,7 @@ module.exports["service"] = {
                                         [ 'call', [ 'select', [ 'id', 'task' ], 'succ' ], [ [
                                             "arrayLiteral",
                                             []
-                                        ] ] ] ] ] ] ] ] ] ]);
+                                        ] ] ] ], [ 'stmtList', [ 'return' ] ] ] ] ] ] ] ]);
         test.done();
     }
 };

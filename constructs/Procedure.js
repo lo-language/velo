@@ -13,6 +13,7 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const Proc = require('../compiler/Proc');
 const CFNode = require('../compiler/CFNode');
 const Response = require('../constructs/Response');
 const JsWriter = require('../codegen/JsWriter');
@@ -101,15 +102,14 @@ __.prototype.compile2 = function (sourceCtx) {
         // implement auto-reply: if a service doesn't explicitly respond, it should reply <empty>
 
         if (body.isIntact()) {
-            body.append(new CFNode(new Response('reply').compile2(localCtx, body)));
+            body.append(new Response('reply').compile2(localCtx));
         }
     }
 
     // connect the body
     lastStmt.setNext(body);
 
-    return JS.fnDef(this.isService ? ['args', 'succ', 'fail'] : ['args'],
-            new JsWriter().generateJs(firstStmt));
+    return new Proc(this.isService ? ['args', 'succ', 'fail'] : ['args'], firstStmt);
 };
 
 module.exports = __;

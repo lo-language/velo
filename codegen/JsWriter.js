@@ -90,7 +90,7 @@ class JsWriter {
         this.tail = JS.stmtList(JS.fnDef([], this.captureTail(), name));
 
         // todo return connector here instead
-        return JS.stmtList(JS.exprStmt(JS.fnCall(JS.ID(name), [])));
+        return new Connector(name);
     }
 
     /**

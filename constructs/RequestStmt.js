@@ -14,6 +14,7 @@
 const JS = require('../codegen/JsPrimitives');
 const CFNode = require('../compiler/CFNode');
 const BlockingReq = require('../compiler/BlockingReq');
+const JsWriter = require('../codegen/JsWriter');
 
 /**
  * A "function call" (request) statement.
@@ -22,15 +23,15 @@ const BlockingReq = require('../compiler/BlockingReq');
  *
  * @param address
  * @param args
- * @param replyHandler
+ * @param succHandler
  * @param failHandler
  * @param blocking
  */
-var __ = function (address, args, replyHandler, failHandler, blocking) {
+var __ = function (address, args, succHandler, failHandler, blocking) {
 
     this.address = address;
     this.args = args;
-    this.replyHandler = replyHandler;
+    this.succHandler = succHandler;
     this.failHandler = failHandler;
     this.blocking = blocking;
 };
@@ -44,7 +45,7 @@ __.prototype.getAst = function () {
         type: 'request_stmt',
         address: this.address.getAst(),
         args: this.args.map(arg => arg.getAst()),
-        subsequent: this.replyHandler ? this.replyHandler.getAst() : undefined,
+        subsequent: this.succHandler ? this.succHandler.getAst() : undefined,
         contingency: this.failHandler ? this.failHandler.getAst() : undefined,
         blocking: this.blocking
     };
@@ -59,7 +60,7 @@ __.prototype.getTree = function () {
         'request',
         this.address.getTree(),
         this.args.map(arg => arg.getTree()),
-        this.replyHandler ? this.replyHandler.getTree() : null,
+        this.succHandler ? this.succHandler.getTree() : null,
         this.failHandler ? this.failHandler.getTree() : null,
         this.blocking
     ];
@@ -79,14 +80,20 @@ __.prototype.compile2 = function (sourceCtx, targetCtx) {
         return arg.compile2(sourceCtx, targetCtx);
     });
 
-    var succHandler = this.replyHandler ? this.replyHandler.compile2(sourceCtx, targetCtx) : null;
+    // these return proc objects
+
+    var succHandler = this.succHandler ? this.succHandler.compile2(sourceCtx, targetCtx) : null;
     var failHandler = this.failHandler ? this.failHandler.compile2(sourceCtx, targetCtx) : null;
 
     return this.blocking ?
         new BlockingReq(address, args, succHandler, failHandler) :
-        new CFNode(JS.exprStmt(JS.runtimeCall('sendAsync', [
-            address, JS.arrayLiteral(args), succHandler, failHandler
-        ])));
+        new CFNode(writer => {
+            return JS.exprStmt(JS.runtimeCall('sendAsync', [
+                address, JS.arrayLiteral(args),
+                succHandler ? succHandler.getJs(new JsWriter()) : JS.NULL,
+                failHandler ? failHandler.getJs(new JsWriter()) : JS.NULL
+            ]))
+        });
 };
 
 module.exports = __;

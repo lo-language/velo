@@ -10,7 +10,8 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-
+const CFNode = require('../compiler/CFNode');
+const JsWriter = require('../codegen/JsWriter');
 
 /**
  * A scan statement. Scan is different from something like "for every X in Y" because
@@ -70,10 +71,16 @@ __.prototype.compile = function (context) {
  */
 __.prototype.compile2 = function (sourceCtx, targetCtx) {
 
-    return JS.exprStmt(JS.utilCall('scan', [
-        this.over.compile2(sourceCtx, targetCtx),
-        this.into.compile2(sourceCtx, targetCtx)
-    ]));
+    var over = this.over.compile2(sourceCtx, targetCtx);
+    var into = this.into.compile2(sourceCtx, targetCtx);
+
+    return new CFNode(writer => {
+
+        // we could alternately call writer.sub() or something if we don't want to require JsWriter
+        return JS.exprStmt(JS.utilCall('scan', [
+            over, into.getJs(new JsWriter())
+        ]));
+    });
 };
 
 module.exports = __;

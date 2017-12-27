@@ -19,9 +19,10 @@
 
 "use strict";
 
-const JS = require('./../codegen/JsPrimitives');
+const JS = require('../codegen/JsPrimitives');
 const CFNode = require('./CFNode');
-const Connector = require('./../codegen/Connector');
+const JsWriter = require('../codegen/JsWriter');
+const Connector = require('../codegen/Connector');
 
 
 class ReqNode extends CFNode {
@@ -30,8 +31,8 @@ class ReqNode extends CFNode {
      *
      * @param address
      * @param args
-     * @param succ      a function def
-     * @param fail
+     * @param succ      a Proc
+     * @param fail      a Proc
      */
     constructor(address, args, succ, fail) {
 
@@ -56,27 +57,24 @@ class ReqNode extends CFNode {
 
         if (writer.hasTail()) {
 
-            var tail = writer.captureTail();
-            var connect = tail instanceof Connector;
+            var contCall = writer.wrapTail();
 
-            // our cute little optimization here (connector-as-handler) could break the stack
-            // if the handler calls aren't detached from the stack
+            // we're putting a continuation into the context for rendering the handlers
+            // but they actually render to fn def exprs, NOT statement lists...
 
-            // todo we need to add the tail, or a call to a cont, to the handler, correct?
-
-            console.log('ho no');
+            var succHandler = this.succHandler ? this.succHandler.getJs(writer.branch(contCall)) : JS.ID(contCall.name);
+            var failHandler = this.failHandler ? this.failHandler.getJs(writer.branch(contCall)) : JS.ID(contCall.name);
 
             return JS.exprStmt(JS.runtimeCall('sendAndBlock', [
                 this.address, JS.arrayLiteral(this.args),
-                connect ? JS.ID(tail.name) : JS.fnDef([], tail),
-                connect ? JS.ID(tail.name) : JS.fnDef([], tail)
+                succHandler, failHandler
             ]));
         }
 
         return JS.exprStmt(JS.runtimeCall('sendAndBlock', [
             this.address, JS.arrayLiteral(this.args),
-            this.succHandler ? this.succHandler : JS.NULL,
-            this.failHandler ? this.failHandler : JS.NULL
+            this.succHandler ? this.succHandler.getJs(new JsWriter()) : JS.NULL,
+            this.failHandler ? this.failHandler.getJs(new JsWriter()) : JS.NULL
         ]));
     }
 }
