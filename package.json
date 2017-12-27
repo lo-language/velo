@@ -1,8 +1,8 @@
 {
   "name": "velo",
   "private": true,
-  "description": "A JavaScript transpiler implementation of the Lo programming language",
-  "version": "0.4.0",
+  "description": "A proof-of-concept implementation of the Lo programming language as a transpiler targeting JavaScript",
+  "version": "0.5.0",
   "author": "Seth Purcell",
   "preferGlobal": true,
   "engines": {

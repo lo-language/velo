@@ -74,6 +74,7 @@ __.prototype.resolve = function (registry) {
                 console.log(err);
             }
         }, err => {
+            // todo improve error reporting here
             console.error(err);
         }));
 

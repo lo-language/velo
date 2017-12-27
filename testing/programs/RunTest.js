@@ -364,8 +364,8 @@ module.exports['reply handling'] = {
                     test.equal(res, 42);
                     test.done();
                 }
-                ).fin();
-        // }).fin();
+                ).done();
+        // }).done();
     }
 };
 
