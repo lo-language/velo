@@ -73,18 +73,21 @@ module.exports["basics"] = {
         //  bar = 57;
         // }
 
-
         var body = new Lo.stmtList(new Lo.assign(new Lo.identifier('bar'), new Lo.number('57')));
 
         var loop = new Lo.while(new Lo.requestExpr(new Lo.identifier('foo'), [], true), body);
-        var stack = [];
+        var ctx = new LoContext();
 
         // compiling a stmt returns a control flow graph
-        var js = new JsWriter().generateJs(loop.compile2(new LoContext(), stack));
+        var js = new JsWriter().generateJs(loop.compile2(ctx));
+
+        // make sure we properly report any vars in the body
+        test.deepEqual(ctx.getJsVars(), ['$bar']);
 
         test.deepEqual(js.renderTree(), ['stmtList',
             ['expr-stmt',
-                ['call', ['function', 'L1', [], ['stmtList', ['expr-stmt', ['call', ['select', ['id', 'task'], 'sendAndBlock'], [['id', '$foo'], ['arrayLiteral', []], ['function', null, ['res0'], ['stmtList', ['if', ["subscript", ["id", "res0"], ["num", "0"]], ["stmtList", ["expr-stmt", ["assign", ["id", "$bar"], ["num", "57"]]], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]
+                ['call', ['function', 'L1', [], ['stmtList',
+                    ['expr-stmt', ['call', ['select', ['id', 'task'], 'sendAndBlock'], [['id', '$foo'], ['arrayLiteral', []], ['function', null, ['res0'], ['stmtList', ['if', ["subscript", ["id", "res0"], ["num", "0"]], ["stmtList", ["expr-stmt", ["assign", ["id", "$bar"], ["num", "57"]]], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]
                 ]]]]],
                     ['null']]]]]],
                     []]]]);

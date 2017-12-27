@@ -129,12 +129,14 @@ __.prototype.sendAndBlock = function (address, args, succ, fail) {
  */
 __.prototype.processResponses = function () {
 
-    if (this.blocked || this.responses.length == 0) {
+    if (this.blocked) {// || this.responses.length == 0) {
         return;
     }
 
     // pull off a response and run it
-    this.responses.shift().call();
+    if (this.responses.length > 0) {
+        this.responses.shift().call();
+    }
 
     // see if we've now completed and should auto-respond; not factored out for perf
     if (this.pendingReqs == 0 && this.responses.length == 0 && this.hasResponded == false) {
