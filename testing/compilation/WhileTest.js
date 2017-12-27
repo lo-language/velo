@@ -75,9 +75,7 @@ module.exports['basics'] = {
             )
         );
 
-        var stack = [];
-
-        var js = new JsWriter().generateJs(loop.compile2(new LoContext(), stack));
+        var js = new JsWriter().generateJs(loop.compile2(new LoContext()));
 
         test.deepEqual(js.renderTree(), ['stmtList',
             ['expr-stmt',
@@ -94,8 +92,9 @@ module.exports['basics'] = {
                                             ['select', ['id', 'task'], 'sendAndBlock'],
                                             [['id', '$bar'],
                                                 ['arrayLiteral', [['num', '57']]],
-                                                ['function', null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]], ['function', null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]
-                                            ]]]]]]]]]],
+                                                [ 'id', 'k0' ], [ 'id', 'k0' ] ] ] ],
+                                    [ 'stmtList',
+                                        ['function', 'k0', [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]]]]]]],
                     []]]]);
         test.done();
     },
@@ -119,23 +118,46 @@ module.exports['basics'] = {
             )
         );
 
-        var stack = [];
+        var js = new JsWriter().generateJs(loop.compile2(new LoContext()));
 
-        var js = new JsWriter().generateJs(loop.compile2(new LoContext(), stack));
-
-        test.deepEqual(js.renderTree(), ['stmtList',
-            ['expr-stmt',
-                ['call',
-                    ['function',
+        test.deepEqual(js.renderTree(), [ 'stmtList',
+            [ 'expr-stmt',
+                [ 'call',
+                    [ 'function',
                         'L1',
                         [],
-                        ['stmtList',
-                            ['expr-stmt',
-                                ['call',
-                                    ['select', ['id', 'task'], 'sendAndBlock'],
-                                    [['id', '$foo'],
-                                        ['arrayLiteral', []],
-                                        ['function', null, ['res0'], ['stmtList', ['if', ["subscript", ["id", "res0"], ["num", "0"]], ["stmtList", ["expr-stmt", ["call", ["select", ["id", "task"], "sendAndBlock"], [["id", "$bar"], ["arrayLiteral", [["num", "57"]]], ["function", null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]], ["function", null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]]]]]]]]], ['null']]]]]], []]]]);
+                        [ 'stmtList',
+                            [ 'expr-stmt',
+                                [ 'call',
+                                    [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
+                                    [ [ 'id', '$foo' ],
+                                        [ 'arrayLiteral', [] ],
+                                        [ 'function',
+                                            null,
+                                            [ 'res0' ],
+                                            [ 'stmtList', [ 'if', ["subscript",
+                                                [ "id", "res0" ], [ "num", "0" ] ],
+                                                [ "stmtList",
+                                                [ "expr-stmt",
+                                                    [ "call",
+                                                        [ "select", [ "id", "task" ], "sendAndBlock" ],
+                                                        [ [ "id", "$bar" ], [ "arrayLiteral", [ [ "num", "57" ] ] ], [ "id", "k0" ], [ "id", "k0" ] ]
+                                                    ]
+                                                ],
+                                                [
+                                                    "stmtList",
+                                                    [
+                                                        "function",
+                                                        "k0",
+                                                        [],
+                                                        [ "stmtList",
+                                                            [ "expr-stmt",
+                                                                [ "call",
+                                                                    [ "id", "setImmediate" ],
+                                                                    [ [ "call", [ "select", [ "id", "task" ], "doAsync" ], [ [ "id", "L1" ] ] ] ] ] ]
+                                                        ] ] ] ] ] ] ],
+                                        [ 'null' ] ] ] ] ] ],
+                    [] ] ] ]);
         test.done();
     }
 };

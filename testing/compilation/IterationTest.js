@@ -82,8 +82,6 @@ module.exports["basics"] = {
         // compiling a stmt returns a control flow graph
         var js = new JsWriter().generateJs(loop.compile2(new LoContext(), stack));
 
-        console.log(js.renderJs());
-
         test.deepEqual(js.renderTree(), ['stmtList',
             ['expr-stmt',
                 ['call', ['function', 'L1', [], ['stmtList', ['expr-stmt', ['call', ['select', ['id', 'task'], 'sendAndBlock'], [['id', '$foo'], ['arrayLiteral', []], ['function', null, ['res0'], ['stmtList', ['if', ["subscript", ["id", "res0"], ["num", "0"]], ["stmtList", ["expr-stmt", ["assign", ["id", "$bar"], ["num", "57"]]], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]
@@ -125,7 +123,23 @@ module.exports["basics"] = {
 
         test.deepEqual(js.renderTree(), ['stmtList',
             ['expr-stmt',
-                ['call', ['function', 'L1', [], ['stmtList', ['if', ['id', '$foo'], ['stmtList', ['expr-stmt', ['call', ['select', ['id', 'task'], 'sendAndBlock'], [['id', '$bar'], ['arrayLiteral', [['num', '57']]], ['function', null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]], ['function', null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]]]]]]]]], []]]]);
+                ['call',
+                    ['function',
+                        'L1',
+                        [],
+                        ['stmtList',
+                            ['if',
+                                ['id', '$foo'],
+                                ['stmtList',
+                                    ['expr-stmt',
+                                        ['call',
+                                            ['select', ['id', 'task'], 'sendAndBlock'],
+                                            [['id', '$bar'],
+                                                ['arrayLiteral', [['num', '57']]],
+                                                ['id', 'k0'], ['id', 'k0']]]],
+                                    ['stmtList',
+                                        ['function', 'k0', [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]]]]]]],
+                    []]]]);
 
 
         // todo optimize this case to produce this
@@ -195,7 +209,6 @@ module.exports["basics"] = {
         //   y++;
         // }
 
-
         var node = new Lo.while(
             new Lo.binaryOpExpr('<', new Lo.identifier('y'), new Lo.identifier('MAX')),
             new Lo.stmtList(
@@ -208,9 +221,15 @@ module.exports["basics"] = {
                             null,
                             null,
                             true
-                        )
+                        ),
+                        new Lo.stmtList(new Lo.assign(
+                            new Lo.identifier('x'),
+                            new Lo.binaryOpExpr('+', new Lo.identifier('x'), new Lo.number('1'))))
                     )
-                )
+                ),
+                new Lo.stmtList(new Lo.assign(
+                    new Lo.identifier('y'),
+                    new Lo.binaryOpExpr('+', new Lo.identifier('y'), new Lo.number('1'))))
             )
         );
 
@@ -225,13 +244,18 @@ module.exports["basics"] = {
                         ['stmtList',
                             ['if',
                                 ['lt', ['id', '$y'], ['id', '$MAX']],
-                                ['stmtList', ['expr-stmt', ['call', ['function', 'L1', [], ['stmtList', ["if", ["lt", ["id", "$x"], ["id", "$MAX"]], ["stmtList", ["expr-stmt", ["call", ["select", ["id", "task"], "sendAndBlock"], [["id", "$log"], ["arrayLiteral", [["id", "$count"]]], ["function", null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]], ["function", null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]]]]]], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L2"]]]]]]]]]], []]]]]]], []]]]);
+                                ['stmtList',
+                                    ['expr-stmt',
+                                        ['call',
+                                            ['function', 'L1', [], ['stmtList', ["if",
+                                                ["lt", ["id", "$x"], ["id", "$MAX"]], ["stmtList", ["expr-stmt", ["call", ["select", ["id", "task"], "sendAndBlock"], [["id", "$log"], ["arrayLiteral", [["id", "$count"]]], ["id", "k0"], ["id", "k0"]]]], ["stmtList", ["function", "k0", [], ["stmtList", ["expr-stmt", ["assign", ["id", "$x"], ["call", ["select", ["id", "Util"], "add"], [["id", "$x"], ["num", "1"]]]]], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]]]]], ["stmtList", ["expr-stmt", ["assign", ["id", "$y"], ["call", ["select", ["id", "Util"], "add"], [["id", "$y"], ["num", "1"]]]]], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L2"]]]]]]]]]]],
+                                            []]]]]]],
+                    []]]]);
 
         test.done();
     },
 
     "async body and cond": function (test) {
-
 
         // while foo() {
         //   bar <- 57;
@@ -264,7 +288,13 @@ module.exports["basics"] = {
                                     ['select', ['id', 'task'], 'sendAndBlock'],
                                     [['id', '$foo'],
                                         ['arrayLiteral', []],
-                                        ['function', null, ['res0'], ['stmtList', ['if', ["subscript", ["id", "res0"], ["num", "0"]], ["stmtList", ["expr-stmt", ["call", ["select", ["id", "task"], "sendAndBlock"], [["id", "$bar"], ["arrayLiteral", [["num", "57"]]], ["function", null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]], ["function", null, [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]]]]]]]]], ['null']]]]]], []]]]);
+                                        ['function',
+                                            null,
+                                            ['res0'],
+                                            ['stmtList', ['if', ["subscript", ["id", "res0"], ["num", "0"]],
+                                                ["stmtList", ["expr-stmt", ["call", ["select", ["id", "task"], "sendAndBlock"], [["id", "$bar"], ["arrayLiteral", [["num", "57"]]], ["id", "k0"], ["id", "k0"]]]], ["stmtList", ["function", "k0", [], ["stmtList", ["expr-stmt", ["call", ["id", "setImmediate"], [["call", ["select", ["id", "task"], "doAsync"], [["id", "L1"]]]]]]]]]]]]],
+                                        ['null']]]]]],
+                    []]]]);
 
         // test.equal(a.render(),
         //     'let loop = function () {if ($foo) {var cont0 = function () {setImmediate(task.doAsync(loop));};' +
