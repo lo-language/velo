@@ -15,7 +15,7 @@ module.exports["service"] = {
     "basic": function (test) {
 
         // should actually throw an error if result isn't defined in the context
-        // proc is <-> (next) { result *= bar(42); }
+        // proc is (next) { result *= bar(42); }
 
         var node = new Lo.procedure(
             ['next'],
@@ -58,7 +58,7 @@ module.exports["service"] = {
                                                 [ "id", "$result" ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ] ] ] ],
                                         [ 'null' ] ] ] ] ] ] ] ] ];
 
-        test.deepEqual(node.compile2(new LoContext()).getJs(new JsWriter()).renderTree(), result);
+        test.deepEqual(node.compile2(new LoContext()).renderTree(), result);
         test.done();
     },
 
@@ -114,7 +114,7 @@ module.exports["service"] = {
                                         ] ] ] ],
                                     [ 'stmtList', [ 'return' ] ] ] ] ] ] ] ] ];
 
-        test.deepEqual(node.compile2(new LoContext()).getJs(new JsWriter()).renderTree(), result);
+        test.deepEqual(node.compile2(new LoContext()).renderTree(), result);
         test.done();
     },
 
@@ -149,8 +149,7 @@ module.exports["service"] = {
             ),
             true);
 
-        var base = node.compile2(new LoContext());
-        var result = node.compile2(new LoContext()).getJs(new JsWriter());
+        var result = node.compile2(new LoContext());
 
         test.deepEqual(result.renderTree(),
             [ 'function',

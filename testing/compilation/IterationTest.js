@@ -318,31 +318,5 @@ module.exports["basics"] = {
         //     '{\nvar res0 = res ? res[0] : null;\ncont0();}, null);\n\n}\n\n}else {var z = 57;var bee = 27;}};\n\nloop();\n');
 
         test.done();
-    },
-
-    // "indirectly async body": function (test) {
-    //
-    //     var node = {
-    //         type: 'iteration',
-    //         condition: {
-    //             type: 'application',
-    //             address: {type: 'id', name: 'foo'},
-    //             args: []
-    //         },
-    //         statements: {type: 'stmt_list',
-    //             head: {
-    //                 type: 'application_stmt',
-    //                 application: {
-    //                     type: 'application',
-    //                     address: {type: 'id', name: 'bar'},
-    //                     args: [{type: 'number', val: '57'}]
-    //                 }
-    //             },
-    //             tail: null}
-    //     };
-    //
-    //     var a = new LoContext().createInner().compile2Stmt(node);
-    //
-    //     test.done();
-    // }
+    }
 };

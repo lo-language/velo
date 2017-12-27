@@ -109,7 +109,13 @@ __.prototype.compile2 = function (sourceCtx) {
     // connect the body
     lastStmt.setNext(body);
 
-    return new Proc(this.isService ? ['args', 'succ', 'fail'] : ['args'], firstStmt);
+    // todo this is pretty ugly
+    // we're compensating for procedure doing double-duty as both a standalone service
+    // and as a handler, which may need to be joined into main control flow. in the former
+    // case we can render down to JS now, in the latter we must defer it to codegen time
+    return this.isService ?
+        JS.fnDef(['args', 'succ', 'fail'], new JsWriter().generateJs(firstStmt)) :
+        new Proc(['args'], firstStmt);
 };
 
 module.exports = __;

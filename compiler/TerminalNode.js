@@ -5,14 +5,10 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
- * Success is finding something you really like to do and caring enough about it
- * to do it well.
  =============================================================================*/
 
 /**
- * Packages up an IR procedure, but isn't a control flow node.
- *
- * We need to do this so we can
+ * A CF graph node that is terminal (can't be appended to).
  *
  * Created by: spurcell
  * 12/25/14
@@ -21,27 +17,37 @@
 "use strict";
 
 const JS = require('./../codegen/JsPrimitives');
+const CFNode = require('./CFNode');
 
-class Proc {
+
+class TerminalNode extends CFNode {
 
     /**
      *
-     * @param args
-     * @param body
+     * @param js
+     * @param intact
      */
-    constructor(args, body) {
+    constructor(js, intact = true) {
 
-        this.args = args;
-        this.body = body;
+        super(js, intact);
+    }
+
+
+    /**
+     * no-op
+     */
+    setNext(next) {
+
     }
 
     /**
+     * no-op
      */
-    getJs (writer) {
+    append (node) {
 
-        return JS.fnDef(this.args, writer.generateJs(this.body));
+        return this;
     }
 }
 
-module.exports = Proc;
+module.exports = TerminalNode;
 

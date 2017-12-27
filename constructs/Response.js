@@ -11,6 +11,7 @@
 
 const JS = require('../codegen/JsPrimitives');
 const CFNode = require('../compiler/CFNode');
+const TerminalNode = require('../compiler/TerminalNode');
 
 
 /**
@@ -81,8 +82,9 @@ __.prototype.compile2 = function (sourceCtx, targetCtx) {
 
     // only if we're in a non-async branch context do we need the return
     // if the following is an async connector, we don't need the return
+    // we could optimize to only include the return if necessary
 
-    return new CFNode(response).append(new CFNode(JS.return()));
+    return new CFNode(response).append(new TerminalNode(JS.return()));
 };
 
 module.exports = __;

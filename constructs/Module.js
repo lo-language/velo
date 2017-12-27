@@ -15,6 +15,7 @@ const JS = require('../codegen/JsPrimitives');
 const LoContext = require('../compiler/LoContext');
 const StmtList = require('./StmtList');
 const CFNode = require('../compiler/CFNode');
+const JsWriter = require('../codegen/JsWriter');
 const vm = require('vm');
 
 /**
@@ -62,65 +63,6 @@ __.prototype.getTree = function () {
     return ['module'].concat(this.defs.map(def => def.getTree()));
 };
 
-/**
- * Compiles this module to JS.
- *
- * Compiling a module discovers its dependencies.
- */
-__.prototype.compile = function (registry, errorListener) {
-
-    // create a root context
-    var context = new LoContext();
-
-    context.setRegistry(registry);
-    context.setErrorListener(errorListener);
-
-    // todo another compensating hack because of compiling tail-first
-    // compile all the deps right here
-
-    this.deps.forEach(function (dep) {
-
-        // ignore the return value, which is just a no-op
-        dep.compile(context);
-    });
-
-    var t = this;
-
-    // since module defs aren't captured as a linkedlist
-    // todo fix this?
-
-    function linkDefs (idx) {
-
-        if (idx < t.defs.length) {
-            return new StmtList(t.defs[idx], linkDefs(idx + 1));
-        }
-
-        return null;
-    }
-
-    var stmts = linkDefs(0).compile2(context);
-
-    // bail if we had errors
-    if (context.hasErrors()) {
-        throw new Error("compilation failed");
-    }
-
-    var exports = context.getConstants().map(c => {
-        return [JS.string(c.name), JS.ID('$' + c.name)];
-    });
-
-    // try a return here, see if it works
-    stmts.append(new CFNode(
-        JS.return(
-            JS.objLiteral(exports)
-        )
-    ));
-
-    return stmts;
-};
-
-
-
 
 /**
  * Compiles this module to JS.
@@ -145,10 +87,11 @@ __.prototype.compile2 = function (registry, errorListener) {
 
     var t = this;
 
-    var lastStmt = new CFNode();
+    var firstStmt = new CFNode();
+    var lastStmt = firstStmt;
 
     this.defs.forEach(def => {
-        lastStmt = lastStmt.setNext(new CFNode(def.compile2(loContext)));
+        lastStmt = lastStmt.setNext(def.compile2(loContext));
     });
 
     // bail if we had errors
@@ -167,7 +110,8 @@ __.prototype.compile2 = function (registry, errorListener) {
         )
     ));
 
-    return lastStmt.getRoot();
+    // all other compiles return IR; this returns JS? NASTY
+    return new JsWriter().generateJs(firstStmt);
 };
 
 
