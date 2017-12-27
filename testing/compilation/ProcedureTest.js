@@ -15,7 +15,7 @@ module.exports["service"] = {
     "basic": function (test) {
 
         // should actually throw an error if result isn't defined in the context
-        // proc is (next) { result *= bar(42); }
+        // proc is (next) { result = bar(42); }
 
         var node = new Lo.procedure(
             ['next'],
@@ -55,7 +55,15 @@ module.exports["service"] = {
                                             null,
                                             [ 'res0' ],
                                             [ 'stmtList', [ 'expr-stmt', ["assign",
-                                                [ "id", "$result" ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ] ] ] ],
+                                                [ "id", "$result" ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ]
+                                            ],
+                                                [ "stmtList",
+                                                    [ "expr-stmt",
+                                                        [ "call",
+                                                            [ "select", [ "id", "task" ], "autoReply" ],
+                                                            [ ]
+                                                        ]
+                                                    ] ] ] ],
                                         [ 'null' ] ] ] ] ] ] ] ] ];
 
         test.deepEqual(node.compile2(new LoContext()).renderTree(), result);
@@ -109,10 +117,8 @@ module.exports["service"] = {
                                             [ 'null' ] ] ] ],
                                 [ 'stmtList',
                                     [ 'expr-stmt',
-                                        [ 'call', [ 'select', [ 'id', 'task' ], 'succ' ], [ [
-                                            "arrayLiteral", []
-                                        ] ] ] ],
-                                    [ 'stmtList', [ 'return' ] ] ] ] ] ] ] ] ];
+                                        [ 'call', [ 'select', [ 'id', 'task' ], 'autoReply' ], [ ] ] ]
+                                     ] ] ] ] ] ] ];
 
         test.deepEqual(node.compile2(new LoContext()).renderTree(), result);
         test.done();
@@ -184,10 +190,7 @@ module.exports["service"] = {
                                                                 [ "id", "$test" ] ] ] ] ] ] ] ] ] ],
                                 [ 'stmtList',
                                     [ 'expr-stmt',
-                                        [ 'call', [ 'select', [ 'id', 'task' ], 'succ' ], [ [
-                                            "arrayLiteral",
-                                            []
-                                        ] ] ] ], [ 'stmtList', [ 'return' ] ] ] ] ] ] ] ]);
+                                        [ 'call', [ 'select', [ 'id', 'task' ], 'autoReply' ], [ ] ] ] ] ] ] ] ] ]);
         test.done();
     }
 };

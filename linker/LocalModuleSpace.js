@@ -73,6 +73,8 @@ __.prototype.resolve = function (registry) {
             catch (err) {
                 console.log(err);
             }
+        }, err => {
+            console.error(err);
         }));
 
         // delete after acquiring in case there was a cycle

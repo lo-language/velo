@@ -129,14 +129,12 @@ __.prototype.sendAndBlock = function (address, args, succ, fail) {
  */
 __.prototype.processResponses = function () {
 
-    if (this.blocked) {// || this.responses.length == 0) {
+    if (this.blocked || this.responses.length == 0) {
         return;
     }
 
     // pull off a response and run it
-    if (this.responses.length > 0) {
-        this.responses.shift().call();
-    }
+    this.responses.shift().call();
 
     // see if we've now completed and should auto-respond; not factored out for perf
     if (this.pendingReqs == 0 && this.responses.length == 0 && this.hasResponded == false) {
@@ -189,11 +187,11 @@ __.prototype.fail = function (resp) {
  *
  * todo rename this checkStatus? autoReply? better yet, inline it
  */
-__.prototype.deactivate = function () {
+__.prototype.autoReply = function () {
 
     // make sure there are zero outstanding requests
 
-    if (this.blocked == false && this.pendingReqs == 0 && this.hasResponded == false) {
+    if (this.blocked == false && this.pendingReqs == 0 && this.responses == 0 && this.hasResponded == false) {
         this.succ();
     }
 };

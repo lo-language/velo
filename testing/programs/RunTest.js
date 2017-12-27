@@ -70,26 +70,26 @@ module.exports['exists'] = {
 };
 
 
-// module.exports['nestedLoops'] = {
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'nestedLoops');
-//         cb();
-//     },
-//
-//     'success': function (test) {
-//
-//         var log = function (args, succ, fail) {
-//             succ();
-//         };
-//
-//         // this.harness.dumpModules().then(() => {
-//
-//             this.harness.testSuccess(test, [log], 9);
-//         // });
-//     }
-// };
+module.exports['nestedLoops'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'nestedLoops');
+        cb();
+    },
+
+    'success': function (test) {
+
+        var log = function (args, succ, fail) {
+            succ();
+        };
+
+        // this.harness.dumpModules().then(() => {
+
+            this.harness.testSuccess(test, [log], 9);
+        // });
+    }
+};
 
 module.exports['fail'] = {
 
@@ -188,10 +188,12 @@ module.exports['helloWorld'] = {
 
         test.expect(2);
 
+        // one call to write is sync, one is async, so there's a race between the async call
+        // and the test completion
         var system = {
             out: {
                 write: function (args, succ, fail) {
-                    // console.log(args);
+                    // console.log('here');
                     test.equal(args[0], "hello, world!");
                     succ();
                 }
@@ -333,38 +335,39 @@ module.exports['reply arity'] = {
     }
 };
 
-// module.exports['reply handling'] = {
-//
-//     "setUp": function (cb) {
-//
-//         this.harness = new Harness(__dirname, 'replyHandling');
-//         cb();
-//     },
-//
-//     'success': function (test) {
-//
-//         test.expect(1);
-//
-//         // both functions just reply immediately
-//         // todo add a test that does this experiment within a reply handler
-//
-//         // this.harness.dumpModules().then(() => {
-//
-//             this.harness.run([
-//                 function (args, succ, fail) {
-//                     succ([]);
-//                 },
-//                 function (args, succ, fail) {
-//                     setImmediate(succ, [42]);
-//                 }
-//             ]).then(
-//                 function (res) {
-//                     test.equal(res, 42);
-//                     test.done();
-//                 });
-//         // });
-//     }
-// };
+module.exports['reply handling'] = {
+
+    "setUp": function (cb) {
+
+        this.harness = new Harness(__dirname, 'replyHandling');
+        cb();
+    },
+
+    'success': function (test) {
+
+        test.expect(1);
+
+        // both functions just reply immediately
+        // todo add a test that does this experiment within a reply handler
+
+        // this.harness.dumpModules().then(() => {
+
+            this.harness.run([
+                function (args, succ, fail) {
+                    succ([27]);
+                },
+                function (args, succ, fail) {
+                    setImmediate(succ, [42]);
+                }
+            ]).then(
+                function (res) {
+                    test.equal(res, 42);
+                    test.done();
+                }
+                ).fin();
+        // }).fin();
+    }
+};
 
 
 module.exports['built-ins'] = {

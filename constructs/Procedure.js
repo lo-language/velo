@@ -15,6 +15,7 @@
 const JS = require('../codegen/JsPrimitives');
 const Proc = require('../compiler/Proc');
 const CFNode = require('../compiler/CFNode');
+const TerminalNode = require('../compiler/TerminalNode');
 const Response = require('../constructs/Response');
 const JsWriter = require('../codegen/JsWriter');
 
@@ -100,10 +101,7 @@ __.prototype.compile2 = function (sourceCtx) {
     if (this.isService) {
 
         // implement auto-reply: if a service doesn't explicitly respond, it should reply <empty>
-
-        if (body.isIntact()) {
-            body.append(new Response('reply').compile2(localCtx));
-        }
+        body.append(new TerminalNode(JS.exprStmt(JS.runtimeCall('autoReply', []))));
     }
 
     // connect the body

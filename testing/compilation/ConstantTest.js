@@ -161,9 +161,8 @@ module.exports["non-root constants"] = {
                                         [ 'assign', [ 'id', '$result' ], [ 'num', '10' ] ] ],
                                     [ 'stmtList',
                                         [ 'expr-stmt',
-                                            [ 'call', [ 'select', [ 'id', 'task' ], 'succ' ], [ [
-                                                'arrayLiteral', [] ] ] ] ],
-                                        [ 'stmtList', [ 'return' ] ] ] ] ] ] ] ] ] ]);
+                                            [ 'call', [ 'select', [ 'id', 'task' ], 'autoReply' ], [ ] ] ],
+                                         ] ] ] ] ] ] ] ]);
 
         test.equal(context.has('main'), true);
         test.ok(context.isConstant('main'));
