@@ -49,20 +49,21 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
     if (this.op == 'cardinality') {
 
         // offload to the runtime lib
-        return JS.utilCall('cardinality', [this.operand.compile(context)]);
+        return JS.utilCall('cardinality', [this.operand.compile(sourceCtx, targetCtx)]);
     }
 
 
     if (this.op == 'complement') {
 
-        return JS.not(this.operand.compile(context));
+        return JS.not(this.operand.compile(sourceCtx, targetCtx));
     }
 };
 

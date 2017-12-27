@@ -12,7 +12,10 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const Context = require('../codegen/Context');
+const LoContext = require('../compiler/LoContext');
+const StmtList = require('./StmtList');
+const CFNode = require('../compiler/CFNode');
+const JsWriter = require('../codegen/JsWriter');
 const vm = require('vm');
 
 /**
@@ -60,6 +63,7 @@ __.prototype.getTree = function () {
     return ['module'].concat(this.defs.map(def => def.getTree()));
 };
 
+
 /**
  * Compiles this module to JS.
  *
@@ -67,11 +71,10 @@ __.prototype.getTree = function () {
  */
 __.prototype.compile = function (registry, errorListener) {
 
-    // create a root context
-    var context = new Context();
+    var loContext = new LoContext();
 
-    context.setRegistry(registry);
-    context.setErrorListener(errorListener);
+    loContext.setRegistry(registry);
+    loContext.setErrorListener(errorListener);
 
     // todo another compensating hack because of compiling tail-first
     // compile all the deps right here
@@ -79,42 +82,36 @@ __.prototype.compile = function (registry, errorListener) {
     this.deps.forEach(function (dep) {
 
         // ignore the return value, which is just a no-op
-        dep.compile(context);
+        dep.compile(loContext);
     });
 
     var t = this;
 
-    function compileDefs (idx) {
+    var firstStmt = new CFNode();
+    var lastStmt = firstStmt;
 
-        if (idx < t.defs.length) {
-
-            return JS.stmtList(
-                t.defs[idx].compile(context),
-                compileDefs(idx + 1));
-        }
-
-        return null;
-    }
-
-    var stmts = compileDefs(0);
+    this.defs.forEach(def => {
+        lastStmt = lastStmt.setNext(def.compile(loContext));
+    });
 
     // bail if we had errors
-    if (context.hasErrors()) {
+    if (loContext.hasErrors()) {
         throw new Error("compilation failed");
     }
 
-    var exports = context.getConstants().map(c => {
+    var exports = loContext.getConstants().map(c => {
         return [JS.string(c.name), JS.ID('$' + c.name)];
     });
 
     // try a return here, see if it works
-    stmts.attach(JS.stmtList(
+    lastStmt = lastStmt.setNext(new CFNode(
         JS.return(
             JS.objLiteral(exports)
         )
     ));
 
-    return stmts;
+    // all other compiles return IR; this returns JS? NASTY
+    return new JsWriter().generateJs(firstStmt);
 };
 
 

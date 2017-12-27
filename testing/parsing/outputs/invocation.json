@@ -57,12 +57,28 @@
                     "type": "id",
                     "name": "foo"
                   },
-                  "args": [
-                    {
-                      "type": "number",
-                      "val": "18"
-                    }
-                  ],
+                  "args": [],
+                  "contingency": {
+                    "type": "procedure",
+                    "params": [
+                      "error"
+                    ],
+                    "body": {
+                      "type": "stmt_list",
+                      "head": {
+                        "type": "response",
+                        "channel": "substitute",
+                        "args": [
+                          {
+                            "type": "string",
+                            "val": "ok"
+                          }
+                        ]
+                      },
+                      "tail": null
+                    },
+                    "isService": false
+                  },
                   "blocking": true
                 },
                 "tail": {
@@ -74,20 +90,27 @@
                       "name": "foo"
                     },
                     "args": [],
+                    "subsequent": {
+                      "type": "yields",
+                      "target": {
+                        "type": "id",
+                        "name": "bar"
+                      }
+                    },
                     "contingency": {
                       "type": "procedure",
                       "params": [
-                        "error"
+                        "err"
                       ],
                       "body": {
                         "type": "stmt_list",
                         "head": {
                           "type": "response",
-                          "channel": "substitute",
+                          "channel": "fail",
                           "args": [
                             {
                               "type": "string",
-                              "val": "ok"
+                              "val": "d'oh!"
                             }
                           ]
                         },

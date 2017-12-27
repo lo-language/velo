@@ -6,7 +6,7 @@
 "use strict";
 
 const Lo = require('../../constructs');
-var Context = require('../../codegen/Context');
+const LoContext = require('../../compiler/LoContext');
 
 module.exports["identifiers"] = {
 
@@ -16,7 +16,7 @@ module.exports["identifiers"] = {
 
         var node = new Lo.moduleRef('Node', 'HTTP');
 
-        var context = new Context();
+        var context = new LoContext();
 
         var registry = {
             include: function (ns, id) {
@@ -39,7 +39,7 @@ module.exports["identifiers"] = {
 
         var node = new Lo.moduleRef(null, 'Moon');
 
-        var context = new Context();
+        var context = new LoContext();
 
         var registry = {
             include: function (ns, id) {

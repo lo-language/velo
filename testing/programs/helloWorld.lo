@@ -1,11 +1,13 @@
-Common is module;
+using Common as Common;
 
 main is (args, system) {
 
+    //     Common.createGreeter <- ("world") => greeter;
+
     greeter = Common.createGreeter("world");
 
-    greeter.greet system;
+    greeter.greet <- system;
 
     // fire and forget - we won't wait!
-    @system.out.write Common.GREETING;
+    @system.out.write <- Common.GREETING;
 };

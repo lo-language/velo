@@ -6,13 +6,16 @@
 "use strict";
 
 const Lo = require('../../constructs');
-const Context = require('../../codegen/Context');
-const JS = require('../../codegen/JsPrimitives');
+const LoContext = require('../../compiler/LoContext');
+const CFNode = require('../../compiler/CFNode');
+const JsWriter = require('../../codegen/JsWriter');
 const util = require('util');
 
 module.exports["blocking calls"] = {
 
     "expr args": function (test) {
+
+        // reply num * main(num - 1);
 
         var node = new Lo.response('reply', [new Lo.binaryOpExpr(
             '*',
@@ -23,10 +26,10 @@ module.exports["blocking calls"] = {
                 ],
                 true))]);
 
-        // compile with a nice service context
-        var result = new Lo.stmtList(node).compile(new Context().createInner(true));
+        var ctx = new LoContext().createInner(true);
+        var result = node.compile(ctx);
 
-        test.deepEqual(result.renderTree(),
+        test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
             [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
@@ -45,7 +48,8 @@ module.exports["blocking calls"] = {
                                             [ 'arrayLiteral', [ [ 'mul', [
                                                 "id",
                                                 "$num"
-                                            ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ] ] ] ] ] ] ] ],
+                                            ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ] ] ] ] ] ],
+                                [ 'stmtList', [ 'return' ] ] ] ],
                             [ 'null' ] ] ] ] ]);
 
         test.done();
@@ -60,7 +64,10 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile(new Context()).renderTree(),
+        var ctx = new LoContext().createInner(true);
+        var result = node.compile(ctx);
+
+        test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -89,7 +96,10 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile(new Context()).renderTree(),
+        var ctx = new LoContext().createInner(true);
+        var result = node.compile(ctx);
+
+        test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -120,7 +130,10 @@ module.exports["blocking calls"] = {
             )
         );
 
-        test.deepEqual(new Lo.stmtList(node).compile(new Context()).renderTree(),
+        var ctx = new LoContext().createInner(true);
+        var result = node.compile(ctx);
+
+        test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -142,9 +155,10 @@ module.exports["blocking calls"] = {
 
     "with nested requests": function (test) {
 
+        // x = baz(foo(), bar());
 
         var node = new Lo.assign(
-            new Lo.identifier('baz'),
+            new Lo.identifier('x'),
             new Lo.requestExpr(
                 new Lo.identifier('baz'), [
                     new Lo.requestExpr(
@@ -157,27 +171,10 @@ module.exports["blocking calls"] = {
             )
         );
 
-        var swaps = [
-            ['res0',
-                [ 'expr-stmt',
-                    [ 'call',
-                        [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
-                        [ [ 'id', '$foo' ],
-                            [ 'arrayLiteral', [ ] ], [ 'null' ] ] ] ] ],
-            ['res1',
-                [ 'expr-stmt',
-                    [ 'call',
-                        [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
-                        [ [ 'id', '$bar' ], [ 'arrayLiteral', [] ], [ 'null' ] ] ] ] ],
-            ['res2',
-                [ 'expr-stmt',
-                    [ 'call',
-                        [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
-                        [ [ 'id', '$baz' ],
-                            [ 'arrayLiteral', [ [ 'id', 'res0' ], [ 'id', 'res1' ] ] ], [ 'null' ] ] ] ] ],
-        ];
+        var ctx = new LoContext().createInner(true);
+        var result = node.compile(ctx);
 
-        test.deepEqual(new Lo.stmtList(node).compile(new Context()).renderTree(),
+        test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
             [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
@@ -207,12 +204,10 @@ module.exports["blocking calls"] = {
                                                             "function",
                                                             null,
                                                             [ "res2" ],
-                                                            [ "stmtList", [ "expr-stmt", [ "assign", [ "id", "$baz" ], [ "subscript", [ "id", "res2" ], [ "num", "0" ] ] ] ] ]
+                                                            [ "stmtList", [ "expr-stmt", [ "assign", [ "id", "$x" ], [ "subscript", [ "id", "res2" ], [ "num", "0" ] ] ] ] ]
                                                         ], [ "null" ] ] ] ] ] ],
                                             [ 'null' ] ] ] ] ] ],
                         [ 'null' ] ] ] ] ]);
         test.done();
     }
 };
-
-

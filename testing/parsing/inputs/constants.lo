@@ -1,9 +1,9 @@
-Moon is module;
-HTTP is module NPM::HTTP;
+using Moon;
+using NPM::HTTP as HTTP;
 
 name is "Bigfoot Bjornsen";
 
-game is getGame();  // todo this is grammatical but should be a compile error
+game is getGame();  // todo this is grammatical but should be a compile error at this level
 
 test is () {
 

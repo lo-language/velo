@@ -14,8 +14,8 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const BranchContext = require('../codegen/BranchContext');
-
+const CFNode = require('../compiler/CFNode');
+const BranchNode = require('../compiler/BranchNode');
 
 /**
  * A conditional statement.
@@ -70,35 +70,39 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
-    // if one branch is async we need to make a continuation and call it from both branches
+    // hmmm...
+    // if the predicate has a req expr in it, will our node be flagged as non-intact?
+    // todo what should happen there?
 
-    var predicate = this.predicate.compile(context);
+    var predicate = this.predicate.compile(sourceCtx, targetCtx);
 
-    var bc = new BranchContext(context);
-    var consequent = this.consequent.compile(bc);
+    // we could create some kind of branch or block context here
+    var ctx = [];
+    var trueBranch = this.consequent.compile(sourceCtx, ctx);
 
-    // we can use the same branch context for both branches
+    if (ctx.length > 0) {
+        var wrapper = CFNode.makeWrapper(ctx);
+        wrapper.append(trueBranch);
+        trueBranch = wrapper;
+    }
+
     if (this.alternate) {
-        var alternate = this.alternate.compile(bc);
-    }
-    else if (bc.isDiscontinuous()) {
-
-        // we've wrapped our tail in a continuation so
-        // it needs to be called in the alternate branch as well
-
-        alternate = bc.getConnector();
+        var falseBranch = this.alternate.compile(sourceCtx, []);
     }
 
-    // todo - push into BC?
-    if (bc.isDiscontinuous()) {
-        bc.connect();
-    }
+    // todo restore this
+    // workaround for the case where alternate is an individual cond stmt rather than a stmtlist
+    // could change the parser to eliminate this case
+    // if (alternate && alternate instanceof CFNode == false) {
+    //     alternate = new CFNode(alternate);
+    // }
 
-    return JS.cond(predicate, consequent, alternate);
+    return new BranchNode(predicate, trueBranch, falseBranch);
 };
 
 module.exports = __;

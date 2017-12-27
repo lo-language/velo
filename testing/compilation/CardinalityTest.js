@@ -5,7 +5,7 @@
 
 "use strict";
 
-var Context = require('../../codegen/Context');
+var LoContext = require('../../compiler/LoContext');
 const JS = require('../../codegen/JsPrimitives');
 const Lo = require('../../constructs');
 
@@ -18,7 +18,7 @@ module.exports["cardinality"] = {
         // todo throw runtime error if none match?
         // todo can get rid of function call here with conditional operator
 
-        test.deepEqual(node.compile(new Context()).renderTree(), JS.fnCall(
+        test.deepEqual(node.compile(new LoContext()).renderTree(), JS.fnCall(
             JS.select(JS.ID('Util'), 'cardinality'),
             [JS.ID('$foo')]).renderTree());
 

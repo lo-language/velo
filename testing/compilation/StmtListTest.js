@@ -5,67 +5,43 @@
 
 "use strict";
 
-var Context = require('../../codegen/Context');
+var LoContext = require('../../compiler/LoContext');
+var Lo = require('../../constructs');
+var JsWriter = require('../../codegen/JsWriter');
 var util = require('util');
 
 module.exports["statement lists"] = {
 
-    // "independent": function (test) {
-    //
-    //     var node = {
-    //         type: "stmt_list",
-    //         head: {
-    //             type: 'assign',
-    //             op: '=',
-    //             left: {type: 'id', name: 'foo'},
-    //             right: {type: 'number', val: '42'}
-    //         },
-    //         tail: {
-    //             type: "stmt_list",
-    //             head: {
-    //                 type: 'assign',
-    //                 op: '=',
-    //                 left: {type: 'id', name: 'bar'},
-    //                 right: {type: 'number', val: '57'}
-    //             },
-    //             tail: null
-    //         }
-    //     };
-    //
-    //     test.equal(new Context().createInner().compile(node).render(),
-    //         '$foo = 42;\n$bar = 57;\n');
-    //     test.done();
-    // },
-    //
-    // "dependent": function (test) {
-    //
-    //     var node = {
-    //         type: "stmt_list",
-    //         head: {
-    //             type: "assign",
-    //             op: '=',
-    //             left: {type: 'id', name: 'foo'},
-    //             right: {
-    //                 type: 'application',
-    //                 address: {type: 'id', name: 'bar'},
-    //                 args: [
-    //                     {type: 'number', val: '42'}
-    //                 ]}
-    //         },
-    //         tail: {
-    //             type: "stmt_list",
-    //             head: {
-    //                 type: 'assign',
-    //                 op: '=',
-    //                 left: {type: 'id', name: 'baz'},
-    //                 right: {type: 'number', val: '57'}
-    //             },
-    //             tail: null
-    //         }
-    //     };
-    //
-    //     test.equal(new Context().createInner().compile(node).render(),
-    //         'task.sendMessage($bar, [42], function (res) {\nvar P0 = res ? res[0] : null;\n$foo = P0;\n$baz = 57;\n}, null);\n\n');
-    //     test.done();
-    // }
+    "independent": function (test) {
+
+        var node = new Lo.stmtList(
+            new Lo.assign(new Lo.identifier('foo'), new Lo.number('42'), '='),
+            new Lo.stmtList(
+                new Lo.assign(new Lo.identifier('bar'), new Lo.number('57'), '=')
+            )
+        );
+
+        test.equal(new JsWriter().generateJs(node.compile(new LoContext())).renderJs(),
+            '$foo = 42;\n$bar = 57;\n');
+        test.done();
+    },
+
+    "dependent": function (test) {
+
+        var node = new Lo.stmtList(
+            new Lo.assign(new Lo.identifier('foo'),
+                new Lo.requestExpr(
+                    new Lo.identifier('bar'), [new Lo.number('42')]),
+                '='),
+            new Lo.stmtList(
+                new Lo.assign(new Lo.identifier('baz'), new Lo.number('57'), '=')
+            )
+        );
+
+        var js = new JsWriter().generateJs(node.compile(new LoContext(), []));
+
+        test.equal(js.renderJs(),
+            'task.sendAndBlock($bar, [42], function (res0) {\n\n$foo = res0[0];\n$baz = 57;\n}, null);\n');
+        test.done();
+    }
 };

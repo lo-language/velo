@@ -5,8 +5,7 @@
 
 "use strict";
 
-const Context = require('../../codegen/Context');
-const RequestEnv = require('../../codegen/RequestEnv');
+const Context = require('../../compiler/LoContext');
 
 module.exports["basics"] = {
 
@@ -35,20 +34,6 @@ module.exports["basics"] = {
 
         test.equal(child.isRoot(), false);
 
-        test.done();
-    },
-
-    "isContinuous": function (test) {
-
-        var root = new Context();
-
-        test.equal(root.isDiscontinuous(), false);
-        test.equal(root.isContinuous(), true);
-
-        root.pushEnv(new RequestEnv());
-
-        test.equal(root.isDiscontinuous(), true);
-        test.equal(root.isContinuous(), false);
         test.done();
     },
 

@@ -14,6 +14,12 @@ const LoadAndGo = require('../linker/LoadAndGo');
 var __ = function (sourceDir, mainModName) {
 
     this.localSpace = new LocalModuleSpace(sourceDir);
+
+    this.localSpace.on('error', function (moduleId, node, error) {
+
+        console.error("error compiling " + moduleId + ": " + error);
+    });
+
     this.program = new LoadAndGo(this.localSpace, mainModName);
     this.mainModName = mainModName;
     this.dump = false;

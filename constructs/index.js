@@ -22,11 +22,9 @@ module.exports = {
     condExpr: require("./CondExpr"),
     constant: require("./Constant"),
     destructure: require("./Destructure"),
-    eventDef: require("./EventDef"),
     existence: require("./Existence"),
     field: require("./Field"),
     identifier: require("./Identifier"),
-    mapExpr: require("./MapExpr"),
     mapLiteral: require("./MapLiteral"),
     membership: require("./Membership"),
     module: require("./Module"),
@@ -46,5 +44,6 @@ module.exports = {
     string: require("./String"),
     subscript: require("./Subscript"),
     unaryOpExpr: require("./UnaryOpExpr"),
-    while: require("./While")
+    while: require("./While"),
+    yields: require("./Yields")
 };

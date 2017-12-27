@@ -55,28 +55,16 @@ __.prototype.getTree = function () {
     ];
 };
 
-
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
-    var left = this.left.compile(context);
-    var right = this.right.compile(context);
-
-//    todo - make sure both sides are defined
-//    could relax this if we want to allow declaration after usage
-//    should also factor this out into a getValue() maybe
-
-//    if (node.left.jsVal === undefined) {
-//        throw new Error("left operand not defined");
-//    }
-//
-//    if (node.right.jsVal === undefined) {
-//        throw new Error("right operand not defined");
-//    }
+    var left = this.left.compile(sourceCtx, targetCtx);
+    var right = this.right.compile(sourceCtx, targetCtx);
 
     var op = this.op;
 

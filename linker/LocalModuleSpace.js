@@ -11,7 +11,6 @@
 
 const fs = require('fs');
 const Q = require('q');
-const ASTBuilder = require('./../parser/ASTBuilder');
 const Parser = require('./../parser/Parser');
 const vm = require('vm');
 const EventEmitter = require('events');
@@ -74,6 +73,9 @@ __.prototype.resolve = function (registry) {
             catch (err) {
                 console.log(err);
             }
+        }, err => {
+            // todo improve error reporting here
+            console.error(err);
         }));
 
         // delete after acquiring in case there was a cycle

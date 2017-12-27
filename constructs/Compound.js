@@ -45,12 +45,13 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
     return JS.objLiteral(this.fields.map(field => {
-        return field.compile(context);
+        return field.compile(sourceCtx, targetCtx);
     }));
 };
 

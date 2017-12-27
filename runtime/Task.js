@@ -187,11 +187,11 @@ __.prototype.fail = function (resp) {
  *
  * todo rename this checkStatus? autoReply? better yet, inline it
  */
-__.prototype.deactivate = function () {
+__.prototype.autoReply = function () {
 
     // make sure there are zero outstanding requests
 
-    if (this.blocked == false && this.pendingReqs == 0 && this.hasResponded == false) {
+    if (this.blocked == false && this.pendingReqs == 0 && this.responses == 0 && this.hasResponded == false) {
         this.succ();
     }
 };

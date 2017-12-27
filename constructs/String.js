@@ -66,9 +66,10 @@ __.prototype.hasType = function (type) {
  *
  * todo break these out into their own classes?
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
     return JS.string(this.value);
 };

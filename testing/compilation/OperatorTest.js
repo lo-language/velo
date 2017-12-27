@@ -5,8 +5,7 @@
 
 "use strict";
 
-const Context = require('../../codegen/Context');
-const JS = require('../../codegen/JsPrimitives');
+const LoContext = require('../../compiler/LoContext');
 const Lo = require('../../constructs');
 
 module.exports["op"] = {
@@ -15,7 +14,7 @@ module.exports["op"] = {
 
         var node = new Lo.binaryOpExpr('+', new Lo.number('1'), new Lo.number('2'));
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile(new LoContext()).renderTree(),
             [ 'call',
             [ 'select', [ 'id', 'Util' ], 'add' ],
             [ [ 'num', '1' ], [ 'num', '2' ] ] ]);
@@ -44,7 +43,7 @@ module.exports["op"] = {
 
             var node = new Lo.binaryOpExpr(op[0], new Lo.number('1'), new Lo.number('2'));
 
-            test.deepEqual(node.compile(new Context()).renderTree(), [ op[1], [ 'num', '1' ], [ 'num', '2' ] ]);
+            test.deepEqual(node.compile(new LoContext()).renderTree(), [ op[1], [ 'num', '1' ], [ 'num', '2' ] ]);
         });
 
         test.done();
@@ -60,7 +59,7 @@ module.exports["op"] = {
                 new Lo.number('2')),
             new Lo.number('3'));
 
-        test.deepEqual(node.compile(new Context()).renderTree(), [ '||',
+        test.deepEqual(node.compile(new LoContext()).renderTree(), [ '||',
             [ '&&', [ 'num', '1' ], [ 'num', '2' ] ],
             [ 'num', '3' ] ]);
         test.done();
@@ -70,7 +69,7 @@ module.exports["op"] = {
 
         var node = new Lo.unaryOpExpr('complement', new Lo.identifier('foo'));
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile(new LoContext()).renderTree(),
             [ 'not', [ 'id', '$foo' ] ]);
         test.done();
     },
@@ -81,7 +80,7 @@ module.exports["op"] = {
             new Lo.identifier('dudes'),
             new Lo.string('trillian'));
 
-        test.deepEqual(node.compile(new Context()).renderTree(), [ 'call',
+        test.deepEqual(node.compile(new LoContext()).renderTree(), [ 'call',
             [ 'select', [ 'id', 'Util' ], 'in' ],
             [ [ 'string', 'trillian' ], [ 'id', '$dudes' ] ] ]);
         test.done();
@@ -94,7 +93,7 @@ module.exports["op"] = {
                 new Lo.identifier('foo'),
                 new Lo.identifier('bar'));
 
-        test.deepEqual(node.compile(new Context()).renderTree(), [ 'strict-eq', [ 'id', '$foo' ], [ 'id', '$bar' ] ]);
+        test.deepEqual(node.compile(new LoContext()).renderTree(), [ 'strict-eq', [ 'id', '$foo' ], [ 'id', '$bar' ] ]);
         test.done();
     },
 
@@ -110,7 +109,7 @@ module.exports["op"] = {
             new Lo.identifier('foo'),
             new Lo.identifier('bar'));
 
-        test.deepEqual(node.compile(new Context()).renderTree(), [ 'call',
+        test.deepEqual(node.compile(new LoContext()).renderTree(), [ 'call',
             [ 'select', [ 'id', 'Util' ], 'concat' ],
             [ [ 'id', '$foo' ], [ 'id', '$bar' ] ] ]);
         test.done();

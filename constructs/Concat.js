@@ -60,12 +60,13 @@ __.prototype.hasType = function (type) {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
-    const left = this.left.compile(context);
-    const right = this.right.compile(context);
+    const left = this.left.compile(sourceCtx, targetCtx);
+    const right = this.right.compile(sourceCtx, targetCtx);
 
     // see if we know the type at compile time
     if (this.left.hasType && this.left.hasType('string')

@@ -11,7 +11,8 @@
 
 "use strict";
 
-const RequestEnv = require('../codegen/RequestEnv');
+const JS = require('../codegen/JsPrimitives');
+const ReqExprNode = require('../compiler/ReqExprNode');
 
 
 /**
@@ -55,25 +56,23 @@ __.prototype.getTree = function () {
 };
 
 /**
- * Compiles this node to JS in the given context, injecting a wrapper into the context.
+ * Pushes a wrapper into the context.
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
-    var target = this.address.compile(context);
+    var address = this.address.compile(sourceCtx, targetCtx);
 
     var args = this.args.map(arg => {
-        return arg.compile(context);
+        return arg.compile(sourceCtx, targetCtx);
     });
 
-    // get a placeholder
-    // we push a request into the context whether sync or async
-    var reqEnv = new RequestEnv(target, args, this.blocking);
+    var label = sourceCtx.pushRequest(address, args);
 
-    context.pushEnv(reqEnv);
-
-    return reqEnv.getRef();
+    // gets a temp var and returns it
+    return JS.subscript(JS.ID(label), JS.num('0'));
 };
 
 module.exports = __;

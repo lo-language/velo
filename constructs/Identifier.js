@@ -14,17 +14,16 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const Future = require('../codegen/Future');
 
 
 /**
  * An identifier
  */
-var __ = function (name, line) {
+var __ = function (name, line, isLvalue) {
 
     this.name = name;
     this.line = line || '??';
-    this.isLvalue = false;
+    this.isLvalue = isLvalue || false;
 };
 
 
@@ -56,19 +55,20 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
     // see if the identifier is defined
 
-    if (context.has(this.name)) {
+    if (sourceCtx.has(this.name)) {
 
         // if we're a constant, do the old switcheroo
-        if (context.isModule(this.name)) {
+        if (sourceCtx.isModule(this.name)) {
 
             // console.log('compiling', this.name, context.resolve(this.name).renderJs());
-            return context.resolve(this.name);
+            return sourceCtx.resolve(this.name);
         }
 
         return JS.ID('$' + this.name);
@@ -76,7 +76,7 @@ __.prototype.compile = function (context) {
 
     // of course, we need to see inside a conditional to know if it's been defined...
     if (this.isLvalue == false) {
-        context.attachError(this, "identifier \"" + this.name + "\" used but not bound in this context");
+        sourceCtx.reportError(this, "identifier \"" + this.name + "\" used but not bound in this context");
     }
 
     return JS.ID('$' + this.name);

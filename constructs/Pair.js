@@ -51,11 +51,12 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
-    return [this.key.compile(context), this.value.compile(context)];
+    return [this.key.compile(sourceCtx, targetCtx), this.value.compile(sourceCtx, targetCtx)];
 };
 
 module.exports = __;

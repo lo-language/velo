@@ -10,11 +10,9 @@
  =============================================================================*/
 
 /**
- * Compilation context; handles compile-time symbol tracking.
+ * Source-side compilation context; handles compile-time symbol tracking.
  *
  * A context can be a module (root) context, a service context, or a sink context
- *
- * ??? should we maintain separate contexts for the source language and the target language? kind of conflating them here
  *
  * Created by: spurcell
  * 12/25/14
@@ -22,8 +20,7 @@
 
 "use strict";
 
-const JS = require('./JsPrimitives');
-const Connector = require('./Connector');
+const ReqExprNode = require('./ReqExprNode');
 
 
 /**
@@ -45,15 +42,15 @@ var __ = function (parent, isService) {
     // our local symbol table, containing params, locals, constants, futures, etc.
     this.symbols = {};
 
+    // arguably more of a target context concept, but putting in source context for now
+    this.nextLoopNum = 1;
+
     // dependency set
     this.deps = {};
 
-    this.envs = [];
-    this.envId = 0;
+    this.wrapper = null;
+    this.reqId = 0;
 
-    this.connector = null;
-    this.continuous = true; // continuous until proven async
-    this.contId = 0;
     this.registry = parent ? parent.registry : null;
 
     this.errors = [];
@@ -66,6 +63,8 @@ __.prototype.getModulePath = function () {
 
     return this.parent ? this.parent.getModulePath() : (this.path || '??');
 };
+
+
 
 
 /**
@@ -83,6 +82,19 @@ __.prototype.isRoot = function () {
 __.prototype.isService = function () {
 
     return this.type == 'service';
+};
+
+
+/**
+ * Returns true if this is a service context.
+ */
+__.prototype.getNextLoopName = function () {
+
+    if (this.parent) {
+        return this.parent.getNextLoopName();
+    }
+
+    return 'L' + this.nextLoopNum++;
 };
 
 
@@ -307,19 +319,42 @@ __.prototype.createInner = function (isService) { // push? nest? inner? derive? 
 
 
 /**
- * Pushes an environment and sets an ID.
  */
-__.prototype.pushEnv = function (env) {
+__.prototype.pushRequest = function (address, args) {
 
-    this.continuous = false;
+    var label = 'res' + this.reqId++;
+    var reqNode = new ReqExprNode(address, args, label);
 
-    // ok, this context just became discontinuous!
-    // we need to reach up to our parent and see if there are any following statements (if this is a branch context)
+    // prepend the request onto the wrapper list
+    this.wrapper = this.wrapper ? this.wrapper.append(reqNode) : reqNode;
 
-    env.setId(this.envId++);
-    this.envs.push(env);
+    // gets a temp var and returns it
+    return label;
 };
 
+
+/**
+ *
+ */
+__.prototype.unpackAndWrap = function (node) {
+
+    var result = this.wrapper;
+
+    this.wrapper = null;
+
+    if (result) {
+        result.append(node);
+        return result;
+    }
+
+    return node;
+};
+
+
+__.prototype.hasWrapper = function () {
+
+    return this.wrapper ? true : false;
+};
 
 /**
  * Returns true if a response can be issued in this context (for it or a parent).
@@ -340,118 +375,15 @@ __.prototype.canRespond = function () {
 };
 
 
-/**
- * Returns a statement list terminator for this context.
- */
-__.prototype.isContinuous = function () {
 
-    return this.continuous;
-};
-
-
-/**
- * Returns a statement list terminator for this context.
- */
-__.prototype.isDiscontinuous = function () {
-
-    return this.continuous == false;
-};
-
-
-/**
- * Sets the following statements property.
- *
- * @param stmtList
- */
-__.prototype.setFollowing = function (stmtList) {
-
-    this.following = stmtList;
-};
-
-
-/**
- * Gets the following statements.
- *
- * @param stmtList
- */
-__.prototype.getFollowing = function (stmtList) {
-
-    return this.following;
-};
-
-
-/**
- * Returns true if there are currently following statements.
- */
-__.prototype.hasFollowing = function () {
-
-    return this.following ? true : false;
-};
-
-
-/**
- * Wraps the following statements in a continuation.
- *
- * @return {*} a JS AST for a ref to the continuation
- */
-__.prototype.wrapFollowing = function () {
-
-    this.continuous = false;
-
-    if (this.following) {
-
-        var contName = 'k' + this.getNextLabel();
-
-        var contDef = JS.fnDef([], this.following, contName);
-
-        this.following = JS.stmtList(contDef);
-
-        return JS.ID(contName);
-    }
-
-    return null;
-};
-
-/**
- * Wraps the following statements in an async loop construct.
- */
-__.prototype.createAsyncLoop = function (condition, body) {
-
-    // todo - code improvement ideas:
-    // - don't define loop functions within loops
-    // - don't define continuations just to call into loop functions (would still need to wrap in setImmediate)
-
-    this.continuous = false;
-
-    var loopName = 'l' + this.getNextLabel();
-    var loopId = JS.ID(loopName);
-
-    var loopDef = JS.letDecl(loopName, JS.fnDef([], JS.stmtList(JS.cond(condition, body, this.following))));
-
-    this.following = null;
-
-    return {id: loopId, def: loopDef};
-};
-
-__.prototype.getNextLabel = function () {
-
-    if (this.parent) {
-        return this.parent.getNextLabel();
-    }
-
-    return this.contId++;
-};
-
-
-__.prototype.getConnector = function () {
-
-    if (this.connector) {
-        return this.connector;
-    }
-    else if (this.parent) {
-        return this.parent.getConnector();
-    }
-};
+// __.prototype.getNextLabel = function () {
+//
+//     if (this.parent) {
+//         return this.parent.getNextLabel();
+//     }
+//
+//     return this.contId++;
+// };
 
 
 __.prototype.isRValue = function () {
@@ -464,10 +396,12 @@ __.prototype.isRValue = function () {
  * @param node
  * @param message
  */
-__.prototype.attachError = function (node, message) {
+__.prototype.reportError = function (node, message) {
+
+    // attach an error to this context's report
 
     if (this.parent) {
-        this.parent.attachError(node, message);
+        this.parent.reportError(node, message);
         return;
     }
 

@@ -25,7 +25,7 @@
           right_arrow:  '->',
           tilde_arrow:  '~>',
           concat:       '><',
-          PAIR_SEP:     '=>',
+          yields:       '=>',
           push_front:   '+>',
           push_back:    '<+',
           equality:     /==|!=/,
@@ -45,8 +45,8 @@
           mod:          '%',
           cond:         '?',
           ID:           { match: /[a-zA-Z_][a-zA-Z_0-9]*/, keywords: {
-                          KW: ['is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
-                                'module', 'exists', 'defined', 'undefined'],
+                          KW: ['as', 'is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
+                                'module', 'exists', 'defined', 'undefined', 'using'],
                         }},
           NL:           { match: /\n/, lineBreaks: true },
         },
@@ -86,7 +86,24 @@
 # Pass your lexer object using the @lexer option:
 @lexer lexer
 
-module -> dependency:* definition:+                                 {% function (d) { return new Lo.module(d[1], d[0]); } %}
+module -> using:* definition:+                                      {% function (d) { return new Lo.module(d[1], d[0]); } %}
+
+using -> "using" dep ";"                                            {% function (d) { return d[1]; } %}
+
+dep
+    ->  %ID                                                         {% function (d) {
+                                                                        return new Lo.constant(d[0].value,
+                                                                            new Lo.moduleRef(null, d[0].value));
+                                                                    } %}
+    |   locator "as" %ID                                            {% function (d) {
+                                                                        return new Lo.constant(d[2].value, d[0]);
+                                                                    } %}
+
+# only supports a single-step namespace for now
+locator
+    ->  %string                                                     {% function (d) { return new Lo.moduleRef(null, d[0].value); } %}
+    |   (%ID "::"):? %ID                                            {% function (d) {
+                                                    return new Lo.moduleRef(d[0] ? d[0][0].value : null, d[1].value); } %}
 
 statementList
     ->  statement                                                   {% function (d) { return new Lo.stmtList(d[0]); } %}
@@ -116,14 +133,14 @@ statement
                                                                         return new Lo.arrayPush(
                                                                             d[1][0].value == '<+' ? 'push-back' : 'push-front', d[0], d[2]);
                                                                     } %}
-    |   async:? expr "<-" "(" exprList ")" (handlers | ";")         {% function (d) {
-                                                                        return new Lo.requestStmt(d[1], d[4],
-                                                                            d[6][0][0], d[6][0][1], d[0] == null);
+    |   async:? expr "<-" exprList:? handlers                       {% function (d) {
+                                                                        return new Lo.requestStmt(d[1], d[3] ? d[3] : [],
+                                                                            d[4][0], d[4][1], d[0] == null);
                                                                     } %}
-    |   async:? expr exprList:? (handlers | ";")                    {% function (d) {
-                                                                        return new Lo.requestStmt(d[1], d[2] || [],
-                                                                            d[3][0][0], d[3][0][1], d[0] == null);
-                                                                    } %}
+    #|   async:? expr exprList:? handlers                            {% function (d) {
+    #                                                                    return new Lo.requestStmt(d[1], d[2] || [],
+    #                                                                        d[3][0], d[3][1], d[0] == null);
+    #                                                                } %}
     |   "while" expr block                                          {% function (d) {return new Lo.while(d[1], d[2]);} %}
     |   "scan" expr "->" proc                                       {% function (d) {return new Lo.scan(d[1], d[3]);} %}
 
@@ -139,19 +156,17 @@ destructure
 
 definition -> %ID ("is"|"are") expr ";"                             {% function (d) {return new Lo.constant(d[0].value, d[2]);} %}
 
-dependency -> %ID "is" "module" locator:? ";"                       {% function (d) {
-                                                                        return new Lo.constant(d[0].value,
-                                                                            d[3] ? d[3] : new Lo.moduleRef(null, d[0].value));
-                                                                    } %}
-
-# only supports a single-step namespace for now
-locator -> (%ID "::"):? %ID                     {% function (d) {
-                                                    return new Lo.moduleRef(d[0] ? d[0][0].value : null, d[1].value); } %}
-
+# there's got to be a better way to describe this
 handlers
-    ->  replyHandler                            {% function (d) { return [d[0], null]; } %}
+    ->  ";"                                     {% function (d) { return [null, null]; } %}
+    |   assignHandler ";"                       {% function (d) { return [d[0], null]; } %}
+    |   assignHandler failHandler
+    |   replyHandler                            {% function (d) { return [d[0], null]; } %}
     |   failHandler                             {% function (d) { return [null, d[0]]; } %}
     |   replyHandler failHandler
+
+assignHandler
+    ->  "=>" %ID                                {% function (d) { return new Lo.yields(new Lo.identifier(d[1].value)); } %}
 
 replyHandler
     ->  "->" proc                               {% function (d) { return d[1]; } %}
@@ -234,7 +249,7 @@ literal
     |   interp_string                               {% id %}
     |   "[" (expr ",":?):* "]"                      {% function (d) { return new Lo.array(d[1].map(function (elem) {return elem[0];})); } %}
     |   "(" (field ",":?):+ ")"                     {% function (d) { return new Lo.compound(d[1].map(function (field) {return field[0];})); } %}
-    |   "{" %PAIR_SEP "}"                           {% function (d) { return new Lo.mapLiteral([]); } %}
+    |   "{" "=>" "}"                                {% function (d) { return new Lo.mapLiteral([]); } %}
     |   "{" (pair ",":?):+ "}"                      {% function (d) { return new Lo.mapLiteral(d[1].map(function (pair) {return pair[0];})); } %}
     |   "{" (expr ",":?):* "}"                      {% function (d) { return new Lo.setLiteral(d[1].map(function (elem) {return elem[0];})); } %}
     |   proc                                        {% function (d) { d[0].isService = true; return d[0]; } %}
@@ -251,7 +266,7 @@ interp_string
     } %}
 
 field   -> %ID ":" expr                             {% function (d) { return new Lo.field(d[0].value, d[2]); } %}
-pair    -> expr %PAIR_SEP expr                      {% function (d) { return new Lo.pair(d[0], d[2]); } %}
+pair    -> expr "=>" expr                           {% function (d) { return new Lo.pair(d[0], d[2]); } %}
 
 proc -> "(" paramList:? ")" block                   {% function (d) { return new Lo.procedure(d[1] ? d[1] : [], d[3]); } %}
 

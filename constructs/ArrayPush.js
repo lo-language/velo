@@ -51,15 +51,17 @@ __.prototype.getTree = function () {
     return [this.op, this.left.getTree(), this.right.getTree()];
 };
 
+
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
-    var left = this.left.compile(context);
-    var right = this.right.compile(context);
+    var left = this.left.compile(sourceCtx, targetCtx);
+    var right = this.right.compile(sourceCtx, targetCtx);
 
     // todo probably want to add some runtime checks
 

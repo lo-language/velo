@@ -13,19 +13,19 @@ main is (test) {
 
     // fail handler only
 
-    mightFail ~> () {
+    mightFail <- ~> () {
 
-        test.ok true;
+        test.ok <- true;
     }
 
     // both handlers
 
-    mightFail -> () {
+    mightFail <- -> () {
 
-        test.ok false;
+        test.ok <- false;
     }
     ~> () {
 
-        test.ok true;
+        test.ok <- true;
     }
 };

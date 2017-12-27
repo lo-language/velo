@@ -14,7 +14,7 @@ main is (log) {
 
             x++;
             count++;
-            log count;
+            log <- count;
         }
 
         y++;

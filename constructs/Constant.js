@@ -14,6 +14,7 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const CFNode = require('../compiler/CFNode');
 const ModuleRef = require('./ModuleRef');
 
 /**
@@ -52,9 +53,10 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
     // we need to define the symbol in the context before compiling the value
     // in case it's recursive
@@ -63,20 +65,21 @@ __.prototype.compile = function (context) {
 
     if (this.value instanceof ModuleRef) {
 
-        value = this.value.compile(context);
+        value = this.value.compile(sourceCtx, targetCtx);
 
-        context.define(this.name, value, true);
+        sourceCtx.define(this.name, value, true);
         return JS.NOOP;
     }
 
     // register with the symbol table
-    context.define(this.name, value);
+    sourceCtx.define(this.name, value);
 
-    value = this.value.compile(context);
+    value = this.value.compile(sourceCtx, targetCtx);
 
-    context._setValue(this.name, value);
+    sourceCtx._setValue(this.name, value);
 
-    return JS.constDecl('$' + this.name, value);
+    // we can't do this for some reason even though constDecl is a stmt
+    return new CFNode(JS.constDecl('$' + this.name, value));
 };
 
 module.exports = __;

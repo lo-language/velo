@@ -63,15 +63,16 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
     // lean on JS slice since it has the same semantics
 
-    var list = this.array.compile(context);
-    var start = this.start ? this.start.compile(context) : JS.num('0');
-    var end = this.end ? this.end.compile(context) : null;
+    var list = this.array.compile(sourceCtx, targetCtx);
+    var start = this.start ? this.start.compile(sourceCtx, targetCtx) : JS.num('0');
+    var end = this.end ? this.end.compile(sourceCtx, targetCtx) : null;
 
     return JS.fnCall(
         JS.select(list, 'slice'),

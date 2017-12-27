@@ -5,22 +5,25 @@
 
 "use strict";
 
-const Context = require('../../codegen/Context');
-const JS = require('../../codegen/JsPrimitives');
+const LoContext = require('../../compiler/LoContext');
 const Lo = require('../../constructs');
-
+const JsWriter = require('../../codegen/JsWriter');
 
 module.exports["basics"] = {
 
     "array scan": function (test) {
+
+        // scan foo -> (item) {
+        //    count = 1;
+        // }
         
         var node = new Lo.scan(
             new Lo.identifier('foo'),
-            new Lo.procedure(['item'],
-            new Lo.stmtList(new Lo.assign(new Lo.identifier('count'), new Lo.number('1'))))
-        );
+            new Lo.procedure(
+                ['item'],
+                new Lo.stmtList(new Lo.assign(new Lo.identifier('count'), new Lo.number('1')))));
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(new JsWriter().generateJs(node.compile(new LoContext())).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'Util' ], 'scan' ],
@@ -35,7 +38,7 @@ module.exports["basics"] = {
                                         [ 'assign',
                                             [ 'id', '$item' ],
                                             [ 'subscript', [ 'id', 'args' ], [ 'num', '0' ] ] ] ],
-                                    [ 'stmtList', [ 'expr-stmt', [ 'assign', [ 'id', '$count' ], [ 'num', '1' ] ] ] ] ] ] ] ] ] ]);
+                                    [ 'stmtList', [ 'expr-stmt', [ 'assign', [ 'id', '$count' ], [ 'num', '1' ] ] ] ] ] ] ] ] ] ] ]);
 
         test.done();
     }

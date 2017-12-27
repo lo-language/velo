@@ -51,14 +51,15 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
     return JS.utilCall(
         'in', [
-            this.member.compile(context),
-            this.set.compile(context)
+            this.member.compile(sourceCtx, targetCtx),
+            this.set.compile(sourceCtx, targetCtx)
         ]);
 };
 

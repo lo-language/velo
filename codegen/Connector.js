@@ -5,18 +5,14 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
+ * Success is finding something you really like to do and caring enough about it
+ * to do it well.
  =============================================================================*/
 
 /**
- * A connector is a chunk of JS that carries control flow from one location to another either
- * actively as a function call or passively, as a no-op to just let statements flow naturally.
  *
- * A connector renders its call if and only if
- *
- * - its context is discontinous
- * - there's a logically following statement
- *
- * Created by seth on 1/2/17.
+ * Created by: spurcell
+ * 12/25/14
  */
 
 "use strict";
@@ -24,51 +20,29 @@
 const JS = require('./JsPrimitives');
 
 
-var __ = function (context) {
+class Connector {
 
-    this.call = null;
-    this.parent = null;
-};
+    /**
+     *
+     * @param name
+     */
+    constructor(name) {
 
-
-__.prototype.setCall = function (call) {
-    this.call = call;
-};
-
-
-__.prototype.renderTree = function () {
-
-    if (this.parent) {
-        return this.parent.renderTree();
+        this.name = name;
+        this.stmt = JS.stmtList(JS.exprStmt(JS.fnCall(JS.ID(this.name), [])));
     }
 
-    if (this.call) {
-        return this.call.renderTree();
-    }
-};
+    renderTree () {
 
-
-__.prototype.renderJs = function () {
-
-    if (this.parent) {
-        return this.parent.renderJs();
+        return this.stmt.renderTree();
     }
 
-    if (this.call) {
-        return this.call.renderJs();
+    /**
+     */
+    renderJs () {
+
+        return this.stmt.renderJs();
     }
+}
 
-    return '';
-};
-
-
-/**
- * Makes this connector proxy to the given one.
- *
- * @param connector
- */
-__.prototype.proxyTo = function (connector) {
-    this.parent = connector;
-};
-
-module.exports = __;
+module.exports = Connector;

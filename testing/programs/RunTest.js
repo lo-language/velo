@@ -188,10 +188,12 @@ module.exports['helloWorld'] = {
 
         test.expect(2);
 
+        // one call to write is sync, one is async, so there's a race between the async call
+        // and the test completion
         var system = {
             out: {
                 write: function (args, succ, fail) {
-                    // console.log(args);
+                    // console.log('here');
                     test.equal(args[0], "hello, world!");
                     succ();
                 }
@@ -352,7 +354,7 @@ module.exports['reply handling'] = {
 
             this.harness.run([
                 function (args, succ, fail) {
-                    succ([]);
+                    succ([27]);
                 },
                 function (args, succ, fail) {
                     setImmediate(succ, [42]);
@@ -361,8 +363,9 @@ module.exports['reply handling'] = {
                 function (res) {
                     test.equal(res, 42);
                     test.done();
-                });
-        // });
+                }
+                ).done();
+        // }).done();
     }
 };
 

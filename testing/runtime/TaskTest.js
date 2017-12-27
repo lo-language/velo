@@ -126,7 +126,7 @@ module.exports['responses'] = {
                 test.done();
             }, null);
 
-        task.deactivate();
+        task.autoReply();
     },
 
     "no implicit reply after sync reply": function (test) {
@@ -142,7 +142,7 @@ module.exports['responses'] = {
             });
 
         task.succ(["foo"]);
-        task.deactivate();
+        task.autoReply();
     },
 
     "no implicit reply after sync fail": function (test) {
@@ -158,7 +158,7 @@ module.exports['responses'] = {
             });
 
         task.fail(["boo"]);
-        task.deactivate();
+        task.autoReply();
     },
 
     "no implicit reply while blocked": function (test) {
@@ -171,7 +171,7 @@ module.exports['responses'] = {
             });
 
         task.sendAndBlock(hang, ["boo"]);
-        task.deactivate();
+        task.autoReply();
         test.done();
     }
 };
@@ -487,7 +487,7 @@ module.exports['finishing'] = {
 
             var task = new Task(succ, fail);
 
-            // bug was: task is deactivated after sending this request
+            // bug was: task is autoReplyd after sending this request
             // so when the response comes back and the sync sendMessage fires,
             // it erroneously sees no more work left to do and fires a default reply
 
@@ -498,7 +498,7 @@ module.exports['finishing'] = {
                 task.succ(["leeloo"]);
             });
 
-            task.deactivate();
+            task.autoReply();
         };
 
         Task.sendRootRequest(main, null,
@@ -525,7 +525,7 @@ module.exports['finishing'] = {
 
             var task = new Task(succ, fail);
 
-            // task is deactivated after sending this request
+            // task is autoReplyd after sending this request
             // so when the response comes back and the sync sendMessage fires,
             // it erroneously sees no more work left to do and fires a default reply
             task.sendAsync(asyncService, 'foo', function (result) {

@@ -5,28 +5,33 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
+ * He who knows does not speak; he who speaks does not know. ― Laozi
+ *
  =============================================================================*/
 
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const BranchContext = require('../codegen/BranchContext');
-
+const CFNode = require('../compiler/CFNode');
+const BlockingReq = require('../compiler/BlockingReq');
+const JsWriter = require('../codegen/JsWriter');
 
 /**
- * A "function call" (request) statement
+ * A "function call" (request) statement.
+ * This is a special kind of node because appending a node to it may end up
+ * creating a continuation or inside a callback to the call if it's blocking.
  *
  * @param address
  * @param args
- * @param replyHandler
+ * @param succHandler
  * @param failHandler
  * @param blocking
  */
-var __ = function (address, args, replyHandler, failHandler, blocking) {
+var __ = function (address, args, succHandler, failHandler, blocking) {
 
     this.address = address;
     this.args = args;
-    this.replyHandler = replyHandler;
+    this.succHandler = succHandler;
     this.failHandler = failHandler;
     this.blocking = blocking;
 };
@@ -40,7 +45,7 @@ __.prototype.getAst = function () {
         type: 'request_stmt',
         address: this.address.getAst(),
         args: this.args.map(arg => arg.getAst()),
-        subsequent: this.replyHandler ? this.replyHandler.getAst() : undefined,
+        subsequent: this.succHandler ? this.succHandler.getAst() : undefined,
         contingency: this.failHandler ? this.failHandler.getAst() : undefined,
         blocking: this.blocking
     };
@@ -55,72 +60,40 @@ __.prototype.getTree = function () {
         'request',
         this.address.getTree(),
         this.args.map(arg => arg.getTree()),
-        this.replyHandler ? this.replyHandler.getTree() : null,
+        this.succHandler ? this.succHandler.getTree() : null,
         this.failHandler ? this.failHandler.getTree() : null,
         this.blocking
     ];
 };
 
+
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
+    var address = this.address.compile(sourceCtx, targetCtx);
     var args = this.args.map(arg => {
-        return arg.compile(context);
+        return arg.compile(sourceCtx, targetCtx);
     });
 
-    if (this.blocking == false) {
+    // these return proc objects
 
-        return JS.exprStmt(
-            JS.runtimeCall('sendAsync', [
-                this.address.compile(context), JS.arrayLiteral(args),
-                this.replyHandler ? this.replyHandler.compile(context) : JS.NULL,
-                this.failHandler ? this.failHandler.compile(context) : JS.NULL
-            ]));
-    }
+    var succHandler = this.succHandler ? this.succHandler.compile(sourceCtx, targetCtx) : null;
+    var failHandler = this.failHandler ? this.failHandler.compile(sourceCtx, targetCtx) : null;
 
-    if (context.getFollowing() == null) {
-
-        return JS.exprStmt(
-            JS.runtimeCall('sendAndBlock', [
-                this.address.compile(context), JS.arrayLiteral(args),
-                this.replyHandler ? this.replyHandler.compile(context) : JS.NULL,
-                this.failHandler ? this.failHandler.compile(context) : JS.NULL
-            ]));
-    }
-
-    // add the continuation to each handler or if there's no
-    // handler, just use the continuation as the branch
-
-    var replyHandler, failHandler;
-
-    var contRef = context.wrapFollowing();
-
-    var contCall = contRef ? JS.stmtList(JS.exprStmt(JS.fnCall(contRef, []))) : null;
-
-    // we just drop in the call as the connector since we know the branches are async
-    var bc = new BranchContext(context, contCall);
-
-    if (this.replyHandler) {
-        replyHandler = this.replyHandler.compile(bc);
-    }
-    else {
-        replyHandler = contRef || JS.NULL;
-    }
-
-    if (this.failHandler) {
-        failHandler = this.failHandler.compile(bc);
-    }
-    else {
-        failHandler = contRef || JS.NULL;
-    }
-
-    return JS.exprStmt(
-            JS.runtimeCall('sendAndBlock', [
-                this.address.compile(context), JS.arrayLiteral(args), replyHandler, failHandler]));
+    return this.blocking ?
+        new BlockingReq(address, args, succHandler, failHandler) :
+        new CFNode(writer => {
+            return JS.exprStmt(JS.runtimeCall('sendAsync', [
+                address, JS.arrayLiteral(args),
+                succHandler ? succHandler.getJs(new JsWriter()) : JS.NULL,
+                failHandler ? failHandler.getJs(new JsWriter()) : JS.NULL
+            ]))
+        });
 };
 
 module.exports = __;

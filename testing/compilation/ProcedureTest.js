@@ -5,16 +5,17 @@
 
 "use strict";
 
-const Context = require('../../codegen/Context');
+const LoContext = require('../../compiler/LoContext');
 const JS = require('../../codegen/JsPrimitives');
 const Lo = require('../../constructs');
+const JsWriter = require('../../codegen/JsWriter');
 
 module.exports["service"] = {
 
     "basic": function (test) {
 
         // should actually throw an error if result isn't defined in the context
-        // proc is <-> (next) { result *= bar(42); }
+        // proc is (next) { result = bar(42); }
 
         var node = new Lo.procedure(
             ['next'],
@@ -54,20 +55,25 @@ module.exports["service"] = {
                                             null,
                                             [ 'res0' ],
                                             [ 'stmtList', [ 'expr-stmt', ["assign",
-                                                [ "id", "$result" ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ] ] ] ],
-                                        [ 'null' ] ] ] ],
-                            [ 'stmtList',
-                                [ 'expr-stmt',
-                                    [ 'call', [ 'select', [ 'id', 'task' ], 'deactivate' ], [] ] ] ] ] ] ] ] ];
+                                                [ "id", "$result" ], [ "subscript", [ "id", "res0" ], [ "num", "0" ] ] ]
+                                            ],
+                                                [ "stmtList",
+                                                    [ "expr-stmt",
+                                                        [ "call",
+                                                            [ "select", [ "id", "task" ], "autoReply" ],
+                                                            [ ]
+                                                        ]
+                                                    ] ] ] ],
+                                        [ 'null' ] ] ] ] ] ] ] ] ];
 
-        test.deepEqual(node.compile(new Context()).renderTree(), result);
+        test.deepEqual(node.compile(new LoContext()).renderTree(), result);
         test.done();
     },
 
     "args ordering": function (test) {
 
         // should actually throw an error if result isn't defined in the context
-        // proc is <-> (args, io) { @write("hello"); }
+        // proc is (args, io) { @write <- "hello"; }
 
         var node = new Lo.procedure(
             ['args', 'io'],
@@ -75,6 +81,8 @@ module.exports["service"] = {
                 new Lo.requestStmt(
                     new Lo.identifier('write'),
                     [new Lo.string('hello')],
+                    null,
+                    null,
                     false
                 )
             ),
@@ -102,20 +110,28 @@ module.exports["service"] = {
                             [ 'stmtList',
                                 [ 'expr-stmt',
                                     [ 'call',
-                                        [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
+                                        [ 'select', [ 'id', 'task' ], 'sendAsync' ],
                                         [ [ 'id', '$write' ],
                                             [ 'arrayLiteral', [ [ 'string', 'hello' ] ] ],
                                             [ 'null' ],
                                             [ 'null' ] ] ] ],
                                 [ 'stmtList',
                                     [ 'expr-stmt',
-                                        [ 'call', [ 'select', [ 'id', 'task' ], 'deactivate' ], [] ] ] ] ] ] ] ] ] ];
+                                        [ 'call', [ 'select', [ 'id', 'task' ], 'autoReply' ], [ ] ] ]
+                                     ] ] ] ] ] ] ];
 
-        test.deepEqual(node.compile(new Context()).renderTree(), result);
+        test.deepEqual(node.compile(new LoContext()).renderTree(), result);
         test.done();
     },
 
     "nested procs doesn't duplicate var declarations": function (test) {
+
+        // () {
+        //   report = '';
+        //   scan tests -> (test) {
+        //     report = test;
+        //   }
+        // }
 
         var node = new Lo.procedure(
             [],
@@ -139,7 +155,9 @@ module.exports["service"] = {
             ),
             true);
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        var result = node.compile(new LoContext());
+
+        test.deepEqual(result.renderTree(),
             [ 'function',
                 null,
                 [ 'args', 'succ', 'fail' ],
@@ -172,7 +190,7 @@ module.exports["service"] = {
                                                                 [ "id", "$test" ] ] ] ] ] ] ] ] ] ],
                                 [ 'stmtList',
                                     [ 'expr-stmt',
-                                        [ 'call', [ 'select', [ 'id', 'task' ], 'deactivate' ], [] ] ] ] ] ] ] ] ]);
+                                        [ 'call', [ 'select', [ 'id', 'task' ], 'autoReply' ], [ ] ] ] ] ] ] ] ] ]);
         test.done();
     }
 };

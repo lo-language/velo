@@ -5,11 +5,9 @@
 
 "use strict";
 
-var Context = require('../../codegen/Context');
-var JS = require('../../codegen/JsPrimitives');
-var util = require('util');
 const Lo = require('../../constructs');
-
+const LoContext = require('../../compiler/LoContext');
+const JsWriter = require('../../codegen/JsWriter');
 
 module.exports["sync"] = {
 
@@ -28,11 +26,11 @@ module.exports["sync"] = {
             )
         );
 
-        test.deepEqual(node.compile(new Context().createInner()).renderTree(),
+        test.deepEqual(new JsWriter().generateJs(node.compile(new LoContext())).renderTree(), [ 'stmtList',
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
-                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ]);
+                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ] ] ]);
         test.done();
     },
 
@@ -57,13 +55,14 @@ module.exports["sync"] = {
             )
         );
 
-        test.deepEqual(node.compile(new Context().createInner()).renderTree(),
+        test.deepEqual(new JsWriter().generateJs(node.compile(new LoContext())).renderTree(), [ 'stmtList',
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
                         [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ],
                     [ 'stmtList',
-                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '32' ] ] ] ] ]);
+                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '32' ] ] ] ] ] ]);
+
         test.done();
     },
 
@@ -97,17 +96,18 @@ module.exports["sync"] = {
             )
         );
 
-        test.deepEqual(node.compile(new Context().createInner()).renderTree(),
-                [ 'if',
-                    [ 'id', '$foo' ],
-                    [ 'stmtList',
-                        [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ],
+        test.deepEqual(new JsWriter().generateJs(node.compile(new LoContext())).renderTree(), [ 'stmtList',
+            [ 'if',
+                [ 'id', '$foo' ],
+                [ 'stmtList',
+                    [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '42' ] ] ] ],
+                [ 'stmtList',
                     [ 'if',
                         [ 'id', '$bar' ],
                         [ 'stmtList',
                             [ 'expr-stmt', [ 'assign', [ 'id', '$bar' ], [ 'num', '32' ] ] ] ],
                         [ 'stmtList',
-                            [ 'expr-stmt', [ 'assign', [ 'id', '$baz' ], [ 'num', '82' ] ] ] ] ] ]);
+                            [ 'expr-stmt', [ 'assign', [ 'id', '$baz' ], [ 'num', '82' ] ] ] ] ] ] ] ]);
         test.done();
     }
 };
@@ -118,21 +118,23 @@ module.exports["async"] = {
 
         // todo test we don't create conts when not necessary
 
-        // should create a context
-        // should call compile on each statement
+        // if foo {
+        //  bar = foo();
+        // }
+        // baz = ball;
 
         var node = new Lo.stmtList(
             new Lo.conditional(
                 new Lo.identifier('foo'),
                 new Lo.stmtList(
-                    new Lo.assign( new Lo.identifier('bar'), new Lo.requestExpr(new Lo.identifier('foo'), []))
+                    new Lo.assign(new Lo.identifier('bar'), new Lo.requestExpr(new Lo.identifier('foo'), []))
                 )
             ),
-        new Lo.stmtList(
-            new Lo.assign( new Lo.identifier('baz'), new Lo.identifier('ball'))
-        ));
+            new Lo.stmtList(
+                new Lo.assign( new Lo.identifier('baz'), new Lo.identifier('ball'))
+            ));
 
-        test.deepEqual(node.compile(new Context()).renderTree(), [ 'stmtList',
+        test.deepEqual(new JsWriter().generateJs(node.compile(new LoContext())).renderTree(), [ 'stmtList',
             [ 'if',
                 [ 'id', '$foo' ],
                 [ 'stmtList',
@@ -153,12 +155,13 @@ module.exports["async"] = {
                                 [ 'null' ] ] ] ] ],
                 [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'k0' ], [] ] ] ] ],
             [ 'stmtList',
-                [ 'function',
-                    'k0',
-                    [],
-                    [ 'stmtList',
-                        [ 'expr-stmt',
-                            [ 'assign', [ 'id', '$baz' ], [ 'id', '$ball' ] ] ] ] ] ] ]);
+                    [ 'function',
+                        'k0',
+                        [],
+                        [ 'stmtList',
+                            [ 'expr-stmt',
+                                [ 'assign', [ 'id', '$baz' ], [ 'id', '$ball' ] ] ] ] ]
+                    ] ]);
 
         // test.equal(new Context().createInner().compile(node).renderTree(),
         //     "var cont0 = function () {};if ($foo) {task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\n$bar = P0;\ncont0();}, null);\n\n}\n\nelse {cont0();}\n\n");

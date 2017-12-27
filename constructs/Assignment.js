@@ -15,6 +15,7 @@
 
 const JS = require('../codegen/JsPrimitives');
 const Identifier = require('./Identifier');
+const CFNode = require('../compiler/CFNode');
 
 
 /**
@@ -28,6 +29,7 @@ var __ = function (left, right) {
     this.left = left;
     this.right = right;
 
+    // todo now this is an ugly hack, right here
     if (typeof left.setLvalue == 'function') {
         left.setLvalue();
     }
@@ -60,41 +62,37 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param sourceCtx
+ * @param last
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, last) {
 
-    var left = this.left.compile(context);
-    var right = this.right.compile(context);
+    var left = this.left.compile(sourceCtx, last);
+    var right = this.right.compile(sourceCtx, last);
 
     // todo this implies block-level scoping
-    if (this.left instanceof Identifier) {
 
-        // if the LHS is a bare ID...
+    // if the LHS is a bare ID...
+    if (this.left instanceof Identifier) {
 
         var name = this.left.name;
 
         // validate we're not assigning to a constant
-        if (context.isConstant(name)) {
-            context.attachError(this.left, "can't assign to a constant (" + name + ")");
+        if (sourceCtx.isConstant(name)) {
+            sourceCtx.attachError(this.left, "can't assign to a constant (" + name + ")");
         }
 
         // declare if a new var
-        if (context.has(name) == false) {
-            context.declare(name);
+        if (sourceCtx.has(name) == false) {
+            sourceCtx.declare(name);
+            // targetCtx.declareVar(name); // todo - get JS vars from target ctx, not source ctx
         }
-
-        // see if the RHS is a dispatch
-        // if (this.right.type == 'message') {
-        //     context.setFuture(name);
-        // }
     }
 
-    return JS.exprStmt(JS.assign(left, right));
+    return new CFNode(JS.exprStmt(JS.assign(left, right)));
 
     // this was genius
     // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP
-
 };
 
 module.exports = __;

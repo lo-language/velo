@@ -59,12 +59,13 @@ __.prototype.hasType = function (type) {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
     if (this.type == 'string') {
-        return JS.fnCall(JS.ID('String'), [this.expr.compile(context)]);
+        return JS.fnCall(JS.ID('String'), [this.expr.compile(sourceCtx, targetCtx)]);
     }
 
     throw new Error('we only coerce to strings at the moment, baby');

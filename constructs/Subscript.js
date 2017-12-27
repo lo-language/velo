@@ -53,12 +53,13 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
+ * @param sourceCtx
+ * @param targetCtx
  */
-__.prototype.compile = function (context) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
-    var array = this.array.compile(context);
-    var index = this.index.compile(context);
+    var array = this.array.compile(sourceCtx, targetCtx);
+    var index = this.index.compile(sourceCtx, targetCtx);
 
     // support negative subscripts if the subscript is a literal
     // to do this more generally we'd have to catch it at runtime, probably with splice

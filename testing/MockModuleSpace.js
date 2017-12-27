@@ -10,9 +10,9 @@
 "use strict";
 
 const Q = require('q');
-const ASTBuilder = require('./../parser/ASTBuilder');
 const vm = require('vm');
 const EventEmitter = require('events');
+const Parser = require('./../parser/Parser');
 
 
 /**
@@ -26,7 +26,7 @@ var __ = function (source) {
     EventEmitter.call(this);
 
     this.modules = {
-        'ROOT': new ASTBuilder().parse(source)
+        'ROOT': new Parser().parse(source)
     };
 
     this.loaded = {};
@@ -85,6 +85,7 @@ __.prototype.loadModules = function (sandbox) {
     Object.keys(this.modules).forEach(moduleId => {
 
         var body = this.jsModules[moduleId];
+
         var code = "(function() {'use strict';\n\n" + body + '\n\n})';
 
         this.loaded[moduleId] = vm.runInNewContext(code, sandbox)();

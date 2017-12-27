@@ -5,8 +5,7 @@
 
 "use strict";
 
-const Context = require('../../codegen/Context');
-const JS = require('../../codegen/JsPrimitives');
+const LoContext = require('../../compiler/LoContext');
 const Lo = require('../../constructs');
 
 
@@ -20,7 +19,7 @@ module.exports["slice"] = {
             new Lo.number('3')
         );
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile(new LoContext()).renderTree(),
             [ 'call',
                 [ 'select', [ 'id', '$foo' ], 'slice' ],
                 [ [ 'num', '1' ], [ 'add', [ 'num', '3' ], [ 'num', '1' ] ] ] ]);
@@ -34,7 +33,7 @@ module.exports["slice"] = {
             new Lo.identifier('foo')
         );
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile(new LoContext()).renderTree(),
             [ 'call',
                 [ 'select', [ 'id', '$foo' ], 'slice' ],
                 [ [ 'num', '0' ] ] ]);
@@ -50,7 +49,7 @@ module.exports["slice"] = {
             new Lo.number('-1')
         );
 
-        test.deepEqual(node.compile(new Context()).renderTree(),
+        test.deepEqual(node.compile(new LoContext()).renderTree(),
             [ 'call',
                 [ 'select', [ 'id', '$foo' ], 'slice' ],
                 [ [ 'num', '-3' ], [ 'add', [ 'num', '-1' ], [ 'num', '1' ] ] ] ]);
