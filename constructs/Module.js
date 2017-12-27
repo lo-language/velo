@@ -69,7 +69,7 @@ __.prototype.getTree = function () {
  *
  * Compiling a module discovers its dependencies.
  */
-__.prototype.compile2 = function (registry, errorListener) {
+__.prototype.compile = function (registry, errorListener) {
 
     var loContext = new LoContext();
 

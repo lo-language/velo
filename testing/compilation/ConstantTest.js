@@ -34,7 +34,7 @@ module.exports["root constants"] = {
             }
         };
 
-        test.equal(module.compile2(mockRegistry).renderJs(), '' +
+        test.equal(module.compile(mockRegistry).renderJs(), '' +
             'const $main = function (args, succ, fail) {\n\n' +
             'var task = new Task(succ, fail);\n' +
             'task.succ([JS.Math.PI]);\n' +

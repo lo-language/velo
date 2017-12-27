@@ -54,7 +54,7 @@ module.exports['basics'] = {
                     'sayHello is () {\n' +
                     '    reply "hullo!";\n};\n' +
                     'main is () {\n' +
-                    '    sayHello<-;\n};\n');
+                    '    sayHello <-;\n};\n');
 
         var program = new Program(modSpace, 'ROOT');
 
