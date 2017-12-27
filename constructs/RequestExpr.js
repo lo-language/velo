@@ -56,42 +56,17 @@ __.prototype.getTree = function () {
 };
 
 /**
- * Compiles this node to JS in the given context, injecting a wrapper into the context.
- *
- * @param context
- */
-__.prototype.compile = function (context) {
-
-    var target = this.address.compile(context);
-
-    var args = this.args.map(arg => {
-        return arg.compile(context);
-    });
-
-    // get a placeholder
-    // we push a request into the context whether sync or async
-    var reqEnv = new RequestEnv(target, args, this.block);
-
-    context.pushEnv(reqEnv);
-
-    return reqEnv.getRef();
-};
-
-
-
-
-/**
  * Pushes a wrapper into the context.
  *
  * @param sourceCtx
  * @param targetCtx
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
-    var address = this.address.compile2(sourceCtx, targetCtx);
+    var address = this.address.compile(sourceCtx, targetCtx);
 
     var args = this.args.map(arg => {
-        return arg.compile2(sourceCtx, targetCtx);
+        return arg.compile(sourceCtx, targetCtx);
     });
 
     var label = sourceCtx.pushRequest(address, args);

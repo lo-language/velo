@@ -17,7 +17,7 @@ module.exports["basics"] = {
 
         test.equal(context.has('foo'), false);
 
-        test.deepEqual(node.compile2(context).renderTree(),
+        test.deepEqual(node.compile(context).renderTree(),
             [ 'function',
                 null,
                 [ 'res' ],

@@ -21,7 +21,7 @@ module.exports["assignment"] = {
 
         test.equal(context.has('foo'), false);
 
-        test.deepEqual(new JsWriter().generateJs(node.compile2(context)).renderTree(), ['stmtList',
+        test.deepEqual(new JsWriter().generateJs(node.compile(context)).renderTree(), ['stmtList',
             [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
 
         test.equal(context.has('foo'), true);
@@ -36,7 +36,7 @@ module.exports["assignment"] = {
 
         var context = new LoContext().createInner();
 
-        test.deepEqual(new JsWriter().generateJs(node.compile2(context)).renderTree(), ['stmtList',
+        test.deepEqual(new JsWriter().generateJs(node.compile(context)).renderTree(), ['stmtList',
                 [ 'expr-stmt',
                     [ 'assign',
                         [ 'subscript', [ 'id', '$foo' ], [ 'id', '$bar' ] ],
@@ -53,7 +53,7 @@ module.exports["assignment"] = {
         var context = new LoContext().createInner();
 
         test.equal(context.has('foo'), false);
-        test.deepEqual(new JsWriter().generateJs(node.compile2(context)).renderTree(), ['stmtList',
+        test.deepEqual(new JsWriter().generateJs(node.compile(context)).renderTree(), ['stmtList',
             [ 'expr-stmt',
                 [ 'assign', [ 'id', '$foo' ], [ 'id', '$bar' ] ] ] ]);
         test.equal(context.has('foo'), true);
@@ -73,7 +73,7 @@ module.exports["assignment"] = {
 
         test.equal(context.has('foo'), false);
 
-        test.deepEqual(new JsWriter().generateJs(node.compile2(context, [])).renderTree(), ['stmtList',
+        test.deepEqual(new JsWriter().generateJs(node.compile(context, [])).renderTree(), ['stmtList',
             [ 'expr-stmt',
                 [ 'assign',
                     [ 'id', '$foo' ],
@@ -96,7 +96,7 @@ module.exports["assignment"] = {
 
         test.equal(context.has('foo'), true);
 
-        test.deepEqual(new JsWriter().generateJs(node.compile2(context)).renderTree(), ['stmtList',
+        test.deepEqual(new JsWriter().generateJs(node.compile(context)).renderTree(), ['stmtList',
                 [ 'expr-stmt', [ 'assign', [ 'id', '$foo' ], [ 'num', '57' ] ] ] ]);
         test.deepEqual(context.getJsVars(), []);
         test.done();

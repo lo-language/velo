@@ -62,56 +62,13 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
- */
-__.prototype.compile = function (context) {
-
-    var left = this.left.compile(context);
-    var right = this.right.compile(context);
-
-    // todo this implies block-level scoping
-    if (this.left instanceof Identifier) {
-
-        // if the LHS is a bare ID...
-
-        var name = this.left.name;
-
-        // validate we're not assigning to a constant
-        if (context.isConstant(name)) {
-            context.attachError(this.left, "can't assign to a constant (" + name + ")");
-        }
-
-        // declare if a new var
-        if (context.has(name) == false) {
-            context.declare(name);
-        }
-
-        // see if the RHS is a dispatch
-        // if (this.right.type == 'message') {
-        //     context.setFuture(name);
-        // }
-    }
-
-    return JS.exprStmt(JS.assign(left, right));
-
-    // this was genius
-    // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP
-
-};
-
-
-
-
-/**
- * Compiles this node to JS in the given context.
- *
  * @param sourceCtx
  * @param last
  */
-__.prototype.compile2 = function (sourceCtx, last) {
+__.prototype.compile = function (sourceCtx, last) {
 
-    var left = this.left.compile2(sourceCtx, last);
-    var right = this.right.compile2(sourceCtx, last);
+    var left = this.left.compile(sourceCtx, last);
+    var right = this.right.compile(sourceCtx, last);
 
     // todo this implies block-level scoping
 

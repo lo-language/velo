@@ -54,25 +54,13 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
- */
-__.prototype.compile = function (context) {
-
-    return JS.exprStmt(JS.utilCall('scan', [this.over.compile(context), this.into.compile(context)]));
-};
-
-
-
-/**
- * Compiles this node to JS in the given context.
- *
  * @param sourceCtx
  * @param targetCtx
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
-    var over = this.over.compile2(sourceCtx, targetCtx);
-    var into = this.into.compile2(sourceCtx, targetCtx);
+    var over = this.over.compile(sourceCtx, targetCtx);
+    var into = this.into.compile(sourceCtx, targetCtx);
 
     return new CFNode(writer => {
 

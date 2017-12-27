@@ -50,20 +50,19 @@ __.prototype.getTree = function () {
     ];
 };
 
-
 /**
  * Compiles this node to JS in the given context.
  *
  * @param sourceCtx
  * @param targetCtx
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
     if (sourceCtx.canRespond() == false) {
         throw new Error("can't respond from this context");
     }
 
-    var args = JS.arrayLiteral(this.args.map(arg => arg.compile2(sourceCtx, targetCtx)));
+    var args = JS.arrayLiteral(this.args.map(arg => arg.compile(sourceCtx, targetCtx)));
 
     var response = this.type == 'reply' ?
         JS.exprStmt(JS.runtimeCall('succ', [args])) :

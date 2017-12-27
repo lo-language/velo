@@ -26,7 +26,7 @@ module.exports["sync"] = {
             )
         );
 
-        test.deepEqual(new JsWriter().generateJs(node.compile2(new LoContext())).renderTree(), [ 'stmtList',
+        test.deepEqual(new JsWriter().generateJs(node.compile(new LoContext())).renderTree(), [ 'stmtList',
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
@@ -55,7 +55,7 @@ module.exports["sync"] = {
             )
         );
 
-        test.deepEqual(new JsWriter().generateJs(node.compile2(new LoContext())).renderTree(), [ 'stmtList',
+        test.deepEqual(new JsWriter().generateJs(node.compile(new LoContext())).renderTree(), [ 'stmtList',
                 [ 'if',
                     [ 'id', '$foo' ],
                     [ 'stmtList',
@@ -96,7 +96,7 @@ module.exports["sync"] = {
             )
         );
 
-        test.deepEqual(new JsWriter().generateJs(node.compile2(new LoContext())).renderTree(), [ 'stmtList',
+        test.deepEqual(new JsWriter().generateJs(node.compile(new LoContext())).renderTree(), [ 'stmtList',
             [ 'if',
                 [ 'id', '$foo' ],
                 [ 'stmtList',
@@ -134,7 +134,7 @@ module.exports["async"] = {
                 new Lo.assign( new Lo.identifier('baz'), new Lo.identifier('ball'))
             ));
 
-        test.deepEqual(new JsWriter().generateJs(node.compile2(new LoContext())).renderTree(), [ 'stmtList',
+        test.deepEqual(new JsWriter().generateJs(node.compile(new LoContext())).renderTree(), [ 'stmtList',
             [ 'if',
                 [ 'id', '$foo' ],
                 [ 'stmtList',
@@ -163,7 +163,7 @@ module.exports["async"] = {
                                 [ 'assign', [ 'id', '$baz' ], [ 'id', '$ball' ] ] ] ] ]
                     ] ]);
 
-        // test.equal(new Context().createInner().compile2(node).renderTree(),
+        // test.equal(new Context().createInner().compile(node).renderTree(),
         //     "var cont0 = function () {};if ($foo) {task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\n$bar = P0;\ncont0();}, null);\n\n}\n\nelse {cont0();}\n\n");
         test.done();
     },
@@ -187,7 +187,7 @@ module.exports["async"] = {
     //         true
     //     );
     //
-    //     test.deepEqual(node.compile2(new Context().createInner()).renderJs(), "");
+    //     test.deepEqual(node.compile(new Context().createInner()).renderJs(), "");
     //     test.done();
     // }
 
@@ -220,7 +220,7 @@ module.exports["async"] = {
 //                 tail: null}
 //         };
 //
-//         test.equal(new Context().createInner().compile2(node).renderTree(),
+//         test.equal(new Context().createInner().compile(node).renderTree(),
 //             'if ($foo) {task.respond("reply", [42]);\nreturn;}\n\n');
 //         test.done();
 //     }

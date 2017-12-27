@@ -18,7 +18,7 @@ module.exports["basics"] = {
             new Lo.identifier('baz')
         );
 
-        test.deepEqual(node.compile2(new LoContext()).renderTree(),
+        test.deepEqual(node.compile(new LoContext()).renderTree(),
             [ 'cond-expr',
                 [ 'id', '$foo' ],
                 [ 'id', '$bar' ],

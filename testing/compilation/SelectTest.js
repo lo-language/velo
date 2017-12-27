@@ -18,7 +18,7 @@ module.exports["select"] = {
             'bar'
         );
 
-        test.deepEqual(node.compile2(new LoContext()).renderTree(),
+        test.deepEqual(node.compile(new LoContext()).renderTree(),
             JS.select(JS.ID('$foo'), 'bar').renderTree());
         test.done();
     }

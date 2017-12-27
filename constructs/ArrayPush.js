@@ -51,26 +51,6 @@ __.prototype.getTree = function () {
     return [this.op, this.left.getTree(), this.right.getTree()];
 };
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param context
- */
-__.prototype.compile = function (context) {
-
-    var left = this.left.compile(context);
-    var right = this.right.compile(context);
-
-    // todo probably want to add some runtime checks
-
-    if (this.op == 'push-front') {
-        return JS.exprStmt(JS.fnCall(JS.select(right, 'unshift'), [left]));
-    }
-    else {
-        return JS.exprStmt(JS.fnCall(JS.select(left, 'push'), [right]));
-    }
-};
-
 
 /**
  * Compiles this node to JS in the given context.
@@ -78,10 +58,10 @@ __.prototype.compile = function (context) {
  * @param sourceCtx
  * @param targetCtx
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
-    var left = this.left.compile2(sourceCtx, targetCtx);
-    var right = this.right.compile2(sourceCtx, targetCtx);
+    var left = this.left.compile(sourceCtx, targetCtx);
+    var right = this.right.compile(sourceCtx, targetCtx);
 
     // todo probably want to add some runtime checks
 

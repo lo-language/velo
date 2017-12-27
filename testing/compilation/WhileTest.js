@@ -28,7 +28,7 @@ module.exports['basics'] = {
         var stack = [];
 
         // compiling a stmt returns a graph
-        var js = new JsWriter().generateJs(loop.compile2(new LoContext(), stack));
+        var js = new JsWriter().generateJs(loop.compile(new LoContext(), stack));
 
         test.deepEqual(js.renderTree(), ['stmtList',
             ['while',
@@ -45,7 +45,7 @@ module.exports['basics'] = {
         var stack = [];
 
         // compiling a stmt returns a control flow graph
-        var js = new JsWriter().generateJs(loop.compile2(new LoContext(), stack));
+        var js = new JsWriter().generateJs(loop.compile(new LoContext(), stack));
 
         test.deepEqual(js.renderTree(), ['stmtList',
             ['expr-stmt',
@@ -75,7 +75,7 @@ module.exports['basics'] = {
             )
         );
 
-        var js = new JsWriter().generateJs(loop.compile2(new LoContext()));
+        var js = new JsWriter().generateJs(loop.compile(new LoContext()));
 
         test.deepEqual(js.renderTree(), ['stmtList',
             ['expr-stmt',
@@ -118,7 +118,7 @@ module.exports['basics'] = {
             )
         );
 
-        var js = new JsWriter().generateJs(loop.compile2(new LoContext()));
+        var js = new JsWriter().generateJs(loop.compile(new LoContext()));
 
         test.deepEqual(js.renderTree(), [ 'stmtList',
             [ 'expr-stmt',

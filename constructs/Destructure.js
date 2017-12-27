@@ -43,19 +43,10 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
- */
-__.prototype.compile = function (context) {
-
-};
-
-/**
- * Compiles this node to JS in the given context.
- *
  * @param sourceCtx
  * @param targetCtx
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
 };
 

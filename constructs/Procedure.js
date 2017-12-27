@@ -65,7 +65,7 @@ __.prototype.getTree = function () {
  *
  * @param sourceCtx
  */
-__.prototype.compile2 = function (sourceCtx) {
+__.prototype.compile = function (sourceCtx) {
 
     // push a new context onto the scope stack
     var localCtx = sourceCtx.createInner(this.isService);
@@ -82,7 +82,7 @@ __.prototype.compile2 = function (sourceCtx) {
 
     // compile the statement(s) in the context of the local scope;
     // this will also populate our symbol table
-    var body = this.body.compile2(localCtx);
+    var body = this.body.compile(localCtx);
 
     // declare our local vars
     var localVars = localCtx.getJsVars();

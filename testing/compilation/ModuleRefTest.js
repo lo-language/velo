@@ -28,7 +28,7 @@ module.exports["identifiers"] = {
 
         context.setRegistry(registry);
 
-        test.deepEqual(node.compile2(context).renderTree(),
+        test.deepEqual(node.compile(context).renderTree(),
                     [ 'select', [ 'id', 'Node' ], 'HTTP' ]);
         test.done();
     },
@@ -53,7 +53,7 @@ module.exports["identifiers"] = {
 
         context.define("Moon", 42);
 
-        test.deepEqual(node.compile2(context).renderTree(),
+        test.deepEqual(node.compile(context).renderTree(),
                     [ 'select', [ 'id', '__local' ], 'Moon' ]);
 
         test.done();

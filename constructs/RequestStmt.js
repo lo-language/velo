@@ -73,17 +73,17 @@ __.prototype.getTree = function () {
  * @param sourceCtx
  * @param targetCtx
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
-    var address = this.address.compile2(sourceCtx, targetCtx);
+    var address = this.address.compile(sourceCtx, targetCtx);
     var args = this.args.map(arg => {
-        return arg.compile2(sourceCtx, targetCtx);
+        return arg.compile(sourceCtx, targetCtx);
     });
 
     // these return proc objects
 
-    var succHandler = this.succHandler ? this.succHandler.compile2(sourceCtx, targetCtx) : null;
-    var failHandler = this.failHandler ? this.failHandler.compile2(sourceCtx, targetCtx) : null;
+    var succHandler = this.succHandler ? this.succHandler.compile(sourceCtx, targetCtx) : null;
+    var failHandler = this.failHandler ? this.failHandler.compile(sourceCtx, targetCtx) : null;
 
     return this.blocking ?
         new BlockingReq(address, args, succHandler, failHandler) :

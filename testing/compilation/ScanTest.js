@@ -23,7 +23,7 @@ module.exports["basics"] = {
                 ['item'],
                 new Lo.stmtList(new Lo.assign(new Lo.identifier('count'), new Lo.number('1')))));
 
-        test.deepEqual(new JsWriter().generateJs(node.compile2(new LoContext())).renderTree(), [ 'stmtList',
+        test.deepEqual(new JsWriter().generateJs(node.compile(new LoContext())).renderTree(), [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', 'Util' ], 'scan' ],

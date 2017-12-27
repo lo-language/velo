@@ -70,58 +70,20 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
- */
-__.prototype.compile = function (context) {
-
-    // if one branch is async we need to make a continuation and call it from both branches
-
-    var predicate = this.predicate.compile(context);
-
-    var bc = new BranchContext(context);
-    var consequent = this.consequent.compile(bc);
-
-    // we can use the same branch context for both branches
-    if (this.alternate) {
-        var alternate = this.alternate.compile(bc);
-    }
-    else if (bc.isDiscontinuous()) {
-
-        // we've wrapped our tail in a continuation so
-        // it needs to be called in the alternate branch as well
-
-        alternate = bc.getConnector();
-    }
-
-    // todo - push into BC?
-    if (bc.isDiscontinuous()) {
-        bc.connect();
-    }
-
-    return JS.cond(predicate, consequent, alternate);
-};
-
-
-
-
-
-/**
- * Compiles this node to JS in the given context.
- *
  * @param sourceCtx
  * @param targetCtx
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
     // hmmm...
     // if the predicate has a req expr in it, will our node be flagged as non-intact?
     // todo what should happen there?
 
-    var predicate = this.predicate.compile2(sourceCtx, targetCtx);
+    var predicate = this.predicate.compile(sourceCtx, targetCtx);
 
     // we could create some kind of branch or block context here
     var ctx = [];
-    var trueBranch = this.consequent.compile2(sourceCtx, ctx);
+    var trueBranch = this.consequent.compile(sourceCtx, ctx);
 
     if (ctx.length > 0) {
         var wrapper = CFNode.makeWrapper(ctx);
@@ -130,7 +92,7 @@ __.prototype.compile2 = function (sourceCtx, targetCtx) {
     }
 
     if (this.alternate) {
-        var falseBranch = this.alternate.compile2(sourceCtx, []);
+        var falseBranch = this.alternate.compile(sourceCtx, []);
     }
 
     // todo restore this

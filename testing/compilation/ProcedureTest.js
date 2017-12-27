@@ -66,7 +66,7 @@ module.exports["service"] = {
                                                     ] ] ] ],
                                         [ 'null' ] ] ] ] ] ] ] ] ];
 
-        test.deepEqual(node.compile2(new LoContext()).renderTree(), result);
+        test.deepEqual(node.compile(new LoContext()).renderTree(), result);
         test.done();
     },
 
@@ -120,7 +120,7 @@ module.exports["service"] = {
                                         [ 'call', [ 'select', [ 'id', 'task' ], 'autoReply' ], [ ] ] ]
                                      ] ] ] ] ] ] ];
 
-        test.deepEqual(node.compile2(new LoContext()).renderTree(), result);
+        test.deepEqual(node.compile(new LoContext()).renderTree(), result);
         test.done();
     },
 
@@ -155,7 +155,7 @@ module.exports["service"] = {
             ),
             true);
 
-        var result = node.compile2(new LoContext());
+        var result = node.compile(new LoContext());
 
         test.deepEqual(result.renderTree(),
             [ 'function',

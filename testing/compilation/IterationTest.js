@@ -24,7 +24,7 @@ module.exports["basics"] = {
             )
         );
 
-        var result = node.compile2(new LoContext()).getJs(new JsWriter());
+        var result = node.compile(new LoContext()).getJs(new JsWriter());
 
         test.deepEqual(result.renderTree(),
             ['while',
@@ -36,7 +36,7 @@ module.exports["basics"] = {
         node = new Lo.stmtList(node,
             new Lo.stmtList(new Lo.assign(new Lo.identifier('z'), new Lo.number('57'))));
 
-        result = new JsWriter().generateJs(node.compile2(new LoContext()));
+        result = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(),
             ['stmtList',
@@ -50,7 +50,7 @@ module.exports["basics"] = {
         // // try attaching another statement
         node.attach(new Lo.stmtList(new Lo.assign(new Lo.identifier('mork'), new Lo.string('ork'))));
 
-        result = new JsWriter().generateJs(node.compile2(new LoContext()));
+        result = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(),
             ['stmtList',
@@ -79,7 +79,7 @@ module.exports["basics"] = {
         var ctx = new LoContext();
 
         // compiling a stmt returns a control flow graph
-        var js = new JsWriter().generateJs(loop.compile2(ctx));
+        var js = new JsWriter().generateJs(loop.compile(ctx));
 
         // make sure we properly report any vars in the body
         test.deepEqual(ctx.getJsVars(), ['$bar']);
@@ -122,7 +122,7 @@ module.exports["basics"] = {
             )
         );
 
-        var js = new JsWriter().generateJs(node.compile2(new LoContext()));
+        var js = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(js.renderTree(), ['stmtList',
             ['expr-stmt',
@@ -236,7 +236,7 @@ module.exports["basics"] = {
             )
         );
 
-        var js = new JsWriter().generateJs(node.compile2(new LoContext()));
+        var js = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(js.renderTree(), ['stmtList',
             ['expr-stmt',
@@ -277,7 +277,7 @@ module.exports["basics"] = {
             )
         );
 
-        var js = new JsWriter().generateJs(node.compile2(new LoContext()));
+        var js = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(js.renderTree(), ['stmtList',
             ['expr-stmt',

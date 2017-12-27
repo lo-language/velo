@@ -21,7 +21,7 @@ module.exports["statement lists"] = {
             )
         );
 
-        test.equal(new JsWriter().generateJs(node.compile2(new LoContext())).renderJs(),
+        test.equal(new JsWriter().generateJs(node.compile(new LoContext())).renderJs(),
             '$foo = 42;\n$bar = 57;\n');
         test.done();
     },
@@ -38,7 +38,7 @@ module.exports["statement lists"] = {
             )
         );
 
-        var js = new JsWriter().generateJs(node.compile2(new LoContext(), []));
+        var js = new JsWriter().generateJs(node.compile(new LoContext(), []));
 
         test.equal(js.renderJs(),
             'task.sendAndBlock($bar, [42], function (res0) {\n\n$foo = res0[0];\n$baz = 57;\n}, null);\n');

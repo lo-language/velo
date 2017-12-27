@@ -53,27 +53,14 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
- */
-__.prototype.compile = function (context) {
-
-    return this.undef ?
-        JS.strictEqual(JS.typeof(this.expr.compile(context)), JS.string('undefined')) :
-        JS.strictNotEqual(JS.typeof(this.expr.compile(context)), JS.string('undefined'));
-};
-
-
-/**
- * Compiles this node to JS in the given context.
- *
  * @param sourceCtx
  * @param targetCtx
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
     return this.undef ?
-        JS.strictEqual(JS.typeof(this.expr.compile2(sourceCtx, targetCtx)), JS.string('undefined')) :
-        JS.strictNotEqual(JS.typeof(this.expr.compile2(sourceCtx, targetCtx)), JS.string('undefined'));
+        JS.strictEqual(JS.typeof(this.expr.compile(sourceCtx, targetCtx)), JS.string('undefined')) :
+        JS.strictNotEqual(JS.typeof(this.expr.compile(sourceCtx, targetCtx)), JS.string('undefined'));
 };
 
 module.exports = __;

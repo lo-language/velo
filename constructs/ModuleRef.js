@@ -48,26 +48,11 @@ __.prototype.getTree = function () {
 
 /**
  * Compiles this module reference to JS.
- */
-__.prototype.compile = function (context) {
-
-    // will throw if namespace is unknown
-    context.registry.include(this.namespace || '__local', this.id);
-
-    // module namespaces are injected as globals at load-time
-    return JS.select(JS.ID(this.namespace || '__local'), this.id);
-};
-
-
-
-
-/**
- * Compiles this module reference to JS.
  *
  * @param sourceCtx
  * @param targetCtx
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
     // will throw if namespace is unknown
     sourceCtx.registry.include(this.namespace || '__local', this.id);

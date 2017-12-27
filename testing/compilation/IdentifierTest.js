@@ -14,7 +14,7 @@ module.exports["identifiers"] = {
 
         var node = new Lo.identifier('foo');
 
-        test.deepEqual(node.compile2(new LoContext()).renderTree(),
+        test.deepEqual(node.compile(new LoContext()).renderTree(),
             ['id', '$foo']);
         test.done();
     },
@@ -23,7 +23,7 @@ module.exports["identifiers"] = {
 
         var node = new Lo.identifier('foo');
 
-        test.deepEqual(node.compile2(new LoContext()).renderTree(),
+        test.deepEqual(node.compile(new LoContext()).renderTree(),
             ['id', '$foo']);
         test.done();
     }

@@ -53,42 +53,10 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
- */
-// __.prototype.compile = function (context) {
-//
-//     // we need to define the symbol in the context before compiling the value
-//     // in case it's recursive
-//
-//     var value;
-//
-//     if (this.value instanceof ModuleRef) {
-//
-//         value = this.value.compile(context);
-//
-//         context.define(this.name, value, true);
-//         return JS.NOOP;
-//     }
-//
-//     // register with the symbol table
-//     context.define(this.name, value);
-//
-//     value = this.value.compile(context);
-//
-//     context._setValue(this.name, value);
-//
-//     return JS.constDecl('$' + this.name, value);
-// };
-
-
-
-/**
- * Compiles this node to JS in the given context.
- *
  * @param sourceCtx
  * @param targetCtx
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
     // we need to define the symbol in the context before compiling the value
     // in case it's recursive
@@ -97,7 +65,7 @@ __.prototype.compile2 = function (sourceCtx, targetCtx) {
 
     if (this.value instanceof ModuleRef) {
 
-        value = this.value.compile2(sourceCtx, targetCtx);
+        value = this.value.compile(sourceCtx, targetCtx);
 
         sourceCtx.define(this.name, value, true);
         return JS.NOOP;
@@ -106,7 +74,7 @@ __.prototype.compile2 = function (sourceCtx, targetCtx) {
     // register with the symbol table
     sourceCtx.define(this.name, value);
 
-    value = this.value.compile2(sourceCtx, targetCtx);
+    value = this.value.compile(sourceCtx, targetCtx);
 
     sourceCtx._setValue(this.name, value);
 

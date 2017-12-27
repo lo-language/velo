@@ -17,7 +17,7 @@ module.exports["basics"] = {
 
         var context = new LoContext().createInner();
 
-        test.deepEqual(node.compile2(context).renderTree(),
+        test.deepEqual(node.compile(context).renderTree(),
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', '$foo' ], 'unshift' ],
@@ -33,7 +33,7 @@ module.exports["basics"] = {
 
         var context = new LoContext().createInner();
 
-        test.deepEqual(node.compile2(context).renderTree(),
+        test.deepEqual(node.compile(context).renderTree(),
             [ 'expr-stmt',
                 [ 'call',
                     [ 'select', [ 'id', '$foo' ], 'push' ],

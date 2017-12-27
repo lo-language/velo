@@ -59,43 +59,12 @@ __.prototype.getTree = function () {
 /**
  * Compiles this node to JS in the given context.
  *
- * @param context
- */
-__.prototype.compile = function (context) {
-
-    var target = this.target.compile(context);
-
-    // not DRY -- duplicates logic from Assignment...
-    // if the LHS is a bare ID...
-
-    var name = this.target.name;
-
-    // validate we're not assigning to a constant
-    if (context.isConstant(name)) {
-        context.attachError(this.left, "can't assign to a constant (" + name + ")");
-    }
-
-    // declare if a new var
-    if (context.has(name) == false) {
-        context.declare(name);
-    }
-
-    return JS.fnDef(['res'], JS.stmtList(
-        JS.assign(target, JS.subscript(JS.ID('res'), JS.num('0')), '=')));
-};
-
-
-
-
-/**
- * Compiles this node to JS in the given context.
- *
  * @param sourceCtx
  * @param targetCtx
  */
-__.prototype.compile2 = function (sourceCtx, targetCtx) {
+__.prototype.compile = function (sourceCtx, targetCtx) {
 
-    var target = this.target.compile2(sourceCtx, targetCtx);
+    var target = this.target.compile(sourceCtx, targetCtx);
 
     // not DRY -- duplicates logic from Assignment...
     // if the LHS is a bare ID...

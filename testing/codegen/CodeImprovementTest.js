@@ -33,7 +33,7 @@ module.exports["basics"] = {
     //         true
     //     );
     //
-    //     var result = node.compile2(new Context(), new CFNode());
+    //     var result = node.compile(new Context(), new CFNode());
     //
     //     test.deepEqual(result.renderTree(),
     //         [ 'expr-stmt',
@@ -62,7 +62,7 @@ module.exports["basics"] = {
     //
     //     var node = new Lo.response('reply');
     //
-    //     test.deepEqual(node.compile2(new Context().createInner(true)).renderTree(),
+    //     test.deepEqual(node.compile(new Context().createInner(true)).renderTree(),
     //         [ 'expr-stmt',
     //             [ 'call',
     //                 [ 'select', [ 'id', 'task' ], 'succ' ],
@@ -93,7 +93,7 @@ module.exports["basics"] = {
     //         new Lo.assign(new Lo.identifier('point'), new Lo.number('2'))
     //     ));
     //
-    //     var result = node.compile2(new Context());
+    //     var result = node.compile(new Context());
     //
     //     test.deepEqual(result.renderTree(), [ 'stmtList',
     //         [ 'if',
@@ -147,7 +147,7 @@ module.exports["basics"] = {
     //         new Lo.assign(new Lo.identifier('i'), new Lo.number('2'))
     //     ));
     //
-    //     var result = node.compile2(new Context().createInner(true), new CFNode());
+    //     var result = node.compile(new Context().createInner(true), new CFNode());
     //
     //     test.deepEqual(result.renderTree(), [ 'stmtList',
     //         [ 'expr-stmt',

@@ -55,14 +55,14 @@ __.prototype.getTree = function () {
  * @param targetCtx
  * @returns {*}
  */
-__.prototype.compile2 = function (loContext, targetCtx) {
+__.prototype.compile = function (loContext, targetCtx) {
 
     // we have two strategies at our disposal: native loop and recursive loop
     // we use the native loop when we can; otherwise must use our recursive loop
 
     var condCtx = loContext.createInner();
-    var loopCond = this.cond.compile2(condCtx);
-    var loopBody = this.body.compile2(loContext);
+    var loopCond = this.cond.compile(condCtx);
+    var loopBody = this.body.compile(loContext);
 
     // if neither part is broken, can use a native while loop
 

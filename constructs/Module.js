@@ -82,7 +82,7 @@ __.prototype.compile = function (registry, errorListener) {
     this.deps.forEach(function (dep) {
 
         // ignore the return value, which is just a no-op
-        dep.compile2(loContext);
+        dep.compile(loContext);
     });
 
     var t = this;
@@ -91,7 +91,7 @@ __.prototype.compile = function (registry, errorListener) {
     var lastStmt = firstStmt;
 
     this.defs.forEach(def => {
-        lastStmt = lastStmt.setNext(def.compile2(loContext));
+        lastStmt = lastStmt.setNext(def.compile(loContext));
     });
 
     // bail if we had errors

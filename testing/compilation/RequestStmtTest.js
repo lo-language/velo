@@ -32,7 +32,7 @@ module.exports["blocking"] = {
                 true
             );
 
-        var result = new JsWriter().generateJs(node.compile2(new LoContext()));
+        var result = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(), ['stmtList',
                 [ 'expr-stmt',
@@ -76,7 +76,7 @@ module.exports["blocking"] = {
             new Lo.stmtList(
                 new Lo.assign(new Lo.identifier('bazball'), new Lo.number('42'))));
 
-        var result = new JsWriter().generateJs(node.compile2(new LoContext()));
+        var result = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -123,7 +123,7 @@ module.exports["blocking"] = {
                 true
             );
 
-        var result = new JsWriter().generateJs(node.compile2(new LoContext()));
+        var result = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -164,7 +164,7 @@ module.exports["blocking"] = {
             new Lo.stmtList(
                 new Lo.assign(new Lo.identifier('bazball'), new Lo.number('42'))));
 
-        var result = new JsWriter().generateJs(node.compile2(new LoContext()));
+        var result = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -219,7 +219,7 @@ module.exports["blocking"] = {
                 true
             );
 
-        var result = new JsWriter().generateJs(reqStmt.compile2(new LoContext()));
+        var result = new JsWriter().generateJs(reqStmt.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
                 [ 'expr-stmt',
@@ -247,7 +247,7 @@ module.exports["blocking"] = {
             new Lo.stmtList(
                 new Lo.assign(new Lo.identifier('bazball'), new Lo.number('42'))));
 
-        result = new JsWriter().generateJs(node.compile2(new LoContext()));
+        result = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(),
             [ 'stmtList',
@@ -291,7 +291,7 @@ module.exports["blocking"] = {
             true
         );
 
-        var result = new JsWriter().generateJs(reqStmt.compile2(new LoContext()));
+        var result = new JsWriter().generateJs(reqStmt.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
                 [ 'expr-stmt',
@@ -306,7 +306,7 @@ module.exports["blocking"] = {
         var node = new Lo.stmtList(reqStmt,
             new Lo.stmtList(new Lo.assign(new Lo.identifier('foo'), new Lo.identifier('bar'))));
 
-        result = new JsWriter().generateJs(node.compile2(new LoContext()));
+        result = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -343,7 +343,7 @@ module.exports["blocking"] = {
                 true
             ));
 
-        var result = new JsWriter().generateJs(node.compile2(new LoContext()));
+        var result = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -386,7 +386,7 @@ module.exports["blocking"] = {
             )
         ));
 
-        result = new JsWriter().generateJs(node.compile2(new LoContext()));
+        result = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(),
             [ 'stmtList',
@@ -456,7 +456,7 @@ module.exports["blocking"] = {
                 true
             ));
 
-        var result = new JsWriter().generateJs(node.compile2(new LoContext()));
+        var result = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -523,7 +523,7 @@ module.exports["non-blocking"] = {
             false
         );
 
-        var result = new JsWriter().generateJs(node.compile2(new LoContext()));
+        var result = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -547,7 +547,7 @@ module.exports["non-blocking"] = {
                 new Lo.number('42')
             )));
 
-        result = new JsWriter().generateJs(node.compile2(new LoContext()));
+        result = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -588,7 +588,7 @@ module.exports["non-blocking"] = {
             false
         );
 
-        var result = new JsWriter().generateJs(node.compile2(new LoContext()));
+        var result = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -634,7 +634,7 @@ module.exports["non-blocking"] = {
             false
         );
 
-        var result = new JsWriter().generateJs(node.compile2(new LoContext()));
+        var result = new JsWriter().generateJs(node.compile(new LoContext()));
 
         test.deepEqual(result.renderTree(), [ 'stmtList',
             [ 'expr-stmt',
@@ -666,7 +666,7 @@ module.exports["non-blocking"] = {
 
         // var node = new Lo.requestStmt();
 
-        // test.deepEqual(node.compile2(new LoContext()).renderTree(),
+        // test.deepEqual(node.compile(new LoContext()).renderTree(),
         //     [ 'stmtList',
         //         [ 'expr-stmt',
         //             [ 'call',

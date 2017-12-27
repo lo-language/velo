@@ -27,7 +27,7 @@ module.exports["blocking calls"] = {
                 true))]);
 
         var ctx = new LoContext().createInner(true);
-        var result = node.compile2(ctx);
+        var result = node.compile(ctx);
 
         test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
             [ 'stmtList',
@@ -65,7 +65,7 @@ module.exports["blocking calls"] = {
         );
 
         var ctx = new LoContext().createInner(true);
-        var result = node.compile2(ctx);
+        var result = node.compile(ctx);
 
         test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
             [ 'stmtList',
@@ -97,7 +97,7 @@ module.exports["blocking calls"] = {
         );
 
         var ctx = new LoContext().createInner(true);
-        var result = node.compile2(ctx);
+        var result = node.compile(ctx);
 
         test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
             [ 'stmtList',
@@ -131,7 +131,7 @@ module.exports["blocking calls"] = {
         );
 
         var ctx = new LoContext().createInner(true);
-        var result = node.compile2(ctx);
+        var result = node.compile(ctx);
 
         test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
             [ 'stmtList',
@@ -172,7 +172,7 @@ module.exports["blocking calls"] = {
         );
 
         var ctx = new LoContext().createInner(true);
-        var result = node.compile2(ctx);
+        var result = node.compile(ctx);
 
         test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
             [ 'stmtList',
