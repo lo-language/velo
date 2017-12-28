@@ -20,7 +20,7 @@ module.exports = {
 
     "array": function (test) {
 
-        var ar = new Lo.array([new Lo.number(12), new Lo.number(22)]);
+        var ar = new Lo.arrayLiteral([new Lo.number(12), new Lo.number(22)]);
 
         test.deepEqual(ar.getTree(), ['array', 12, 22]);
 

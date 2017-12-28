@@ -37,7 +37,7 @@ module.exports["literals"] = {
 
     "array": function (test) {
 
-        var node = new Lo.array([
+        var node = new Lo.arrayLiteral([
             new Lo.string("foo"),
             new Lo.string("mani"),
             new Lo.string("padme"),

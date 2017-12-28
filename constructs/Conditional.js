@@ -13,96 +13,101 @@
 
 "use strict";
 
-const JS = require('../codegen/JsPrimitives');
 const CFNode = require('../compiler/CFNode');
 const BranchNode = require('../compiler/BranchNode');
+const LoConstruct = require('./LoConstruct');
 
-/**
- * A conditional statement.
- *
- * @param predicate
- * @param consequent
- * @param alternate
- */
-var __ = function (predicate, consequent, alternate) {
 
-    this.predicate = predicate;
-    this.consequent = consequent;
-    this.alternate = alternate;
-};
+class Conditional extends LoConstruct {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+    /**
+     * A conditional statement.
+     *
+     * @param predicate
+     * @param consequent
+     * @param alternate
+     */
+    constructor(predicate, consequent, alternate) {
 
-    var result = {
-        type: 'conditional',
-        predicate: this.predicate.getAst(),
-        consequent: this.consequent.getAst()
-    };
-
-    if (this.alternate) {
-        result.alternate = this.alternate.getAst();
+        super();
+        this.predicate = predicate;
+        this.consequent = consequent;
+        this.alternate = alternate;
     }
 
-    return result;
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+        var result = {
+            type: 'conditional',
+            predicate: this.predicate.getAst(),
+            consequent: this.consequent.getAst()
+        };
 
-    var result = [
-        'branch',
-        this.predicate.getTree(),
-        this.consequent.getTree()
-    ];
+        if (this.alternate) {
+            result.alternate = this.alternate.getAst();
+        }
 
-    if (this.alternate) {
-        result.push(this.alternate.getTree());
+        return result;
     }
 
-    return result;
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+        var result = [
+            'branch',
+            this.predicate.getTree(),
+            this.consequent.getTree()
+        ];
 
-    // hmmm...
-    // if the predicate has a req expr in it, will our node be flagged as non-intact?
-    // todo what should happen there?
+        if (this.alternate) {
+            result.push(this.alternate.getTree());
+        }
 
-    var predicate = this.predicate.compile(sourceCtx, targetCtx);
-
-    // we could create some kind of branch or block context here
-    var ctx = [];
-    var trueBranch = this.consequent.compile(sourceCtx, ctx);
-
-    if (ctx.length > 0) {
-        var wrapper = CFNode.makeWrapper(ctx);
-        wrapper.append(trueBranch);
-        trueBranch = wrapper;
+        return result;
     }
 
-    if (this.alternate) {
-        var falseBranch = this.alternate.compile(sourceCtx, []);
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
+
+        // hmmm...
+        // if the predicate has a req expr in it, will our node be flagged as non-intact?
+        // todo what should happen there?
+
+        var predicate = this.predicate.compile(sourceCtx, targetCtx);
+
+        // we could create some kind of branch or block context here
+        var ctx = [];
+        var trueBranch = this.consequent.compile(sourceCtx, ctx);
+
+        if (ctx.length > 0) {
+            var wrapper = CFNode.makeWrapper(ctx);
+            wrapper.append(trueBranch);
+            trueBranch = wrapper;
+        }
+
+        if (this.alternate) {
+            var falseBranch = this.alternate.compile(sourceCtx, []);
+        }
+
+        // todo restore this
+        // workaround for the case where alternate is an individual cond stmt rather than a stmtlist
+        // could change the parser to eliminate this case
+        // if (alternate && alternate instanceof CFNode == false) {
+        //     alternate = new CFNode(alternate);
+        // }
+
+        return new BranchNode(predicate, trueBranch, falseBranch);
     }
+}
 
-    // todo restore this
-    // workaround for the case where alternate is an individual cond stmt rather than a stmtlist
-    // could change the parser to eliminate this case
-    // if (alternate && alternate instanceof CFNode == false) {
-    //     alternate = new CFNode(alternate);
-    // }
-
-    return new BranchNode(predicate, trueBranch, falseBranch);
-};
-
-module.exports = __;
+module.exports = Conditional;

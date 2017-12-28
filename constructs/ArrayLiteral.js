@@ -17,27 +17,13 @@ const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
 
 
-class Number extends LoConstruct {
+class ArrayLiteral extends LoConstruct {
 
-    /**
-     * A literal number
-     *
-     * @param value     a string representation of the number
-     */
-    constructor(value) {
+    constructor (elements) {
 
         super();
-        this.value = value;
-    }
 
-    /**
-     * Accessor
-     *
-     * @returns {*}
-     */
-    getValue() {
-
-        return this.value;
+        this.elements = elements;
     }
 
     /**
@@ -46,8 +32,8 @@ class Number extends LoConstruct {
     getAst() {
 
         return {
-            type: 'number',
-            val: this.value
+            type: 'array',
+            elements: this.elements.map(elem => elem.getAst())
         };
     }
 
@@ -56,7 +42,7 @@ class Number extends LoConstruct {
      */
     getTree() {
 
-        return this.value;
+        return ['array'].concat(this.elements.map(elem => elem.getTree()));
     }
 
     /**
@@ -67,8 +53,11 @@ class Number extends LoConstruct {
      */
     compile(sourceCtx, targetCtx) {
 
-        return JS.num(this.value);
+        return JS.arrayLiteral(
+            this.elements.map(item => {
+                return item.compile(sourceCtx, targetCtx);
+            }));
     }
 }
 
-module.exports = Number;
+module.exports = ArrayLiteral;

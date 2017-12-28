@@ -71,10 +71,13 @@ __.prototype.resolve = function (registry) {
                 this.jsModules[moduleId] = module.compile(registry, (node, error) => {this.emit("error", moduleId, node, error);}).renderJs();
             }
             catch (err) {
-                console.log(err);
+                console.error("Compiler failure with module " + moduleId);
+                console.error(err);
+                console.error("Aborting compilation; please open an issue.");
+                throw err;
             }
         }, err => {
-            // todo improve error reporting here
+            console.error("Failed to acquire module " + moduleId);
             console.error(err);
         }));
 

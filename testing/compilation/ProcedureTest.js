@@ -12,6 +12,27 @@ const JsWriter = require('../../codegen/JsWriter');
 
 module.exports["service"] = {
 
+    "empty service": function (test) {
+
+        var node = new Lo.procedure(
+            [],
+            new Lo.stmtList(),
+            true
+        );
+
+        test.deepEqual(node.compile(new LoContext()).renderTree(), [ 'function',
+            null,
+            [ 'args', 'succ', 'fail' ],
+            [ 'stmtList',
+                [ 'var',
+                    'task',
+                    [ 'new', 'Task', [ [ 'id', 'succ' ], [ 'id', 'fail' ] ] ] ],
+                [ 'stmtList',
+                    [ 'expr-stmt',
+                        [ 'call', [ 'select', [ 'id', 'task' ], 'autoReply' ], [] ] ] ] ] ]);
+        test.done();
+    },
+
     "basic": function (test) {
 
         // should actually throw an error if result isn't defined in the context

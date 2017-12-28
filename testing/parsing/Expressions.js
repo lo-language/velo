@@ -46,7 +46,10 @@ module.exports["basic"] = {
 
     "literal": function (test) {
 
-        test.deepEqual(new Parser("expr").parse("42").getAst(), {type: 'number', val: '42'});
+        var result = new Parser("expr").parse("42");
+
+        test.deepEqual(result.getAst(), {type: 'number', val: '42'});
+        test.deepEqual(result.getSourceLoc(), [1, 1]);
 
         test.done();
     },

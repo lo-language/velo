@@ -92,11 +92,10 @@ using -> "using" dep ";"                                            {% function 
 
 dep
     ->  %ID                                                         {% function (d) {
-                                                                        return new Lo.constant(d[0].value,
-                                                                            new Lo.moduleRef(null, d[0].value));
+            return new Lo.constant(d[0].value, new Lo.moduleRef(null, d[0].value));
                                                                     } %}
     |   locator "as" %ID                                            {% function (d) {
-                                                                        return new Lo.constant(d[2].value, d[0]);
+            return new Lo.constant(d[2].value, d[0]);
                                                                     } %}
 
 # only supports a single-step namespace for now
@@ -113,10 +112,8 @@ statement
     ->  definition                                                  {% id %}
     |   response                                                    {% id %}
     |   expr %assign expr ";"       				                {% function (d) {
-                                                                        return new Lo.assign(d[0], d[1].value == '=' ? d[2] :
-                                                                            new Lo.binaryOpExpr(
-                                                                                {'+=': '+', '-=': '-', '*=': '*', '/=': '/', '%=': '%'}[d[1].value],
-                                                                                d[0], d[2])); } %}
+            return new Lo.assign(d[0], d[1].value == '=' ? d[2] : new Lo.binaryOpExpr(
+            {'+=': '+', '-=': '-', '*=': '*', '/=': '/', '%=': '%'}[d[1].value], d[0], d[2])); } %}
     |   destructure %assign expr ";"       				            {% function (d) {
                                                                         return new Lo.assign(d[0], d[1].value == '=' ? d[2] :
                                                                             new Lo.binaryOpExpr(
@@ -141,11 +138,13 @@ statement
     #                                                                    return new Lo.requestStmt(d[1], d[2] || [],
     #                                                                        d[3][0], d[3][1], d[0] == null);
     #                                                                } %}
-    |   "while" expr block                                          {% function (d) {return new Lo.while(d[1], d[2]);} %}
-    |   "scan" expr "->" proc                                       {% function (d) {return new Lo.scan(d[1], d[3]);} %}
+    |   "while" expr block                                          {% function (d) {
+            return new Lo.while(d[1], d[2]).setSourceLoc(d[0]);} %}
+    |   "scan" expr "->" proc                                       {% function (d) {
+            return new Lo.scan(d[1], d[3]).setSourceLoc(d[0]);} %}
 
 response -> ("reply" | "fail" | "substitute") exprList:? ";"        {% function (d) {
-                                                                        return new Lo.response(d[0][0].value, d[1] || []);
+    return new Lo.response(d[0][0].value, d[1] || []).setSourceLoc(d[0][0]);
                                                                     } %}
 
 async -> "async" | "@"
@@ -154,7 +153,10 @@ destructure
     ->   "(" %ID ("," %ID):+ ")"                                    {% function (d) {return new Lo.destructure([d[1].value].
                                                                         concat(d[2].map(function (id) { return id[1].value; }))); } %}
 
-definition -> %ID ("is"|"are") expr ";"                             {% function (d) {return new Lo.constant(d[0].value, d[2]);} %}
+definition -> %ID ("is"|"are") expr ";"                             {%
+    function (d) {
+        return new Lo.constant(d[0].value, d[2]).setSourceLoc(d[0]);
+    } %}
 
 # there's got to be a better way to describe this
 handlers
@@ -175,9 +177,12 @@ failHandler
     ->  "~>" proc                               {% function (d) { return d[1]; } %}
 
 conditional
-	->  "if" expr block                         {% function (d) { return new Lo.conditional(d[1], d[2]); } %}
-    |   "if" expr block "else" block         	{% function (d) { return new Lo.conditional(d[1], d[2], d[4]); } %}
-    |   "if" expr block "else" conditional    	{% function (d) { return new Lo.conditional(d[1], d[2], d[4]); } %}
+	->  "if" expr block                         {% function (d) {
+	        return new Lo.conditional(d[1], d[2]).setSourceLoc(d[0]); } %}
+    |   "if" expr block "else" block         	{% function (d) {
+            return new Lo.conditional(d[1], d[2], d[4]).setSourceLoc(d[0]); } %}
+    |   "if" expr block "else" conditional    	{% function (d) {
+            return new Lo.conditional(d[1], d[2], d[4]).setSourceLoc(d[0]); } %}
 
 
 # expression grammar, mostly courtesy of Jeff Lee's 1985 C grammar
@@ -244,31 +249,44 @@ exprList -> expr ("," expr):*                           {% function (d) {
                                                         } %}
 
 literal
-    ->  %bool                                       {% function (d) { return new Lo.boolean(d[0].value === 'true'); } %}
-    |   %number                                     {% function (d) { return new Lo.number(d[0].value); } %}
+    ->  %bool                                       {% function (d) {
+            return new Lo.boolean(d[0].value === 'true').setSourceLoc(d[0]); } %}
+    |   %number                                     {% function (d) {
+            return new Lo.number(d[0].value).setSourceLoc(d[0]); } %}
     |   interp_string                               {% id %}
-    |   "[" (expr ",":?):* "]"                      {% function (d) { return new Lo.array(d[1].map(function (elem) {return elem[0];})); } %}
-    |   "(" (field ",":?):+ ")"                     {% function (d) { return new Lo.compound(d[1].map(function (field) {return field[0];})); } %}
-    |   "{" "=>" "}"                                {% function (d) { return new Lo.mapLiteral([]); } %}
-    |   "{" (pair ",":?):+ "}"                      {% function (d) { return new Lo.mapLiteral(d[1].map(function (pair) {return pair[0];})); } %}
-    |   "{" (expr ",":?):* "}"                      {% function (d) { return new Lo.setLiteral(d[1].map(function (elem) {return elem[0];})); } %}
+    |   "[" (expr ",":?):* "]"                      {%
+    function (d) {
+            return new Lo.arrayLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]);
+    } %}
+    |   "(" (field ",":?):+ ")"                     {% function (d) {
+            return new Lo.compound(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } %}
+    |   "{" "=>" "}"                                {% function (d) {
+            return new Lo.mapLiteral([]).setSourceLoc(d[0]); } %}
+    |   "{" (pair ",":?):+ "}"                      {% function (d) {
+            return new Lo.mapLiteral(d[1].map(function (pair) {return pair[0];})).setSourceLoc(d[0]); } %}
+    |   "{" (expr ",":?):* "}"                      {% function (d) {
+            return new Lo.setLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]); } %}
     |   proc                                        {% function (d) { d[0].isService = true; return d[0]; } %}
 
 interp_string
-    ->  %string                                     {% function (d) { return new Lo.string(d[0].value); } %}
+    ->  %string                                     {%
+    function (d) {
+        return new Lo.string(d[0].value).setSourceLoc(d[0].line, d[0].col - 1); // adjust for quotes
+    } %}
     |   %interp_begin expr %interp_end interp_string    {%
 
     function (d) {
 
         return new Lo.concat(
             new Lo.concat(new Lo.string(d[0].value), new Lo.coercion(d[1])),
-            d[3]);
+            d[3]).setSourceLoc(d[0].line, d[0].col - 1);
     } %}
 
 field   -> %ID ":" expr                             {% function (d) { return new Lo.field(d[0].value, d[2]); } %}
 pair    -> expr "=>" expr                           {% function (d) { return new Lo.pair(d[0], d[2]); } %}
 
-proc -> "(" paramList:? ")" block                   {% function (d) { return new Lo.procedure(d[1] ? d[1] : [], d[3]); } %}
+proc -> "(" paramList:? ")" block                   {% function (d) {
+    return new Lo.procedure(d[1] ? d[1] : [], d[3]).setSourceLoc(d[0]); } %}
 
 block -> "{" statementList:? "}"                    {% function (d) { return d[1] ? d[1] : new Lo.stmtList(); } %}
 

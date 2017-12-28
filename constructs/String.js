@@ -14,64 +14,70 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * A literal string
- */
-var __ = function (value) {
+class String extends LoConstruct {
 
-    this.value = value;
-};
+    /**
+     * A literal string
+     */
+    constructor(value) {
 
-/**
- * Accessor
- *
- * @returns {*}
- */
-__.prototype.getValue = function () {
+        super();
 
-    return this.value;
-};
+        this.value = value;
+    }
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+    /**
+     * Accessor
+     *
+     * @returns {*}
+     */
+    getValue() {
 
-    return {
-        type: 'string',
-        val: this.value
-    };
-};
+        return this.value;
+    }
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-    return ['string', this.value];
-};
+        return {
+            type: 'string',
+            val: this.value
+        };
+    }
 
-/**
- *
- */
-__.prototype.hasType = function (type) {
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-    return type == 'string';
-};
+        return ['string', this.value];
+    }
 
-/**
- * Compiles this node to JS in the given context.
- *
- * todo break these out into their own classes?
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+    /**
+     *
+     */
+    hasType(type) {
 
-    return JS.string(this.value);
-};
+        return type == 'string';
+    }
 
-module.exports = __;
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * todo break these out into their own classes?
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
+
+        return JS.string(this.value);
+    }
+}
+
+module.exports = String;

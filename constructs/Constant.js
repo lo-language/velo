@@ -16,70 +16,76 @@
 const JS = require('../codegen/JsPrimitives');
 const CFNode = require('../compiler/CFNode');
 const ModuleRef = require('./ModuleRef');
+const LoConstruct = require('./LoConstruct');
 
-/**
- * A constant definition
- */
-var __ = function (name, value) {
 
-    this.name = name;
-    this.value = value;
-};
+class Constant extends LoConstruct {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+    /**
+     * A constant definition
+     */
+    constructor(name, value) {
 
-    return {
-        type: 'constant',
-        name: this.name,
-        value: this.value.getAst()
-    };
-};
+        super();
+        this.name = name;
+        this.value = value;
+    }
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-    return [
-        'def',
-        this.name,
-        this.value.getTree()
-    ];
-};
+        return {
+            type: 'constant',
+            name: this.name,
+            value: this.value.getAst()
+        };
+    }
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-    // we need to define the symbol in the context before compiling the value
-    // in case it's recursive
+        return [
+            'def',
+            this.name,
+            this.value.getTree()
+        ];
+    }
 
-    var value;
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
 
-    if (this.value instanceof ModuleRef) {
+        // we need to define the symbol in the context before compiling the value
+        // in case it's recursive
+
+        var value;
+
+        if (this.value instanceof ModuleRef) {
+
+            value = this.value.compile(sourceCtx, targetCtx);
+
+            sourceCtx.define(this.name, value, true);
+            return JS.NOOP;
+        }
+
+        // register with the symbol table
+        sourceCtx.define(this.name, value);
 
         value = this.value.compile(sourceCtx, targetCtx);
 
-        sourceCtx.define(this.name, value, true);
-        return JS.NOOP;
+        sourceCtx._setValue(this.name, value);
+
+        // we can't do this for some reason even though constDecl is a stmt
+        return new CFNode(JS.constDecl('$' + this.name, value));
     }
+}
 
-    // register with the symbol table
-    sourceCtx.define(this.name, value);
-
-    value = this.value.compile(sourceCtx, targetCtx);
-
-    sourceCtx._setValue(this.name, value);
-
-    // we can't do this for some reason even though constDecl is a stmt
-    return new CFNode(JS.constDecl('$' + this.name, value));
-};
-
-module.exports = __;
+module.exports = Constant;

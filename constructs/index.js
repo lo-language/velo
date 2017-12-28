@@ -11,7 +11,7 @@
 
 module.exports = {
 
-    array: require("./Array"),
+    arrayLiteral: require("./ArrayLiteral"),
     arrayPush: require("./ArrayPush"),
     assign: require("./Assignment"),
     binaryOpExpr: require("./BinaryOpExpr"),
