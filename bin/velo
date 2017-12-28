@@ -21,6 +21,7 @@
 
 process.title = 'velo';
 
+const fs = require('fs');
 const util = require('util');
 const path = require('path');
 const argv = require('minimist')(process.argv.slice(2));
@@ -72,18 +73,28 @@ switch (cmd) {
 
                 var exitCode = 1;
 
-                if (failParams.length > 0) {
+                // if (failParams.length > 0) {
+                //
+                //     if (typeof failParams[0] === "number") {
+                //         exitCode = failParams[0];
+                //     }
+                //     else {
+                //         // todo include line failed at
+                //         console.error("FAILED", failParams[0]);
+                //     }
+                // }
 
-                    if (typeof failParams[0] === "number") {
-                        exitCode = failParams[0];
-                    }
-                    else {
-                        // todo include line failed at
-                        console.error("FAILED", failParams[0]);
-                    }
-                }
+                // todo -- dump without recompiling
+                return localSpace.resolve(program).then(function () {
 
-                process.exit(exitCode);
+                    console.error(failParams);
+                    console.error("\n>>> CRASH! -- JS dumped to velo_crash.js");
+
+                    var ostream = fs.createWriteStream('velo_crash.js');
+                    localSpace.dumpModules(ostream);
+
+                    ostream.on('close', function () { process.exit(exitCode); });
+                });
             });
 
     default:

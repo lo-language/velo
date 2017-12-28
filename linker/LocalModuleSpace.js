@@ -151,6 +151,8 @@ __.prototype.dumpModules = function (stream) {
 
         stream.write(this.jsModules[moduleId]);
     });
+
+    stream.end();
 };
 
 

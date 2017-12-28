@@ -68,7 +68,7 @@ __.prototype.run = function (args) {
             return d.promise;
         }
         catch (err) {
-            console.log(err);
+            // console.log(err);
             throw err;
         }
     });
