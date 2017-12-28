@@ -179,7 +179,8 @@ var grammar = {
         return new Lo.conditional(d[1], d[2], d[4]).setSourceLoc(d[0]); } },
     {"name": "conditional", "symbols": [{"literal":"if"}, "expr", "block", {"literal":"else"}, "conditional"], "postprocess":  function (d) {
         return new Lo.conditional(d[1], d[2], d[4]).setSourceLoc(d[0]); } },
-    {"name": "primary_expr", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID)], "postprocess": function (d) {return new Lo.identifier(d[0].value); }},
+    {"name": "primary_expr", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID)], "postprocess":  function (d) {
+        return new Lo.identifier(d[0].value).setSourceLoc(d[0]); } },
     {"name": "primary_expr", "symbols": ["literal"], "postprocess": id},
     {"name": "primary_expr", "symbols": [{"literal":"("}, "expr", {"literal":")"}], "postprocess": function (d) {return d[1]; }},
     {"name": "primary_expr", "symbols": [{"literal":"`"}, "expr", {"literal":"`"}], "postprocess": function (d) {return new Lo.coercion(d[1]); }},

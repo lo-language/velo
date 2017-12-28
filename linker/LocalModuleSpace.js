@@ -67,15 +67,17 @@ __.prototype.resolve = function (registry) {
         acquires.push(this.acquire(moduleId).then(module => {
             this.modules[moduleId] = module;
 
-            try {
-                this.jsModules[moduleId] = module.compile(registry, (node, error) => {this.emit("error", moduleId, node, error);}).renderJs();
-            }
-            catch (err) {
-                console.error("Compiler failure with module " + moduleId);
-                console.error(err);
-                console.error("Aborting compilation; please open an issue.");
-                throw err;
-            }
+            // try {
+                this.jsModules[moduleId] = module.compile(registry, (node, error) => {
+                    this.emit("error", moduleId, node, error);
+                }).renderJs();
+            // }
+            // catch (err) {
+            //     console.error("Compiler failure with module " + moduleId);
+            //     console.error(err);
+            //     console.error("Aborting compilation; please open an issue.");
+            //     throw err;
+            // }
         }, err => {
             console.error("Failed to acquire module " + moduleId);
             console.error(err);

@@ -46,7 +46,9 @@ var program = new LoadAndGo(localSpace, path.basename(sourceFile, '.lo'));
 
 localSpace.on('error', function (file, node, message) {
 
-    console.error(`Error compiling ${file}, line ${node.line}:`, message);
+    var loc = node.getSourceLoc();
+
+    console.error(`${file} L${loc[0]}c${loc[1]}:`, message);
 });
 
 switch (cmd) {

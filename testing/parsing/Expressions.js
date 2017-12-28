@@ -14,7 +14,10 @@ module.exports["basic"] = {
 
     "id": function (test) {
 
-        test.deepEqual(new Parser("expr").parse("foo").getAst(), {type: 'id', name: 'foo'});
+        var result = new Parser("expr").parse("foo");
+
+        test.deepEqual(result.getAst(), {type: 'id', name: 'foo'});
+        test.deepEqual(result.getSourceLoc(), [1,1]);
 
         test.done();
     },

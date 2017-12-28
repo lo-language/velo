@@ -110,7 +110,7 @@ __.prototype.compile = function (registry, errorListener) {
         )
     ));
 
-    // all other compiles return IR; this returns JS? NASTY
+    // all other compile()s return IR; this returns JS? NASTY
     return new JsWriter().generateJs(firstStmt);
 };
 

@@ -188,7 +188,8 @@ conditional
 # expression grammar, mostly courtesy of Jeff Lee's 1985 C grammar
 
 primary_expr
-    ->   %ID                                            {% function (d) {return new Lo.identifier(d[0].value); } %}
+    ->   %ID                                            {% function (d) {
+            return new Lo.identifier(d[0].value).setSourceLoc(d[0]); } %}
     |   literal                                         {% id %}
     |   "(" expr ")"                                    {% function (d) {return d[1]; } %}
     |   "`" expr "`"                                    {% function (d) {return new Lo.coercion(d[1]); } %}
