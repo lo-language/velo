@@ -81,25 +81,13 @@ class Conditional extends LoConstruct {
         // if the predicate contains a req expr this stmt will be wrapped as usual
         // if either branch contains a request the BranchNode will deal with it
 
-        var predicate = this.predicate.compile(sourceCtx);
-
         // we give the branches their own source contexts so they don't consume
         // any wrappers from the predicate
 
-        var trueBranch = this.consequent.compile(sourceCtx.createInner());
-
-        if (this.alternate) {
-            var falseBranch = this.alternate.compile(sourceCtx.createInner());
-        }
-
-        // todo restore this
-        // workaround for the case where alternate is an individual cond stmt rather than a stmtlist
-        // could change the parser to eliminate this case
-        // if (alternate && alternate instanceof CFNode == false) {
-        //     alternate = new CFNode(alternate);
-        // }
-
-        return new BranchNode(predicate, trueBranch, falseBranch);
+        return new BranchNode(
+            this.predicate.compile(sourceCtx),
+            this.consequent.compile(sourceCtx.createInner()),
+            this.alternate ? this.alternate.compile(sourceCtx.createInner()) : null);
     }
 }
 

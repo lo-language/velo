@@ -182,7 +182,7 @@ conditional
     |   "if" expr block "else" block         	{% function (d) {
             return new Lo.conditional(d[1], d[2], d[4]).setSourceLoc(d[0]); } %}
     |   "if" expr block "else" conditional    	{% function (d) {
-            return new Lo.conditional(d[1], d[2], d[4]).setSourceLoc(d[0]); } %}
+            return new Lo.conditional(d[1], d[2], new Lo.stmtList(d[4])).setSourceLoc(d[0]); } %}
 
 
 # expression grammar, mostly courtesy of Jeff Lee's 1985 C grammar

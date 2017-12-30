@@ -179,24 +179,28 @@
                     "tail": null
                   },
                   "alternate": {
-                    "type": "conditional",
-                    "predicate": {
-                      "type": "op",
-                      "op": "==",
-                      "left": {
-                        "type": "id",
-                        "name": "foo"
+                    "type": "stmt_list",
+                    "head": {
+                      "type": "conditional",
+                      "predicate": {
+                        "type": "op",
+                        "op": "==",
+                        "left": {
+                          "type": "id",
+                          "name": "foo"
+                        },
+                        "right": {
+                          "type": "number",
+                          "val": "15"
+                        }
                       },
-                      "right": {
-                        "type": "number",
-                        "val": "15"
+                      "consequent": {
+                        "type": "stmt_list",
+                        "head": null,
+                        "tail": null
                       }
                     },
-                    "consequent": {
-                      "type": "stmt_list",
-                      "head": null,
-                      "tail": null
-                    }
+                    "tail": null
                   }
                 },
                 "tail": {
@@ -239,29 +243,33 @@
                       "tail": null
                     },
                     "alternate": {
-                      "type": "conditional",
-                      "predicate": {
-                        "type": "op",
-                        "op": "==",
-                        "left": {
-                          "type": "id",
-                          "name": "foo"
+                      "type": "stmt_list",
+                      "head": {
+                        "type": "conditional",
+                        "predicate": {
+                          "type": "op",
+                          "op": "==",
+                          "left": {
+                            "type": "id",
+                            "name": "foo"
+                          },
+                          "right": {
+                            "type": "number",
+                            "val": "15"
+                          }
                         },
-                        "right": {
-                          "type": "number",
-                          "val": "15"
+                        "consequent": {
+                          "type": "stmt_list",
+                          "head": null,
+                          "tail": null
+                        },
+                        "alternate": {
+                          "type": "stmt_list",
+                          "head": null,
+                          "tail": null
                         }
                       },
-                      "consequent": {
-                        "type": "stmt_list",
-                        "head": null,
-                        "tail": null
-                      },
-                      "alternate": {
-                        "type": "stmt_list",
-                        "head": null,
-                        "tail": null
-                      }
+                      "tail": null
                     }
                   },
                   "tail": {
