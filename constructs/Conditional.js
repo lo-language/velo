@@ -75,28 +75,21 @@ class Conditional extends LoConstruct {
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
-     * @param targetCtx
      */
-    compile(sourceCtx, targetCtx) {
+    compile(sourceCtx) {
 
-        // hmmm...
-        // if the predicate has a req expr in it, will our node be flagged as non-intact?
-        // todo what should happen there?
+        // if the predicate contains a req expr this stmt will be wrapped as usual
+        // if either branch contains a request the BranchNode will deal with it
 
-        var predicate = this.predicate.compile(sourceCtx, targetCtx);
+        var predicate = this.predicate.compile(sourceCtx);
 
-        // we could create some kind of branch or block context here
-        var ctx = [];
-        var trueBranch = this.consequent.compile(sourceCtx, ctx);
+        // we give the branches their own source contexts so they don't consume
+        // any wrappers from the predicate
 
-        if (ctx.length > 0) {
-            var wrapper = CFNode.makeWrapper(ctx);
-            wrapper.append(trueBranch);
-            trueBranch = wrapper;
-        }
+        var trueBranch = this.consequent.compile(sourceCtx.createInner());
 
         if (this.alternate) {
-            var falseBranch = this.alternate.compile(sourceCtx, []);
+            var falseBranch = this.alternate.compile(sourceCtx.createInner());
         }
 
         // todo restore this

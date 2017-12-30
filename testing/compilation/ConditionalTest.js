@@ -163,8 +163,45 @@ module.exports["async"] = {
                                 [ 'assign', [ 'id', '$baz' ], [ 'id', '$ball' ] ] ] ] ]
                     ] ]);
 
-        // test.equal(new Context().createInner().compile(node).renderTree(),
-        //     "var cont0 = function () {};if ($foo) {task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\n$bar = P0;\ncont0();}, null);\n\n}\n\nelse {cont0();}\n\n");
+        test.done();
+    },
+
+
+    "req in predicate": function (test) {
+
+        // if report.finalize() == false {
+        //   fail;
+        // }
+
+        var node = new Lo.stmtList(new Lo.conditional(
+            new Lo.binaryOpExpr('==',
+                new Lo.requestExpr(new Lo.select(new Lo.identifier('report'), 'finalize'), [], true),
+                new Lo.boolean('false')),
+            new Lo.stmtList(
+                new Lo.response('fail')
+            )
+        ));
+
+        test.deepEqual(new JsWriter().generateJs(node.compile(new LoContext())).renderTree(), [ 'stmtList',
+            [ 'expr-stmt',
+                [ 'call',
+                    [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
+                    [ [ 'select', [ 'id', '$report' ], 'finalize' ],
+                        [ 'arrayLiteral', [] ],
+                        [ 'function',
+                            null,
+                            [ 'res0' ],
+                            [ 'stmtList',
+                                [ 'if',
+                                    [ 'strict-eq',
+                                        [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ],
+                                        [ 'bool', 'true' ] ],
+                                    [ 'stmtList',
+                                        [ 'expr-stmt',
+                                            [ 'call', [ 'select', [ 'id', 'task' ], 'fail' ], [ [ 'arrayLiteral', [] ] ] ] ],
+                                        [ 'stmtList', [ 'return' ] ] ] ] ] ],
+                        [ 'null' ] ] ] ] ]);
+
         test.done();
     },
 
@@ -257,29 +294,6 @@ module.exports["async"] = {
 //                         [ 'expr-stmt', [ 'call', [ 'id', 'cont0' ], [] ] ] ],
 //                     [ 'stmtList',
 //                         [ 'expr-stmt', [ 'call', [ 'id', 'cont0' ], [] ] ] ] ] ] ]);
-//
-//         test.done();
-//     },
-//
-//     "async predicate": function (test) {
-//
-//         var asyncCall = new Wrapper();
-//         asyncCall.pushRequest(new Request(JS.ID('$foo'), [], null, null, true));
-//
-//         var stmt = new AsyncCond(JS.ID('$foo'), asyncCall.wrap(new JsStmt()), null, new Wrapper());
-//
-//         test.equal(stmt.isAsync(), true);
-//
-//         test.deepEqual(stmt.renderTree(), [ 'stmtList',
-//             [ 'if',
-//                 [ 'id', '$foo' ],
-//                 [ 'stmtList',
-//                     [ 'expr-stmt',
-//                         [ 'call',
-//                             [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-//                             [ [ 'id', '$foo' ],
-//                                 [ 'arrayLiteral', [] ],
-//                                 [ 'function', null, [ 'res0' ], [ 'stmtList' ] ] ] ] ] ] ] ]);
 //
 //         test.done();
 //     }

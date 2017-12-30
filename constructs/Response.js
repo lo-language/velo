@@ -63,7 +63,7 @@ class Response extends LoConstruct {
     compile(sourceCtx, targetCtx) {
 
         if (sourceCtx.canRespond() == false) {
-            throw new Error("can't respond from this context");
+            sourceCtx.reportError(this, "can't respond from this context");
         }
 
         var args = JS.arrayLiteral(this.args.map(arg => arg.compile(sourceCtx, targetCtx)));
