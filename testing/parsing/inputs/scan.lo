@@ -1,6 +1,6 @@
 test is (log) {
 
-    scan foo -> (item) {
+    scan foo >> (item) {
 
         log <- item;
     }

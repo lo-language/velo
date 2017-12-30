@@ -24,8 +24,9 @@
           left_arrow:   '<-',
           right_arrow:  '->',
           tilde_arrow:  '~>',
-          concat:       '><',
           yields:       '=>',
+          forward:      '>>',
+          concat:       '><',
           push_front:   '+>',
           push_back:    '<+',
           equality:     /==|!=/,
@@ -140,7 +141,7 @@ statement
     #                                                                } %}
     |   "while" expr block                                          {% function (d) {
             return new Lo.while(d[1], d[2]).setSourceLoc(d[0]);} %}
-    |   "scan" expr "->" proc                                       {% function (d) {
+    |   "scan" expr ">>" proc                                       {% function (d) {
             return new Lo.scan(d[1], d[3]).setSourceLoc(d[0]);} %}
 
 response -> ("reply" | "fail" | "substitute") exprList:? ";"        {% function (d) {
@@ -261,7 +262,7 @@ literal
     } %}
     |   "(" (field ",":?):+ ")"                     {% function (d) {
             return new Lo.compound(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } %}
-    |   "{" "=>" "}"                                {% function (d) {
+    |   "{" "=" "}"                                {% function (d) {
             return new Lo.mapLiteral([]).setSourceLoc(d[0]); } %}
     |   "{" (pair ",":?):+ "}"                      {% function (d) {
             return new Lo.mapLiteral(d[1].map(function (pair) {return pair[0];})).setSourceLoc(d[0]); } %}
@@ -284,7 +285,7 @@ interp_string
     } %}
 
 field   -> %ID ":" expr                             {% function (d) { return new Lo.field(d[0].value, d[2]); } %}
-pair    -> expr "=>" expr                           {% function (d) { return new Lo.pair(d[0], d[2]); } %}
+pair    -> expr "=" expr                           {% function (d) { return new Lo.pair(d[0], d[2]); } %}
 
 proc -> "(" paramList:? ")" block                   {% function (d) {
     return new Lo.procedure(d[1] ? d[1] : [], d[3]).setSourceLoc(d[0]); } %}

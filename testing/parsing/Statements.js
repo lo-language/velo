@@ -201,7 +201,7 @@ module.exports["iteration"] = {
 
     "scan": function (test) {
 
-        var result = new Parser("statement").parse('scan foo -> (item) { bar++; }');
+        var result = new Parser("statement").parse('scan foo >> (item) { bar++; }');
 
         test.deepEqual(result.getAst(),
             { type: 'scan',

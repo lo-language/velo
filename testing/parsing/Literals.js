@@ -178,7 +178,7 @@ module.exports["literals"] = {
 
         var parser = new Parser("pair");
 
-        var result = parser.parse('"Roy Batty" => "replicant"');
+        var result = parser.parse('"Roy Batty" = "replicant"');
 
         test.deepEqual(result.getAst(),
             { type: 'pair',
@@ -192,7 +192,7 @@ module.exports["literals"] = {
 
         var parser = new Parser("literal");
 
-        var result = parser.parse('  { => }');
+        var result = parser.parse('  { = }');
 
         test.deepEqual(result.getAst(), { type: 'map', elements: [] });
         test.deepEqual(result.getSourceLoc(), [1,3]);
@@ -204,7 +204,7 @@ module.exports["literals"] = {
 
         var parser = new Parser("literal");
 
-        var result = parser.parse(' {"Doolittle" => "The Pixies", "Ziggy Stardust" => "David Bowie"}');
+        var result = parser.parse(' {"Doolittle" = "The Pixies", "Ziggy Stardust" = "David Bowie"}');
 
         test.deepEqual(result.getAst(),
             { type: 'map',
@@ -224,7 +224,7 @@ module.exports["literals"] = {
 
         var parser = new Parser("literal");
 
-        var result = parser.parse('{"Doolittle" => "The Pixies" "Ziggy Stardust" => "David Bowie"}');
+        var result = parser.parse('{"Doolittle" = "The Pixies" "Ziggy Stardust" = "David Bowie"}');
 
         test.deepEqual(result.getAst(),
             { type: 'map',

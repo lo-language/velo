@@ -28,8 +28,9 @@ function id(x) {return x[0]; }
           left_arrow:   '<-',
           right_arrow:  '->',
           tilde_arrow:  '~>',
-          concat:       '><',
           yields:       '=>',
+          forward:      '>>',
+          concat:       '><',
           push_front:   '+>',
           push_back:    '<+',
           equality:     /==|!=/,
@@ -140,7 +141,7 @@ var grammar = {
         } },
     {"name": "statement", "symbols": [{"literal":"while"}, "expr", "block"], "postprocess":  function (d) {
         return new Lo.while(d[1], d[2]).setSourceLoc(d[0]);} },
-    {"name": "statement", "symbols": [{"literal":"scan"}, "expr", {"literal":"->"}, "proc"], "postprocess":  function (d) {
+    {"name": "statement", "symbols": [{"literal":"scan"}, "expr", {"literal":">>"}, "proc"], "postprocess":  function (d) {
         return new Lo.scan(d[1], d[3]).setSourceLoc(d[0]);} },
     {"name": "response$subexpression$1", "symbols": [{"literal":"reply"}]},
     {"name": "response$subexpression$1", "symbols": [{"literal":"fail"}]},
@@ -259,7 +260,7 @@ var grammar = {
     {"name": "literal$ebnf$2", "symbols": ["literal$ebnf$2", "literal$ebnf$2$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "literal", "symbols": [{"literal":"("}, "literal$ebnf$2", {"literal":")"}], "postprocess":  function (d) {
         return new Lo.compound(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } },
-    {"name": "literal", "symbols": [{"literal":"{"}, {"literal":"=>"}, {"literal":"}"}], "postprocess":  function (d) {
+    {"name": "literal", "symbols": [{"literal":"{"}, {"literal":"="}, {"literal":"}"}], "postprocess":  function (d) {
         return new Lo.mapLiteral([]).setSourceLoc(d[0]); } },
     {"name": "literal$ebnf$3$subexpression$1$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
     {"name": "literal$ebnf$3$subexpression$1$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
@@ -292,7 +293,7 @@ var grammar = {
                 d[3]).setSourceLoc(d[0].line, d[0].col - 1);
         } },
     {"name": "field", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID), {"literal":":"}, "expr"], "postprocess": function (d) { return new Lo.field(d[0].value, d[2]); }},
-    {"name": "pair", "symbols": ["expr", {"literal":"=>"}, "expr"], "postprocess": function (d) { return new Lo.pair(d[0], d[2]); }},
+    {"name": "pair", "symbols": ["expr", {"literal":"="}, "expr"], "postprocess": function (d) { return new Lo.pair(d[0], d[2]); }},
     {"name": "proc$ebnf$1", "symbols": ["paramList"], "postprocess": id},
     {"name": "proc$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "proc", "symbols": [{"literal":"("}, "proc$ebnf$1", {"literal":")"}, "block"], "postprocess":  function (d) {
