@@ -6,3 +6,4 @@ docs/output
 /testing/coverage/
 .istanbul.yml
 scratch*
+velo_crash.js

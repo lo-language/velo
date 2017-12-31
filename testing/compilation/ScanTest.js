@@ -41,5 +41,34 @@ module.exports["basics"] = {
                                     [ 'stmtList', [ 'expr-stmt', [ 'assign', [ 'id', '$count' ], [ 'num', '1' ] ] ] ] ] ] ] ] ] ] ]);
 
         test.done();
+    },
+
+
+    "scan with async proc body and following stmt": function (test) {
+
+        // scan items >> (item) {
+        //
+        //      write <- 1;
+        // }
+
+        /*
+
+        task.sendMessage(proc, [items[]],
+
+
+         */
+
+        // can we reduce this to a while loop?
+
+        var node = new Lo.scan(
+            new Lo.identifier('items'),
+            new Lo.procedure(
+                ['item'],
+                new Lo.stmtList(
+                    new Lo.requestStmt(new Lo.identifier('write'), [new Lo.number('1')]))));
+
+        test.deepEqual(new JsWriter().generateJs(node.compile(new LoContext())).renderTree(), [ 'stmtList' ]);
+
+        test.done();
     }
 };

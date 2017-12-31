@@ -19,6 +19,7 @@ const TerminalNode = require('../compiler/TerminalNode');
 const Response = require('../constructs/Response');
 const JsWriter = require('../codegen/JsWriter');
 const LoConstruct = require('./LoConstruct');
+const Connector = require('../codegen/Connector');
 
 
 class Procedure extends LoConstruct {
@@ -105,7 +106,10 @@ class Procedure extends LoConstruct {
         if (this.isService) {
 
             // implement auto-reply: if a service doesn't explicitly respond, it should reply <empty>
-            body.append(new TerminalNode(JS.exprStmt(JS.runtimeCall('autoReply', []))));
+            body.append(new TerminalNode(
+                new Connector(
+                    JS.fnCall(JS.select(JS.select(JS.ID('task'), 'autoReply'), 'bind'), [JS.ID('task')]),
+                    JS.stmtList(JS.exprStmt(JS.fnCall(JS.select(JS.ID('task'), 'autoReply'), []))))));
         }
 
         // connect the body

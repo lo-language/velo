@@ -54,6 +54,63 @@ module.exports["vanilla"] = {
     }
 };
 
+module.exports["tail capture"] = {
+
+    "basic capture": function (test) {
+
+        var writer = new Writer();
+
+        // white box test
+
+        var tail = JS.stmtList(JS.assign(JS.ID('foo'), JS.num('42')));
+
+        writer.tail = tail;
+
+        test.deepEqual(writer.captureTail().renderTree(), tail.renderTree());
+        test.equal(writer.tail, null);
+
+        test.done();
+    },
+
+    "wrap tail in continuation": function (test) {
+
+        var writer = new Writer();
+
+        // white box test
+
+        var tail = JS.stmtList(JS.assign(JS.ID('foo'), JS.num('42')));
+
+        writer.tail = tail;
+
+        test.deepEqual(writer.wrapTail().renderTree(), [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'k0' ], [] ] ] ]);
+        test.deepEqual(writer.tail.renderTree(), JS.stmtList(JS.fnDef([], tail, 'k0')).renderTree());
+
+        test.done();
+    },
+
+    "doesn't double-wrap continuation": function (test) {
+
+        // white box test
+
+        var tail = JS.stmtList(JS.assign(JS.ID('foo'), JS.num('42')));
+
+        var writer = new Writer().branch(tail);
+
+        var wrapped = writer.wrapTail();
+
+        test.deepEqual(wrapped.renderTree(), [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'k0' ], [] ] ] ]);
+        test.deepEqual(writer.tail.renderTree(), JS.stmtList(JS.fnDef([], tail, 'k0')).renderTree());
+
+        // should be almost a no-op
+
+        writer = new Writer().branch(wrapped);
+
+        test.deepEqual(writer.wrapTail().renderTree(), [ 'stmtList', [ 'expr-stmt', [ 'call', [ 'id', 'k0' ], [] ] ] ]);
+        test.equal(writer.tail, null);
+
+        test.done();
+    }
+};
 
 module.exports["cond"] = {
 

@@ -11,7 +11,6 @@
 
 const CFNode = require('../compiler/CFNode');
 const BranchNode = require('../compiler/BranchNode');
-const Connector = require('../codegen/Connector');
 const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
 

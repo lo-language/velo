@@ -205,28 +205,130 @@ module.exports["async"] = {
         test.done();
     },
 
-    // "bug": function (test) {
-    //
-    //     var node = new Lo.procedure(
-    //         ['test'],
-    //         new Lo.stmtList(
-    //             new Lo.conditional(
-    //                 new Lo.identifier('out'),
-    //                 new Lo.stmtList(
-    //                     new Lo.requestStmt(
-    //                         new Lo.identifier('write'),
-    //                         [new Lo.identifier('summary')],
-    //                         null, null, true
-    //                     )
-    //                 )
-    //             )
-    //         ),
-    //         true
-    //     );
-    //
-    //     test.deepEqual(node.compile(new Context().createInner()).renderJs(), "");
-    //     test.done();
-    // }
+    "optimizations": function (test) {
+
+        // (test) {
+        //   if out {
+        //     write <- summary;
+        //   }
+        // }
+
+        /*
+
+        unoptimized version is:
+
+        function (args, succ, fail) {
+
+            var task = new Task(succ, fail);
+            var $test;
+            $test = args[0];
+            if ($out) {
+                task.sendAndBlock($write, [$summary], k1, k1);
+                function k1 () {
+
+                    k0();
+                }
+            } else {
+                k0();
+            }
+            function k0 () {
+
+                task.autoReply();
+            }
+        }
+
+        */
+
+        /*
+
+        optimized version would be:
+
+        function (args, succ, fail) {
+
+            var task = new Task(succ, fail);
+            var $test;
+
+            $test = args[0];
+
+            if ($out) {
+                task.sendAndBlock($write, [$summary], k0, k0);
+            } else {
+                k0();
+            }
+            function k0 () {
+
+                task.autoReply();
+            }
+        }
+        */
+
+        /*
+        most-optimized version could be:
+
+        function (args, succ, fail) {
+
+            var task = new Task(succ, fail);
+            var $test;
+
+            $test = args[0];
+
+            if ($out) {
+                task.sendAndBlock($write, [$summary], task.autoReply.bind(task), task.autoReply.bind(task));
+            } else {
+                task.autoReply();
+            }
+        }
+        */
+
+        var node = new Lo.procedure(
+            ['test'],
+            new Lo.stmtList(
+                new Lo.conditional(
+                    new Lo.identifier('out'),
+                    new Lo.stmtList(
+                        new Lo.requestStmt(
+                            new Lo.identifier('write'),
+                            [new Lo.identifier('summary')],
+                            null, null, true
+                        )
+                    )
+                )
+            ),
+            true
+        );
+
+        test.deepEqual(node.compile(new LoContext()).renderTree(), [ 'function',
+            null,
+            [ 'args', 'succ', 'fail' ],
+            [ 'stmtList',
+                [ 'var',
+                    'task',
+                    [ 'new', 'Task', [ [ 'id', 'succ' ], [ 'id', 'fail' ] ] ] ],
+                [ 'stmtList',
+                    [ 'var', '$test' ],
+                    [ 'stmtList',
+                        [ 'expr-stmt',
+                            [ 'assign',
+                                [ 'id', '$test' ],
+                                [ 'subscript', [ 'id', 'args' ], [ 'num', '0' ] ] ] ],
+                        [ 'stmtList',
+                            [ 'if',
+                                [ 'id', '$out' ],
+                                [ 'stmtList',
+                                    [ 'expr-stmt',
+                                        [ 'call',
+                                            [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
+                                            [ [ 'id', '$write' ],
+                                                [ 'arrayLiteral', [ [ 'id', '$summary' ] ] ],
+                                                [ 'call', [ "select", [ "select", [ "id", "task" ], "autoReply" ], "bind"],
+                                                    [ [ 'id', 'task' ] ] ],
+                                                [ 'call', [ "select", [ "select", [ "id", "task" ], "autoReply" ], "bind"],
+                                                    [ [ 'id', 'task' ] ] ] ] ] ] ],
+                                [ 'stmtList',
+                                    [ 'expr-stmt',
+                                        [ 'call', [ 'select', [ 'id', 'task' ], 'autoReply' ], [] ] ] ] ] ] ] ] ] ]);
+        test.done();
+    },
 
 //     "nested ifs create separate continuations": function (test) {
 //         // todo
