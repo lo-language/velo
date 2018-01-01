@@ -14,14 +14,14 @@ module.exports["params"] = {
 
     "one param": function (test) {
 
-        test.deepEqual(new Parser("paramList").parse("foo"), ['foo']);
+        test.deepEqual(new Parser("id_list").parse("foo"), ['foo']);
 
         test.done();
     },
 
     "multiple params": function (test) {
 
-        test.deepEqual(new Parser("paramList").parse("foo, bar, baz"), ['foo', 'bar', 'baz']);
+        test.deepEqual(new Parser("id_list").parse("foo, bar, baz"), ['foo', 'bar', 'baz']);
 
         test.done();
     }

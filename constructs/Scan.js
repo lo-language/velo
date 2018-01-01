@@ -70,6 +70,8 @@ class Scan extends LoConstruct {
         return new CFNode(writer => {
 
             // we could alternately call writer.sub() or something if we don't want to require JsWriter
+            // we can't do genJs because the proc isn't a handler? we need to build more of a while loop cond thing around it?
+            // right, we can't 'edit' the proc
             return JS.exprStmt(JS.utilCall('scan', [
                 over, into.getJs(new JsWriter())
             ]));

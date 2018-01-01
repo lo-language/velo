@@ -109,9 +109,23 @@ __.in = function (item, collection) {
 __.scan = function (collection, handler) {
 
     // handler is a proc fn that takes an args array
+    // scan is sugar; should we just desugar it in Lo space and be done with it?
+    // or does the different handling of arrays and maps indicate it's not sugar?
+    // or can this method just take a cont arg?
+
+    // scan items >> proc
+    //
+    // var i = 0;
+    // while (i < itemCount) {
+    //   proc(items[]);
+    // }
 
     // todo we probably need to make this async-safe by waiting for each task to complete
     // and registering each call with our bookkeeping
+    // we need to make the proc blocking...
+
+    // the way to handle this without altering the target proc is to create a custom
+    // reply handler for the proc?
 
     return Array.isArray(collection) ?
         collection.forEach(function (elem) {

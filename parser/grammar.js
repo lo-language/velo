@@ -51,7 +51,10 @@ function id(x) {return x[0]; }
           cond:         '?',
           ID:           { match: /[a-zA-Z_][a-zA-Z_0-9]*/, keywords: {
                           KW: ['as', 'is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
-                                'module', 'exists', 'defined', 'undefined', 'using'],
+                                'module', 'exists', 'defined', 'undefined', 'using',
+
+                                // le primitive types
+                                'dyn', 'bool', 'int', 'char', 'string', 'float', 'dec'],
                         }},
           NL:           { match: /\n/, lineBreaks: true },
         },
@@ -106,8 +109,8 @@ var grammar = {
     {"name": "locator$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "locator", "symbols": ["locator$ebnf$1", (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess":  function (d) {
         return new Lo.moduleRef(d[0] ? d[0][0].value : null, d[1].value); } },
-    {"name": "statementList", "symbols": ["statement"], "postprocess": function (d) { return new Lo.stmtList(d[0]); }},
-    {"name": "statementList", "symbols": ["statement", "statementList"], "postprocess": function (d) { return new Lo.stmtList(d[0], d[1]); }},
+    {"name": "stmt_list", "symbols": ["statement"], "postprocess": function (d) { return new Lo.stmtList(d[0]); }},
+    {"name": "stmt_list", "symbols": ["statement", "stmt_list"], "postprocess": function (d) { return new Lo.stmtList(d[0], d[1]); }},
     {"name": "statement", "symbols": ["definition"], "postprocess": id},
     {"name": "statement", "symbols": ["response"], "postprocess": id},
     {"name": "statement", "symbols": ["expr", (lexer.has("assign") ? {type: "assign"} : assign), "expr", {"literal":";"}], "postprocess":  function (d) {
@@ -166,14 +169,14 @@ var grammar = {
             return new Lo.constant(d[0].value, d[2]).setSourceLoc(d[0]);
         } },
     {"name": "handlers", "symbols": [{"literal":";"}], "postprocess": function (d) { return [null, null]; }},
-    {"name": "handlers", "symbols": ["assignHandler", {"literal":";"}], "postprocess": function (d) { return [d[0], null]; }},
-    {"name": "handlers", "symbols": ["assignHandler", "failHandler"]},
-    {"name": "handlers", "symbols": ["replyHandler"], "postprocess": function (d) { return [d[0], null]; }},
-    {"name": "handlers", "symbols": ["failHandler"], "postprocess": function (d) { return [null, d[0]]; }},
-    {"name": "handlers", "symbols": ["replyHandler", "failHandler"]},
-    {"name": "assignHandler", "symbols": [{"literal":"=>"}, (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess": function (d) { return new Lo.yields(new Lo.identifier(d[1].value)); }},
-    {"name": "replyHandler", "symbols": [{"literal":"->"}, "proc"], "postprocess": function (d) { return d[1]; }},
-    {"name": "failHandler", "symbols": [{"literal":"~>"}, "proc"], "postprocess": function (d) { return d[1]; }},
+    {"name": "handlers", "symbols": ["assign_handler", {"literal":";"}], "postprocess": function (d) { return [d[0], null]; }},
+    {"name": "handlers", "symbols": ["assign_handler", "fail_handler"]},
+    {"name": "handlers", "symbols": ["reply_handler"], "postprocess": function (d) { return [d[0], null]; }},
+    {"name": "handlers", "symbols": ["fail_handler"], "postprocess": function (d) { return [null, d[0]]; }},
+    {"name": "handlers", "symbols": ["reply_handler", "fail_handler"]},
+    {"name": "assign_handler", "symbols": [{"literal":"=>"}, (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess": function (d) { return new Lo.yields(new Lo.identifier(d[1].value)); }},
+    {"name": "reply_handler", "symbols": [{"literal":"->"}, "proc"], "postprocess": function (d) { return d[1]; }},
+    {"name": "fail_handler", "symbols": [{"literal":"~>"}, "proc"], "postprocess": function (d) { return d[1]; }},
     {"name": "conditional", "symbols": [{"literal":"if"}, "expr", "block"], "postprocess":  function (d) {
         return new Lo.conditional(d[1], d[2]).setSourceLoc(d[0]); } },
     {"name": "conditional", "symbols": [{"literal":"if"}, "expr", "block", {"literal":"else"}, "block"], "postprocess":  function (d) {
@@ -294,17 +297,30 @@ var grammar = {
         } },
     {"name": "field", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID), {"literal":":"}, "expr"], "postprocess": function (d) { return new Lo.field(d[0].value, d[2]); }},
     {"name": "pair", "symbols": ["expr", {"literal":"="}, "expr"], "postprocess": function (d) { return new Lo.pair(d[0], d[2]); }},
-    {"name": "proc$ebnf$1", "symbols": ["paramList"], "postprocess": id},
+    {"name": "typed_id$ebnf$1", "symbols": ["type_spec"], "postprocess": id},
+    {"name": "typed_id$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "typed_id", "symbols": ["typed_id$ebnf$1", (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess": function (d) { return d[1]; }},
+    {"name": "proc$ebnf$1", "symbols": ["id_list"], "postprocess": id},
     {"name": "proc$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "proc", "symbols": [{"literal":"("}, "proc$ebnf$1", {"literal":")"}, "block"], "postprocess":  function (d) {
         return new Lo.procedure(d[1] ? d[1] : [], d[3]).setSourceLoc(d[0]); } },
-    {"name": "block$ebnf$1", "symbols": ["statementList"], "postprocess": id},
+    {"name": "block$ebnf$1", "symbols": ["stmt_list"], "postprocess": id},
     {"name": "block$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "block", "symbols": [{"literal":"{"}, "block$ebnf$1", {"literal":"}"}], "postprocess": function (d) { return d[1] ? d[1] : new Lo.stmtList(); }},
-    {"name": "paramList$ebnf$1", "symbols": []},
-    {"name": "paramList$ebnf$1$subexpression$1", "symbols": [{"literal":","}, (lexer.has("ID") ? {type: "ID"} : ID)]},
-    {"name": "paramList$ebnf$1", "symbols": ["paramList$ebnf$1", "paramList$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "paramList", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID), "paramList$ebnf$1"], "postprocess": function (d) { return [d[0].value].concat(d[1].map(function (id) {return id[1].value;})); }}
+    {"name": "id_list$ebnf$1", "symbols": []},
+    {"name": "id_list$ebnf$1$subexpression$1", "symbols": [{"literal":","}, "typed_id"]},
+    {"name": "id_list$ebnf$1", "symbols": ["id_list$ebnf$1", "id_list$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "id_list", "symbols": ["typed_id", "id_list$ebnf$1"], "postprocess":  function (d) {
+        return [d[0].value].concat(d[1].map(function (id) {return id[1].value;})); } },
+    {"name": "type_spec", "symbols": [{"literal":"dyn"}]},
+    {"name": "type_spec", "symbols": [{"literal":"bool"}]},
+    {"name": "type_spec", "symbols": [{"literal":"int"}]},
+    {"name": "type_spec", "symbols": [{"literal":"char"}]},
+    {"name": "type_spec", "symbols": [{"literal":"string"}]},
+    {"name": "type_spec", "symbols": [{"literal":"float"}]},
+    {"name": "type_spec", "symbols": [{"literal":"dec"}]},
+    {"name": "type_spec", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID)]},
+    {"name": "type_spec", "symbols": ["type_spec", {"literal":"*"}]}
 ]
   , ParserStart: "module"
 }

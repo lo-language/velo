@@ -69,12 +69,9 @@ class String extends LoConstruct {
     /**
      * Compiles this node to JS in the given context.
      *
-     * todo break these out into their own classes?
-     *
      * @param sourceCtx
-     * @param targetCtx
      */
-    compile(sourceCtx, targetCtx) {
+    compile(sourceCtx) {
 
         return JS.string(this.value);
     }

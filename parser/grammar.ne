@@ -47,7 +47,10 @@
           cond:         '?',
           ID:           { match: /[a-zA-Z_][a-zA-Z_0-9]*/, keywords: {
                           KW: ['as', 'is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
-                                'module', 'exists', 'defined', 'undefined', 'using'],
+                                'module', 'exists', 'defined', 'undefined', 'using',
+
+                                // le primitive types
+                                'dyn', 'bool', 'int', 'char', 'string', 'float', 'dec'],
                         }},
           NL:           { match: /\n/, lineBreaks: true },
         },
@@ -105,9 +108,9 @@ locator
     |   (%ID "::"):? %ID                                            {% function (d) {
                                                     return new Lo.moduleRef(d[0] ? d[0][0].value : null, d[1].value); } %}
 
-statementList
+stmt_list
     ->  statement                                                   {% function (d) { return new Lo.stmtList(d[0]); } %}
-    |   statement statementList                                     {% function (d) { return new Lo.stmtList(d[0], d[1]); } %}
+    |   statement stmt_list                                         {% function (d) { return new Lo.stmtList(d[0], d[1]); } %}
 
 statement
     ->  definition                                                  {% id %}
@@ -154,6 +157,7 @@ destructure
     ->   "(" %ID ("," %ID):+ ")"                                    {% function (d) {return new Lo.destructure([d[1].value].
                                                                         concat(d[2].map(function (id) { return id[1].value; }))); } %}
 
+# we don't need typed_id here since it's always obvious and inferrable from the provided value
 definition -> %ID ("is"|"are") expr ";"                             {%
     function (d) {
         return new Lo.constant(d[0].value, d[2]).setSourceLoc(d[0]);
@@ -162,19 +166,19 @@ definition -> %ID ("is"|"are") expr ";"                             {%
 # there's got to be a better way to describe this
 handlers
     ->  ";"                                     {% function (d) { return [null, null]; } %}
-    |   assignHandler ";"                       {% function (d) { return [d[0], null]; } %}
-    |   assignHandler failHandler
-    |   replyHandler                            {% function (d) { return [d[0], null]; } %}
-    |   failHandler                             {% function (d) { return [null, d[0]]; } %}
-    |   replyHandler failHandler
+    |   assign_handler ";"                       {% function (d) { return [d[0], null]; } %}
+    |   assign_handler fail_handler
+    |   reply_handler                            {% function (d) { return [d[0], null]; } %}
+    |   fail_handler                             {% function (d) { return [null, d[0]]; } %}
+    |   reply_handler fail_handler
 
-assignHandler
+assign_handler
     ->  "=>" %ID                                {% function (d) { return new Lo.yields(new Lo.identifier(d[1].value)); } %}
 
-replyHandler
+reply_handler
     ->  "->" proc                               {% function (d) { return d[1]; } %}
 
-failHandler
+fail_handler
     ->  "~>" proc                               {% function (d) { return d[1]; } %}
 
 conditional
@@ -285,12 +289,26 @@ interp_string
     } %}
 
 field   -> %ID ":" expr                             {% function (d) { return new Lo.field(d[0].value, d[2]); } %}
-pair    -> expr "=" expr                           {% function (d) { return new Lo.pair(d[0], d[2]); } %}
+pair    -> expr "=" expr                            {% function (d) { return new Lo.pair(d[0], d[2]); } %}
 
-proc -> "(" paramList:? ")" block                   {% function (d) {
+typed_id -> type_spec:? %ID                         {% function (d) { return d[1]; } %}
+
+proc -> "(" id_list:? ")" block                   {% function (d) {
     return new Lo.procedure(d[1] ? d[1] : [], d[3]).setSourceLoc(d[0]); } %}
 
-block -> "{" statementList:? "}"                    {% function (d) { return d[1] ? d[1] : new Lo.stmtList(); } %}
+block -> "{" stmt_list:? "}"                    {% function (d) { return d[1] ? d[1] : new Lo.stmtList(); } %}
 
-paramList
-	-> %ID ("," %ID):*                              {% function (d) { return [d[0].value].concat(d[1].map(function (id) {return id[1].value;})); } %}
+id_list
+	-> typed_id ("," typed_id):*                              {% function (d) {
+	    return [d[0].value].concat(d[1].map(function (id) {return id[1].value;})); } %}
+
+type_spec
+    ->  "dyn"
+    |   "bool"
+    |   "int"
+    |   "char"
+    |   "string"
+    |   "float"
+    |   "dec"
+    |   %ID
+    | type_spec "*"
