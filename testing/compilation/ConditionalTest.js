@@ -205,7 +205,36 @@ module.exports["async"] = {
         test.done();
     },
 
+    "bug: var declared in branch not in proper context": function (test) {
+
+        // if foo {
+        //   length = 10;
+        // }
+
+        var node = new Lo.conditional(
+            new Lo.identifier('foo'),
+            new Lo.stmtList(
+                new Lo.assign(new Lo.identifier('length'), new Lo.number('10'))
+            )
+        );
+
+        var ctx = new LoContext();
+        test.deepEqual(new JsWriter().generateJs(node.compile(ctx)).renderTree(),
+            [ 'stmtList',
+                [ 'if',
+                    [ 'id', '$foo' ],
+                    [ 'stmtList',
+                        [ 'expr-stmt',
+                            [ 'assign', [ 'id', '$length' ], [ 'num', '10' ] ] ] ] ] ]);
+
+        test.ok(ctx.has('length'));
+
+        test.done();
+    },
+
     "optimizations": function (test) {
+
+        // this actually tests optimizations implemented in JsWriter...
 
         // (test) {
         //   if out {

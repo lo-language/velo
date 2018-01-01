@@ -20,400 +20,340 @@
 
 "use strict";
 
-const ReqExprNode = require('./ReqExprNode');
 
+class LoContext {
 
-/**
- *
- * @param parent    the parent context, if any
- * @param isService
- */
-var __ = function (parent, isService) {
+    /**
+     *
+     * @param parent    the parent context, if any
+     * @param isService
+     */
+    constructor(parent, isService) {
 
-    this.parent = parent;
+        this.parent = parent;
 
-    if (parent) {
-        this.type = isService ? 'service' : 'sink';
-    }
-    else {
-        this.type = 'module';
-    }
-
-    // our local symbol table, containing params, locals, constants, futures, etc.
-    this.symbols = {};
-
-    // arguably more of a target context concept, but putting in source context for now
-    this.nextLoopNum = 1;
-
-    // dependency set
-    this.deps = {};
-
-    this.wrapper = null;
-    this.reqId = 0;
-
-    this.registry = parent ? parent.registry : null;
-
-    this.errors = [];
-};
-
-/**
- *
- */
-__.prototype.getModulePath = function () {
-
-    return this.parent ? this.parent.getModulePath() : (this.path || '??');
-};
-
-
-
-
-/**
- * Returns true if this is a root (module) context.
- */
-__.prototype.isRoot = function () {
-
-    return this.type == 'module';
-};
-
-
-/**
- * Returns true if this is a service context.
- */
-__.prototype.isService = function () {
-
-    return this.type == 'service';
-};
-
-
-/**
- * Returns true if this is a service context.
- */
-__.prototype.getNextLoopName = function () {
-
-    if (this.parent) {
-        return this.parent.getNextLoopName();
-    }
-
-    return 'L' + this.nextLoopNum++;
-};
-
-
-/**
- * Returns true if this is a sink context.
- */
-__.prototype.isSink = function () {
-
-    return this.type == 'sink';
-};
-
-/**
- * Sets the module registry for this context.
- */
-__.prototype.setRegistry = function (registry) {
-
-    this.registry = registry;
-};
-
-/**
- * Sets the module registry for this context.
- */
-__.prototype.setErrorListener = function (listener) {
-
-    this.errorListener = listener;
-};
-
-
-/**
- * Declares a variable in this context.
- *
- * @param name
- */
-__.prototype.declare = function (name) {
-
-    if (this.isConstant(name)) {
-        throw new Error(name + " is a constant in this context");
-    }
-
-    this.symbols['@' + name] = {type: 'var', name: name};
-};
-
-
-/**
- * Defines a constant in this context.
- *
- * @param name
- * @param value
- * @param isModule   bind at load-time, not compile-time
- */
-__.prototype.define = function (name, value, isModule) {
-
-    if (this.has(name)) {
-        throw new Error(name + " is a constant or variable in this context");
-    }
-
-    this._setValue(name, value, isModule);
-};
-
-/**
- * Defines a constant in this context.
- *
- * @param name
- * @param value
- * @param isModule   bind at load-time, not compile-time
- */
-__.prototype._setValue = function (name, value, isModule) {
-
-    this.symbols['@' + name] = {
-        type: 'const',
-        name: name,
-        value: value,
-        isModule: isModule || false
-    };
-};
-
-
-/**
- * Defines a future.
- *
- * @param name
- */
-__.prototype.setFuture = function (name) {
-
-    this.symbols['@' + name] = {type: 'future', name: name};
-};
-
-
-/**
- * Returns true if the given name refers to a future.
- *
- * @param name
- */
-__.prototype.isFuture = function (name) {
-
-    if (this.symbols['@' + name] !== undefined
-        && this.symbols['@' + name].type == 'future') {
-        return true;
-    }
-};
-
-
-/**
- * Returns true if the given name is defined in this context.
- */
-__.prototype.has = function (name) {
-
-    if (this.symbols['@' + name] !== undefined) {
-        return true;
-    }
-
-    // console.log(this.parent == null ? "no parent" : "has parent");
-    if (this.parent) {
-        return this.parent.has(name);
-    }
-
-    return false;
-};
-
-
-__.prototype.getJsVars = function () {
-
-    return Object.keys(this.symbols).reduce((accum, key) => {
-
-        var symbol = this.symbols[key];
-
-        if (symbol.type == 'var' || symbol.type == 'future') {
-            accum.push('$' + symbol.name);
+        if (parent) {
+            this.type = isService ? 'service' : 'sink';
+        }
+        else {
+            this.type = 'module';
         }
 
-        return accum;
+        // our local symbol table, containing params, locals, constants, futures, etc.
+        this.symbols = {};
 
-    }, []);
-};
+        // arguably more of a target context concept, but putting in source context for now
+        this.nextLoopNum = 1;
 
+        // dependency set
+        this.deps = {};
 
-__.prototype.getConstants = function () {
+        this.stmtEnvs = [];
 
-    return Object.keys(this.symbols).reduce((accum, key) => {
+        this.registry = parent ? parent.registry : null;
 
-        var symbol = this.symbols[key];
+        this.errors = [];
+    }
 
-        if (symbol.type == 'const' && symbol.isModule == false) {
-            accum.push(symbol);
+    /**
+     *
+     */
+    getModulePath() {
+
+        return this.parent ? this.parent.getModulePath() : (this.path || '??');
+    }
+
+    /**
+     * Returns true if this is a root (module) context.
+     */
+    isRoot() {
+
+        return this.type == 'module';
+    }
+
+    /**
+     * Returns true if this is a service context.
+     */
+    isService() {
+
+        return this.type == 'service';
+    }
+
+    /**
+     * Returns true if this is a service context.
+     */
+    getNextLoopName() {
+
+        if (this.parent) {
+            return this.parent.getNextLoopName();
         }
 
-        return accum;
-
-    }, []);
-};
-
-
-/**
- * Returns true if the specified name is a defined constant.
- *
- * @param name
- * @return {Boolean}
- */
-__.prototype.isConstant = function (name) {
-
-    if (this.symbols['@' + name] && this.symbols['@' + name].type == 'const') {
-        return true;
+        return 'L' + this.nextLoopNum++;
     }
 
-    if (this.parent) {
-        return this.parent.isConstant(name);
+    /**
+     * Returns true if this is a sink context.
+     */
+    isSink() {
+
+        return this.type == 'sink';
     }
 
-    return false;
-};
+    /**
+     * Sets the module registry for this context.
+     */
+    setRegistry(registry) {
 
-
-/**
- * Returns true if the specified name is a defined constant.
- *
- * @param name
- * @return {Boolean}
- */
-__.prototype.isModule = function (name) {
-
-    if (this.symbols['@' + name] && this.symbols['@' + name].isModule) {
-        return true;
+        this.registry = registry;
     }
 
-    if (this.parent) {
-        return this.parent.isModule(name);
+    /**
+     * Sets the module registry for this context.
+     */
+    setErrorListener(listener) {
+
+        this.errorListener = listener;
     }
 
-    return false;
-};
+    /**
+     * Declares a variable in this context.
+     *
+     * @param name
+     */
+    declare(name) {
 
-/**
- * Returns the value of the specified constant.
- *
- * @param name
- * @return {*}
- */
-__.prototype.resolve = function (name) {
+        if (this.isConstant(name)) {
+            throw new Error(name + " is a constant in this context");
+        }
 
-    if (this.symbols['@' + name] !== undefined) {
-        return this.symbols['@' + name].value;
+        this.symbols['@' + name] = {type: 'var', name: name};
     }
 
-    if (this.parent) {
-        return this.parent.resolve(name);
+    /**
+     * Defines a constant in this context.
+     *
+     * @param name
+     * @param value
+     * @param isModule   bind at load-time, not compile-time
+     */
+    define(name, value, isModule) {
+
+        if (this.has(name)) {
+            throw new Error(name + " is a constant or variable in this context");
+        }
+
+        this._setValue(name, value, isModule);
     }
 
-    throw new Error(name + " is not a defined constant");
-};
+    /**
+     * Defines a constant in this context.
+     *
+     * @param name
+     * @param value
+     * @param isModule   bind at load-time, not compile-time
+     */
+    _setValue(name, value, isModule) {
 
-
-/**
- * Creates and returns a new inner context.
- *
- * @param isService
- * @return {*}
- */
-__.prototype.createInner = function (isService) { // push? nest? inner? derive? pushDown?
-
-    return new __(this, isService);
-};
-
-
-/**
- */
-__.prototype.pushRequest = function (address, args) {
-
-    var label = 'res' + this.reqId++;
-    var reqNode = new ReqExprNode(address, args, label);
-
-    // prepend the request onto the wrapper list
-    this.wrapper = this.wrapper ? this.wrapper.append(reqNode) : reqNode;
-
-    // gets a temp var and returns it
-    return label;
-};
-
-
-/**
- *
- */
-__.prototype.unpackAndWrap = function (node) {
-
-    var result = this.wrapper;
-
-    this.wrapper = null;
-
-    if (result) {
-        result.append(node);
-        return result;
+        this.symbols['@' + name] = {
+            type: 'const',
+            name: name,
+            value: value,
+            isModule: isModule || false
+        };
     }
 
-    return node;
-};
+    /**
+     * Defines a future.
+     *
+     * @param name
+     */
+    setFuture(name) {
 
-
-__.prototype.hasWrapper = function () {
-
-    return this.wrapper ? true : false;
-};
-
-/**
- * Returns true if a response can be issued in this context (for it or a parent).
- *
- * @return {*}
- */
-__.prototype.canRespond = function () {
-
-    if (this.type == 'service') {
-        return true;
+        this.symbols['@' + name] = {type: 'future', name: name};
     }
 
-    if (this.parent) {
-        return this.parent.canRespond();
+    /**
+     * Returns true if the given name refers to a future.
+     *
+     * @param name
+     */
+    isFuture(name) {
+
+        if (this.symbols['@' + name] !== undefined
+            && this.symbols['@' + name].type == 'future') {
+            return true;
+        }
     }
 
-    return false;
-};
+    /**
+     * Returns true if the given name is defined in this context.
+     */
+    has(name) {
 
+        if (this.symbols['@' + name] !== undefined) {
+            return true;
+        }
 
+        // console.log(this.parent == null ? "no parent" : "has parent");
+        if (this.parent) {
+            return this.parent.has(name);
+        }
 
-// __.prototype.getNextLabel = function () {
-//
-//     if (this.parent) {
-//         return this.parent.getNextLabel();
-//     }
-//
-//     return this.contId++;
-// };
-
-
-__.prototype.isRValue = function () {
-    return false;
-};
-
-/**
- * Attaches a compilation error to the given node.
- *
- * @param node
- * @param message
- */
-__.prototype.reportError = function (node, message) {
-
-    // attach an error to this context's report
-
-    if (this.parent) {
-        this.parent.reportError(node, message);
-        return;
+        return false;
     }
 
-    this.errorListener && this.errorListener(node, message);
+    getJsVars() {
 
-    this.errors.push(node, message);
-};
+        return Object.keys(this.symbols).reduce((accum, key) => {
 
-__.prototype.hasErrors = function () {
+            var symbol = this.symbols[key];
 
-    return this.errors.length > 0;
-};
+            if (symbol.type == 'var' || symbol.type == 'future') {
+                accum.push('$' + symbol.name);
+            }
+
+            return accum;
+
+        }, []);
+    }
+
+    getConstants() {
+
+        return Object.keys(this.symbols).reduce((accum, key) => {
+
+            var symbol = this.symbols[key];
+
+            if (symbol.type == 'const' && symbol.isModule == false) {
+                accum.push(symbol);
+            }
+
+            return accum;
+
+        }, []);
+    }
+
+    /**
+     * Returns true if the specified name is a defined constant.
+     *
+     * @param name
+     * @return {Boolean}
+     */
+    isConstant(name) {
+
+        if (this.symbols['@' + name] && this.symbols['@' + name].type == 'const') {
+            return true;
+        }
+
+        if (this.parent) {
+            return this.parent.isConstant(name);
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns true if the specified name is a defined constant.
+     *
+     * @param name
+     * @return {Boolean}
+     */
+    isModule(name) {
+
+        if (this.symbols['@' + name] && this.symbols['@' + name].isModule) {
+            return true;
+        }
+
+        if (this.parent) {
+            return this.parent.isModule(name);
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns the value of the specified constant.
+     *
+     * @param name
+     * @return {*}
+     */
+    resolve(name) {
+
+        if (this.symbols['@' + name] !== undefined) {
+            return this.symbols['@' + name].value;
+        }
+
+        if (this.parent) {
+            return this.parent.resolve(name);
+        }
+
+        throw new Error(name + " is not a defined constant");
+    }
+
+    /**
+     * Creates and returns a new inner context.
+     *
+     * @param isService
+     * @return {*}
+     */
+    createInner(isService) { // push? nest? inner? derive? pushDown?
+
+        return new LoContext(this, isService);
+    }
+
+    hasWrapper() {
+
+        return this.wrapper ? true : false;
+    }
+
+    /**
+     * Returns true if a response can be issued in this context (for it or a parent).
+     *
+     * @return {*}
+     */
+    canRespond() {
+
+        if (this.type == 'service') {
+            return true;
+        }
+
+        if (this.parent) {
+            return this.parent.canRespond();
+        }
+
+        return false;
+    }
+
+    // };
+    isRValue() {
+        return false;
+    }
+
+    /**
+     * Attaches a compilation error to the given node.
+     *
+     * @param node
+     * @param message
+     */
+    reportError(node, message) {
+
+        // attach an error to this context's report
+
+        if (this.parent) {
+            this.parent.reportError(node, message);
+            return;
+        }
+
+        this.errorListener && this.errorListener(node, message);
+
+        this.errors.push(node, message);
+    }
+
+    //     return this.contId++;
+    hasErrors() {
+
+        return this.errors.length > 0;
+    }
+}
 
 
-module.exports = __;
+module.exports = LoContext;

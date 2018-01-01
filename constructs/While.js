@@ -13,7 +13,7 @@ const CFNode = require('../compiler/CFNode');
 const BranchNode = require('../compiler/BranchNode');
 const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
-
+const StmtContext = require('../compiler/StmtContext');
 
 class While extends LoConstruct {
 
@@ -63,7 +63,7 @@ class While extends LoConstruct {
         // we have two strategies at our disposal: native loop and recursive loop
         // we use the native loop when we can; otherwise must use our recursive loop
 
-        var condCtx = loContext.createInner();
+        var condCtx = new StmtContext(loContext);
         var loopCond = this.cond.compile(condCtx);
         var loopBody = this.body.compile(loContext);
 
@@ -91,7 +91,7 @@ class While extends LoConstruct {
         });
 
         // wrap the condition in any wrapping reqs
-        fnBody = condCtx.unpackAndWrap(fnBody);
+        fnBody = condCtx.wrap(fnBody);
 
         // form the loop by adding a recursive call to the loop body
         // use setImmediate to avoid blowing up the stack

@@ -15,6 +15,7 @@ const Identifier = require('./Identifier');
 const Constant = require('./Constant');
 const LoConstruct = require('./LoConstruct');
 const CFNode = require('../compiler/CFNode');
+const StmtCtx = require('../compiler/StmtContext');
 
 class StmtList extends LoConstruct {
 
@@ -105,10 +106,12 @@ class StmtList extends LoConstruct {
             return new CFNode();
         }
 
-        var head = this.head.compile(sourceCtx);
+        var stmtCtx = new StmtCtx(sourceCtx);
+
+        var head = this.head.compile(stmtCtx);
 
         // unpack any wrapping requests
-        head = sourceCtx.unpackAndWrap(head);
+        head = stmtCtx.wrap(head);
 
         if (this.tail) {
             head.append(this.tail.compile(sourceCtx));

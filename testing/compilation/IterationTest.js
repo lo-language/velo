@@ -8,6 +8,7 @@
 const JS = require('../../codegen/JsPrimitives');
 const Lo = require('../../constructs');
 const LoContext = require('../../compiler/LoContext');
+const StmtContext = require('../../compiler/StmtContext');
 const JsWriter = require('../../codegen/JsWriter');
 
 module.exports["basics"] = {
@@ -76,13 +77,14 @@ module.exports["basics"] = {
         var body = new Lo.stmtList(new Lo.assign(new Lo.identifier('bar'), new Lo.number('57')));
 
         var loop = new Lo.while(new Lo.requestExpr(new Lo.identifier('foo'), [], true), body);
-        var ctx = new LoContext();
+        var parent = new LoContext();
+        var ctx = new StmtContext(parent);
 
         // compiling a stmt returns a control flow graph
         var js = new JsWriter().generateJs(loop.compile(ctx));
 
         // make sure we properly report any vars in the body
-        test.deepEqual(ctx.getJsVars(), ['$bar']);
+        test.deepEqual(parent.getJsVars(), ['$bar']);
 
         test.deepEqual(js.renderTree(), ['stmtList',
             ['expr-stmt',

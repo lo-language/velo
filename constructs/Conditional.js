@@ -16,7 +16,7 @@
 const CFNode = require('../compiler/CFNode');
 const BranchNode = require('../compiler/BranchNode');
 const LoConstruct = require('./LoConstruct');
-
+const StmtContext = require('../compiler/StmtContext');
 
 class Conditional extends LoConstruct {
 
@@ -84,10 +84,14 @@ class Conditional extends LoConstruct {
         // we give the branches their own source contexts so they don't consume
         // any wrappers from the predicate
 
+        // but this confines vars declared in the branches to these contexts...
+        // we're conflating scope with a statement context for collecting wrappers...
+        // which is the key usage??
+
         return new BranchNode(
             this.predicate.compile(sourceCtx),
-            this.consequent.compile(sourceCtx.createInner()),
-            this.alternate ? this.alternate.compile(sourceCtx.createInner()) : null);
+            this.consequent.compile(new StmtContext(sourceCtx)),
+            this.alternate ? this.alternate.compile(new StmtContext(sourceCtx)) : null);
     }
 }
 

@@ -7,6 +7,7 @@
 
 const Lo = require('../../constructs');
 const LoContext = require('../../compiler/LoContext');
+const StmtContext = require('../../compiler/StmtContext');
 const CFNode = require('../../compiler/CFNode');
 const JsWriter = require('../../codegen/JsWriter');
 const util = require('util');
@@ -26,10 +27,10 @@ module.exports["blocking calls"] = {
                 ],
                 true))]);
 
-        var ctx = new LoContext().createInner(true);
+        var ctx = new StmtContext(new LoContext().createInner(true));
         var result = node.compile(ctx);
 
-        test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
+        test.deepEqual(new JsWriter().generateJs(ctx.wrap(result)).renderTree(),
             [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
@@ -64,10 +65,10 @@ module.exports["blocking calls"] = {
             )
         );
 
-        var ctx = new LoContext().createInner(true);
+        var ctx = new StmtContext(new LoContext().createInner(true));
         var result = node.compile(ctx);
 
-        test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
+        test.deepEqual(new JsWriter().generateJs(ctx.wrap(result)).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -96,10 +97,10 @@ module.exports["blocking calls"] = {
             )
         );
 
-        var ctx = new LoContext().createInner(true);
+        var ctx = new StmtContext(new LoContext().createInner(true));
         var result = node.compile(ctx);
 
-        test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
+        test.deepEqual(new JsWriter().generateJs(ctx.wrap(result)).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -130,10 +131,10 @@ module.exports["blocking calls"] = {
             )
         );
 
-        var ctx = new LoContext().createInner(true);
+        var ctx = new StmtContext(new LoContext().createInner(true));
         var result = node.compile(ctx);
 
-        test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
+        test.deepEqual(new JsWriter().generateJs(ctx.wrap(result)).renderTree(),
             [ 'stmtList',
                 [ 'expr-stmt',
                     [ 'call',
@@ -171,10 +172,10 @@ module.exports["blocking calls"] = {
             )
         );
 
-        var ctx = new LoContext().createInner(true);
+        var ctx = new StmtContext(new LoContext().createInner(true));
         var result = node.compile(ctx);
 
-        test.deepEqual(new JsWriter().generateJs(ctx.unpackAndWrap(result)).renderTree(),
+        test.deepEqual(new JsWriter().generateJs(ctx.wrap(result)).renderTree(),
             [ 'stmtList',
             [ 'expr-stmt',
                 [ 'call',
