@@ -1,6 +1,6 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -19,7 +19,7 @@ const JsWriter = require('../codegen/JsWriter');
 const vm = require('vm');
 
 /**
- * A module definition; the root of an AST. Called by the ASTBuilder
+ * A module definition; the root of an AST.
  */
 var __ = function (defs, deps) {
 

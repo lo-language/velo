@@ -1,6 +1,6 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -80,13 +80,6 @@ class Conditional extends LoConstruct {
 
         // if the predicate contains a req expr this stmt will be wrapped as usual
         // if either branch contains a request the BranchNode will deal with it
-
-        // we give the branches their own source contexts so they don't consume
-        // any wrappers from the predicate
-
-        // but this confines vars declared in the branches to these contexts...
-        // we're conflating scope with a statement context for collecting wrappers...
-        // which is the key usage??
 
         return new BranchNode(
             this.predicate.compile(sourceCtx),

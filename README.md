@@ -48,11 +48,11 @@ Velo maps the various JavaScript built-in objects to modules under the `JS` name
 
 For example, this program uses the `Math` built-in object.
 
-    Math is module JS::Math;
+    using JS::Math as Math;
     
     main is (args, system) {
     
-        system.out.writeln Math.E;
+        system.out.writeln <- Math.E;
     };
 
 
