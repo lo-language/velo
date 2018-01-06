@@ -1,6 +1,6 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -11,26 +11,6 @@
 
 const Task = require('../runtime/Task');
 const http = require('http');
-
-/**
- * The Lo standard library
- *
- * Created by spurcell on 8/19/17.
- */
-
-var __ = function () {
-
-};
-
-
-/**
- * Registers the given module ID as a dependency.
- */
-__.prototype.register = function (id) {
-
-    // no-op; could optionally do some validation here
-};
-
 
 /**
  *

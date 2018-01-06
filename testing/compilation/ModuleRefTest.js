@@ -12,21 +12,21 @@ module.exports["identifiers"] = {
 
     "explicit namespace": function (test) {
 
-        test.expect(3);
+        // test.expect(3);
 
         var node = new Lo.moduleRef('Node', 'HTTP');
 
         var context = new LoContext();
 
-        var registry = {
-            include: function (ns, id) {
+        // var registry = {
+        //     include: function (ns, id) {
+        //
+        //         test.equal(ns, 'Node');
+        //         test.equal(id, 'HTTP');
+        //     }
+        // };
 
-                test.equal(ns, 'Node');
-                test.equal(id, 'HTTP');
-            }
-        };
-
-        context.setRegistry(registry);
+        // context.setRegistry(registry);
 
         test.deepEqual(node.compile(context).renderTree(),
                     [ 'select', [ 'id', 'Node' ], 'HTTP' ]);
@@ -41,15 +41,15 @@ module.exports["identifiers"] = {
 
         var context = new LoContext();
 
-        var registry = {
-            include: function (ns, id) {
-
-                test.equal(ns, '__local');
-                test.equal(id, 'Moon');
-            }
-        };
-
-        context.setRegistry(registry);
+        // var registry = {
+        //     include: function (ns, id) {
+        //
+        //         test.equal(ns, '__local');
+        //         test.equal(id, 'Moon');
+        //     }
+        // };
+        //
+        // context.setRegistry(registry);
 
         context.define("Moon", 42);
 

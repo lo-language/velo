@@ -1,6 +1,6 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -10,49 +10,54 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * A compound literal
- *
- * @param fields
- */
-var __ = function (fields) {
+class Compound extends LoConstruct {
 
-    this.fields = fields;
-};
+    /**
+     * A compound literal
+     *
+     * @param fields
+     */
+    constructor(fields) {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+        super();
+        this.fields = fields;
+    }
 
-    return {
-        type: 'compound',
-        fields: this.fields.map(field => field.getAst())
-    };
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+        return {
+            type: 'compound',
+            fields: this.fields.map(field => field.getAst())
+        };
+    }
 
-    return ['compound'].concat(
-        this.fields.map(field => field.getTree()));
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+        return ['compound'].concat(
+            this.fields.map(field => field.getTree()));
+    }
 
-    return JS.objLiteral(this.fields.map(field => {
-        return field.compile(sourceCtx, targetCtx);
-    }));
-};
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
 
-module.exports = __;
+        return JS.objLiteral(this.fields.map(field => {
+            return field.compile(sourceCtx, targetCtx);
+        }));
+    }
+}
+
+module.exports = Compound;

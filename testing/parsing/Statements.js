@@ -28,8 +28,10 @@ module.exports["basic"] = {
 
     "response": function (test) {
 
-        test.deepEqual(new Parser("statement").parse('reply;').getAst(),
+        var result = new Parser("statement").parse('reply;');
+        test.deepEqual(result.getAst(),
             { type: 'response', channel: 'reply', args: [] });
+        test.deepEqual(result.getSourceLoc(), [1,1]);
 
         test.deepEqual(new Parser("statement").parse('reply foo;').getAst(),
             { type: 'response', channel: 'reply', args: [{ type: 'id', name: 'foo' }] });
@@ -40,10 +42,12 @@ module.exports["basic"] = {
         test.deepEqual(new Parser("statement").parse('fail;').getAst(),
             { type: 'response', channel: 'fail', args: [] });
 
-        test.deepEqual(new Parser("statement").parse('fail "d\'oh!";').getAst(),
+        result = new Parser("statement").parse(' fail "d\'oh!";');
+        test.deepEqual(result.getAst(),
             { type: 'response',
                 channel: 'fail',
                 args: [ { type: 'string', val: 'd\'oh!' } ] });
+        test.deepEqual(result.getSourceLoc(), [1,2]);
 
         test.deepEqual(new Parser("statement").parse('fail foo;').getAst(),
             { type: 'response', channel: 'fail', args: [{ type: 'id', name: 'foo' }] });
@@ -145,6 +149,7 @@ module.exports["basic"] = {
                         left: { type: 'id', name: 'bar' },
                         right: { type: 'id', name: 'baz' } },
                     tail: null } });
+        test.deepEqual(result.getSourceLoc(), [1,1]);
 
         test.done();
     }
@@ -172,7 +177,9 @@ module.exports["iteration"] = {
 
     "while": function (test) {
 
-        test.deepEqual(new Parser("statement").parse('while foo { bar++; }').getAst(),
+        var result = new Parser("statement").parse('while foo { bar++; }');
+
+        test.deepEqual(result.getAst(),
             { type: 'iteration',
                 condition: { type: 'id', name: 'foo' },
                 statements:
@@ -187,12 +194,16 @@ module.exports["iteration"] = {
                             right: { type: 'number', val: '1' } } },
                     tail: null } });
 
+        test.deepEqual(result.getSourceLoc(), [1,1]);
+
         test.done();
     },
 
     "scan": function (test) {
 
-        test.deepEqual(new Parser("statement").parse('scan foo -> (item) { bar++; }').getAst(),
+        var result = new Parser("statement").parse('scan foo >> (item) { bar++; }');
+
+        test.deepEqual(result.getAst(),
             { type: 'scan',
                 over: { type: 'id', name: 'foo' },
                 into:
@@ -210,6 +221,8 @@ module.exports["iteration"] = {
                                 right: { type: 'number', val: '1' } } },
                         tail: null },
                     isService: false } });
+
+        test.deepEqual(result.getSourceLoc(), [1,1]);
 
         test.done();
     }

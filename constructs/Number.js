@@ -1,6 +1,6 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -14,56 +14,61 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * A literal number
- *
- * @param value     a string representation of the number
- */
-var __ = function (value) {
+class Number extends LoConstruct {
 
-    this.value = value;
-};
+    /**
+     * A literal number
+     *
+     * @param value     a string representation of the number
+     */
+    constructor(value) {
 
-/**
- * Accessor
- *
- * @returns {*}
- */
-__.prototype.getValue = function () {
+        super();
+        this.value = value;
+    }
 
-    return this.value;
-};
+    /**
+     * Accessor
+     *
+     * @returns {*}
+     */
+    getValue() {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+        return this.value;
+    }
 
-    return {
-        type: 'number',
-        val: this.value
-    };
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+        return {
+            type: 'number',
+            val: this.value
+        };
+    }
 
-    return this.value;
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+        return this.value;
+    }
 
-    return JS.num(this.value);
-};
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
 
-module.exports = __;
+        return JS.num(this.value);
+    }
+}
+
+module.exports = Number;

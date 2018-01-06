@@ -1,12 +1,10 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
  *
- * Success is finding something you really like to do and caring enough about it
- * to do it well.
  =============================================================================*/
 
 /**
@@ -24,12 +22,11 @@ class Connector {
 
     /**
      *
-     * @param name
      */
-    constructor(name) {
+    constructor(nameForm, callForm) {
 
-        this.name = name;
-        this.stmt = JS.stmtList(JS.exprStmt(JS.fnCall(JS.ID(this.name), [])));
+        this.fnName = nameForm;
+        this.stmt = callForm || JS.stmtList(JS.exprStmt(JS.fnCall(nameForm, [])));
     }
 
     renderTree () {

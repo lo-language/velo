@@ -1,6 +1,6 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -13,96 +13,79 @@
 
 "use strict";
 
-const JS = require('../codegen/JsPrimitives');
 const CFNode = require('../compiler/CFNode');
 const BranchNode = require('../compiler/BranchNode');
+const LoConstruct = require('./LoConstruct');
+const StmtContext = require('../compiler/StmtContext');
 
-/**
- * A conditional statement.
- *
- * @param predicate
- * @param consequent
- * @param alternate
- */
-var __ = function (predicate, consequent, alternate) {
+class Conditional extends LoConstruct {
 
-    this.predicate = predicate;
-    this.consequent = consequent;
-    this.alternate = alternate;
-};
+    /**
+     * A conditional statement.
+     *
+     * @param predicate
+     * @param consequent
+     * @param alternate
+     */
+    constructor(predicate, consequent, alternate) {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
-
-    var result = {
-        type: 'conditional',
-        predicate: this.predicate.getAst(),
-        consequent: this.consequent.getAst()
-    };
-
-    if (this.alternate) {
-        result.alternate = this.alternate.getAst();
+        super();
+        this.predicate = predicate;
+        this.consequent = consequent;
+        this.alternate = alternate;
     }
 
-    return result;
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+        var result = {
+            type: 'conditional',
+            predicate: this.predicate.getAst(),
+            consequent: this.consequent.getAst()
+        };
 
-    var result = [
-        'branch',
-        this.predicate.getTree(),
-        this.consequent.getTree()
-    ];
+        if (this.alternate) {
+            result.alternate = this.alternate.getAst();
+        }
 
-    if (this.alternate) {
-        result.push(this.alternate.getTree());
+        return result;
     }
 
-    return result;
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+        var result = [
+            'branch',
+            this.predicate.getTree(),
+            this.consequent.getTree()
+        ];
 
-    // hmmm...
-    // if the predicate has a req expr in it, will our node be flagged as non-intact?
-    // todo what should happen there?
+        if (this.alternate) {
+            result.push(this.alternate.getTree());
+        }
 
-    var predicate = this.predicate.compile(sourceCtx, targetCtx);
-
-    // we could create some kind of branch or block context here
-    var ctx = [];
-    var trueBranch = this.consequent.compile(sourceCtx, ctx);
-
-    if (ctx.length > 0) {
-        var wrapper = CFNode.makeWrapper(ctx);
-        wrapper.append(trueBranch);
-        trueBranch = wrapper;
+        return result;
     }
 
-    if (this.alternate) {
-        var falseBranch = this.alternate.compile(sourceCtx, []);
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     */
+    compile(sourceCtx) {
+
+        // if the predicate contains a req expr this stmt will be wrapped as usual
+        // if either branch contains a request the BranchNode will deal with it
+
+        return new BranchNode(
+            this.predicate.compile(sourceCtx),
+            this.consequent.compile(new StmtContext(sourceCtx)),
+            this.alternate ? this.alternate.compile(new StmtContext(sourceCtx)) : null);
     }
+}
 
-    // todo restore this
-    // workaround for the case where alternate is an individual cond stmt rather than a stmtlist
-    // could change the parser to eliminate this case
-    // if (alternate && alternate instanceof CFNode == false) {
-    //     alternate = new CFNode(alternate);
-    // }
-
-    return new BranchNode(predicate, trueBranch, falseBranch);
-};
-
-module.exports = __;
+module.exports = Conditional;

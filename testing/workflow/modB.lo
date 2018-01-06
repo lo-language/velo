@@ -1,0 +1,7 @@
+using "modA.lo" as modA;
+using "modC.lo" as modC;
+
+
+main is (args, system) {
+
+};

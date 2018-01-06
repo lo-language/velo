@@ -1,6 +1,6 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -12,63 +12,71 @@
 const JS = require('../codegen/JsPrimitives');
 const CFNode = require('../compiler/CFNode');
 const JsWriter = require('../codegen/JsWriter');
+const LoConstruct = require('./LoConstruct');
 
-/**
- * A scan statement. Scan is different from something like "for every X in Y" because
- * a) there's no item referent in the same scope as scan, if it's named, it's in a subscope
- * b) it's more like an emitter of a sequence (a msg source) than a control structure like while
- *
- * @param over
- * @param into
- */
-var __ = function (over, into) {
 
-    this.over = over;
-    this.into = into;
-};
+class Scan extends LoConstruct {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+    /**
+     * A scan statement. Scan is different from something like "for every X in Y" because
+     * a) there's no item referent in the same scope as scan, if it's named, it's in a subscope
+     * b) it's more like an emitter of a sequence (a msg source) than a control structure like while
+     *
+     * @param over
+     * @param into
+     */
+    constructor(over, into) {
 
-    return {
-        type: 'scan',
-        over: this.over.getAst(),
-        into: this.into.getAst()
-    };
-};
+        super();
+        this.over = over;
+        this.into = into;
+    }
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-    return [
-        'scan',
-        this.over.getTree(),
-        this.into.getTree()
-    ];
-};
+        return {
+            type: 'scan',
+            over: this.over.getAst(),
+            into: this.into.getAst()
+        };
+    }
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-    var over = this.over.compile(sourceCtx, targetCtx);
-    var into = this.into.compile(sourceCtx, targetCtx);
+        return [
+            'scan',
+            this.over.getTree(),
+            this.into.getTree()
+        ];
+    }
 
-    return new CFNode(writer => {
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
 
-        // we could alternately call writer.sub() or something if we don't want to require JsWriter
-        return JS.exprStmt(JS.utilCall('scan', [
-            over, into.getJs(new JsWriter())
-        ]));
-    });
-};
+        var over = this.over.compile(sourceCtx, targetCtx);
+        var into = this.into.compile(sourceCtx, targetCtx);
 
-module.exports = __;
+        return new CFNode(writer => {
+
+            // we could alternately call writer.sub() or something if we don't want to require JsWriter
+            // we can't do genJs because the proc isn't a handler? we need to build more of a while loop cond thing around it?
+            // right, we can't 'edit' the proc
+            return JS.exprStmt(JS.utilCall('scan', [
+                over, into.getJs(new JsWriter())
+            ]));
+        });
+    }
+}
+
+module.exports = Scan;

@@ -6,6 +6,7 @@
 "use strict";
 
 const LoContext = require('../../compiler/LoContext');
+const StmtContext = require('../../compiler/StmtContext');
 const CFNode = require('../../compiler/CFNode');
 const JsWriter = require('../../codegen/JsWriter');
 const Lo = require('../../constructs');
@@ -69,7 +70,7 @@ module.exports["assignment"] = {
             new Lo.requestExpr(new Lo.identifier('bar'), [])
         );
 
-        var context = new LoContext().createInner();
+        var context = new StmtContext(new LoContext().createInner());
 
         test.equal(context.has('foo'), false);
 

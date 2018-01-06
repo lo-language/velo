@@ -1,6 +1,6 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -14,72 +14,75 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * An identifier
- */
-var __ = function (name, line, isLvalue) {
+class Identifier extends LoConstruct {
 
-    this.name = name;
-    this.line = line || '??';
-    this.isLvalue = isLvalue || false;
-};
+    /**
+     * An identifier
+     */
+    constructor(name, line, isLvalue) {
 
+        super();
+        this.name = name;
+        this.line = line || '??';
+        this.isLvalue = isLvalue || false;
+    }
 
-__.prototype.setLvalue = function () {
-    this.isLvalue = true;
-};
+    setLvalue() {
+        this.isLvalue = true;
+    }
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-    return {
-        type: "id",
-        name: this.name
-    };
-};
+        return {
+            type: "id",
+            name: this.name
+        };
+    }
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-    // should this behave differently as lvalue or rvalue?
+        // should this behave differently as lvalue or rvalue?
 
-    return ["id", this.name];
-};
+        return ["id", this.name];
+    }
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     */
+    compile(sourceCtx) {
 
-    // see if the identifier is defined
+        // see if the identifier is defined
 
-    if (sourceCtx.has(this.name)) {
+        if (sourceCtx.has(this.name)) {
 
-        // if we're a constant, do the old switcheroo
-        if (sourceCtx.isModule(this.name)) {
+            // if we're a constant, do the old switcheroo
+            if (sourceCtx.isModule(this.name)) {
+                return sourceCtx.resolve(this.name);
+            }
 
-            // console.log('compiling', this.name, context.resolve(this.name).renderJs());
-            return sourceCtx.resolve(this.name);
+            return JS.ID('$' + this.name);
+        }
+
+        // of course, we need to see inside a conditional to know if it's been defined...
+        if (this.isLvalue == false) {
+            sourceCtx.reportError(this, "identifier \"" + this.name + "\" used but not bound in this context");
+            // return JS.NOOP; // not sure what else to do here
         }
 
         return JS.ID('$' + this.name);
     }
+}
 
-    // of course, we need to see inside a conditional to know if it's been defined...
-    if (this.isLvalue == false) {
-        sourceCtx.reportError(this, "identifier \"" + this.name + "\" used but not bound in this context");
-    }
 
-    return JS.ID('$' + this.name);
-};
-
-module.exports = __;
+module.exports = Identifier;

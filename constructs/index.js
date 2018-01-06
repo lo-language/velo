@@ -1,6 +1,6 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -11,7 +11,7 @@
 
 module.exports = {
 
-    array: require("./Array"),
+    arrayLiteral: require("./ArrayLiteral"),
     arrayPush: require("./ArrayPush"),
     assign: require("./Assignment"),
     binaryOpExpr: require("./BinaryOpExpr"),

@@ -1,6 +1,6 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -57,13 +57,13 @@ class ReqNode extends CFNode {
 
         if (writer.hasTail()) {
 
-            var contCall = writer.wrapTail();
+            var connector = writer.wrapTail();
 
             // we're putting a continuation into the context for rendering the handlers
             // but they actually render to fn def exprs, NOT statement lists...
 
-            var succHandler = this.succHandler ? this.succHandler.getJs(writer.branch(contCall)) : JS.ID(contCall.name);
-            var failHandler = this.failHandler ? this.failHandler.getJs(writer.branch(contCall)) : JS.ID(contCall.name);
+            var succHandler = this.succHandler ? this.succHandler.getJs(writer.branch(connector)) : connector.fnName;
+            var failHandler = this.failHandler ? this.failHandler.getJs(writer.branch(connector)) : connector.fnName;
 
             return JS.exprStmt(JS.runtimeCall('sendAndBlock', [
                 this.address, JS.arrayLiteral(this.args),

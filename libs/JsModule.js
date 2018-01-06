@@ -7,38 +7,29 @@
  *
  =============================================================================*/
 
+/**
+ * Wraps JS functionality in a Lo module.
+ *
+ * Created by seth on 1/6/18.
+ */
+
 "use strict";
 
-/**
- * Exposes JS built-in objects as modules.
- *
- * Created by spurcell on 3/6/17.
- */
+const LibModule = require('./LibModule');
 
-var __ = function () {
+class JsModule extends LibModule {
 
-};
+    constructor (name) {
 
+        super(name, 'JS');
+    }
 
-/**
- * Registers the given module ID as a dependency.
- */
-__.prototype.register = function (id) {
+    /**
+     * @param sandbox
+     */
+    load (sandbox) {
 
-    // no-op; could optionally do some validation here
-};
-
-
-/**
- *
- */
-__.prototype.getModules = function () {
-
-    // todo - have a factory to create these wrapped methods
-
-    return {
-
-        Math: {
+        return {
 
             E: Math.E,
 
@@ -55,10 +46,8 @@ __.prototype.getModules = function () {
             random: function (args, succ, fail) {
                 fail(["naughty!"]);
             }
-        }
-    };
-};
+        };
+    }
+}
 
-
-module.exports = __;
-
+module.exports = JsModule;

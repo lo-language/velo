@@ -1,6 +1,6 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -14,56 +14,61 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * A literal boolean
- */
-var __ = function (value) {
+class Boolean extends LoConstruct {
+    
+    /**
+     * A literal boolean
+     */
+    constructor(value) {
 
-    this.value = value;
-};
+        super();
+        this.value = value;
+    }
 
-/**
- * Accessor
- *
- * @returns {*}
- */
-__.prototype.getValue = function () {
+    /**
+     * Accessor
+     *
+     * @returns {*}
+     */
+    getValue() {
 
-    return this.value;
-};
+        return this.value;
+    }
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-    // ??? might not want to return an actual bool here - number literals are kept as strings
+        // ??? might not want to return an actual bool here - number literals are kept as strings
 
-    return {
-        type: 'boolean',
-        val: this.value
-    };
-};
+        return {
+            type: 'boolean',
+            val: this.value
+        };
+    }
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-    return this.value;
-};
+        return this.value;
+    }
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
 
-    return JS.bool(this.value ? 'true' : 'false');
-};
+        return JS.bool(this.value ? 'true' : 'false');
+    }
+}
 
-module.exports = __;
+module.exports = Boolean;

@@ -1,6 +1,6 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -20,7 +20,7 @@ module.exports = {
 
     "array": function (test) {
 
-        var ar = new Lo.array([new Lo.number(12), new Lo.number(22)]);
+        var ar = new Lo.arrayLiteral([new Lo.number(12), new Lo.number(22)]);
 
         test.deepEqual(ar.getTree(), ['array', 12, 22]);
 

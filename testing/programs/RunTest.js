@@ -10,7 +10,7 @@
 
 "use strict";
 
-const Harness = require('../Harness');
+const Program = require('../../Program');
 const Task = require('../../runtime/Task');
 const util = require('util');
 
@@ -19,30 +19,27 @@ module.exports['set operations'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(__dirname, 'set-operations');
+        this.program = new Program('set-operations.lo', __dirname);
         cb();
     },
 
     'success': function (test) {
 
-        // this.harness.dumpModules().then(() => {
+        this.program.run().then(
+            function (resp) {
 
-            this.harness.run([]).then(
-                function (resp) {
+                test.deepEqual(resp, [{
+                    'fiat': true,
+                    'lux': true,
+                    'bark': true,
+                    'hark': true,
+                    'lark': true
+                }]);
 
-                    test.deepEqual(resp, [{
-                        'fiat': true,
-                        'lux': true,
-                        'bark': true,
-                        'hark': true,
-                        'lark': true
-                    }]);
+                test.ok(resp[0].__LO_SET);
 
-                    test.ok(resp[0].__LO_SET);
-
-                    test.done();
-                }).done();
-        // });
+                test.done();
+            });
     }
 };
 
@@ -50,7 +47,7 @@ module.exports['exists'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(__dirname, 'exists');
+        this.program = new Program('exists.lo', __dirname);
         cb();
     },
 
@@ -60,12 +57,18 @@ module.exports['exists'] = {
             succ();
         };
 
-        this.harness.testSuccess(test, [log]);
+        this.program.run([log]).then(function () {
+            test.done();
+        });
     },
 
     'obj not exists': function (test) {
 
-        this.harness.testFailure(test, [], 'no log!');
+        this.program.run().catch(function (result) {
+
+            test.deepEqual(result, ['no log!']);
+            test.done();
+        });
     }
 };
 
@@ -74,7 +77,7 @@ module.exports['nestedLoops'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(__dirname, 'nestedLoops');
+        this.program = new Program('nestedLoops.lo', __dirname);
         cb();
     },
 
@@ -84,10 +87,10 @@ module.exports['nestedLoops'] = {
             succ();
         };
 
-        // this.harness.dumpModules().then(() => {
-
-            this.harness.testSuccess(test, [log], 9);
-        // });
+        this.program.run([log]).then(function (result) {
+            test.deepEqual(result, [9]);
+            test.done();
+        });
     }
 };
 
@@ -95,7 +98,7 @@ module.exports['fail'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(__dirname, 'fail');
+        this.program = new Program('fail.lo', __dirname);
         cb();
     },
 
@@ -103,18 +106,15 @@ module.exports['fail'] = {
 
         test.expect(2);
 
-        // this.harness.dumpModules().then(() => {
-
-            this.harness.run([{
-                ok: function (args, succ, fail) {
-                    test.ok(args[0]);
-                    succ();
-                }
-            }]).then(
-                function (res) {
-                    test.done();
-                }).done();
-        // });
+        this.program.run([{
+            ok: function (args, succ, fail) {
+                test.ok(args[0]);
+                succ();
+            }
+        }]).then(
+            function (result) {
+                test.done();
+            });
     }
 };
 
@@ -122,20 +122,30 @@ module.exports['factorial'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(__dirname, 'factorial');
+        this.program = new Program('factorial.lo', __dirname);
         cb();
     },
 
     'success': function (test) {
-        this.harness.testSuccess(test, [10], 3628800);
+
+        this.program.run([10]).then(function (result) {
+            test.deepEqual(result, [3628800]);
+            test.done();
+        });
     },
 
     'failure': function (test) {
-        this.harness.testFailure(test, [-1], 'I pity the fool!');
+        this.program.run([-1]).catch(function (result) {
+            test.deepEqual(result, ["I pity the fool!"]);
+            test.done();
+        });
     },
 
     'undef failure': function (test) {
-        this.harness.testFailure(test, [], "c'mon!");
+        this.program.run().catch(function (result) {
+            test.deepEqual(result, ["c'mon!"]);
+            test.done();
+        });
     }
 };
 
@@ -143,7 +153,7 @@ module.exports['factorial2'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(__dirname, 'factorial2');
+        this.program = new Program('factorial2.lo', __dirname);
         cb();
     },
 
@@ -158,7 +168,9 @@ module.exports['factorial2'] = {
             }
         };
 
-        this.harness.testSuccess(test, [[10], io]);
+        this.program.run([[10], io]).then(function (result) {
+            test.done();
+        });
     }
 };
 
@@ -166,13 +178,15 @@ module.exports['collections'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(__dirname, 'collections');
+        this.program = new Program('collections.lo', __dirname);
         cb();
     },
 
     'all': function (test) {
 
-        this.harness.testSuccess(test);
+        this.program.run().then(function (result) {
+            test.done();
+        });
     }
 };
 
@@ -180,7 +194,7 @@ module.exports['helloWorld'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(__dirname, 'helloWorld');
+        this.program = new Program('helloWorld.lo', __dirname);
         cb();
     },
 
@@ -200,10 +214,9 @@ module.exports['helloWorld'] = {
             }
         };
 
-        // this.harness.dumpModules().then(() => {
-
-            this.harness.testSuccess(test, [[], system, {}]);
-        // });
+        this.program.run([[], system, {}]).then(function (result) {
+            test.done();
+        });
     }
 };
 
@@ -211,16 +224,24 @@ module.exports['fibonacci'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(__dirname, 'fibonacci');
+        this.program = new Program('fibonacci.lo', __dirname);
         cb();
     },
 
     'success': function (test) {
-        this.harness.testSuccess(test, [10], 55);
+
+        this.program.run([10]).then(function (result) {
+            test.deepEqual(result, [55]);
+            test.done();
+        });
     },
 
     'failure': function (test) {
-        this.harness.testFailure(test, [-1], 'Whatsamatta, you?');
+
+        this.program.run([-1]).catch(function (result) {
+            test.deepEqual(result, ['Whatsamatta, you?']);
+            test.done();
+        });
     }
 };
 
@@ -228,36 +249,50 @@ module.exports['conditionals'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(__dirname, 'conditionals');
+        this.program = new Program('conditionals.lo', __dirname);
         cb();
     },
 
     'neg': function (test) {
-        this.harness.testSuccess(test, [-1], 'negative');
+
+        this.program.run([-1]).then(function (result) {
+            test.deepEqual(result, ['negative']);
+            test.done();
+        });
     },
 
     'zero': function (test) {
-        this.harness.testSuccess(test, [0], 'zero!');
+        this.program.run([0]).then(function (result) {
+            test.deepEqual(result, ['zero!']);
+            test.done();
+        });
     },
 
     'pos': function (test) {
-        this.harness.testSuccess(test, [1], 'positive');
+
+        this.program.run([1]).then(function (result) {
+            test.deepEqual(result, ['positive']);
+            test.done();
+        });
     }
 };
 
 module.exports['iteration'] = {
 
-    // test that uncaught errors are properly escalated out of the program
-
     "setUp": function (cb) {
 
-        this.harness = new Harness(__dirname, 'iteration');
+        this.program = new Program('iteration.lo', __dirname);
         cb();
     },
 
     "stack doesn't overflow": function (test) {
 
-        this.harness.testSuccess(test, [100000], 100000).done();
+        // todo not a relevant test without a req in the loop!
+
+        this.program.run([100000]).then(function (result) {
+            test.deepEqual(result, [100000]);
+            test.done();
+        });
     }
 };
 
@@ -265,13 +300,16 @@ module.exports['procedure'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(__dirname, 'procedure');
+        this.program = new Program('procedure.lo', __dirname);
         cb();
     },
 
     'success': function (test) {
 
-        this.harness.testSuccess(test, [], 60);
+        this.program.run([]).then(function (result) {
+            test.deepEqual(result, [60]);
+            test.done();
+        });
     }
 };
 
@@ -279,7 +317,7 @@ module.exports['conditional in loop'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(__dirname, 'condInLoop');
+        this.program = new Program('condInLoop.lo', __dirname);
         cb();
     },
 
@@ -287,15 +325,15 @@ module.exports['conditional in loop'] = {
 
         var logMessages = [];
 
-        this.harness.run([
+        this.program.run([
 
             function (args, succ, fail) {
                 logMessages.push(args[0]);
                 succ();
             }
-        ]).then(function (resp) {
+        ]).then(function (result) {
 
-            test.equal(resp, 5);
+            test.deepEqual(result, [5]);
 
             // give the async calls a chance to get through
             setImmediate(function () {
@@ -311,7 +349,7 @@ module.exports['reply arity'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(__dirname, 'replyArity');
+        this.program = new Program('replyArity.lo', __dirname);
         cb();
     },
 
@@ -322,16 +360,16 @@ module.exports['reply arity'] = {
         // both functions just reply immediately
         // todo add a test that does this experiment within a reply handler
 
-        this.harness.run([{
+        this.program.run([{
             equal: function (args, succ, fail) {
 
                 test.deepEqual(args[0], args[1]);
                 succ();
             }
         }]).then(
-            function (res) {
+            function (result) {
                 test.done();
-            }).done();
+            });
     }
 };
 
@@ -339,7 +377,7 @@ module.exports['reply handling'] = {
 
     "setUp": function (cb) {
 
-        this.harness = new Harness(__dirname, 'replyHandling');
+        this.program = new Program('replyHandling.lo', __dirname);
         cb();
     },
 
@@ -350,22 +388,18 @@ module.exports['reply handling'] = {
         // both functions just reply immediately
         // todo add a test that does this experiment within a reply handler
 
-        // this.harness.dumpModules().then(() => {
-
-            this.harness.run([
-                function (args, succ, fail) {
-                    succ([27]);
-                },
-                function (args, succ, fail) {
-                    setImmediate(succ, [42]);
-                }
-            ]).then(
-                function (res) {
-                    test.equal(res, 42);
-                    test.done();
-                }
-                ).done();
-        // }).done();
+        this.program.run([
+            function (args, succ, fail) {
+                succ([27]);
+            },
+            function (args, succ, fail) {
+                setImmediate(succ, [42]);
+            }
+        ]).then(
+            function (result) {
+                test.deepEqual(result, [42]);
+                test.done();
+            });
     }
 };
 
@@ -374,13 +408,16 @@ module.exports['built-ins'] = {
 
    "setUp": function (cb) {
 
-       this.harness = new Harness(__dirname, 'built-ins');
+       this.program = new Program('built-ins.lo', __dirname);
        cb();
    },
 
    'success': function (test) {
 
-       this.harness.testSuccess(test, [], -1);
+       this.program.run().then(function (result) {
+           test.deepEqual(result, [-1]);
+           test.done();
+       });
    }
 };
 
@@ -389,18 +426,24 @@ module.exports['fibonacci2'] = {
 
    "setUp": function (cb) {
 
-       this.harness = new Harness(__dirname, 'fibonacci2');
+       this.program = new Program('fibonacci2.lo', __dirname);
        cb();
    },
 
    'success': function (test) {
 
-       this.harness.testSuccess(test, [10], 55);
+       this.program.run([10]).then(function (result) {
+           test.deepEqual(result, [55]);
+           test.done();
+       });
    },
 
    'failure': function (test) {
 
-       this.harness.testFailure(test, [-1], "Whatsamatta, you?");
+       this.program.run([-1]).catch(function (result) {
+           test.deepEqual(result, ["Whatsamatta, you?"]);
+           test.done();
+       });
    }
 };
 

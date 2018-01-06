@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -21,14 +21,13 @@
 
 process.title = 'velo';
 
+const Program = require('../Program');
+const System = require('../runtime/System');
+
+const fs = require('fs');
 const util = require('util');
 const path = require('path');
 const argv = require('minimist')(process.argv.slice(2));
-
-const LocalModuleSpace = require('../linker/LocalModuleSpace');
-const LoadAndGo = require('../linker/LoadAndGo');
-
-// const NodeBuilder = require('../pipeline/NodeBuilder');
 
 var commands = ['run', 'build', 'dump'];
 
@@ -36,54 +35,79 @@ var cmd = argv._.shift();
 var sourceFile = argv._.shift();
 
 if (sourceFile == null) {
-    console.error("error: no source file specified");
+    console.error('ERROR', "no source file specified");
     process.exit();
 }
 
+var program = new Program(sourceFile, process.cwd());
 
-// initialize
-
-var localSpace = new LocalModuleSpace(path.dirname(sourceFile));
-var program = new LoadAndGo(localSpace, path.basename(sourceFile, '.lo'));
-
-localSpace.on('error', function (file, node, message) {
-
-    console.error(`Error compiling ${file}, line ${node.line}:`, message);
+program.on('INFO', msg => {
+    console.error('INFO', msg);
 });
+
+program.on('ERROR', msg => {
+    console.error('ERROR', msg);
+});
+
+// localSpace.on('error', function (file, node, message) {
+//
+//     var loc = node.getSourceLoc();
+//
+//     console.error(`${file} L${loc[0]}c${loc[1]}:`, message);
+// });
 
 switch (cmd) {
 
     case 'dump':
-        return localSpace.resolve(program).then(function () {
-            localSpace.dumpModules(process.stdout);
-        });
+        // return localSpace.resolve(program).then(function () {
+        //     localSpace.dumpModules(process.stdout);
+        // });
 
     case 'build':
         console.error("sorry, building not supported yet");
         //return new NodeBuilder().build(program, argv.build);
         return;
 
+    case 'debug':
+        console.error("debug mode");
+
+        // load the crash dump
+
+        // run it
+
+        break;
+
     case 'run':
-        // have load and go produce an object that can be run?
-        // there's the prep stage which involves loading (maybe) to create a runnable
-        // can also just directly create a runnable?
-        return program.run([argv._, program.getSystem()]).catch(
+
+        return program.run([argv._, System]).catch(
             function (failParams) {
 
                 var exitCode = 1;
 
-                if (failParams.length > 0) {
-
-                    if (typeof failParams[0] === "number") {
-                        exitCode = failParams[0];
-                    }
-                    else {
-                        // todo include line failed at
-                        console.error("FAILED", failParams[0]);
-                    }
-                }
-
                 process.exit(exitCode);
+
+                // if (failParams.length > 0) {
+                //
+                //     if (typeof failParams[0] === "number") {
+                //         exitCode = failParams[0];
+                //     }
+                //     else {
+                //         // todo include line failed at
+                //         console.error("FAILED", failParams[0]);
+                //     }
+                // }
+
+                // todo -- dump without recompiling
+                // return localSpace.resolve(program).then(function () {
+                //
+                //     console.error(failParams);
+                //     console.error("\n>>> CRASH DETECTED -- JS dumped to velo_crash.js");
+                //
+                //     var ostream = fs.createWriteStream('velo_crash.js');
+                //     // localSpace.dumpModules(ostream);
+                //
+                //     ostream.on('close', function () { process.exit(exitCode); });
+                // });
             });
 
     default:

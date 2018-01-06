@@ -1,6 +1,6 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -11,71 +11,77 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * An array concatenation expression (including strings)
- *
- * @param left
- * @param right
- */
-var __ = function (left, right) {
+class Concat extends LoConstruct {
 
-    this.left = left;
-    this.right = right;
-};
+    /**
+     * An array concatenation expression (including strings)
+     *
+     * @param left
+     * @param right
+     */
+    constructor(left, right) {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+        super();
 
-    return {
-        type: 'concat',
-        left: this.left.getAst(),
-        right: this.right.getAst()
-    };
-};
-
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
-
-    return [
-        'concat',
-        this.left.getTree(),
-        this.right.getTree(),
-    ];
-};
-
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.hasType = function (type) {
-
-    return this.left.hasType(type) && this.right.hasType(type);
-};
-
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
-
-    const left = this.left.compile(sourceCtx, targetCtx);
-    const right = this.right.compile(sourceCtx, targetCtx);
-
-    // see if we know the type at compile time
-    if (this.left.hasType && this.left.hasType('string')
-        && this.right.hasType && this.right.hasType('string')) {
-        return JS.add(left, right);
+        this.left = left;
+        this.right = right;
     }
 
-    // kick it to the runtime
-    return JS.utilCall('concat', [left, right]);
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-module.exports = __;
+        return {
+            type: 'concat',
+            left: this.left.getAst(),
+            right: this.right.getAst()
+        };
+    }
+
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
+
+        return [
+            'concat',
+            this.left.getTree(),
+            this.right.getTree(),
+        ];
+    }
+
+    /**
+     * Returns the Lo AST for this node.
+     */
+    hasType(type) {
+
+        return this.left.hasType(type) && this.right.hasType(type);
+    }
+
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
+
+        const left = this.left.compile(sourceCtx, targetCtx);
+        const right = this.right.compile(sourceCtx, targetCtx);
+
+        // see if we know the type at compile time
+        if (this.left.hasType && this.left.hasType('string')
+            && this.right.hasType && this.right.hasType('string')) {
+            return JS.add(left, right);
+        }
+
+        // kick it to the runtime
+        return JS.utilCall('concat', [left, right]);
+    }
+}
+
+module.exports = Concat;

@@ -11,14 +11,13 @@
   "dependencies": {
     "minimist": "^1.2.0",
     "moo": "^0.4.3",
-    "nearley": "^2.11.0",
-    "q": ""
+    "nearley": "^2.11.0"
   },
   "devDependencies": {
     "nodeunit": ""
   },
   "scripts": {
-    "test": "nodeunit testing/codegen testing/compilation testing/feature testing/parsing testing/linking testing/programs testing/runtime"
+    "test": "nodeunit testing/codegen testing/compilation testing/parsing testing/programs testing/runtime testing/workflow"
   },
   "bin": {
     "velo": "./bin/velo"

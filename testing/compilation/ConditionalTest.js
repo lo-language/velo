@@ -163,33 +163,201 @@ module.exports["async"] = {
                                 [ 'assign', [ 'id', '$baz' ], [ 'id', '$ball' ] ] ] ] ]
                     ] ]);
 
-        // test.equal(new Context().createInner().compile(node).renderTree(),
-        //     "var cont0 = function () {};if ($foo) {task.sendMessage($foo, [], function (res) {\nvar P0 = res ? res[0] : null;\n$bar = P0;\ncont0();}, null);\n\n}\n\nelse {cont0();}\n\n");
         test.done();
     },
 
-    // "bug": function (test) {
-    //
-    //     var node = new Lo.procedure(
-    //         ['test'],
-    //         new Lo.stmtList(
-    //             new Lo.conditional(
-    //                 new Lo.identifier('out'),
-    //                 new Lo.stmtList(
-    //                     new Lo.requestStmt(
-    //                         new Lo.identifier('write'),
-    //                         [new Lo.identifier('summary')],
-    //                         null, null, true
-    //                     )
-    //                 )
-    //             )
-    //         ),
-    //         true
-    //     );
-    //
-    //     test.deepEqual(node.compile(new Context().createInner()).renderJs(), "");
-    //     test.done();
-    // }
+
+    "req in predicate": function (test) {
+
+        // if report.finalize() == false {
+        //   fail;
+        // }
+
+        var node = new Lo.stmtList(new Lo.conditional(
+            new Lo.binaryOpExpr('==',
+                new Lo.requestExpr(new Lo.select(new Lo.identifier('report'), 'finalize'), [], true),
+                new Lo.boolean('false')),
+            new Lo.stmtList(
+                new Lo.response('fail')
+            )
+        ));
+
+        test.deepEqual(new JsWriter().generateJs(node.compile(new LoContext())).renderTree(), [ 'stmtList',
+            [ 'expr-stmt',
+                [ 'call',
+                    [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
+                    [ [ 'select', [ 'id', '$report' ], 'finalize' ],
+                        [ 'arrayLiteral', [] ],
+                        [ 'function',
+                            null,
+                            [ 'res0' ],
+                            [ 'stmtList',
+                                [ 'if',
+                                    [ 'strict-eq',
+                                        [ 'subscript', [ 'id', 'res0' ], [ 'num', '0' ] ],
+                                        [ 'bool', 'true' ] ],
+                                    [ 'stmtList',
+                                        [ 'expr-stmt',
+                                            [ 'call', [ 'select', [ 'id', 'task' ], 'fail' ], [ [ 'arrayLiteral', [] ] ] ] ],
+                                        [ 'stmtList', [ 'return' ] ] ] ] ] ],
+                        [ 'null' ] ] ] ] ]);
+
+        test.done();
+    },
+
+    "bug: var declared in branch not in proper context": function (test) {
+
+        // if foo {
+        //   length = 10;
+        // }
+
+        var node = new Lo.conditional(
+            new Lo.identifier('foo'),
+            new Lo.stmtList(
+                new Lo.assign(new Lo.identifier('length'), new Lo.number('10'))
+            )
+        );
+
+        var ctx = new LoContext();
+        test.deepEqual(new JsWriter().generateJs(node.compile(ctx)).renderTree(),
+            [ 'stmtList',
+                [ 'if',
+                    [ 'id', '$foo' ],
+                    [ 'stmtList',
+                        [ 'expr-stmt',
+                            [ 'assign', [ 'id', '$length' ], [ 'num', '10' ] ] ] ] ] ]);
+
+        test.ok(ctx.has('length'));
+
+        test.done();
+    },
+
+    "optimizations": function (test) {
+
+        // this actually tests optimizations implemented in JsWriter...
+
+        // (test) {
+        //   if out {
+        //     write <- summary;
+        //   }
+        // }
+
+        /*
+
+        unoptimized version is:
+
+        function (args, succ, fail) {
+
+            var task = new Task(succ, fail);
+            var $test;
+            $test = args[0];
+            if ($out) {
+                task.sendAndBlock($write, [$summary], k1, k1);
+                function k1 () {
+
+                    k0();
+                }
+            } else {
+                k0();
+            }
+            function k0 () {
+
+                task.autoReply();
+            }
+        }
+
+        */
+
+        /*
+
+        optimized version would be:
+
+        function (args, succ, fail) {
+
+            var task = new Task(succ, fail);
+            var $test;
+
+            $test = args[0];
+
+            if ($out) {
+                task.sendAndBlock($write, [$summary], k0, k0);
+            } else {
+                k0();
+            }
+            function k0 () {
+
+                task.autoReply();
+            }
+        }
+        */
+
+        /*
+        most-optimized version could be:
+
+        function (args, succ, fail) {
+
+            var task = new Task(succ, fail);
+            var $test;
+
+            $test = args[0];
+
+            if ($out) {
+                task.sendAndBlock($write, [$summary], task.autoReply.bind(task), task.autoReply.bind(task));
+            } else {
+                task.autoReply();
+            }
+        }
+        */
+
+        var node = new Lo.procedure(
+            ['test'],
+            new Lo.stmtList(
+                new Lo.conditional(
+                    new Lo.identifier('out'),
+                    new Lo.stmtList(
+                        new Lo.requestStmt(
+                            new Lo.identifier('write'),
+                            [new Lo.identifier('summary')],
+                            null, null, true
+                        )
+                    )
+                )
+            ),
+            true
+        );
+
+        test.deepEqual(node.compile(new LoContext()).renderTree(), [ 'function',
+            null,
+            [ 'args', 'succ', 'fail' ],
+            [ 'stmtList',
+                [ 'var',
+                    'task',
+                    [ 'new', 'Task', [ [ 'id', 'succ' ], [ 'id', 'fail' ] ] ] ],
+                [ 'stmtList',
+                    [ 'var', '$test' ],
+                    [ 'stmtList',
+                        [ 'expr-stmt',
+                            [ 'assign',
+                                [ 'id', '$test' ],
+                                [ 'subscript', [ 'id', 'args' ], [ 'num', '0' ] ] ] ],
+                        [ 'stmtList',
+                            [ 'if',
+                                [ 'id', '$out' ],
+                                [ 'stmtList',
+                                    [ 'expr-stmt',
+                                        [ 'call',
+                                            [ 'select', [ 'id', 'task' ], 'sendAndBlock' ],
+                                            [ [ 'id', '$write' ],
+                                                [ 'arrayLiteral', [ [ 'id', '$summary' ] ] ],
+                                                [ 'call', [ "select", [ "select", [ "id", "task" ], "autoReply" ], "bind"],
+                                                    [ [ 'id', 'task' ] ] ],
+                                                [ 'call', [ "select", [ "select", [ "id", "task" ], "autoReply" ], "bind"],
+                                                    [ [ 'id', 'task' ] ] ] ] ] ] ],
+                                [ 'stmtList',
+                                    [ 'expr-stmt',
+                                        [ 'call', [ 'select', [ 'id', 'task' ], 'autoReply' ], [] ] ] ] ] ] ] ] ] ]);
+        test.done();
+    },
 
 //     "nested ifs create separate continuations": function (test) {
 //         // todo
@@ -257,29 +425,6 @@ module.exports["async"] = {
 //                         [ 'expr-stmt', [ 'call', [ 'id', 'cont0' ], [] ] ] ],
 //                     [ 'stmtList',
 //                         [ 'expr-stmt', [ 'call', [ 'id', 'cont0' ], [] ] ] ] ] ] ]);
-//
-//         test.done();
-//     },
-//
-//     "async predicate": function (test) {
-//
-//         var asyncCall = new Wrapper();
-//         asyncCall.pushRequest(new Request(JS.ID('$foo'), [], null, null, true));
-//
-//         var stmt = new AsyncCond(JS.ID('$foo'), asyncCall.wrap(new JsStmt()), null, new Wrapper());
-//
-//         test.equal(stmt.isAsync(), true);
-//
-//         test.deepEqual(stmt.renderTree(), [ 'stmtList',
-//             [ 'if',
-//                 [ 'id', '$foo' ],
-//                 [ 'stmtList',
-//                     [ 'expr-stmt',
-//                         [ 'call',
-//                             [ 'select', [ 'id', 'task' ], 'sendMessage' ],
-//                             [ [ 'id', '$foo' ],
-//                                 [ 'arrayLiteral', [] ],
-//                                 [ 'function', null, [ 'res0' ], [ 'stmtList' ] ] ] ] ] ] ] ]);
 //
 //         test.done();
 //     }

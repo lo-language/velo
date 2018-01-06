@@ -1,6 +1,6 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -19,7 +19,7 @@ const JsWriter = require('../codegen/JsWriter');
 const vm = require('vm');
 
 /**
- * A module definition; the root of an AST. Called by the ASTBuilder
+ * A module definition; the root of an AST.
  */
 var __ = function (defs, deps) {
 
@@ -69,11 +69,10 @@ __.prototype.getTree = function () {
  *
  * Compiling a module discovers its dependencies.
  */
-__.prototype.compile = function (registry, errorListener) {
+__.prototype.compile = function (errorListener) {
 
     var loContext = new LoContext();
 
-    loContext.setRegistry(registry);
     loContext.setErrorListener(errorListener);
 
     // todo another compensating hack because of compiling tail-first
@@ -110,7 +109,7 @@ __.prototype.compile = function (registry, errorListener) {
         )
     ));
 
-    // all other compiles return IR; this returns JS? NASTY
+    // all other compile()s return IR; this returns JS? NASTY
     return new JsWriter().generateJs(firstStmt);
 };
 

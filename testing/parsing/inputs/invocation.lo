@@ -28,7 +28,7 @@ test is () {
     }
 
     // sync with both handlers
-    user.login <- password -> (result) {
+    user.login <- password -> (float* result) {
         reply "ok";
     }
     ~> (error) {
@@ -52,12 +52,12 @@ test is () {
     }
 
     // handle failure only
-    @baz <- 128 ~> (err) {
+    @baz <- 128 ~> (string err) {
         reply "bummer";
     }
 
     // handle both success and failure
-    async foo <- 42 -> (a, b) {
+    async foo <- 42 -> (int a, dec b) {
         reply "yay";
     }
     ~> () {
@@ -66,7 +66,7 @@ test is () {
 
     // nested requests
     // should we support pipes like 42 -> foo -> bar -> baz?
-    @foo <- 42 -> (result) {
+    @foo <- 42 -> (bool result) {
 
         @bar <- (result) -> () {
 
