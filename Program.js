@@ -193,7 +193,7 @@ class Program extends EventEmitter {
 
             this.emit('INFO', 'Acquiring module ' + module.name);
 
-            // detect built-ins
+            // detect built-in libs
 
             if (module.ns == 'JS') {
 
@@ -205,6 +205,17 @@ class Program extends EventEmitter {
                 resolve(jsModule);
                 return;
             }
+
+            // if (module.ns == 'Lo') {
+            //
+            //     // what if we instead *injected* the module content into the module??
+            //     // have a JS loader that does that
+            //
+            //     var libModule = new JsModule(module.name);
+            //     this.modules[libModule.ref] = libModule;
+            //     resolve(libModule);
+            //     return;
+            // }
 
             // just look for the file locally for now
 

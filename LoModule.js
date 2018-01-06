@@ -46,7 +46,7 @@ class LoModule {
     }
 
     /**
-     * Parses the module, returning any errors.
+     * Parses the module, returning any errors. Fluent interface.
      *
      * @param source
      */
@@ -69,24 +69,18 @@ class LoModule {
     }
 
     /**
-     * Compiles the module
+     * Compiles the module with a fluent interface.
      *
-     * @param registry   root symbol table for cross-references
      * @returns {LoModule}
      */
-    compile (registry) {
+    compile (errorListener) {
 
-        this.js = this.ast.compile(registry, (node, error) => {
-            // this.emit("error", moduleId, node, error);
-        }).renderJs();
-
-        // console.log(this.js.replace(/(\n|\r)+/g, ''));
-
+        this.js = this.ast.compile(errorListener).renderJs();
         return this;
     }
 
     /**
-     * Sets the Lo AST for this module
+     * Sets the Lo AST for this module with a fluent interface
      *
      * @param moduleAst
      */

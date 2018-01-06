@@ -102,10 +102,10 @@ class LoContext {
     /**
      * Sets the module registry for this context.
      */
-    setRegistry(registry) {
-
-        this.registry = registry;
-    }
+    // setRegistry(registry) {
+    //
+    //     this.registry = registry;
+    // }
 
     /**
      * Sets the module registry for this context.
@@ -323,7 +323,6 @@ class LoContext {
         return false;
     }
 
-    // };
     isRValue() {
         return false;
     }
@@ -343,7 +342,9 @@ class LoContext {
             return;
         }
 
-        this.errorListener && this.errorListener(node, message);
+        if (this.errorListener) {
+            this.errorListener.emit('ERROR', node, message);
+        }
 
         this.errors.push(node, message);
     }

@@ -20,16 +20,16 @@ module.exports['undefined identifier'] = {
 
     "success": function (test) {
 
-        // test.expect(1);
+        test.expect(2);
 
         var program = new Program(new LoModule('main').parse(
             'main is () {\n' +
             '    sayHello <-;\n};\n'
         ));
 
-        program.on('ERROR', (line, error) => {
-            test.equal(line, 2);
-            test.equal(error, 'reference to unbound identifier "sayHello"');
+        program.on('ERROR', (node, error) => {
+            test.deepEqual(node.sourceLoc, [2, 5]);
+            test.equal(error, 'identifier "sayHello" used but not bound in this context');
         });
 
         program.compile().then(

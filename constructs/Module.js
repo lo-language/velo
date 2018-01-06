@@ -69,11 +69,10 @@ __.prototype.getTree = function () {
  *
  * Compiling a module discovers its dependencies.
  */
-__.prototype.compile = function (registry, errorListener) {
+__.prototype.compile = function (errorListener) {
 
     var loContext = new LoContext();
 
-    loContext.setRegistry(registry);
     loContext.setErrorListener(errorListener);
 
     // todo another compensating hack because of compiling tail-first

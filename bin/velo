@@ -22,6 +22,7 @@
 process.title = 'velo';
 
 const Program = require('../Program');
+const System = require('../runtime/System');
 
 const fs = require('fs');
 const util = require('util');
@@ -77,10 +78,8 @@ switch (cmd) {
         break;
 
     case 'run':
-        // have load and go produce an object that can be run?
-        // there's the prep stage which involves loading (maybe) to create a runnable
-        // can also just directly create a runnable?
-        return program.run([argv._ /*, program.getSystem()*/]).catch(
+
+        return program.run([argv._, System]).catch(
             function (failParams) {
 
                 var exitCode = 1;

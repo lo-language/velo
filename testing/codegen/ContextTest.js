@@ -9,21 +9,6 @@ const Context = require('../../compiler/LoContext');
 
 module.exports["basics"] = {
 
-    "setRegistry": function (test) {
-
-        var root = new Context();
-
-        test.equal(root.registry, null);
-
-        var registry = {};
-
-        root.setRegistry(registry);
-
-        test.equal(root.registry, registry);
-
-        test.done();
-    },
-
     "isRoot": function (test) {
 
         var root = new Context();

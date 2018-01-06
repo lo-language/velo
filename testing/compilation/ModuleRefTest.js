@@ -41,15 +41,15 @@ module.exports["identifiers"] = {
 
         var context = new LoContext();
 
-        var registry = {
-            include: function (ns, id) {
-
-                test.equal(ns, '__local');
-                test.equal(id, 'Moon');
-            }
-        };
-
-        context.setRegistry(registry);
+        // var registry = {
+        //     include: function (ns, id) {
+        //
+        //         test.equal(ns, '__local');
+        //         test.equal(id, 'Moon');
+        //     }
+        // };
+        //
+        // context.setRegistry(registry);
 
         context.define("Moon", 42);
 
