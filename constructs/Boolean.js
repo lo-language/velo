@@ -18,6 +18,7 @@ const LoConstruct = require('./LoConstruct');
 
 
 class Boolean extends LoConstruct {
+    
     /**
      * A literal boolean
      */
