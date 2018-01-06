@@ -18,6 +18,7 @@
 "use strict";
 
 const Parser = require('./parser/Parser');
+const vm = require('vm');
 
 
 class LoModule {
@@ -26,30 +27,42 @@ class LoModule {
 
     /**
      *
-     * @param ref
-     * @param source
+     * @param name
+     * @param ns
      */
-    constructor (ref, source) {
+    constructor (name, ns) {
 
-        this.ref = ref;
-        this.source = source;
+        this.name = name;
+        this.ns = ns || '__local';
+
+        // create the canonical reference
+        this.ref = this.ns + '::' + name;
+
+        this.source = null;
         this.ast = null;
+        this.deps = [];
         this.js = null;
+        this.loaded = null;
     }
 
     /**
      * Parses the module, returning any errors.
      *
-     * @param errorReport   report to add parse errors to
+     * @param source
      */
-    parse (errorReport) {
+    parse (source) {
+
+        // hang onto the source
+        this.source = source;
 
         // todo catch parser errors here and report them
-        this.ast = new Parser().parse(this.source);
 
-        // extract the deps
+        this.ast = new Parser().parse(source);
+
+        // extract the deps from the AST
+
         this.deps = this.ast.deps.map(constant => {
-            return constant.value.getCanonical();
+            return new LoModule(constant.value.id, constant.value.namespace);
         });
 
         return this;
@@ -67,7 +80,7 @@ class LoModule {
             // this.emit("error", moduleId, node, error);
         }).renderJs();
 
-        console.log(this.js.replace(/(\n|\r)+/g, ''));
+        // console.log(this.js.replace(/(\n|\r)+/g, ''));
 
         return this;
     }
@@ -101,6 +114,22 @@ class LoModule {
     setJs (js) {
 
         this.js = js;
+    }
+
+    /**
+     * Loads this module into its own JS context, ready for execution.
+     *
+     * @param sandbox
+     * @returns {*}
+     */
+    load (sandbox) {
+
+        // wrap the generated JS in a strict-mode function and execute it to yield
+        // a JS object containing the compiled module constants
+
+        return this.loaded = vm.runInNewContext(
+            "(function() {'use strict';" + this.js + '\n\n})',
+            sandbox)();
     }
 }
 

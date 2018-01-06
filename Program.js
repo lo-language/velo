@@ -20,25 +20,55 @@
 "use strict";
 
 const LoModule = require('./LoModule');
+const EventEmitter = require('events').EventEmitter;
+const path = require('path');
 const fs = require('fs');
 
+// Lo runtime components
 
-class Program {
+const Task = require('./runtime/Task');
+const Util = require('./runtime/Util');
+const JsModule = require('./runtime/JsModule');
+
+
+class Program extends EventEmitter {
 
     /**
      *
-     * @param rootModuleRef
-     * @param resolvers
+     * @param rootModule    LoModule or module name
+     * @param sourceDir     program source root directory
      */
-    constructor (rootModuleRef, resolvers) {
+    constructor (rootModule, sourceDir) {
 
-        this.rootModuleRef = rootModuleRef;
-        this.resolvers = resolvers;
+        super();
+
+        if (typeof rootModule == 'string') {
+            this.rootModule = new LoModule(rootModule);
+        }
+        else {
+            this.rootModule = rootModule;
+        }
+
+        this.sourceDir = sourceDir;
 
         // map of module ref => module instance
         this.modules = {};
 
-        this.sourceDir = '';
+        // bypass acquiring pre-parsed modules
+        if (rootModule.ast) {
+            this.modules[rootModule.ref] = rootModule;
+        }
+
+        // loaded, runnable modules
+        this.loaded = {};
+
+        // vm sandbox
+
+        this.sandbox = {
+            setImmediate: setImmediate, // todo do we still need this?
+            'Task': Task,
+            'Util': Util
+        };
     }
 
     getModules () {
@@ -63,16 +93,48 @@ class Program {
 
         // convert args to Lo types
 
-        this.compile()
-            .then(() => {
+        return this.compile().then(() => {
 
-            return this.loadAll();
-        })
-            .then(() => {
+            // load all the modules
+            Object.keys(this.modules).forEach(modRef => {
 
-            return this.rootModule.run('main', args);
+                var module = this.modules[modRef];
+
+                var moduleJsObj = module.load(this.sandbox);
+
+                // load the module into the program namespace
+
+                if (this.sandbox.hasOwnProperty(module.ns) == false) {
+                    this.sandbox[module.ns] = {};
+                }
+
+                this.sandbox[module.ns][module.name] = moduleJsObj;
+            });
+
+            var mainService = this.rootModule.loaded.main;
+
+            return new Promise((resolve, reject) => {
+
+                try {
+                    Task.sendRootRequest(mainService, args || [], resolve, reject);
+                }
+                catch (err) {
+
+                    // crash detected
+                    console.error(err);
+                    console.log(this.rootModule.js);
+                }
+            });
+
+        }).catch(err => {
+
+            // catch compilation errors
+            this.emit('ERROR', err);
+
+            // console.log(err);
+
+            throw err;
         });
-
     }
 
     /**
@@ -101,58 +163,70 @@ class Program {
      */
     compile () {
 
-        return this.acquire(this.rootModuleRef).then(() => {
+        // acquire all modules before compiling any
 
-            // compile each module
+        return this.acquire(this.rootModule).then(() => {
+
             Object.keys(this.modules).forEach(modRef => {
-
                 this.modules[modRef].compile(this);
             });
         });
     }
 
     /**
-     * Acquires the specified module and all its dependencies, recursively.
-     * This entails fully parsing each module to find its deps.
+     * Acquires the source for the given module and all its dependencies, recursively.
+     * This entails parsing each module to find its deps.
      *
-     * @param modName
-     * @return {Promise}    for a module
+     * @param module
+     * @return {Promise}    for the acquired module
      */
-    acquire (modName) {
+    acquire (module) {
 
         return new Promise((resolve, reject) => {
 
             // check our cache first
-            if (typeof this.modules[modName.ref] === 'object') {
-                resolve(this.modules[modName.ref]);
-                console.log('Got from cache ' + modName.name);
+            if (typeof this.modules[module.ref] === 'object') {
+                resolve(this.modules[module.ref]);
+                this.emit('DEBUG', 'Got from cache ' + module.name);
                 return;
             }
 
-            console.log('Acquiring module ' + modName.name);
+            this.emit('INFO', 'Acquiring module ' + module.name);
+
+            // detect built-ins
+
+            if (module.ns == 'JS') {
+
+                // what if we instead *injected* the module content into the module??
+                // have a JS loader that does that
+
+                var jsModule = new JsModule(module.name);
+                this.modules[jsModule.ref] = jsModule;
+                resolve(jsModule);
+                return;
+            }
 
             // just look for the file locally for now
 
-            fs.readFile(this.sourceDir + modName.name, 'utf8', (err, source) => {
+            var fileName = path.basename(module.name, '.lo') + '.lo';
+
+            fs.readFile(this.sourceDir + '/' + fileName, 'utf8', (err, source) => {
 
                 if (err) {
-                    reject("Failed to locate module " + modName.name + ' in ' + this.sourceDir);
+                    reject("Failed to locate module " + module.name + ' in ' + this.sourceDir);
                     return;
                 }
 
-                // stash the whole ref with the module?
-                var module = new LoModule(modName.name, source);
-
                 // stash the module
-                this.modules[modName.ref] = module;
+                this.modules[module.ref] = module;
 
                 // parse that bad boy so we can grab its deps
-                module.parse();
+                module.parse(source);
 
                 // acquire its dependencies
                 this.acquireDeps(module).then(() => {
                     resolve(module);
-                });
+                }).catch(reject);   // pass through to our promise
             });
         });
     }
@@ -162,7 +236,7 @@ class Program {
      * Actually acquires in parallel.
      *
      * @param module
-     * @returns {Promise.<*>}
+     * @returns {Promise}
      */
     acquireDeps (module) {
 
@@ -179,15 +253,6 @@ class Program {
 
             return this.acquire(dep);
         }));
-    }
-
-    /**
-     * Loads all modules.
-     *
-     * @return {Promise}
-     */
-    loadAll () {
-
     }
 }
 

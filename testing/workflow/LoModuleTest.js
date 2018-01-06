@@ -20,16 +20,11 @@ module.exports["get deps"] = {
 
     "success": function (test) {
 
-        var program = new Program();
+        var module = new LoModule('test');
 
-        program.sourceDir = __dirname + '/';
+        module.parse('using modA;\nusing modB;\nfoo is 42;\n');
 
-        program.acquire({name: 'main.lo', ref: '__local::main.lo'}).then(module => {
-
-            // test.deepEqual(module.parse().getDeps().map(dep => dep.toString()), [
-            //     { ns: '__local', name: 'modA' },
-            //     { ns: '__local', name: 'modB' } ]);
-            test.done();
-        });
+        test.deepEqual(module.getDeps().map(dep => dep.name), [ 'modA', 'modB' ]);
+        test.done();
     }
 };

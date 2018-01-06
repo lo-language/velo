@@ -18,7 +18,7 @@
     "nodeunit": ""
   },
   "scripts": {
-    "test": "nodeunit testing/codegen testing/compilation testing/feature testing/parsing testing/linking testing/programs testing/runtime"
+    "test": "nodeunit testing/codegen testing/compilation testing/linking testing/parsing testing/programs testing/runtime testing/workflow"
   },
   "bin": {
     "velo": "./bin/velo"

@@ -22,7 +22,7 @@ module.exports["acquire"] = {
 
     "fails on missing module": function (test) {
 
-        var program = new Program({name: 'rootModule'});
+        var program = new Program('rootModule');
 
         program.acquire('missing').catch(function (err) {
             test.done();
@@ -31,35 +31,34 @@ module.exports["acquire"] = {
 
     "success": function (test) {
 
-        var program = new Program({name: 'rootModule'});
-        program.sourceDir = __dirname + '/../programs/';
+        var program = new Program('rootModule', __dirname + '/../programs');
 
         var path = 'fail.lo';
-        var ref = '__local::fail.lo';
-        var modName = {name: path, ref: ref};
+        var module = new LoModule(path);
 
-        program.acquire(modName).then(function (module) {
+        program.acquire(module).then(function (module) {
 
             // should have stashed the module
             var modules = program.getModules();
 
-            test.deepEqual(Object.keys(modules), [ref]);
+            test.deepEqual(Object.keys(modules), [module.ref]);
             test.ok(module instanceof LoModule);
-            test.equal(modules[ref], module);
+            test.equal(modules[module.ref], module);
             test.ok(module.mark == undefined);
 
             // mark the module
-            modules[ref].mark = true;
+            modules[module.ref].mark = true;
 
-            return program.acquire(modName);
+            // test idempotency
+            return program.acquire(module);
         }).then(function (module) {
 
             // should not have reacquired the module
             var modules = program.getModules();
 
-            test.deepEqual(Object.keys(modules), [ref]);
+            test.deepEqual(Object.keys(modules), [module.ref]);
             test.ok(module instanceof LoModule);
-            test.equal(modules[ref], module);
+            test.equal(modules[module.ref], module);
             test.ok(module.mark);
 
             test.done();
@@ -68,11 +67,9 @@ module.exports["acquire"] = {
 
     "resolve deps with cycles": function (test) {
 
-        var modName = {name: 'main.lo', ref: '__local::main.lo'};
-        var program = new Program(modName);
-        program.sourceDir = __dirname + '/';
+        var program = new Program('main.lo', __dirname);
 
-        program.acquire(modName).then(function () {
+        program.acquire(program.rootModule).then(function () {
 
             test.deepEqual(Object.keys(program.getModules()).sort(), [
                 '__local::main.lo',
@@ -89,11 +86,10 @@ module.exports["run"] = {
 
     "basic success": function (test) {
 
-        var program = new Program({name: '../programs/fail.lo', ref: '__local::../programs/fail.lo'});
-        program.sourceDir = __dirname + '/';
+        var program = new Program('factorial.lo', __dirname + '/../programs');
 
-
-        program.compile().then(function () {
+        program.run([10]).then(function (result) {
+            test.deepEqual(result, [ 3628800 ]);
             test.done();
         });
     }

@@ -1,4 +1,4 @@
-using Common as Common;
+using Common;
 
 main is (args, system) {
 

@@ -4,8 +4,8 @@
  * Created by spurcell on 12/5/15.
  */
 
-const Program = require('../../linker/LoadAndGo');
-const MockModuleSpace = require('../MockModuleSpace');
+const Program = require('../../Program');
+const LoModule = require('../../LoModule');
 const util = require('util');
 
 
@@ -15,77 +15,61 @@ module.exports['basics'] = {
 
         test.expect(1);
 
-        var modSpace = new MockModuleSpace('main is () { reply "hullo!"; };');
+        var program = new Program(new LoModule('main').parse('main is () { reply "hullo!"; };'));
 
-        var program = new Program(modSpace, 'ROOT');
-
-        program.run().then(
-            function (res) {
-                test.equal(res, "hullo!");
-                test.done();
-            }
-        ).done();
+        program.run().then(function (result) {
+            test.deepEqual(result, ["hullo!"]);
+            test.done();
+        });
     },
 
     "simple sync": function (test) {
 
         test.expect(1);
 
-        var modSpace = new MockModuleSpace(
+        var program = new Program(new LoModule('main').parse(
                     'sayHello is () {\n' +
                     '    reply "hullo!";\n};\n' +
                     'main is () {\n' +
-                    '    reply sayHello();\n};\n');
+                    '    reply sayHello();\n};\n'));
 
-        var program = new Program(modSpace, 'ROOT');
-
-        program.run().then(
-            function (res) {
-                test.equal(res, "hullo!");
-                test.done();
-            }).done();
+        program.run().then(function (result) {
+            test.deepEqual(result, ["hullo!"]);
+            test.done();
+        });
     },
 
     "sync message, default reply": function (test) {
 
         test.expect(1);
 
-        var modSpace = new MockModuleSpace(
+        var program = new Program(new LoModule('main').parse(
                     'sayHello is () {\n' +
                     '    reply "hullo!";\n};\n' +
                     'main is () {\n' +
-                    '    sayHello <-;\n};\n');
+                    '    sayHello <-;\n};\n'));
 
-        var program = new Program(modSpace, 'ROOT');
-
-        program.run().then(
-            function (res) {
-                test.equal(res, undefined);
-                test.done();
-            }).done();
+        program.run().then(function (result) {
+            test.deepEqual(result, undefined);
+            test.done();
+        });
     },
 
     "sync message, explicit reply": function (test) {
 
         test.expect(1);
 
-        var modSpace = new MockModuleSpace(
+        var program = new Program(new LoModule('main').parse(
                     'sayHello is () {\n' +
                     '    reply "hullo!";\n};\n' +
                     'main is () {\n' +
                     '    sayHello <- 4;\n' +
-                    '    reply "howdy!";\n};\n');
+                    '    reply "howdy!";\n};\n'));
 
-        var program = new Program(modSpace, 'ROOT');
-
-        program.run().then(
-            function (res) {
-                test.equal(res, "howdy!");
-                test.done();
-            },
-            function () {
-                test.fail();
-            });
+        program.run().then(function (result) {
+            test.deepEqual(result, ['howdy!']);
+            test.done();
+        });
     },
 
     "simple dispatch": function (test) {
@@ -97,15 +81,12 @@ module.exports['basics'] = {
             succ();
         };
 
-        var modSpace = new MockModuleSpace(
+        var program = new Program(new LoModule('main').parse(
                     'main is (write) {\n' +
-                    'write <- "hi there!";\n};\n');
+                    'write <- "hi there!";\n};\n'));
 
-        var program = new Program(modSpace, 'ROOT');
-
-        program.run([write]).then(
-            function (res) {
-                setImmediate(test.done.bind(test));
-            }).done();
+        program.run([write]).then(function (result) {
+            setImmediate(test.done.bind(test));
+        });
     }
 };

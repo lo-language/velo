@@ -55,28 +55,11 @@ class ModuleRef extends LoConstruct {
      * Compiles this module reference to JS.
      *
      * @param sourceCtx
-     * @param targetCtx
      */
-    compile(sourceCtx, targetCtx) {
-
-        // will throw if namespace is unknown
-        sourceCtx.registry.include(this.namespace || '__local', this.id);
+    compile(sourceCtx) {
 
         // module namespaces are injected as globals at load-time
-        // todo revisit in terms of target context manipulation
         return JS.select(JS.ID(this.namespace || '__local'), this.id);
-    }
-
-    /**
-     * Returns canonicalized module reference.
-     */
-    getCanonical () {
-
-        return {
-            ns: (this.namespace || '__local'),
-            name: this.id,
-            ref: (this.namespace || '__local') + '::' + this.id
-        };
     }
 }
 

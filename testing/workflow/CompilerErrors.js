@@ -13,9 +13,8 @@
 
 "use strict";
 
-const Program = require('../../linker/LoadAndGo');
-const MockModuleSpace = require('../MockModuleSpace');
-
+const Program = require('../../Program');
+const LoModule = require('../../LoModule');
 
 module.exports['undefined identifier'] = {
 
@@ -23,22 +22,22 @@ module.exports['undefined identifier'] = {
 
         // test.expect(1);
 
-        var modSpace = new MockModuleSpace(
+        var program = new Program(new LoModule('main').parse(
             'main is () {\n' +
-            '    sayHello <-;\n};\n');
+            '    sayHello <-;\n};\n'
+        ));
 
-        var errorListener = function (line, error) {
+        program.on('ERROR', (line, error) => {
             test.equal(line, 2);
             test.equal(error, 'reference to unbound identifier "sayHello"');
-        };
+        });
 
-        modSpace.resolve(null, errorListener).then(
+        program.compile().then(
             function () {
                 test.ok(false);
                 test.done();
             },
             function (err) {
-
                 test.done();
             }
         );
