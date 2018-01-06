@@ -13,26 +13,6 @@ const Task = require('../runtime/Task');
 const http = require('http');
 
 /**
- * The Lo standard library
- *
- * Created by spurcell on 8/19/17.
- */
-
-var __ = function () {
-
-};
-
-
-/**
- * Registers the given module ID as a dependency.
- */
-__.prototype.register = function (id) {
-
-    // no-op; could optionally do some validation here
-};
-
-
-/**
  *
  */
 __.prototype.getModules = function () {

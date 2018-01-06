@@ -20,6 +20,7 @@
 "use strict";
 
 const LoModule = require('./LoModule');
+const libs = require('./libs');
 const EventEmitter = require('events').EventEmitter;
 const path = require('path');
 const fs = require('fs');
@@ -28,7 +29,7 @@ const fs = require('fs');
 
 const Task = require('./runtime/Task');
 const Util = require('./runtime/Util');
-const JsModule = require('./runtime/JsModule');
+const JsModule = require('./libs/JsModule');
 
 
 class Program extends EventEmitter {
@@ -206,16 +207,13 @@ class Program extends EventEmitter {
                 return;
             }
 
-            // if (module.ns == 'Lo') {
-            //
-            //     // what if we instead *injected* the module content into the module??
-            //     // have a JS loader that does that
-            //
-            //     var libModule = new JsModule(module.name);
-            //     this.modules[libModule.ref] = libModule;
-            //     resolve(libModule);
-            //     return;
-            // }
+            if (module.ns == 'Lo') {
+
+                var libModule = new libs[module.name];
+                this.modules[libModule.ref] = libModule;
+                resolve(libModule);
+                return;
+            }
 
             // just look for the file locally for now
 

@@ -4,8 +4,11 @@
  */
 
 using JS::Math as Math;
+using Lo::String as String;
 
 main is () {
+
+    String.split <- "hey there", " ";
 
     reply Math.cos(Math.PI);
 };

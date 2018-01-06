@@ -15,9 +15,9 @@
 
 "use strict";
 
-const LoModule = require('../LoModule');
+const LibModule = require('./LibModule');
 
-class JsModule extends LoModule {
+class JsModule extends LibModule {
 
     constructor (name) {
 
@@ -25,14 +25,6 @@ class JsModule extends LoModule {
     }
 
     /**
-     * no-op
-     */
-    compile () {
-
-    }
-
-    /**
-     * no-op
      * @param sandbox
      */
     load (sandbox) {
