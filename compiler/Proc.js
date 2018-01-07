@@ -12,8 +12,6 @@
 /**
  * Packages up an IR procedure, but isn't a control flow node.
  *
- * We need to do this so we can
- *
  * Created by: spurcell
  * 12/25/14
  */
@@ -21,6 +19,7 @@
 "use strict";
 
 const JS = require('./../codegen/JsPrimitives');
+
 
 class Proc {
 

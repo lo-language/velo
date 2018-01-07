@@ -7,225 +7,227 @@
  *
  =============================================================================*/
 
-/**
- * Models a Lo task
- *
- * open questions: what happens to pending responses after a task responds?
- * should they be dropped on the floor, or should their handlers run?
- * a response is a combination message and control flow construct
- *
- * @param succ  success continuation
- * @param fail  failure continuation
- */
-var __ = function (succ, fail) {
+class Task {
 
-    this.successCont = succ;
-    this.failureCont = fail;
+    /**
+     * Models a Lo task
+     *
+     * open questions: what happens to pending responses after a task responds?
+     * should they be dropped on the floor, or should their handlers run?
+     * a response is a combination message and control flow construct
+     *
+     * @param succ  success continuation
+     * @param fail  failure continuation
+     */
+    constructor(succ, fail) {
 
-    this.blocked = false;   // queuing async responses?
-    this.pendingReqs = 0;   // count of pending async requests (no response yet)
-    this.responses = [];    // queued responses
-    this.hasResponded = false;
-};
+        this.successCont = succ;
+        this.failureCont = fail;
 
+        this.blocked = false;   // queuing async responses?
+        this.pendingReqs = 0;   // count of pending async requests (no response yet)
+        this.responses = [];    // queued responses
+        this.hasResponded = false;
+    }
 
-__.prototype.sendOneWay = function (address, args) {
+    sendOneWay(address, args) {
 
-    // todo
+        // todo
 
-    // also todo - trigger auto-respond from a service that makes no requests
-};
+        // also todo - trigger auto-respond from a service that makes no requests
+    }
 
-/**
- * Send a non-blocking message.
- *
- * @param address
- * @param args
- * @param succ
- * @param fail
- */
-__.prototype.sendAsync = function (address, args, succ, fail) {
+    /**
+     * Send a non-blocking message.
+     *
+     * @param address
+     * @param args
+     * @param succ
+     * @param fail
+     */
+    sendAsync(address, args, succ, fail) {
 
-    this.pendingReqs++;
+        this.pendingReqs++;
 
-    // we use nextTick to make sure it doesn't respond before we've even had a chance to
-    // register following blocking calls
+        // we use nextTick to make sure it doesn't respond before we've even had a chance to
+        // register following blocking calls
 
-    process.nextTick(address, args,
+        process.nextTick(address, args,
 
-        // we wrap the continuations in bookkeeping and queueing logic
-        // to implement our message handling semantics
+            // we wrap the continuations in bookkeeping and queueing logic
+            // to implement our message handling semantics
 
-        (resp) => {
+            (resp) => {
 
-            this.pendingReqs--;
+                this.pendingReqs--;
 
-            if (this.blocked) {
-                this.responses.push(succ.bind(null, resp));
-            }
-            else {
+                if (this.blocked) {
+                    this.responses.push(succ.bind(null, resp));
+                }
+                else {
+                    if (succ) succ(resp);
+
+                    // see if we've now completed and should auto-respond; not factored out for perf
+                    if (this.pendingReqs == 0 && this.responses.length == 0 && this.hasResponded == false) {
+                        this.succ();
+                    }
+                }
+            },
+
+            (resp) => {
+
+                this.pendingReqs--;
+
+                if (this.blocked) {
+                    this.responses.push(fail.bind(null, resp));
+                }
+                else {
+                    if (fail) fail(resp);
+
+                    // see if we've now completed and should auto-respond; not factored out for perf
+                    if (this.pendingReqs == 0 && this.responses.length == 0 && this.hasResponded == false) {
+                        this.succ();
+                    }
+                }
+            });
+    }
+
+    /**
+     * Send a blocking message.
+     *
+     * @param address
+     * @param args
+     * @param succ
+     * @param fail
+     */
+    sendAndBlock(address, args, succ, fail) {
+
+        // enable queuing of responses
+        this.blocked = true;
+
+        // we need to process the response queue here because this may be our
+        // last opportunity to do so
+        address(args,
+
+            (resp) => {
+
+                this.blocked = false;
                 if (succ) succ(resp);
+                this.processResponses();
+            },
 
-                // see if we've now completed and should auto-respond; not factored out for perf
-                if (this.pendingReqs == 0 && this.responses.length == 0 && this.hasResponded == false) {
-                    this.succ();
-                }
-            }
-        },
+            (resp) => {
 
-        (resp) => {
-
-            this.pendingReqs--;
-
-            if (this.blocked) {
-                this.responses.push(fail.bind(null, resp));
-            }
-            else {
+                this.blocked = false;
                 if (fail) fail(resp);
+                this.processResponses();
+            });
+    }
 
-                // see if we've now completed and should auto-respond; not factored out for perf
-                if (this.pendingReqs == 0 && this.responses.length == 0 && this.hasResponded == false) {
-                    this.succ();
-                }
-            }
-        });
-};
+    /**
+     * Drains the response queue.
+     * Iterates via recursion so as not to improperly ignore blocking calls spawned in a loop.
+     */
+    processResponses() {
 
-/**
- * Send a blocking message.
- *
- * @param address
- * @param args
- * @param succ
- * @param fail
- */
-__.prototype.sendAndBlock = function (address, args, succ, fail) {
+        if (this.blocked || this.responses.length == 0) {
+            return;
+        }
 
-    // enable queuing of responses
-    this.blocked = true;
+        // pull off a response and run it
+        this.responses.shift().call();
 
-    // we need to process the response queue here because this may be our
-    // last opportunity to do so
-    address(args,
+        // see if we've now completed and should auto-respond; not factored out for perf
+        if (this.pendingReqs == 0 && this.responses.length == 0 && this.hasResponded == false) {
+            this.succ();
+        }
 
-        (resp) => {
-
-            this.blocked = false;
-            if (succ) succ(resp);
+        // iterate and hopefully don't break the stack...
+        if (this.responses.length > 0) {
             this.processResponses();
-        },
-
-        (resp) => {
-
-            this.blocked = false;
-            if (fail) fail(resp);
-            this.processResponses();
-        });
-};
-
-/**
- * Drains the response queue.
- * Iterates via recursion so as not to improperly ignore blocking calls spawned in a loop.
- */
-__.prototype.processResponses = function () {
-
-    if (this.blocked || this.responses.length == 0) {
-        return;
+        }
     }
 
-    // pull off a response and run it
-    this.responses.shift().call();
+    /**
+     * Signal success to caller.
+     *
+     * @param resp
+     */
+    succ(resp) {
 
-    // see if we've now completed and should auto-respond; not factored out for perf
-    if (this.pendingReqs == 0 && this.responses.length == 0 && this.hasResponded == false) {
-        this.succ();
+        // prevent multiple responses
+        if (this.hasResponded) {
+            return;
+        }
+
+        this.hasResponded = true;
+        this.successCont(resp);
     }
 
-    // iterate and hopefully don't break the stack...
-    if (this.responses.length > 0) {
-        this.processResponses();
-    }
-};
+    /**
+     * Signal failure to caller.
+     *
+     * @param resp
+     */
+    fail(resp) {
 
-/**
- * Signal success to caller.
- *
- * @param resp
- */
-__.prototype.succ = function (resp) {
+        // prevent multiple responses
+        if (this.hasResponded) {
+            return;
+        }
 
-    // prevent multiple responses
-    if (this.hasResponded) {
-        return;
+        this.hasResponded = true;
+        this.failureCont(resp);
     }
 
-    this.hasResponded = true;
-    this.successCont(resp);
-};
+    /**
+     * On exit from a procedure function we call this to see if we need to auto-reply.
+     *
+     * This would be a perfect job for a scope guard destructor.
+     *
+     * todo rename this checkStatus? autoReply? better yet, inline it
+     */
+    autoReply() {
 
-/**
- * Signal failure to caller.
- *
- * @param resp
- */
-__.prototype.fail = function (resp) {
+        // make sure there are zero outstanding requests
 
-    // prevent multiple responses
-    if (this.hasResponded) {
-        return;
+        if (this.blocked == false && this.pendingReqs == 0 && this.responses == 0 && this.hasResponded == false) {
+            this.succ();
+        }
     }
 
-    this.hasResponded = true;
-    this.failureCont(resp);
-};
+    /**
+     * Attaches an external async call to this task and returns a wrapped callback to take care
+     * of the bookkeeping.
+     *
+     * Produces a callback that handles the bookkeeping.
+     * Weaves a request into this task.
+     *
+     * todo how does this interact with blocking/non-blocking calls/auto-reply?
+     *
+     * todo rename attach? await? waitFor? register? callAndWait? weave? insert?
+     *
+     * @param cb    callback
+     * @returns {function()}
+     */
+    doAsync(cb) {
 
+        this.pendingReqs++;
 
-/**
- * On exit from a procedure function we call this to see if we need to auto-reply.
- *
- * This would be a perfect job for a scope guard destructor.
- *
- * todo rename this checkStatus? autoReply? better yet, inline it
- */
-__.prototype.autoReply = function () {
+        var t = this;
 
-    // make sure there are zero outstanding requests
-
-    if (this.blocked == false && this.pendingReqs == 0 && this.responses == 0 && this.hasResponded == false) {
-        this.succ();
+        return function () {
+            t.pendingRequests--;
+            cb();
+        };
     }
-};
-
-/**
- * Attaches an external async call to this task and returns a wrapped callback to take care
- * of the bookkeeping.
- *
- * Produces a callback that handles the bookkeeping.
- * Weaves a request into this task.
- *
- * todo how does this interact with blocking/non-blocking calls/auto-reply?
- *
- * todo rename attach? await? waitFor? register? callAndWait? weave? insert?
- *
- * @param cb    callback
- * @returns {function()}
- */
-__.prototype.doAsync = function (cb) {
-
-    this.pendingReqs++;
-
-    var t = this;
-
-    return function () {
-        t.pendingRequests--;
-        cb();
-    };
-};
 
 
-__.sendRootRequest = function (service, args, succ, fail) {
+    static sendRootRequest (service, args, succ, fail) {
 
-    service(args, succ, fail);
-};
+        service(args, succ, fail);
+    }
+}
 
-module.exports = __;
+
+module.exports = Task;
