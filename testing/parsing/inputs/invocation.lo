@@ -5,25 +5,22 @@ test is () {
      */
 
 
-    // sync with no handlers (one-way message)
+    // sync with no handlers (waits for response but ignores it, is that semantically useful?)
 
-    foo <-;        // how it's supposed to work in Lo
-    foo.bar <-;
-
-    // todo catch instances like the below and WARN
-    //foo.bar(x);   // only supported for backwards-compatibility with programmers; should emit warning
+    foo;
+    foo.bar;
 
     // with params
     foo <- 18;
 
     // sync with fail handler only
 
-    foo <- ~> (error) {
+    foo ~> (error) {
         substitute "ok";
     }
 
     // yields operator
-    foo <- => bar ~> (err) {
+    foo => bar ~> (err) {
         fail "d'oh!";
     }
 
@@ -36,7 +33,7 @@ test is () {
     }
 
     // async with no handlers
-    @foo <-;
+    @foo;
 
     async sessionStore.getByID <- sessionID;
 

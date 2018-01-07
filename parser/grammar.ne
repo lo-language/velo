@@ -134,9 +134,9 @@ statement
                                                                         return new Lo.arrayPush(
                                                                             d[1][0].value == '<+' ? 'push-back' : 'push-front', d[0], d[2]);
                                                                     } %}
-    |   async:? expr "<-" exprList:? handlers                       {% function (d) {
-                                                                        return new Lo.requestStmt(d[1], d[3] ? d[3] : [],
-                                                                            d[4][0], d[4][1], d[0] == null);
+    |   async:? expr ("<-" exprList):? handlers                       {% function (d) {
+                                                                        return new Lo.requestStmt(d[1], d[2] ? d[2][1] : [],
+                                                                            d[3][0], d[3][1], d[0] == null);
                                                                     } %}
     #|   async:? expr exprList:? handlers                            {% function (d) {
     #                                                                    return new Lo.requestStmt(d[1], d[2] || [],

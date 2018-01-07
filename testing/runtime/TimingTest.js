@@ -47,7 +47,7 @@ module.exports['basics'] = {
                     'sayHello is () {\n' +
                     '    reply "hullo!";\n};\n' +
                     'main is () {\n' +
-                    '    sayHello <-;\n};\n'));
+                    '    sayHello;\n};\n'));
 
         program.run().then(function (result) {
             test.deepEqual(result, undefined);

@@ -5,6 +5,8 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
+ * The machine does not isolate us from the great problems of nature but
+ * plunges us more deeply into them.
  =============================================================================*/
 
 /**
@@ -20,15 +22,13 @@
 "use strict";
 
 const LoModule = require('./LoModule');
-const libs = require('./libs');
 const EventEmitter = require('events').EventEmitter;
-const path = require('path');
-const fs = require('fs');
 
 // Lo runtime components
 
 const Task = require('./runtime/Task');
 const Util = require('./runtime/Util');
+const LibModule = require('./libs/LibModule');
 const JsModule = require('./libs/JsModule');
 
 
@@ -44,7 +44,7 @@ class Program extends EventEmitter {
         super();
 
         if (typeof rootModule == 'string') {
-            this.rootModule = new LoModule(rootModule);
+            this.rootModule = new LoModule(rootModule, null, sourceDir);
         }
         else {
             this.rootModule = rootModule;
@@ -100,6 +100,8 @@ class Program extends EventEmitter {
             Object.keys(this.modules).forEach(modRef => {
 
                 var module = this.modules[modRef];
+
+                this.emit('DEBUG', 'Loading ' + modRef);
 
                 var moduleJsObj = module.load(this.sandbox);
 
@@ -183,60 +185,29 @@ class Program extends EventEmitter {
      */
     acquire (module) {
 
-        return new Promise((resolve, reject) => {
+        // check our cache first
+        // see if it's an object because we use a bool as a flag in the same map
 
-            // check our cache first
-            if (typeof this.modules[module.ref] === 'object') {
-                resolve(this.modules[module.ref]);
-                this.emit('DEBUG', 'Got from cache ' + module.name);
-                return;
-            }
+        if (typeof this.modules[module.ref] === 'object') {
+            this.emit('DEBUG', 'Got from cache ' + module.name);
+            return Promise.resolve(this.modules[module.ref]);
+        }
 
-            this.emit('INFO', 'Acquiring module ' + module.name);
+        this.emit('INFO', 'Acquiring module ' + module.name);
+        this.modules[module.ref] = true;        // flag that we've seen this module and are acquiring it
 
-            // detect built-in libs
+        return module.acquire().then(module => {
 
-            if (module.ns == 'JS') {
+            // cache the module
+            this.modules[module.ref] = module;
 
-                // what if we instead *injected* the module content into the module??
-                // have a JS loader that does that
-
-                var jsModule = new JsModule(module.name);
-                this.modules[jsModule.ref] = jsModule;
-                resolve(jsModule);
-                return;
-            }
-
-            if (module.ns == 'Lo') {
-
-                var libModule = new libs[module.name];
-                this.modules[libModule.ref] = libModule;
-                resolve(libModule);
-                return;
-            }
-
-            // just look for the file locally for now
-
-            var fileName = path.basename(module.name, '.lo') + '.lo';
-
-            fs.readFile(this.sourceDir + '/' + fileName, 'utf8', (err, source) => {
-
-                if (err) {
-                    reject("Failed to locate module " + module.name + ' in ' + this.sourceDir);
-                    return;
-                }
-
-                // stash the module
-                this.modules[module.ref] = module;
-
-                // parse that bad boy so we can grab its deps
-                module.parse(source);
-
-                // acquire its dependencies
-                this.acquireDeps(module).then(() => {
-                    resolve(module);
-                }).catch(reject);   // pass through to our promise
+            // acquire its dependencies
+            return this.acquireDeps(module).then(() => {
+                return module;
             });
+        }).catch(err => {
+            this.emit('ERROR', err.message);
+            throw err;
         });
     }
 
@@ -251,16 +222,34 @@ class Program extends EventEmitter {
 
         return Promise.all(module.getDeps().map(dep => {
 
+            var ref = dep.ns + '::' + dep.name;
+
             // don't acquire what's already acquired or pending
-            if (dep.ref in this.modules) {
+            if (ref in this.modules) {
                 return;
             }
 
             // put a placeholder in the modules map to record that we've seen this module;
             // this allows dependency cycles without repeated acquisition
-            this.modules[dep.ref] = true;
 
-            return this.acquire(dep);
+            this.modules[ref] = true;
+
+            // map the dependency ref onto the right kind of module
+
+            switch (dep.ns) {
+
+                case 'Lo':
+                    return this.acquire(new LibModule(dep.name, dep.ns));
+                    break;
+
+                case 'JS':
+                    return this.acquire(new JsModule(dep.name, dep.ns));
+                    break;
+
+                default:
+                    return this.acquire(new LoModule(dep.name, dep.ns, this.sourceDir));
+                    break;
+            }
         }));
     }
 }

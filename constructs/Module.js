@@ -5,8 +5,6 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
- * The machine does not isolate us from the great problems of nature but
- * plunges us more deeply into them.
  =============================================================================*/
 
 "use strict";

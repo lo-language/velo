@@ -136,11 +136,12 @@ var grammar = {
         } },
     {"name": "statement$ebnf$1", "symbols": ["async"], "postprocess": id},
     {"name": "statement$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "statement$ebnf$2", "symbols": ["exprList"], "postprocess": id},
+    {"name": "statement$ebnf$2$subexpression$1", "symbols": [{"literal":"<-"}, "exprList"]},
+    {"name": "statement$ebnf$2", "symbols": ["statement$ebnf$2$subexpression$1"], "postprocess": id},
     {"name": "statement$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "statement", "symbols": ["statement$ebnf$1", "expr", {"literal":"<-"}, "statement$ebnf$2", "handlers"], "postprocess":  function (d) {
-            return new Lo.requestStmt(d[1], d[3] ? d[3] : [],
-                d[4][0], d[4][1], d[0] == null);
+    {"name": "statement", "symbols": ["statement$ebnf$1", "expr", "statement$ebnf$2", "handlers"], "postprocess":  function (d) {
+            return new Lo.requestStmt(d[1], d[2] ? d[2][1] : [],
+                d[3][0], d[3][1], d[0] == null);
         } },
     {"name": "statement", "symbols": [{"literal":"while"}, "expr", "block"], "postprocess":  function (d) {
         return new Lo.while(d[1], d[2]).setSourceLoc(d[0]);} },

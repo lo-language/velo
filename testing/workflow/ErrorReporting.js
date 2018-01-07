@@ -16,15 +16,37 @@
 const Program = require('../../Program');
 const LoModule = require('../../LoModule');
 
-module.exports['undefined identifier'] = {
+module.exports['parse errors'] = {
 
-    "success": function (test) {
+    "message syntax": function (test) {
 
-        test.expect(2);
+        test.expect(1);
+
+        var program = new Program(new LoModule('main').setSource(
+            'main is () {\n' +
+            '    sayHello <-;\n};\n'));
+
+        program.on('ERROR', err => {
+
+            test.equal(err, 'invalid syntax at line 2 col 16:\n\n      sayHello <-;' +
+                '\n                 ^\nUnexpected semi token: ";"\n');
+        });
+
+        program.compile().catch(() => {
+            test.done();
+        });
+    }
+};
+
+module.exports['compile errors'] = {
+
+    "unbound id": function (test) {
+
+        test.expect(3);
 
         var program = new Program(new LoModule('main').parse(
             'main is () {\n' +
-            '    sayHello <-;\n};\n'
+            '    sayHello;\n};\n'
         ));
 
         program.on('ERROR', (node, error) => {
@@ -32,12 +54,9 @@ module.exports['undefined identifier'] = {
             test.equal(error, 'identifier "sayHello" used but not bound in this context');
         });
 
-        program.compile().then(
-            function () {
-                test.ok(false);
-                test.done();
-            },
+        program.compile().catch(
             function (err) {
+                test.equal(err.message, 'compilation failed');
                 test.done();
             }
         );

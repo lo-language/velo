@@ -24,7 +24,7 @@ module.exports["acquire"] = {
 
         var program = new Program('rootModule');
 
-        program.acquire('missing').catch(function (err) {
+        program.acquire(program.rootModule).catch(function (err) {
             test.done();
         });
     },
@@ -34,7 +34,7 @@ module.exports["acquire"] = {
         var program = new Program('rootModule', __dirname + '/../programs');
 
         var path = 'fail.lo';
-        var module = new LoModule(path);
+        var module = new LoModule(path, null, __dirname + '/../programs');
 
         program.acquire(module).then(function (module) {
 

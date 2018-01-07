@@ -25,6 +25,19 @@ class JsModule extends LibModule {
     }
 
     /**
+     * no-op
+     */
+    acquire () {
+
+        return Promise.resolve(this);
+    }
+
+    getDeps () {
+
+        return [];
+    }
+
+    /**
      * @param sandbox
      */
     load (sandbox) {

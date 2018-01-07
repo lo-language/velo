@@ -216,6 +216,8 @@ module.exports['helloWorld'] = {
 
         this.program.run([[], system, {}]).then(function (result) {
             test.done();
+        }).catch(err => {
+            console.log(err);
         });
     }
 };

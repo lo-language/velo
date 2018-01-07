@@ -18,6 +18,8 @@
 "use strict";
 
 const Parser = require('./parser/Parser');
+const path = require('path');
+const fs = require('fs');
 const vm = require('vm');
 
 
@@ -29,8 +31,9 @@ class LoModule {
      *
      * @param name
      * @param ns
+     * @param sourceDir    source root directory
      */
-    constructor (name, ns) {
+    constructor (name, ns, sourceDir) {
 
         this.name = name;
         this.ns = ns || '__local';
@@ -38,11 +41,18 @@ class LoModule {
         // create the canonical reference
         this.ref = this.ns + '::' + name;
 
+        this.sourceDir = sourceDir;
         this.source = null;
         this.ast = null;
         this.deps = [];
         this.js = null;
         this.loaded = null;
+    }
+
+    setSource (source) {
+
+        this.source = source;
+        return this;
     }
 
     /**
@@ -53,16 +63,19 @@ class LoModule {
     parse (source) {
 
         // hang onto the source
-        this.source = source;
+        if (this.source == null) {
+            this.source = source;
+        }
 
-        // todo catch parser errors here and report them
-
-        this.ast = new Parser().parse(source);
+        this.ast = new Parser().parse(this.source);
 
         // extract the deps from the AST
 
         this.deps = this.ast.deps.map(constant => {
-            return new LoModule(constant.value.id, constant.value.namespace);
+            return {
+                ns: constant.value.namespace || '__local',
+                name: constant.value.id
+            };
         });
 
         return this;
@@ -76,17 +89,6 @@ class LoModule {
     compile (errorListener) {
 
         this.js = this.ast.compile(errorListener).renderJs();
-        return this;
-    }
-
-    /**
-     * Sets the Lo AST for this module with a fluent interface
-     *
-     * @param moduleAst
-     */
-    setAST (moduleAst) {
-
-        this.ast = moduleAst;
         return this;
     }
 
@@ -108,6 +110,38 @@ class LoModule {
     setJs (js) {
 
         this.js = js;
+    }
+
+    /**
+     * Acquires the source of this module and parses it so its dependencies
+     * are visible (but does nothing with its dependencies).
+     */
+    acquire () {
+
+        return new Promise((resolve, reject) => {
+
+            if (this.source) {
+                resolve(this.source);
+                return;
+            }
+
+            var fileName = path.basename(this.name, '.lo') + '.lo';
+
+            fs.readFile(this.sourceDir + '/' + fileName, 'utf8', (err, source) => {
+
+                if (err) {
+                    reject("Failed to locate module " + this.name + ' in ' + this.sourceDir);
+                    return;
+                }
+
+                this.setSource(source);
+                resolve();
+            });
+        }).then(() => {
+
+            // parse that bad boy so its dependencies are visible
+            return this.parse();
+        });
     }
 
     /**
