@@ -11,66 +11,71 @@
 
 const JS = require('../codegen/JsPrimitives');
 const Number = require('./Number');
+const LoConstruct = require('./LoConstruct');
 
-// todo break this up into bool, number, string
 
-/**
- * A subscript expression
- *
- * @param array
- * @param index
- */
-var __ = function (array, index) {
+class Subscript extends LoConstruct {
 
-    this.array = array;
-    this.index = index;
-};
+    /**
+     * A subscript expression
+     *
+     * @param array
+     * @param index
+     */
+    constructor(array, index) {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+        super();
 
-    return {
-        type: 'subscript',
-        list: this.array.getAst(),
-        index: this.index.getAst()
-    };
-};
-
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
-
-    return [
-        'subscript',
-        this.array.getTree(),
-        this.index.getTree()
-    ];
-};
-
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
-
-    var array = this.array.compile(sourceCtx, targetCtx);
-    var index = this.index.compile(sourceCtx, targetCtx);
-
-    // support negative subscripts if the subscript is a literal
-    // to do this more generally we'd have to catch it at runtime, probably with splice
-    if (this.index instanceof Number && parseInt(this.index.getValue()) < 0) {
-        index = JS.add(JS.select(array, 'length'), index);
+        this.array = array;
+        this.index = index;
     }
 
-    // todo - what if the list expression is a request or somesuch? can't resolve it twice
-    // wrap it in a helper function?
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-    return JS.subscript(array, index);
-};
+        return {
+            type: 'subscript',
+            list: this.array.getAst(),
+            index: this.index.getAst()
+        };
+    }
 
-module.exports = __;
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
+
+        return [
+            'subscript',
+            this.array.getTree(),
+            this.index.getTree()
+        ];
+    }
+
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
+
+        var array = this.array.compile(sourceCtx, targetCtx);
+        var index = this.index.compile(sourceCtx, targetCtx);
+
+        // support negative subscripts if the subscript is a literal
+        // to do this more generally we'd have to catch it at runtime, probably with splice
+        if (this.index instanceof Number && parseInt(this.index.getValue()) < 0) {
+            index = JS.add(JS.select(array, 'length'), index);
+        }
+
+        // todo - what if the list expression is a request or somesuch? can't resolve it twice
+        // wrap it in a helper function?
+
+        return JS.subscript(array, index);
+    }
+}
+
+module.exports = Subscript;

@@ -15,62 +15,67 @@
 
 const JS = require('../codegen/JsPrimitives');
 const Identifier = require('./Identifier');
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * An array push statement.
- *
- * @param op
- * @param left      expr
- * @param right     expr
- */
-var __ = function (op, left, right) {
+class ArrayPush extends LoConstruct {
 
-    this.op = op;
-    this.left = left;
-    this.right = right;
-};
+    /**
+     * An array push statement.
+     *
+     * @param op
+     * @param left      expr
+     * @param right     expr
+     */
+    constructor(op, left, right) {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
-
-    return {
-        type: this.op,
-        left: this.left.getAst(),
-        right: this.right.getAst()
-    };
-};
-
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
-
-    return [this.op, this.left.getTree(), this.right.getTree()];
-};
-
-
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
-
-    var left = this.left.compile(sourceCtx, targetCtx);
-    var right = this.right.compile(sourceCtx, targetCtx);
-
-    // todo probably want to add some runtime checks
-
-    if (this.op == 'push-front') {
-        return JS.exprStmt(JS.fnCall(JS.select(right, 'unshift'), [left]));
+        super();
+        this.op = op;
+        this.left = left;
+        this.right = right;
     }
-    else {
-        return JS.exprStmt(JS.fnCall(JS.select(left, 'push'), [right]));
-    }
-};
 
-module.exports = __;
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
+
+        return {
+            type: this.op,
+            left: this.left.getAst(),
+            right: this.right.getAst()
+        };
+    }
+
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
+
+        return [this.op, this.left.getTree(), this.right.getTree()];
+    }
+
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
+
+        var left = this.left.compile(sourceCtx, targetCtx);
+        var right = this.right.compile(sourceCtx, targetCtx);
+
+        // todo probably want to add some runtime checks
+
+        if (this.op == 'push-front') {
+            return JS.exprStmt(JS.fnCall(JS.select(right, 'unshift'), [left]));
+        }
+        else {
+            return JS.exprStmt(JS.fnCall(JS.select(left, 'push'), [right]));
+        }
+    }
+}
+
+
+module.exports = ArrayPush;

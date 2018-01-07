@@ -16,83 +16,88 @@
 const JS = require('../codegen/JsPrimitives');
 const Identifier = require('./Identifier');
 const CFNode = require('../compiler/CFNode');
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * An assignment statement.
- *
- * @param left      expr
- * @param right     expr
- */
-var __ = function (left, right) {
+class Assignment extends LoConstruct {
 
-    this.left = left;
-    this.right = right;
+    /**
+     * An assignment statement.
+     *
+     * @param left      expr
+     * @param right     expr
+     */
+    constructor(left, right) {
 
-    // todo now this is an ugly hack, right here
-    if (typeof left.setLvalue == 'function') {
-        left.setLvalue();
-    }
-};
+        super();
+        this.left = left;
+        this.right = right;
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
-
-    return {
-        type: 'assign',
-        left: this.left.getAst(),
-        right: this.right.getAst()
-    };
-};
-
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
-
-    return [
-        'set!',
-        this.left.getTree(),
-        this.right.getTree()
-    ];
-};
-
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param last
- */
-__.prototype.compile = function (sourceCtx, last) {
-
-    var left = this.left.compile(sourceCtx, last);
-    var right = this.right.compile(sourceCtx, last);
-
-    // todo this implies block-level scoping
-
-    // if the LHS is a bare ID...
-    if (this.left instanceof Identifier) {
-
-        var name = this.left.name;
-
-        // validate we're not assigning to a constant
-        if (sourceCtx.isConstant(name)) {
-            sourceCtx.attachError(this.left, "can't assign to a constant (" + name + ")");
-        }
-
-        // declare if a new var
-        if (sourceCtx.has(name) == false) {
-            sourceCtx.declare(name);
-            // targetCtx.declareVar(name); // todo - get JS vars from target ctx, not source ctx
+        // todo now this is an ugly hack, right here
+        if (typeof left.setLvalue == 'function') {
+            left.setLvalue();
         }
     }
 
-    return new CFNode(JS.exprStmt(JS.assign(left, right)));
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-    // this was genius
-    // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP
-};
+        return {
+            type: 'assign',
+            left: this.left.getAst(),
+            right: this.right.getAst()
+        };
+    }
 
-module.exports = __;
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
+
+        return [
+            'set!',
+            this.left.getTree(),
+            this.right.getTree()
+        ];
+    }
+
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param last
+     */
+    compile(sourceCtx, last) {
+
+        var left = this.left.compile(sourceCtx, last);
+        var right = this.right.compile(sourceCtx, last);
+
+        // todo this implies block-level scoping
+
+        // if the LHS is a bare ID...
+        if (this.left instanceof Identifier) {
+
+            var name = this.left.name;
+
+            // validate we're not assigning to a constant
+            if (sourceCtx.isConstant(name)) {
+                sourceCtx.attachError(this.left, "can't assign to a constant (" + name + ")");
+            }
+
+            // declare if a new var
+            if (sourceCtx.has(name) == false) {
+                sourceCtx.declare(name);
+                // targetCtx.declareVar(name); // todo - get JS vars from target ctx, not source ctx
+            }
+        }
+
+        return new CFNode(JS.exprStmt(JS.assign(left, right)));
+
+        // this was genius
+        // above comment inserted by my slightly tipsy wife regarding definitely non-genius code later removed - SP
+    }
+}
+
+module.exports = Assignment;

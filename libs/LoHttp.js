@@ -9,34 +9,22 @@
 
 "use strict";
 
-const Task = require('../runtime/Task');
-const http = require('http');
+const LibModule = require('./LibModule');
 
-/**
- *
- */
-__.prototype.getModules = function () {
 
-    // todo - have a factory to create these wrapped methods
+class LoHttp extends LibModule {
 
-    return {
+    constructor () {
+        super('String', 'Lo');
+    }
 
-        String: {
 
-            // params: string, delimiter
-            // returns: array
+    /**
+     * @param sandbox
+     */
+    load (sandbox) {
 
-            split: function (args, succ, fail) {
-
-                // we want to return an array of one element, which is an array of strings
-                succ([String(args[0]).split("\n")]);
-            }
-        },
-
-        HTTP: {
-
-            // params: string, delimiter
-            // returns: array
+        return {
 
             createServer: function (args, succ, fail) {
 
@@ -73,10 +61,9 @@ __.prototype.getModules = function () {
 
                 task.succ([result]);
             }
-        }
-    };
-};
+        };
+    }
+}
 
 
-module.exports = __;
-
+module.exports = LoHttp;

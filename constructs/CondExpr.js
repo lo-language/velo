@@ -16,70 +16,75 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * A conditional expression
- *
- * @param predicate
- * @param consequent
- * @param alternate
- */
-var __ = function (predicate, consequent, alternate) {
+class CondExpr extends LoConstruct {
 
-    this.predicate = predicate;
-    this.consequent = consequent;
-    this.alternate = alternate;
-};
+    /**
+     * A conditional expression
+     *
+     * @param predicate
+     * @param consequent
+     * @param alternate
+     */
+    constructor(predicate, consequent, alternate) {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
-
-    var result = {
-        type: 'cond-expr',
-        predicate: this.predicate.getAst(),
-        trueVal: this.consequent.getAst()
-    };
-
-    if (this.alternate) {
-        result.falseVal = this.alternate.getAst();
+        super();
+        this.predicate = predicate;
+        this.consequent = consequent;
+        this.alternate = alternate;
     }
 
-    return result;
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
+        var result = {
+            type: 'cond-expr',
+            predicate: this.predicate.getAst(),
+            trueVal: this.consequent.getAst()
+        };
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+        if (this.alternate) {
+            result.falseVal = this.alternate.getAst();
+        }
 
-    var result = ['cond',
-        this.predicate.getTree(),
-        this.consequent.getTree(),
-    ];
-
-    if (this.alternate) {
-        result.push(this.alternate.getTree());
+        return result;
     }
 
-    return result;
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+        var result = ['cond',
+            this.predicate.getTree(),
+            this.consequent.getTree(),
+        ];
 
-    return JS.condExpr(
-        this.predicate.compile(sourceCtx, targetCtx),
-        this.consequent.compile(sourceCtx, targetCtx),
-        this.alternate.compile(sourceCtx, targetCtx));
-};
+        if (this.alternate) {
+            result.push(this.alternate.getTree());
+        }
 
-module.exports = __;
+        return result;
+    }
+
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
+
+        return JS.condExpr(
+            this.predicate.compile(sourceCtx, targetCtx),
+            this.consequent.compile(sourceCtx, targetCtx),
+            this.alternate.compile(sourceCtx, targetCtx));
+    }
+}
+
+
+module.exports = CondExpr;

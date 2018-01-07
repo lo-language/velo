@@ -10,57 +10,62 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * A set membership test operator expression
- *
- * @param set
- * @param member
- */
-var __ = function (set, member) {
+class Membership extends LoConstruct {
 
-    this.set = set;
-    this.member = member;
-};
+    /**
+     * A set membership test operator expression
+     *
+     * @param set
+     * @param member
+     */
+    constructor(set, member) {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+        super();
+        this.set = set;
+        this.member = member;
+    }
 
-    return {
-        type: 'testMembership',
-        set: this.set.getAst(),
-        member: this.member.getAst()
-    };
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+        return {
+            type: 'testMembership',
+            set: this.set.getAst(),
+            member: this.member.getAst()
+        };
+    }
 
-    return [
-        'membership',
-        this.set.getTree(),
-        this.member.getTree()
-    ];
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+        return [
+            'membership',
+            this.set.getTree(),
+            this.member.getTree()
+        ];
+    }
 
-    return JS.utilCall(
-        'in', [
-            this.member.compile(sourceCtx, targetCtx),
-            this.set.compile(sourceCtx, targetCtx)
-        ]);
-};
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
 
-module.exports = __;
+        return JS.utilCall(
+            'in', [
+                this.member.compile(sourceCtx, targetCtx),
+                this.set.compile(sourceCtx, targetCtx)
+            ]);
+    }
+}
+
+module.exports = Membership;

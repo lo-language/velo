@@ -16,102 +16,107 @@ const LoContext = require('../compiler/LoContext');
 const StmtList = require('./StmtList');
 const CFNode = require('../compiler/CFNode');
 const JsWriter = require('../codegen/JsWriter');
-const vm = require('vm');
-
-/**
- * A module definition; the root of an AST.
- */
-var __ = function (defs, deps) {
-
-    this.deps = [];
-    this.defs = defs;
-    this.deps = deps || [];
-    this.exports = {};
-    this.name = 'UNK';
-    this.path = 'UNK';
-};
-
-/**
- * Sets the name of this module
- */
-__.prototype.setInfo = function (id, path) {
-
-    this.name = id;
-    this.path = path;
-};
-
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
-
-    return this.deps.length > 0 ? {
-        type: 'module',
-        deps: this.deps.map(def => def.getAst()),
-        definitions: this.defs.map(def => def.getAst()),
-    } : {
-        type: 'module',
-        definitions: this.defs.map(def => def.getAst()),
-    };
-};
-
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
-
-    return ['module'].concat(this.defs.map(def => def.getTree()));
-};
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * Compiles this module to JS.
- *
- * Compiling a module discovers its dependencies.
- */
-__.prototype.compile = function (errorListener) {
+class Module extends LoConstruct {
 
-    var loContext = new LoContext();
+    /**
+     * A module definition; the root of an AST.
+     */
+    constructor(defs, deps) {
 
-    loContext.setErrorListener(errorListener);
+        super();
 
-    // todo another compensating hack because of compiling tail-first
-    // compile all the deps right here
-
-    this.deps.forEach(function (dep) {
-
-        // ignore the return value, which is just a no-op
-        dep.compile(loContext);
-    });
-
-    var t = this;
-
-    var firstStmt = new CFNode();
-    var lastStmt = firstStmt;
-
-    this.defs.forEach(def => {
-        lastStmt = lastStmt.setNext(def.compile(loContext));
-    });
-
-    // bail if we had errors
-    if (loContext.hasErrors()) {
-        throw new Error("compilation failed");
+        this.deps = [];
+        this.defs = defs;
+        this.deps = deps || [];
+        this.exports = {};
+        this.name = 'UNK';
+        this.path = 'UNK';
     }
 
-    var exports = loContext.getConstants().map(c => {
-        return [JS.string(c.name), JS.ID('$' + c.name)];
-    });
+    /**
+     * Sets the name of this module
+     */
+    setInfo(id, path) {
 
-    // try a return here, see if it works
-    lastStmt = lastStmt.setNext(new CFNode(
-        JS.return(
-            JS.objLiteral(exports)
-        )
-    ));
+        this.name = id;
+        this.path = path;
+    }
 
-    // all other compile()s return IR; this returns JS? NASTY
-    return new JsWriter().generateJs(firstStmt);
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
+
+        return this.deps.length > 0 ? {
+            type: 'module',
+            deps: this.deps.map(def => def.getAst()),
+            definitions: this.defs.map(def => def.getAst()),
+        } : {
+            type: 'module',
+            definitions: this.defs.map(def => def.getAst()),
+        };
+    }
+
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
+
+        return ['module'].concat(this.defs.map(def => def.getTree()));
+    }
+
+    /**
+     * Compiles this module to JS.
+     *
+     * Compiling a module discovers its dependencies.
+     */
+    compile(errorListener) {
+
+        var loContext = new LoContext();
+
+        loContext.setErrorListener(errorListener);
+
+        // todo another compensating hack because of compiling tail-first
+        // compile all the deps right here
+
+        this.deps.forEach(function (dep) {
+
+            // ignore the return value, which is just a no-op
+            dep.compile(loContext);
+        });
+
+        var t = this;
+
+        var firstStmt = new CFNode();
+        var lastStmt = firstStmt;
+
+        this.defs.forEach(def => {
+            lastStmt = lastStmt.setNext(def.compile(loContext));
+        });
+
+        // bail if we had errors
+        if (loContext.hasErrors()) {
+            throw new Error("compilation failed");
+        }
+
+        var exports = loContext.getConstants().map(c => {
+            return [JS.string(c.name), JS.ID('$' + c.name)];
+        });
+
+        // try a return here, see if it works
+        lastStmt = lastStmt.setNext(new CFNode(
+            JS.return(
+                JS.objLiteral(exports)
+            )
+        ));
+
+        // all other compile()s return IR; this returns JS? NASTY
+        return new JsWriter().generateJs(firstStmt);
+    }
+}
 
 
-module.exports = __;
+module.exports = Module;

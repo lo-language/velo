@@ -15,8 +15,6 @@
 
 "use strict";
 
-const JS = require('../codegen/JsPrimitives');
-
 
 class LoConstruct {
 

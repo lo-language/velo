@@ -13,66 +13,72 @@
 
 const JS = require('../codegen/JsPrimitives');
 const ReqExprNode = require('../compiler/ReqExprNode');
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * A "function call" (request) expression
- *
- * @param address
- * @param args
- * @param block
- */
-var __ = function (address, args, block) {
+class RequestExpr extends LoConstruct {
 
-    this.address = address;
-    this.args = args;
-    this.block = block || false;
-};
+    /**
+     * A "function call" (request) expression
+     *
+     * @param address
+     * @param args
+     * @param block
+     */
+    constructor(address, args, block) {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+        super();
 
-    return {
-        type: 'request_expr',
-        address: this.address.getAst(),
-        args: this.args.map(arg => arg.getAst()),
-        blocking: this.block
-    };
-};
+        this.address = address;
+        this.args = args;
+        this.block = block || false;
+    }
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-    return [
-        'apply',
-        this.address.getTree(),
-        this.args.map(arg => arg.getTree()),
-        this.block
-    ];
-};
+        return {
+            type: 'request_expr',
+            address: this.address.getAst(),
+            args: this.args.map(arg => arg.getAst()),
+            blocking: this.block
+        };
+    }
 
-/**
- * Pushes a wrapper into the context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-    var address = this.address.compile(sourceCtx, targetCtx);
+        return [
+            'apply',
+            this.address.getTree(),
+            this.args.map(arg => arg.getTree()),
+            this.block
+        ];
+    }
 
-    var args = this.args.map(arg => {
-        return arg.compile(sourceCtx, targetCtx);
-    });
+    /**
+     * Pushes a wrapper into the context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
 
-    var label = sourceCtx.pushRequest(address, args);
+        var address = this.address.compile(sourceCtx, targetCtx);
 
-    // gets a temp var and returns it
-    return JS.subscript(JS.ID(label), JS.num('0'));
-};
+        var args = this.args.map(arg => {
+            return arg.compile(sourceCtx, targetCtx);
+        });
 
-module.exports = __;
+        var label = sourceCtx.pushRequest(address, args);
+
+        // gets a temp var and returns it
+        return JS.subscript(JS.ID(label), JS.num('0'));
+    }
+}
+
+module.exports = RequestExpr;

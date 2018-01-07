@@ -38,7 +38,7 @@ module.exports = {
     response: require("./Response"),
     scan: require("./Scan"),
     select: require("./Select"),
-    setLiteral: require("./Set"),
+    setLiteral: require("./SetLiteral"),
     slice: require("./Slice"),
     stmtList: require("./StmtList"),
     string: require("./String"),

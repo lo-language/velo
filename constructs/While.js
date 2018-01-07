@@ -15,6 +15,7 @@ const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
 const StmtContext = require('../compiler/StmtContext');
 
+
 class While extends LoConstruct {
 
     /**

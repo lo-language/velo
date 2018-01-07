@@ -10,74 +10,80 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * A subscript expression
- *
- * @param array
- * @param start
- * @param end
- */
-var __ = function (array, start, end) {
+class Slice extends LoConstruct {
 
-    this.array = array;
-    this.start = start;
-    this.end = end;
-};
+    /**
+     * A subscript expression
+     *
+     * @param array
+     * @param start
+     * @param end
+     */
+    constructor(array, start, end) {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+        super();
 
-    var res = {
-        type: 'slice',
-        list: this.array.getAst()
-    };
-
-    if (this.start) {
-        res.start = this.start.getAst();
+        this.array = array;
+        this.start = start;
+        this.end = end;
     }
 
-    if (this.end) {
-        res.end = this.end.getAst();
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
+
+        var res = {
+            type: 'slice',
+            list: this.array.getAst()
+        };
+
+        if (this.start) {
+            res.start = this.start.getAst();
+        }
+
+        if (this.end) {
+            res.end = this.end.getAst();
+        }
+
+        return res;
     }
 
-    return res;
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+        return [
+            'slice',
+            this.array.getTree(),
+            this.start ? this.start.getTree() : null,
+            this.end ? this.end.getTree() : null
+        ];
+    }
 
-    return [
-        'slice',
-        this.array.getTree(),
-        this.start ? this.start.getTree() : null,
-        this.end ? this.end.getTree() : null
-    ];
-};
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+        // lean on JS slice since it has the same semantics
 
-    // lean on JS slice since it has the same semantics
+        var list = this.array.compile(sourceCtx, targetCtx);
+        var start = this.start ? this.start.compile(sourceCtx, targetCtx) : JS.num('0');
+        var end = this.end ? this.end.compile(sourceCtx, targetCtx) : null;
 
-    var list = this.array.compile(sourceCtx, targetCtx);
-    var start = this.start ? this.start.compile(sourceCtx, targetCtx) : JS.num('0');
-    var end = this.end ? this.end.compile(sourceCtx, targetCtx) : null;
+        return JS.fnCall(
+            JS.select(list, 'slice'),
+            end ? [start, JS.add(end, JS.num('1'))] : [start]
+        );
+    }
+}
 
-    return JS.fnCall(
-        JS.select(list, 'slice'),
-        end ? [start, JS.add(end, JS.num('1'))] : [start]
-    );
-};
-
-module.exports = __;
+module.exports = Slice;

@@ -22,7 +22,6 @@
 const JS = require('../codegen/JsPrimitives');
 const CFNode = require('./CFNode');
 const JsWriter = require('../codegen/JsWriter');
-const Connector = require('../codegen/Connector');
 
 
 class ReqNode extends CFNode {

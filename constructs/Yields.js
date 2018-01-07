@@ -18,71 +18,77 @@ const Procedure = require('./Procedure');
 const StmtList = require('./StmtList');
 const Assignment = require('./Assignment');
 const Identifier = require('./Identifier');
+const LoConstruct = require('./LoConstruct');
 
-/**
- * The yields operator (=>)
- *
- * @param target  the name to assign to the
- */
-var __ = function (target) {
 
-    this.target = target;
+class Yields extends LoConstruct {
 
-    // todo yikes this is an ugly hack!
-    if (typeof target.setLvalue == 'function') {
-        target.setLvalue();
-    }
-};
+    /**
+     * The yields operator (=>)
+     *
+     * @param target  the name to assign to the
+     */
+    constructor(target) {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+        super();
+        this.target = target;
 
-    return {
-        type: 'yields',
-        target: this.target.getAst()
-    };
-};
-
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
-
-    return [
-        'yields',
-        this.target.getTree()
-    ];
-};
-
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
-
-    var target = this.target.compile(sourceCtx, targetCtx);
-
-    // not DRY -- duplicates logic from Assignment...
-    // if the LHS is a bare ID...
-
-    var name = this.target.name;
-
-    // validate we're not assigning to a constant
-    if (sourceCtx.isConstant(name)) {
-        sourceCtx.attachError(this.left, "can't assign to a constant (" + name + ")");
+        // todo yikes this is an ugly hack!
+        if (typeof target.setLvalue == 'function') {
+            target.setLvalue();
+        }
     }
 
-    // declare if a new var
-    if (sourceCtx.has(name) == false) {
-        sourceCtx.declare(name);
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
+
+        return {
+            type: 'yields',
+            target: this.target.getAst()
+        };
     }
 
-    return JS.fnDef(['res'], JS.stmtList(
-        JS.assign(target, JS.subscript(JS.ID('res'), JS.num('0')), '=')));
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-module.exports = __;
+        return [
+            'yields',
+            this.target.getTree()
+        ];
+    }
+
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
+
+        var target = this.target.compile(sourceCtx, targetCtx);
+
+        // not DRY -- duplicates logic from Assignment...
+        // if the LHS is a bare ID...
+
+        var name = this.target.name;
+
+        // validate we're not assigning to a constant
+        if (sourceCtx.isConstant(name)) {
+            sourceCtx.attachError(this.left, "can't assign to a constant (" + name + ")");
+        }
+
+        // declare if a new var
+        if (sourceCtx.has(name) == false) {
+            sourceCtx.declare(name);
+        }
+
+        return JS.fnDef(['res'], JS.stmtList(
+            JS.assign(target, JS.subscript(JS.ID('res'), JS.num('0')), '=')));
+    }
+}
+
+module.exports = Yields;

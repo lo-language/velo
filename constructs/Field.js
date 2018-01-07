@@ -14,54 +14,59 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * A record literal field definition
- *
- * @param label
- * @param value
- */
-var __ = function (label, value) {
+class Field extends LoConstruct {
 
-    this.label = label;
-    this.value = value;
-};
+    /**
+     * A record literal field definition
+     *
+     * @param label
+     * @param value
+     */
+    constructor(label, value) {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+        super();
+        this.label = label;
+        this.value = value;
+    }
 
-    return {
-        type: 'field',
-        label: this.label,
-        value: this.value.getAst()
-    };
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+        return {
+            type: 'field',
+            label: this.label,
+            value: this.value.getAst()
+        };
+    }
 
-    return [
-        'field',
-        this.label,
-        this.value.getTree()
-    ];
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+        return [
+            'field',
+            this.label,
+            this.value.getTree()
+        ];
+    }
 
-    // we don't qualify field labels
-    return [JS.string(this.label), this.value.compile(sourceCtx, targetCtx)];
-};
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
 
-module.exports = __;
+        // we don't qualify field labels
+        return [JS.string(this.label), this.value.compile(sourceCtx, targetCtx)];
+    }
+}
+
+module.exports = Field;
