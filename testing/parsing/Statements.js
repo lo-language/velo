@@ -420,18 +420,12 @@ module.exports["requests"] = {
 
 module.exports["modules"] = {
 
-    "module refs": function (test) {
-
-        test.deepEqual(new Parser("locator").parse('Math').getAst(),
-            { type: 'modref', namespace: null, id: 'Math' });
-
-        test.deepEqual(new Parser("locator").parse('JS::Math').getAst(),
-            { type: 'modref', namespace: 'JS', id: 'Math' });
-
-        test.done();
-    },
-
     "module deps": function (test) {
+
+        test.deepEqual(new Parser("dep").parse('Math').getAst(),
+            { type: 'constant',
+                name: 'Math',
+                value: { type: 'modref', namespace: null, id: 'Math' } });
 
         test.deepEqual(new Parser("dep").parse('Math as Math').getAst(),
             { type: 'constant',
@@ -442,6 +436,11 @@ module.exports["modules"] = {
             { type: 'constant',
                 name: 'Math',
                 value: { type: 'modref', namespace: null, id: './Math.lo' } });
+
+        test.deepEqual(new Parser("dep").parse('JS::Math').getAst(),
+            { type: 'constant',
+                name: 'Math',
+                value: { type: 'modref', namespace: 'JS', id: 'Math' } });
 
         test.deepEqual(new Parser("dep").parse('JS::Math as Math').getAst(),
             { type: 'constant',

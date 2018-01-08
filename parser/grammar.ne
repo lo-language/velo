@@ -95,18 +95,13 @@ module -> using:* definition:+                                      {% function 
 using -> "using" dep ";"                                            {% function (d) { return d[1]; } %}
 
 dep
-    ->  %ID                                                         {% function (d) {
-            return new Lo.constant(d[0].value, new Lo.moduleRef(null, d[0].value));
-                                                                    } %}
-    |   locator "as" %ID                                            {% function (d) {
-            return new Lo.constant(d[2].value, d[0]);
-                                                                    } %}
-
-# only supports a single-step namespace for now
-locator
-    ->  %string                                                     {% function (d) { return new Lo.moduleRef(null, d[0].value); } %}
-    |   (%ID "::"):? %ID                                            {% function (d) {
-                                                    return new Lo.moduleRef(d[0] ? d[0][0].value : null, d[1].value); } %}
+    ->  (%ID "::"):? %ID ("as" %ID):?                                            {% function (d) {
+            return new Lo.constant(d[2] ? d[2][1].value : d[1].value,
+                new Lo.moduleRef(d[0] ? d[0][0].value : null, d[1].value));
+        } %}
+    |   %string "as" %ID                                            {% function (d) {
+            return new Lo.constant(d[2].value, new Lo.moduleRef(null, d[0].value));
+        } %}
 
 stmt_list
     ->  statement                                                   {% function (d) { return new Lo.stmtList(d[0]); } %}
