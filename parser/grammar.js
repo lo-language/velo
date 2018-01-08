@@ -60,8 +60,8 @@ function id(x) {return x[0]; }
         },
         in_string: {
 
-          string:       { match: /(?:\\[btnr"\\]|[^\n"`\\])*?"/, value: text => text.slice(0, -1), pop: true },
-          interp_begin: { match: /(?:\\[btnr"\\]|[^\n"`\\])*?`/, value: text => text.slice(0, -1), push: "main" }
+          string:       { match: /(?:\\[nrvtbfx"\\]|[^\n"`\\])*?"/, value: text => text.slice(0, -1), pop: true },
+          interp_begin: { match: /(?:\\[nrvtbfx"\\]|[^\n"`\\])*?`/, value: text => text.slice(0, -1), push: "main" }
         }
     });
 

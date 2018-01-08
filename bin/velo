@@ -41,19 +41,16 @@ if (sourceFile == null) {
 
 var program = new Program(sourceFile, process.cwd());
 
-program.on('INFO', msg => {
-    console.error('INFO', msg);
-});
-
 program.on('ERROR', msg => {
     console.error('ERROR', msg);
 });
 
-// localSpace.on('error', function (file, node, message) {
+// program.on('INFO', msg => {
+//     console.error('INFO', msg);
+// });
 //
-//     var loc = node.getSourceLoc();
-//
-//     console.error(`${file} L${loc[0]}c${loc[1]}:`, message);
+// program.on('DEBUG', msg => {
+//     console.error('DEBUG', msg);
 // });
 
 switch (cmd) {

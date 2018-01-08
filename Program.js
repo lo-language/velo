@@ -128,15 +128,6 @@ class Program extends EventEmitter {
                     console.log(this.rootModule.js);
                 }
             });
-
-        }).catch(err => {
-
-            // catch compilation errors
-            this.emit('ERROR', err);
-
-            // console.log(err);
-
-            throw err;
         });
     }
 
