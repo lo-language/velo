@@ -122,7 +122,6 @@
         "type": "map",
         "elements": [
           {
-            "type": "pair",
             "key": {
               "type": "string",
               "val": "Ford"
@@ -133,7 +132,6 @@
             }
           },
           {
-            "type": "pair",
             "key": {
               "type": "string",
               "val": "Arthur"
@@ -144,7 +142,6 @@
             }
           },
           {
-            "type": "pair",
             "key": {
               "type": "string",
               "val": "Trillian"
@@ -155,7 +152,6 @@
             }
           },
           {
-            "type": "pair",
             "key": {
               "type": "string",
               "val": "Zaphod"

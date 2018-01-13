@@ -11,6 +11,8 @@
 
 const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
+const SetType = require('../compiler/SetType');
+const Type = require('../compiler/Type');
 
 
 class Set extends LoConstruct {
@@ -24,6 +26,21 @@ class Set extends LoConstruct {
 
         super();
         this.elements = elements;
+
+        var type;
+
+        elements.forEach(el => {
+
+            if (type == null) {
+                type = el.type;
+            }
+            else if (el.type.toString() != type.toString()) {
+                console.log('inconsistent types in set literal');
+            }
+        });
+
+        this.elements = elements;
+        this.type = new SetType(type || Type.DYN);
     }
 
     /**

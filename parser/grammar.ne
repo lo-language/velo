@@ -261,10 +261,7 @@ literal
     } %}
     |   "(" (field ",":?):+ ")"                     {% function (d) {
             return new Lo.compound(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } %}
-    |   "{" "=" "}"                                {% function (d) {
-            return new Lo.mapLiteral([]).setSourceLoc(d[0]); } %}
-    |   "{" (pair ",":?):+ "}"                      {% function (d) {
-            return new Lo.mapLiteral(d[1].map(function (pair) {return pair[0];})).setSourceLoc(d[0]); } %}
+    |   map_literal                                 {% id %}
     |   "{" (expr ",":?):* "}"                      {% function (d) {
             return new Lo.setLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]); } %}
     |   proc                                        {% function (d) { d[0].isService = true; return d[0]; } %}
@@ -283,8 +280,15 @@ interp_string
             d[3]).setSourceLoc(d[0].line, d[0].col - 1);
     } %}
 
+map_literal
+    ->   "{" "=>" "}"                               {% function (d) {
+            return new Lo.mapLiteral([]).setSourceLoc(d[0]); } %}
+    |   "{" (pair ",":?):+ "}"                      {% function (d) {
+            return new Lo.mapLiteral(d[1].map(function (pair) {return pair[0];})).setSourceLoc(d[0]); } %}
+
+
 field   -> %ID ":" expr                             {% function (d) { return new Lo.field(d[0].value, d[2]); } %}
-pair    -> expr "=" expr                            {% function (d) { return new Lo.pair(d[0], d[2]); } %}
+pair    -> expr "=>" expr                           {% function (d) { return {key: d[0], value: d[2]}; } %}
 
 typed_id -> type_spec:? %ID                         {% function (d) { return d[1]; } %}
 

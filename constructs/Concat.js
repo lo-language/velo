@@ -12,6 +12,7 @@
 
 const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
+const ArrayType = require('../compiler/ArrayType');
 
 
 class Concat extends LoConstruct {
@@ -28,6 +29,7 @@ class Concat extends LoConstruct {
 
         this.left = left;
         this.right = right;
+        this.type = this.left.type;
     }
 
     /**
@@ -55,14 +57,6 @@ class Concat extends LoConstruct {
     }
 
     /**
-     * Returns the Lo AST for this node.
-     */
-    hasType(type) {
-
-        return this.left.hasType(type) && this.right.hasType(type);
-    }
-
-    /**
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
@@ -74,8 +68,10 @@ class Concat extends LoConstruct {
         const right = this.right.compile(sourceCtx, targetCtx);
 
         // see if we know the type at compile time
-        if (this.left.hasType && this.left.hasType('string')
-            && this.right.hasType && this.right.hasType('string')) {
+        if (this.left.type === ArrayType.STRING &&
+            this.right.type === ArrayType.STRING) {
+        // if (this.left.hasType && this.left.hasType('string')
+        //     && this.right.hasType && this.right.hasType('string')) {
             return JS.add(left, right);
         }
 

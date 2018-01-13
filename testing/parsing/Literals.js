@@ -174,25 +174,11 @@ module.exports["literals"] = {
         test.done();
     },
 
-    "pair": function (test) {
-
-        var parser = new Parser("pair");
-
-        var result = parser.parse('"Roy Batty" = "replicant"');
-
-        test.deepEqual(result.getAst(),
-            { type: 'pair',
-                key: { type: 'string', val: 'Roy Batty' },
-                value: { type: 'string', val: 'replicant' } });
-
-        test.done();
-    },
-
     "emptyMapLiteral": function (test) {
 
         var parser = new Parser("literal");
 
-        var result = parser.parse('  { = }');
+        var result = parser.parse('  { => }');
 
         test.deepEqual(result.getAst(), { type: 'map', elements: [] });
         test.deepEqual(result.getSourceLoc(), [1,3]);
@@ -204,15 +190,15 @@ module.exports["literals"] = {
 
         var parser = new Parser("literal");
 
-        var result = parser.parse(' {"Doolittle" = "The Pixies", "Ziggy Stardust" = "David Bowie"}');
+        var result = parser.parse(' {"Doolittle" => "The Pixies", "Ziggy Stardust" => "David Bowie"}');
 
         test.deepEqual(result.getAst(),
             { type: 'map',
                 elements:
-                    [ { type: 'pair',
+                    [ {
                         key: { type: 'string', val: 'Doolittle' },
                         value: { type: 'string', val: 'The Pixies' } },
-                        { type: 'pair',
+                        {
                             key: { type: 'string', val: 'Ziggy Stardust' },
                             value: { type: 'string', val: 'David Bowie' } } ] });
         test.deepEqual(result.getSourceLoc(), [1,2]);
@@ -224,15 +210,15 @@ module.exports["literals"] = {
 
         var parser = new Parser("literal");
 
-        var result = parser.parse('{"Doolittle" = "The Pixies" "Ziggy Stardust" = "David Bowie"}');
+        var result = parser.parse('{"Doolittle" => "The Pixies" "Ziggy Stardust" => "David Bowie"}');
 
         test.deepEqual(result.getAst(),
             { type: 'map',
                 elements:
-                    [ { type: 'pair',
+                    [ {
                         key: { type: 'string', val: 'Doolittle' },
                         value: { type: 'string', val: 'The Pixies' } },
-                        { type: 'pair',
+                        {
                             key: { type: 'string', val: 'Ziggy Stardust' },
                             value: { type: 'string', val: 'David Bowie' } } ] });
         test.deepEqual(result.getSourceLoc(), [1,1]);

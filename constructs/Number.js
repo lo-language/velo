@@ -15,6 +15,7 @@
 
 const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
+const Type = require('../compiler/Type');
 
 
 class Number extends LoConstruct {
@@ -28,6 +29,7 @@ class Number extends LoConstruct {
 
         super();
         this.value = value;
+        this.type = Type.NUM;
     }
 
     /**

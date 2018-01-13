@@ -11,6 +11,7 @@
 
 const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
+const ArrayType = require('../compiler/ArrayType');
 
 
 class Coercion extends LoConstruct {
@@ -19,13 +20,12 @@ class Coercion extends LoConstruct {
      * Coerces the given expression to the given type.
      *
      * @param expr
-     * @param type
      */
-    constructor(expr, type) {
+    constructor(expr) {
 
         super();
         this.expr = expr;
-        this.type = type || 'string';
+        this.type = ArrayType.STRING;
     }
 
     /**
@@ -36,7 +36,7 @@ class Coercion extends LoConstruct {
         return {
             type: 'coercion',
             expr: this.expr.getAst(),
-            coerce: this.type
+            coerce: this.type.toString()
         };
     }
 
@@ -53,14 +53,6 @@ class Coercion extends LoConstruct {
     }
 
     /**
-     * Returns the Lo AST for this node.
-     */
-    hasType(type) {
-
-        return type == this.type;
-    }
-
-    /**
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
@@ -68,7 +60,7 @@ class Coercion extends LoConstruct {
      */
     compile(sourceCtx, targetCtx) {
 
-        if (this.type == 'string') {
+        if (this.type == ArrayType.STRING) {
             return JS.fnCall(JS.ID('String'), [this.expr.compile(sourceCtx, targetCtx)]);
         }
 

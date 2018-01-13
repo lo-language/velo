@@ -49,15 +49,15 @@ main is () {
 
     // Map literals (including empty), access, and cardinality
 
-    emptyMap = {=};
+    emptyMap = {=>};
 
     if #emptyMap != 0 {
         fail "problem";
     }
 
     cities = {
-        "nyc" = "New York",
-        "phi" = "Philadelphia"
+        "nyc" => "New York",
+        "phi" => "Philadelphia"
     };
 
     if cities["nyc"] != "New York" {

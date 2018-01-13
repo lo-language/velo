@@ -15,8 +15,6 @@
  * Date: 12/24/14
  */
 
-// todo - put all the logic in a tested module and just call into it here
-
 'use strict';
 
 process.title = 'velo';

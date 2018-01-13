@@ -15,10 +15,10 @@ nameSet is {"Ford", "Arthur", "Trillian", "Zaphod"};
 
 // map
 homes is {
-    "Ford"      = "Betelgeuse",
-    "Arthur"    = "Earth",
-    "Trillian"  = "Earth",
-    "Zaphod"    = "Betelgeuse"
+    "Ford"      => "Betelgeuse",
+    "Arthur"    => "Earth",
+    "Trillian"  => "Earth",
+    "Zaphod"    => "Betelgeuse"
 };
 
 // service literal

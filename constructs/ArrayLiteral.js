@@ -15,6 +15,8 @@
 
 const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
+const ArrayType = require('../compiler/ArrayType');
+const Type = require('../compiler/Type');
 
 
 class ArrayLiteral extends LoConstruct {
@@ -23,7 +25,23 @@ class ArrayLiteral extends LoConstruct {
 
         super();
 
+        // let's do a quick scan of the types to see if they're homogeneous
+        // todo what if the array is empty?? just assign it dyn?
+
+        var type;
+
+        elements.forEach(el => {
+
+            if (type == null) {
+                type = el.type;
+            }
+            else if (el.type.toString() != type.toString()) {
+                console.log('inconsistent types in array literal');
+            }
+        });
+
         this.elements = elements;
+        this.type = new ArrayType(type || Type.DYN);
     }
 
     /**

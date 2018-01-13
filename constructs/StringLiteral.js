@@ -7,24 +7,37 @@
  *
  =============================================================================*/
 
+/**
+ * Created by seth on 11/12/16.
+ */
+
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
+const ArrayType = require('../compiler/ArrayType');
 
-
-class Pair extends LoConstruct {
+class String extends LoConstruct {
 
     /**
-     * A set pair literal
-     *
-     * @param key
-     * @param value
+     * A literal string
      */
-    constructor(key, value) {
+    constructor(value) {
 
         super();
-        this.key = key;
+
         this.value = value;
+        this.type = ArrayType.STRING;
+    }
+
+    /**
+     * Accessor
+     *
+     * @returns {*}
+     */
+    getValue() {
+
+        return this.value;
     }
 
     /**
@@ -33,9 +46,8 @@ class Pair extends LoConstruct {
     getAst() {
 
         return {
-            type: 'pair',
-            key: this.key.getAst(),
-            value: this.value.getAst()
+            type: 'string',
+            val: this.value
         };
     }
 
@@ -44,23 +56,18 @@ class Pair extends LoConstruct {
      */
     getTree() {
 
-        return [
-            this.key.getTree(),
-            this.value.getTree()
-        ];
+        return ['string', this.value];
     }
 
     /**
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
-     * @param targetCtx
      */
-    compile(sourceCtx, targetCtx) {
+    compile(sourceCtx) {
 
-        return [this.key.compile(sourceCtx, targetCtx), this.value.compile(sourceCtx, targetCtx)];
+        return JS.string(this.value);
     }
 }
 
-
-module.exports = Pair;
+module.exports = String;
