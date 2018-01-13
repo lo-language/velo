@@ -23,7 +23,6 @@ module.exports = {
     constant: require("./Constant"),
     destructure: require("./Destructure"),
     existence: require("./Existence"),
-    field: require("./Field"),
     identifier: require("./Identifier"),
     mapLiteral: require("./MapLiteral"),
     membership: require("./Membership"),

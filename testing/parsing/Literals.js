@@ -9,6 +9,9 @@ const fs = require('fs');
 const path = require('path');
 const Parser = require('../../parser/Parser');
 const util = require('util');
+const Type = require('../../compiler/Type');
+const ArrayType = require('../../compiler/ArrayType');
+
 
 module.exports["literals"] = {
 
@@ -18,10 +21,12 @@ module.exports["literals"] = {
 
         test.deepEqual(result.getAst(), { type: 'boolean', val: true });
         test.deepEqual(result.getSourceLoc(), [1,1]);
+        test.equal(result.type, Type.BOOL);
 
         result = new Parser("literal").parse("false");
 
         test.deepEqual(result.getAst(), { type: 'boolean', val: false });
+        test.equal(result.type, Type.BOOL);
 
         test.done();
     },
@@ -34,6 +39,7 @@ module.exports["literals"] = {
 
         test.deepEqual(result.getAst(), { type: 'number', val: '10' });
         test.deepEqual(result.getSourceLoc(), [1,1]);
+        test.equal(result.type, Type.NUM);
 
         test.done();
     },
@@ -46,6 +52,7 @@ module.exports["literals"] = {
 
         test.deepEqual(result.getAst(), { type: 'string', val: 'howdy' });
         test.deepEqual(result.getSourceLoc(), [1,1]);
+        test.equal(result.type, ArrayType.STRING);
 
         test.done();
     },
@@ -59,6 +66,7 @@ module.exports["literals"] = {
         test.deepEqual(result.getAst(), { type: 'array',
             elements: [ { type: 'number', val: '14' }, { type: 'number', val: '15.35' } ] });
         test.deepEqual(result.getSourceLoc(), [1,1]);
+        test.equal(result.type.toString(), 'number*');
 
         test.done();
     },
@@ -77,6 +85,7 @@ module.exports["literals"] = {
                     { type: 'string', val: 'rulez' },
                     { type: 'string', val: '#1' } ] });
         test.deepEqual(result.getSourceLoc(), [1,1]);
+        test.equal(result.type.toString(), 'string*');
 
         test.done();
     },
@@ -104,20 +113,6 @@ module.exports["literals"] = {
         test.done();
     },
 
-    "field": function (test) {
-
-        var parser = new Parser("field");
-
-        var result = parser.parse('age: 28');
-
-        test.deepEqual(result.getAst(),
-            { type: 'field',
-                label: 'age',
-                value: { type: 'number', val: '28' } });
-
-        test.done();
-    },
-
     "compound": function (test) {
 
         var parser = new Parser("literal");
@@ -126,13 +121,13 @@ module.exports["literals"] = {
 
         test.deepEqual(result.getAst(),
             { type: 'compound',
-                fields:
-                    [ { type: 'field',
+                fields: [
+                    {
                         label: 'name',
                         value: { type: 'string', val: 'Fry' } },
-                        { type: 'field',
-                            label: 'age',
-                            value: { type: 'string', val: '1024' } } ] });
+                    {
+                        label: 'age',
+                        value: { type: 'string', val: '1024' } } ] });
         test.deepEqual(result.getSourceLoc(), [1,1]);
 
         test.done();

@@ -102,10 +102,10 @@ module.exports["literals"] = {
     "record": function (test) {
 
         var node = new Lo.compound([
-            new Lo.field('Zaphod', new Lo.string('Betelgeuse')),
-            new Lo.field('Ford', new Lo.string('Betelgeuse')),
-            new Lo.field('Arthur', new Lo.string('Earth')),
-            new Lo.field('Trillian', new Lo.string('Earth')),
+                {label: 'Zaphod', value: new Lo.string('Betelgeuse')},
+                {label: 'Ford', value: new Lo.string('Betelgeuse')},
+                {label: 'Arthur', value: new Lo.string('Earth')},
+                {label: 'Trillian', value: new Lo.string('Earth')},
         ]);
 
         test.deepEqual(node.compile(new LoContext()).renderTree(),

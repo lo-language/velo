@@ -33,7 +33,12 @@ class Compound extends LoConstruct {
 
         return {
             type: 'compound',
-            fields: this.fields.map(field => field.getAst())
+            fields: this.fields.map(field => {
+                return {
+                    label: field.label,
+                    value: field.value.getAst()
+                };
+            })
         };
     }
 
@@ -43,19 +48,25 @@ class Compound extends LoConstruct {
     getTree() {
 
         return ['compound'].concat(
-            this.fields.map(field => field.getTree()));
+            this.fields.map(field => {
+                return [
+                    field.label,
+                    field.value.getTree()
+                ];
+            }));
     }
 
     /**
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
-     * @param targetCtx
      */
-    compile(sourceCtx, targetCtx) {
+    compile(sourceCtx) {
+
+        // we don't qualify field labels
 
         return JS.objLiteral(this.fields.map(field => {
-            return field.compile(sourceCtx, targetCtx);
+            return [JS.string(field.label), field.value.compile(sourceCtx)];
         }));
     }
 }

@@ -14,7 +14,7 @@ nameList is ["Ford", "Arthur", "Trillian", "Zaphod"];
 nameSet is {"Ford", "Arthur", "Trillian", "Zaphod"};
 
 // map
-homes is {
+homeWorlds is {
     "Ford"      => "Betelgeuse",
     "Arthur"    => "Earth",
     "Trillian"  => "Earth",
