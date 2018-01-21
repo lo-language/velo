@@ -3,8 +3,8 @@
  * 12/25/14
  */
 
-using JS::Math as Math;
-using Lo::String as String;
+using JS::Math;
+using Lo::String;
 
 main is () {
 

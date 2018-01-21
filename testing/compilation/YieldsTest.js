@@ -7,6 +7,8 @@
 
 const LoContext = require('../../compiler/LoContext');
 const Lo = require('../../constructs');
+const JsWriter = require('../../codegen/JsWriter');
+
 
 module.exports["basics"] = {
 
@@ -17,7 +19,7 @@ module.exports["basics"] = {
 
         test.equal(context.has('foo'), false);
 
-        test.deepEqual(node.compile(context).renderTree(),
+        test.deepEqual(node.compile(context).getJs(new JsWriter()).renderTree(),
             [ 'function',
                 null,
                 [ 'res' ],

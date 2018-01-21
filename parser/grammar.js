@@ -12,6 +12,7 @@ function id(x) {return x[0]; }
           ws:           { match: /[ \t\r\n]+/, lineBreaks: true },
           bcpl_comment: /\/\/.*?$/,
           number:       /0|-?[1-9][0-9]*(?:\.[0-9]+)?/,
+          char:         { match: /'.'/, value: text => text.slice(1, -1) },
 
           string_start: { match: '"', push: "in_string" },
           interp_end:   { match: '`', pop: true },
@@ -30,6 +31,7 @@ function id(x) {return x[0]; }
           tilde_arrow:  '~>',
           yields:       '=>',
           forward:      '>>',
+          fire:         '<<',
           concat:       '><',
           push_front:   '+>',
           push_back:    '<+',
@@ -50,8 +52,8 @@ function id(x) {return x[0]; }
           mod:          '%',
           cond:         '?',
           ID:           { match: /[a-zA-Z_][a-zA-Z_0-9]*/, keywords: {
-                          KW: ['as', 'is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
-                                'module', 'exists', 'defined', 'undefined', 'using',
+                          KW: ['is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
+                                'module', 'exists', 'defined', 'undefined', 'using', 'as', 'on',
 
                                 // le primitive types
                                 'dyn', 'bool', 'int', 'char', 'string', 'float', 'dec'],
@@ -60,8 +62,8 @@ function id(x) {return x[0]; }
         },
         in_string: {
 
-          string:       { match: /(?:\\[btnr"\\]|[^\n"`\\])*?"/, value: text => text.slice(0, -1), pop: true },
-          interp_begin: { match: /(?:\\[btnr"\\]|[^\n"`\\])*?`/, value: text => text.slice(0, -1), push: "main" }
+          string:       { match: /(?:\\[nrvtbfx"\\]|[^\n"`\\])*?"/, value: text => text.slice(0, -1), pop: true },
+          interp_begin: { match: /(?:\\[nrvtbfx"\\]|[^\n"`\\])*?`/, value: text => text.slice(0, -1), push: "main" }
         }
     });
 
@@ -97,25 +99,26 @@ var grammar = {
     {"name": "module$ebnf$2", "symbols": ["module$ebnf$2", "definition"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "module", "symbols": ["module$ebnf$1", "module$ebnf$2"], "postprocess": function (d) { return new Lo.module(d[1], d[0]); }},
     {"name": "using", "symbols": [{"literal":"using"}, "dep", {"literal":";"}], "postprocess": function (d) { return d[1]; }},
-    {"name": "dep", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID)], "postprocess":  function (d) {
-        return new Lo.constant(d[0].value, new Lo.moduleRef(null, d[0].value));
-                                                                } },
-    {"name": "dep", "symbols": ["locator", {"literal":"as"}, (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess":  function (d) {
-        return new Lo.constant(d[2].value, d[0]);
-                                                                } },
-    {"name": "locator", "symbols": [(lexer.has("string") ? {type: "string"} : string)], "postprocess": function (d) { return new Lo.moduleRef(null, d[0].value); }},
-    {"name": "locator$ebnf$1$subexpression$1", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID), {"literal":"::"}]},
-    {"name": "locator$ebnf$1", "symbols": ["locator$ebnf$1$subexpression$1"], "postprocess": id},
-    {"name": "locator$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "locator", "symbols": ["locator$ebnf$1", (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess":  function (d) {
-        return new Lo.moduleRef(d[0] ? d[0][0].value : null, d[1].value); } },
+    {"name": "dep$ebnf$1$subexpression$1", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID), {"literal":"::"}]},
+    {"name": "dep$ebnf$1", "symbols": ["dep$ebnf$1$subexpression$1"], "postprocess": id},
+    {"name": "dep$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "dep$ebnf$2$subexpression$1", "symbols": [{"literal":"as"}, (lexer.has("ID") ? {type: "ID"} : ID)]},
+    {"name": "dep$ebnf$2", "symbols": ["dep$ebnf$2$subexpression$1"], "postprocess": id},
+    {"name": "dep$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "dep", "symbols": ["dep$ebnf$1", (lexer.has("ID") ? {type: "ID"} : ID), "dep$ebnf$2"], "postprocess":  function (d) {
+            return new Lo.constant(d[2] ? d[2][1].value : d[1].value,
+                new Lo.moduleRef(d[0] ? d[0][0].value : null, d[1].value));
+        } },
+    {"name": "dep", "symbols": [(lexer.has("string") ? {type: "string"} : string), {"literal":"as"}, (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess":  function (d) {
+            return new Lo.constant(d[2].value, new Lo.moduleRef(null, d[0].value));
+        } },
     {"name": "stmt_list", "symbols": ["statement"], "postprocess": function (d) { return new Lo.stmtList(d[0]); }},
     {"name": "stmt_list", "symbols": ["statement", "stmt_list"], "postprocess": function (d) { return new Lo.stmtList(d[0], d[1]); }},
     {"name": "statement", "symbols": ["definition"], "postprocess": id},
     {"name": "statement", "symbols": ["response"], "postprocess": id},
     {"name": "statement", "symbols": ["expr", (lexer.has("assign") ? {type: "assign"} : assign), "expr", {"literal":";"}], "postprocess":  function (d) {
         return new Lo.assign(d[0], d[1].value == '=' ? d[2] : new Lo.binaryOpExpr(
-        {'+=': '+', '-=': '-', '*=': '*', '/=': '/', '%=': '%'}[d[1].value], d[0], d[2])); } },
+            {'+=': '+', '-=': '-', '*=': '*', '/=': '/', '%=': '%'}[d[1].value], d[0], d[2])); } },
     {"name": "statement", "symbols": ["destructure", (lexer.has("assign") ? {type: "assign"} : assign), "expr", {"literal":";"}], "postprocess":  function (d) {
         return new Lo.assign(d[0], d[1].value == '=' ? d[2] :
             new Lo.binaryOpExpr(
@@ -136,16 +139,23 @@ var grammar = {
         } },
     {"name": "statement$ebnf$1", "symbols": ["async"], "postprocess": id},
     {"name": "statement$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "statement$ebnf$2", "symbols": ["exprList"], "postprocess": id},
+    {"name": "statement$ebnf$2$subexpression$1", "symbols": [{"literal":"<-"}, "exprList"]},
+    {"name": "statement$ebnf$2", "symbols": ["statement$ebnf$2$subexpression$1"], "postprocess": id},
     {"name": "statement$ebnf$2", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "statement", "symbols": ["statement$ebnf$1", "expr", {"literal":"<-"}, "statement$ebnf$2", "handlers"], "postprocess":  function (d) {
-            return new Lo.requestStmt(d[1], d[3] ? d[3] : [],
-                d[4][0], d[4][1], d[0] == null);
+    {"name": "statement", "symbols": ["statement$ebnf$1", "expr", "statement$ebnf$2", "handlers"], "postprocess":  function (d) {
+            return new Lo.requestStmt(d[1], d[2] ? d[2][1] : [],
+                d[3][0], d[3][1], d[0] == null);
         } },
+    {"name": "statement$ebnf$3", "symbols": ["exprList"], "postprocess": id},
+    {"name": "statement$ebnf$3", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "statement", "symbols": ["expr", {"literal":"<<"}, "statement$ebnf$3", {"literal":";"}], "postprocess":  function (d) {
+        return new Lo.event(d[0], d[2] ? d[2] : []); } },
     {"name": "statement", "symbols": [{"literal":"while"}, "expr", "block"], "postprocess":  function (d) {
         return new Lo.while(d[1], d[2]).setSourceLoc(d[0]);} },
     {"name": "statement", "symbols": [{"literal":"scan"}, "expr", {"literal":">>"}, "proc"], "postprocess":  function (d) {
         return new Lo.scan(d[1], d[3]).setSourceLoc(d[0]);} },
+    {"name": "statement", "symbols": [{"literal":"on"}, "expr", {"literal":">>"}, "proc"], "postprocess":  function (d) {
+        return new Lo.subscribe(d[1], d[3]); } },
     {"name": "response$subexpression$1", "symbols": [{"literal":"reply"}]},
     {"name": "response$subexpression$1", "symbols": [{"literal":"fail"}]},
     {"name": "response$subexpression$1", "symbols": [{"literal":"substitute"}]},
@@ -169,11 +179,13 @@ var grammar = {
             return new Lo.constant(d[0].value, d[2]).setSourceLoc(d[0]);
         } },
     {"name": "handlers", "symbols": [{"literal":";"}], "postprocess": function (d) { return [null, null]; }},
-    {"name": "handlers", "symbols": ["assign_handler", {"literal":";"}], "postprocess": function (d) { return [d[0], null]; }},
-    {"name": "handlers", "symbols": ["assign_handler", "fail_handler"]},
-    {"name": "handlers", "symbols": ["reply_handler"], "postprocess": function (d) { return [d[0], null]; }},
+    {"name": "handlers$subexpression$1", "symbols": ["fail_handler"]},
+    {"name": "handlers$subexpression$1", "symbols": [{"literal":";"}]},
+    {"name": "handlers", "symbols": ["assign_handler", "handlers$subexpression$1"], "postprocess": function (d) { return [d[0], d[1][0].value === ';' ? null : d[1][0]]; }},
+    {"name": "handlers$ebnf$1", "symbols": ["fail_handler"], "postprocess": id},
+    {"name": "handlers$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "handlers", "symbols": ["reply_handler", "handlers$ebnf$1"], "postprocess": function (d) { return [d[0], d[1]]; }},
     {"name": "handlers", "symbols": ["fail_handler"], "postprocess": function (d) { return [null, d[0]]; }},
-    {"name": "handlers", "symbols": ["reply_handler", "fail_handler"]},
     {"name": "assign_handler", "symbols": [{"literal":"=>"}, (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess": function (d) { return new Lo.yields(new Lo.identifier(d[1].value)); }},
     {"name": "reply_handler", "symbols": [{"literal":"->"}, "proc"], "postprocess": function (d) { return d[1]; }},
     {"name": "fail_handler", "symbols": [{"literal":"~>"}, "proc"], "postprocess": function (d) { return d[1]; }},
@@ -243,6 +255,8 @@ var grammar = {
         return new Lo.boolean(d[0].value === 'true').setSourceLoc(d[0]); } },
     {"name": "literal", "symbols": [(lexer.has("number") ? {type: "number"} : number)], "postprocess":  function (d) {
         return new Lo.number(d[0].value).setSourceLoc(d[0]); } },
+    {"name": "literal", "symbols": [(lexer.has("char") ? {type: "char"} : char)], "postprocess":  function (d) {
+        return new Lo.charLiteral(d[0].value).setSourceLoc(d[0]); } },
     {"name": "literal", "symbols": ["interp_string"], "postprocess": id},
     {"name": "literal$ebnf$1", "symbols": []},
     {"name": "literal$ebnf$1$subexpression$1$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
@@ -253,34 +267,14 @@ var grammar = {
         function (d) {
                 return new Lo.arrayLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]);
         } },
+    {"name": "literal", "symbols": ["struct_literal"], "postprocess": id},
+    {"name": "literal", "symbols": ["map_literal"], "postprocess": id},
+    {"name": "literal$ebnf$2", "symbols": []},
     {"name": "literal$ebnf$2$subexpression$1$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
     {"name": "literal$ebnf$2$subexpression$1$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "literal$ebnf$2$subexpression$1", "symbols": ["field", "literal$ebnf$2$subexpression$1$ebnf$1"]},
-    {"name": "literal$ebnf$2", "symbols": ["literal$ebnf$2$subexpression$1"]},
-    {"name": "literal$ebnf$2$subexpression$2$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
-    {"name": "literal$ebnf$2$subexpression$2$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "literal$ebnf$2$subexpression$2", "symbols": ["field", "literal$ebnf$2$subexpression$2$ebnf$1"]},
-    {"name": "literal$ebnf$2", "symbols": ["literal$ebnf$2", "literal$ebnf$2$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "literal", "symbols": [{"literal":"("}, "literal$ebnf$2", {"literal":")"}], "postprocess":  function (d) {
-        return new Lo.compound(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } },
-    {"name": "literal", "symbols": [{"literal":"{"}, {"literal":"="}, {"literal":"}"}], "postprocess":  function (d) {
-        return new Lo.mapLiteral([]).setSourceLoc(d[0]); } },
-    {"name": "literal$ebnf$3$subexpression$1$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
-    {"name": "literal$ebnf$3$subexpression$1$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "literal$ebnf$3$subexpression$1", "symbols": ["pair", "literal$ebnf$3$subexpression$1$ebnf$1"]},
-    {"name": "literal$ebnf$3", "symbols": ["literal$ebnf$3$subexpression$1"]},
-    {"name": "literal$ebnf$3$subexpression$2$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
-    {"name": "literal$ebnf$3$subexpression$2$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "literal$ebnf$3$subexpression$2", "symbols": ["pair", "literal$ebnf$3$subexpression$2$ebnf$1"]},
-    {"name": "literal$ebnf$3", "symbols": ["literal$ebnf$3", "literal$ebnf$3$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "literal", "symbols": [{"literal":"{"}, "literal$ebnf$3", {"literal":"}"}], "postprocess":  function (d) {
-        return new Lo.mapLiteral(d[1].map(function (pair) {return pair[0];})).setSourceLoc(d[0]); } },
-    {"name": "literal$ebnf$4", "symbols": []},
-    {"name": "literal$ebnf$4$subexpression$1$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
-    {"name": "literal$ebnf$4$subexpression$1$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "literal$ebnf$4$subexpression$1", "symbols": ["expr", "literal$ebnf$4$subexpression$1$ebnf$1"]},
-    {"name": "literal$ebnf$4", "symbols": ["literal$ebnf$4", "literal$ebnf$4$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "literal", "symbols": [{"literal":"{"}, "literal$ebnf$4", {"literal":"}"}], "postprocess":  function (d) {
+    {"name": "literal$ebnf$2$subexpression$1", "symbols": ["expr", "literal$ebnf$2$subexpression$1$ebnf$1"]},
+    {"name": "literal$ebnf$2", "symbols": ["literal$ebnf$2", "literal$ebnf$2$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "literal", "symbols": [{"literal":"{"}, "literal$ebnf$2", {"literal":"}"}], "postprocess":  function (d) {
         return new Lo.setLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]); } },
     {"name": "literal", "symbols": ["proc"], "postprocess": function (d) { d[0].isService = true; return d[0]; }},
     {"name": "interp_string", "symbols": [(lexer.has("string") ? {type: "string"} : string)], "postprocess": 
@@ -295,11 +289,30 @@ var grammar = {
                 new Lo.concat(new Lo.string(d[0].value), new Lo.coercion(d[1])),
                 d[3]).setSourceLoc(d[0].line, d[0].col - 1);
         } },
-    {"name": "field", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID), {"literal":":"}, "expr"], "postprocess": function (d) { return new Lo.field(d[0].value, d[2]); }},
-    {"name": "pair", "symbols": ["expr", {"literal":"="}, "expr"], "postprocess": function (d) { return new Lo.pair(d[0], d[2]); }},
-    {"name": "typed_id$ebnf$1", "symbols": ["type_spec"], "postprocess": id},
-    {"name": "typed_id$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "typed_id", "symbols": ["typed_id$ebnf$1", (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess": function (d) { return d[1]; }},
+    {"name": "struct_literal$ebnf$1$subexpression$1$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
+    {"name": "struct_literal$ebnf$1$subexpression$1$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "struct_literal$ebnf$1$subexpression$1", "symbols": ["field", "struct_literal$ebnf$1$subexpression$1$ebnf$1"]},
+    {"name": "struct_literal$ebnf$1", "symbols": ["struct_literal$ebnf$1$subexpression$1"]},
+    {"name": "struct_literal$ebnf$1$subexpression$2$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
+    {"name": "struct_literal$ebnf$1$subexpression$2$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "struct_literal$ebnf$1$subexpression$2", "symbols": ["field", "struct_literal$ebnf$1$subexpression$2$ebnf$1"]},
+    {"name": "struct_literal$ebnf$1", "symbols": ["struct_literal$ebnf$1", "struct_literal$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "struct_literal", "symbols": [{"literal":"("}, "struct_literal$ebnf$1", {"literal":")"}], "postprocess":  function (d) {
+        return new Lo.compound(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } },
+    {"name": "field", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID), {"literal":":"}, "expr"], "postprocess": function (d) { return {label: d[0].value, value: d[2]}; }},
+    {"name": "map_literal", "symbols": [{"literal":"{"}, {"literal":"=>"}, {"literal":"}"}], "postprocess":  function (d) {
+        return new Lo.mapLiteral([]).setSourceLoc(d[0]); } },
+    {"name": "map_literal$ebnf$1$subexpression$1$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
+    {"name": "map_literal$ebnf$1$subexpression$1$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "map_literal$ebnf$1$subexpression$1", "symbols": ["pair", "map_literal$ebnf$1$subexpression$1$ebnf$1"]},
+    {"name": "map_literal$ebnf$1", "symbols": ["map_literal$ebnf$1$subexpression$1"]},
+    {"name": "map_literal$ebnf$1$subexpression$2$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
+    {"name": "map_literal$ebnf$1$subexpression$2$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "map_literal$ebnf$1$subexpression$2", "symbols": ["pair", "map_literal$ebnf$1$subexpression$2$ebnf$1"]},
+    {"name": "map_literal$ebnf$1", "symbols": ["map_literal$ebnf$1", "map_literal$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "map_literal", "symbols": [{"literal":"{"}, "map_literal$ebnf$1", {"literal":"}"}], "postprocess":  function (d) {
+        return new Lo.mapLiteral(d[1].map(function (pair) {return pair[0];})).setSourceLoc(d[0]); } },
+    {"name": "pair", "symbols": ["expr", {"literal":"=>"}, "expr"], "postprocess": function (d) { return {key: d[0], value: d[2]}; }},
     {"name": "proc$ebnf$1", "symbols": ["id_list"], "postprocess": id},
     {"name": "proc$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "proc", "symbols": [{"literal":"("}, "proc$ebnf$1", {"literal":")"}, "block"], "postprocess":  function (d) {
@@ -312,15 +325,22 @@ var grammar = {
     {"name": "id_list$ebnf$1", "symbols": ["id_list$ebnf$1", "id_list$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "id_list", "symbols": ["typed_id", "id_list$ebnf$1"], "postprocess":  function (d) {
         return [d[0].value].concat(d[1].map(function (id) {return id[1].value;})); } },
+    {"name": "typed_id$ebnf$1", "symbols": ["type_spec"], "postprocess": id},
+    {"name": "typed_id$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "typed_id", "symbols": ["typed_id$ebnf$1", (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess": function (d) { return d[1]; }},
+    {"name": "type_spec", "symbols": [{"literal":"null"}]},
     {"name": "type_spec", "symbols": [{"literal":"dyn"}]},
     {"name": "type_spec", "symbols": [{"literal":"bool"}]},
-    {"name": "type_spec", "symbols": [{"literal":"int"}]},
     {"name": "type_spec", "symbols": [{"literal":"char"}]},
-    {"name": "type_spec", "symbols": [{"literal":"string"}]},
+    {"name": "type_spec", "symbols": [{"literal":"int"}]},
     {"name": "type_spec", "symbols": [{"literal":"float"}]},
     {"name": "type_spec", "symbols": [{"literal":"dec"}]},
+    {"name": "type_spec", "symbols": [{"literal":"num"}]},
+    {"name": "type_spec", "symbols": [{"literal":"string"}]},
     {"name": "type_spec", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID)]},
-    {"name": "type_spec", "symbols": ["type_spec", {"literal":"*"}]}
+    {"name": "type_spec", "symbols": ["type_spec", {"literal":"?"}]},
+    {"name": "type_spec", "symbols": ["type_spec", {"literal":"*"}]},
+    {"name": "type_spec", "symbols": ["type_spec", {"literal":"+"}]}
 ]
   , ParserStart: "module"
 }

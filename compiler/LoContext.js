@@ -5,8 +5,6 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
- * Success is finding something you really like to do and caring enough about it
- * to do it well.
  =============================================================================*/
 
 /**
@@ -19,6 +17,9 @@
  */
 
 "use strict";
+
+const Symbol    = require('./Symbol');
+const Type      = require('./Type');
 
 
 class LoContext {
@@ -45,14 +46,11 @@ class LoContext {
         // arguably more of a target context concept, but putting in source context for now
         this.nextLoopNum = 1;
 
-        // dependency set
-        this.deps = {};
-
-        this.stmtEnvs = [];
-
-        this.registry = parent ? parent.registry : null;
-
         this.errors = [];
+
+        // response types for service contexts
+        this.succType = null;
+        this.failType = null;
     }
 
     /**
@@ -321,6 +319,26 @@ class LoContext {
         }
 
         return false;
+    }
+
+    setSuccType(type) {
+
+        // detect inconsistencies
+
+        if (this.succType && this.succType != type) {
+            throw new Error("type mismatch: service already has success type " + this.succType.toString());
+        }
+
+        this.succType = type;
+    }
+
+    setFailType(type) {
+
+        if (this.failType && this.failType != type) {
+            throw new Error("type mismatch: service already has failure type " + this.failType.toString());
+        }
+
+        this.failType = type;
     }
 
     isRValue() {

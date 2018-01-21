@@ -19,6 +19,7 @@
 const JS = require('./JsPrimitives');
 const Connector = require('./Connector');
 
+
 class JsWriter {
 
     constructor (parent) {

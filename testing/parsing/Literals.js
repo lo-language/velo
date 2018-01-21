@@ -9,6 +9,9 @@ const fs = require('fs');
 const path = require('path');
 const Parser = require('../../parser/Parser');
 const util = require('util');
+const Type = require('../../compiler/Type');
+const ArrayType = require('../../compiler/ArrayType');
+
 
 module.exports["literals"] = {
 
@@ -18,10 +21,12 @@ module.exports["literals"] = {
 
         test.deepEqual(result.getAst(), { type: 'boolean', val: true });
         test.deepEqual(result.getSourceLoc(), [1,1]);
+        test.equal(result.type, Type.BOOL);
 
         result = new Parser("literal").parse("false");
 
         test.deepEqual(result.getAst(), { type: 'boolean', val: false });
+        test.equal(result.type, Type.BOOL);
 
         test.done();
     },
@@ -34,6 +39,7 @@ module.exports["literals"] = {
 
         test.deepEqual(result.getAst(), { type: 'number', val: '10' });
         test.deepEqual(result.getSourceLoc(), [1,1]);
+        test.equal(result.type, Type.NUM);
 
         test.done();
     },
@@ -46,6 +52,7 @@ module.exports["literals"] = {
 
         test.deepEqual(result.getAst(), { type: 'string', val: 'howdy' });
         test.deepEqual(result.getSourceLoc(), [1,1]);
+        test.equal(result.type, ArrayType.STRING);
 
         test.done();
     },
@@ -59,6 +66,7 @@ module.exports["literals"] = {
         test.deepEqual(result.getAst(), { type: 'array',
             elements: [ { type: 'number', val: '14' }, { type: 'number', val: '15.35' } ] });
         test.deepEqual(result.getSourceLoc(), [1,1]);
+        test.equal(result.type.toString(), 'number*');
 
         test.done();
     },
@@ -77,6 +85,7 @@ module.exports["literals"] = {
                     { type: 'string', val: 'rulez' },
                     { type: 'string', val: '#1' } ] });
         test.deepEqual(result.getSourceLoc(), [1,1]);
+        test.equal(result.type.toString(), 'string*');
 
         test.done();
     },
@@ -104,36 +113,23 @@ module.exports["literals"] = {
         test.done();
     },
 
-    "field": function (test) {
-
-        var parser = new Parser("field");
-
-        var result = parser.parse('age: 28');
-
-        test.deepEqual(result.getAst(),
-            { type: 'field',
-                label: 'age',
-                value: { type: 'number', val: '28' } });
-
-        test.done();
-    },
-
     "compound": function (test) {
 
         var parser = new Parser("literal");
 
-        var result = parser.parse('(name: "Fry", age: "1024")');
+        var result = parser.parse('(name: "Fry", age: 1024)');
 
         test.deepEqual(result.getAst(),
             { type: 'compound',
-                fields:
-                    [ { type: 'field',
+                fields: [
+                    {
                         label: 'name',
                         value: { type: 'string', val: 'Fry' } },
-                        { type: 'field',
-                            label: 'age',
-                            value: { type: 'string', val: '1024' } } ] });
+                    {
+                        label: 'age',
+                        value: { type: 'number', val: '1024' } } ] });
         test.deepEqual(result.getSourceLoc(), [1,1]);
+        test.equal(result.type.toString(), '(string,number)');
 
         test.done();
     },
@@ -152,6 +148,7 @@ module.exports["literals"] = {
                         { type: 'string', val: 'Bossanova' },
                         { type: 'string', val: 'Trompe le Monde' } ] });
         test.deepEqual(result.getSourceLoc(), [1,2]);
+        test.equal(result.type.toString(), '{string}');
 
         test.done();
     },
@@ -170,20 +167,7 @@ module.exports["literals"] = {
                         { type: 'string', val: 'Bossanova' },
                         { type: 'string', val: 'Trompe le Monde' } ] });
         test.deepEqual(result.getSourceLoc(), [1,2]);
-
-        test.done();
-    },
-
-    "pair": function (test) {
-
-        var parser = new Parser("pair");
-
-        var result = parser.parse('"Roy Batty" = "replicant"');
-
-        test.deepEqual(result.getAst(),
-            { type: 'pair',
-                key: { type: 'string', val: 'Roy Batty' },
-                value: { type: 'string', val: 'replicant' } });
+        test.equal(result.type.toString(), '{string}');
 
         test.done();
     },
@@ -192,10 +176,11 @@ module.exports["literals"] = {
 
         var parser = new Parser("literal");
 
-        var result = parser.parse('  { = }');
+        var result = parser.parse('  { => }');
 
         test.deepEqual(result.getAst(), { type: 'map', elements: [] });
         test.deepEqual(result.getSourceLoc(), [1,3]);
+        test.equal(result.type.toString(), '{dyn => dyn}');
 
         test.done();
     },
@@ -204,18 +189,19 @@ module.exports["literals"] = {
 
         var parser = new Parser("literal");
 
-        var result = parser.parse(' {"Doolittle" = "The Pixies", "Ziggy Stardust" = "David Bowie"}');
+        var result = parser.parse(' {"Doolittle" => "The Pixies", "Ziggy Stardust" => "David Bowie"}');
 
         test.deepEqual(result.getAst(),
             { type: 'map',
                 elements:
-                    [ { type: 'pair',
+                    [ {
                         key: { type: 'string', val: 'Doolittle' },
                         value: { type: 'string', val: 'The Pixies' } },
-                        { type: 'pair',
+                        {
                             key: { type: 'string', val: 'Ziggy Stardust' },
                             value: { type: 'string', val: 'David Bowie' } } ] });
         test.deepEqual(result.getSourceLoc(), [1,2]);
+        test.equal(result.type.toString(), '{string => string}');
 
         test.done();
     },
@@ -224,18 +210,19 @@ module.exports["literals"] = {
 
         var parser = new Parser("literal");
 
-        var result = parser.parse('{"Doolittle" = "The Pixies" "Ziggy Stardust" = "David Bowie"}');
+        var result = parser.parse('{"Doolittle" => "The Pixies" "Ziggy Stardust" => "David Bowie"}');
 
         test.deepEqual(result.getAst(),
             { type: 'map',
                 elements:
-                    [ { type: 'pair',
+                    [ {
                         key: { type: 'string', val: 'Doolittle' },
                         value: { type: 'string', val: 'The Pixies' } },
-                        { type: 'pair',
+                        {
                             key: { type: 'string', val: 'Ziggy Stardust' },
                             value: { type: 'string', val: 'David Bowie' } } ] });
         test.deepEqual(result.getSourceLoc(), [1,1]);
+        test.equal(result.type.toString(), '{string => string}');
 
         test.done();
     },
@@ -256,6 +243,7 @@ module.exports["literals"] = {
                 isService: true });
 
         test.deepEqual(result.getSourceLoc(), [1,2]);
+        test.equal(result.type.toString(), 'foo -> null ~> null');
 
         test.done();
     }

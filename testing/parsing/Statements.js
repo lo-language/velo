@@ -274,7 +274,7 @@ module.exports["requests"] = {
 
     "arrow style with yields": function (test) {
 
-        test.deepEqual(new Parser("statement").parse('foo <- (bar) => baz;').getAst(),
+        test.deepEqual(new Parser("statement").parse('foo <- bar => baz;').getAst(),
             { type: 'request_stmt',
                 address: { type: 'id', name: 'foo' },
                 args: [ { type: 'id', name: 'bar' } ],
@@ -282,7 +282,7 @@ module.exports["requests"] = {
                 contingency: undefined,
                 blocking: true });
 
-        test.deepEqual(new Parser("statement").parse('@foo <- (bar) => baz;').getAst(),
+        test.deepEqual(new Parser("statement").parse('@foo <- bar => baz;').getAst(),
             { type: 'request_stmt',
                 address: { type: 'id', name: 'foo' },
                 args: [ { type: 'id', name: 'bar' } ],
@@ -420,18 +420,12 @@ module.exports["requests"] = {
 
 module.exports["modules"] = {
 
-    "module refs": function (test) {
-
-        test.deepEqual(new Parser("locator").parse('Math').getAst(),
-            { type: 'modref', namespace: null, id: 'Math' });
-
-        test.deepEqual(new Parser("locator").parse('JS::Math').getAst(),
-            { type: 'modref', namespace: 'JS', id: 'Math' });
-
-        test.done();
-    },
-
     "module deps": function (test) {
+
+        test.deepEqual(new Parser("dep").parse('Math').getAst(),
+            { type: 'constant',
+                name: 'Math',
+                value: { type: 'modref', namespace: null, id: 'Math' } });
 
         test.deepEqual(new Parser("dep").parse('Math as Math').getAst(),
             { type: 'constant',
@@ -442,6 +436,11 @@ module.exports["modules"] = {
             { type: 'constant',
                 name: 'Math',
                 value: { type: 'modref', namespace: null, id: './Math.lo' } });
+
+        test.deepEqual(new Parser("dep").parse('JS::Math').getAst(),
+            { type: 'constant',
+                name: 'Math',
+                value: { type: 'modref', namespace: 'JS', id: 'Math' } });
 
         test.deepEqual(new Parser("dep").parse('JS::Math as Math').getAst(),
             { type: 'constant',

@@ -14,11 +14,11 @@ nameList is ["Ford", "Arthur", "Trillian", "Zaphod"];
 nameSet is {"Ford", "Arthur", "Trillian", "Zaphod"};
 
 // map
-homes is {
-    "Ford"      = "Betelgeuse",
-    "Arthur"    = "Earth",
-    "Trillian"  = "Earth",
-    "Zaphod"    = "Betelgeuse"
+homeWorlds is {
+    "Ford"      => "Betelgeuse",
+    "Arthur"    => "Earth",
+    "Trillian"  => "Earth",
+    "Zaphod"    => "Betelgeuse"
 };
 
 // service literal

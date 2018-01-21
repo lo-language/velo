@@ -15,7 +15,7 @@
 
 const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
-
+const Type = require('../compiler/Type');
 
 class Boolean extends LoConstruct {
     
@@ -26,6 +26,7 @@ class Boolean extends LoConstruct {
 
         super();
         this.value = value;
+        this.type = Type.BOOL;
     }
 
     /**

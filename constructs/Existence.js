@@ -14,53 +14,58 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * A runtime existence check operator.
- *
- * @param expr      a nominal expression
- * @param undef     true if checking for non-existence
- */
-var __ = function (expr, undef) {
+class Existence extends LoConstruct {
 
-    this.expr = expr;
-    this.undef = undef;
-};
+    /**
+     * A runtime existence check operator.
+     *
+     * @param expr      a nominal expression
+     * @param undef     true if checking for non-existence
+     */
+    constructor(expr, undef) {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+        super();
+        this.expr = expr;
+        this.undef = undef;
+    }
 
-    return {
-        type: this.undef ? 'undefined' : 'defined',
-        expr: this.expr.getAst()
-    };
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+        return {
+            type: this.undef ? 'undefined' : 'defined',
+            expr: this.expr.getAst()
+        };
+    }
 
-    return [
-        'exists',
-        this.undef ? 'undefined' : 'defined',
-        this.expr.getTree()];
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+        return [
+            'exists',
+            this.undef ? 'undefined' : 'defined',
+            this.expr.getTree()];
+    }
 
-    return this.undef ?
-        JS.strictEqual(JS.typeof(this.expr.compile(sourceCtx, targetCtx)), JS.string('undefined')) :
-        JS.strictNotEqual(JS.typeof(this.expr.compile(sourceCtx, targetCtx)), JS.string('undefined'));
-};
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
 
-module.exports = __;
+        return this.undef ?
+            JS.strictEqual(JS.typeof(this.expr.compile(sourceCtx, targetCtx)), JS.string('undefined')) :
+            JS.strictNotEqual(JS.typeof(this.expr.compile(sourceCtx, targetCtx)), JS.string('undefined'));
+    }
+}
+
+module.exports = Existence;

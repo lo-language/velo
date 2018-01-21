@@ -5,13 +5,15 @@
 
 "use strict";
 
-const Context = require('../../compiler/LoContext');
+const LoContext = require('../../compiler/LoContext');
+const Type = require('../../compiler/Type');
+
 
 module.exports["basics"] = {
 
     "isRoot": function (test) {
 
-        var root = new Context();
+        var root = new LoContext();
 
         test.ok(root.isRoot());
 
@@ -24,7 +26,7 @@ module.exports["basics"] = {
 
     'declare var': function (test) {
 
-        var ctx = new Context().createInner();
+        var ctx = new LoContext().createInner();
 
         test.equal(ctx.has('foo'), false);
         test.deepEqual(ctx.getJsVars(), []);
@@ -44,9 +46,9 @@ module.exports["basics"] = {
         test.done();
     },
 
-    'context type': function (test) {
+    'LoContext type': function (test) {
 
-        var ctx = new Context();
+        var ctx = new LoContext();
 
         test.equal(ctx.isService(), false);
         test.equal(ctx.isSink(), false);
@@ -62,7 +64,7 @@ module.exports["basics"] = {
 
     'declare var that collides with JS': function (test) {
 
-        var ctx = new Context().createInner();
+        var ctx = new LoContext().createInner();
 
         test.equal(ctx.has('function'), false);
         test.deepEqual(ctx.getJsVars(), []);
@@ -81,7 +83,7 @@ module.exports["basics"] = {
 
     'define constant': function (test) {
 
-        var ctx = new Context();
+        var ctx = new LoContext();
 
         test.equal(ctx.has('port'), false);
         test.deepEqual(ctx.getJsVars(), []);
@@ -104,7 +106,7 @@ module.exports["basics"] = {
 
     'define constant that collides with JS': function (test) {
 
-        var ctx = new Context().createInner();
+        var ctx = new LoContext().createInner();
 
         test.equal(ctx.has('function'), false);
         test.deepEqual(ctx.getJsVars(), []);
@@ -118,7 +120,7 @@ module.exports["basics"] = {
 
     'define service constant': function (test) {
 
-        var ctx = new Context().createInner();
+        var ctx = new LoContext().createInner();
 
         test.equal(ctx.has('function'), false);
         test.deepEqual(ctx.getJsVars(), []);
@@ -132,7 +134,7 @@ module.exports["basics"] = {
 
     'set future': function (test) {
 
-        var ctx = new Context();
+        var ctx = new LoContext();
 
         test.equal(ctx.has('John_Zoidberg'), false);
         test.deepEqual(ctx.getJsVars(), []);
@@ -149,7 +151,7 @@ module.exports["child ctx"] = {
 
     'lookup var in parent': function (test) {
 
-        var parent = new Context().createInner();
+        var parent = new LoContext().createInner();
 
         var child = parent.createInner();
 
@@ -177,7 +179,7 @@ module.exports["child ctx"] = {
 
     'lookup constant in parent': function (test) {
 
-        var parent = new Context();
+        var parent = new LoContext();
 
         var child = parent.createInner();
 
@@ -215,7 +217,7 @@ module.exports["can respond"] = {
 
     'in various contexts': function (test) {
 
-        var root = new Context();
+        var root = new LoContext();
         test.equal(root.canRespond(), false);
 
         var sink = root.createInner(false);
@@ -231,20 +233,19 @@ module.exports["can respond"] = {
     }
 };
 
-module.exports["continuations"] = {
+module.exports["service typing"] = {
 
-    'wrapTail': function (test) {
+    'throws error on conflict': function (test) {
+        
+        var ctx = new LoContext();
 
-        // todo
+        ctx.setSuccType(Type.BOOL);
+        test.equal(ctx.succType, Type.BOOL);
 
-        test.done();
-    }
-};
+        ctx.setFailType(Type.NUM);
+        test.equal(ctx.failType, Type.NUM);
 
-module.exports["compile statements"] = {
-
-    'basic': function (test) {
-
+        test.throws(function () {ctx.setSuccType(Type.NUM);});
         test.done();
     }
 };

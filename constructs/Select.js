@@ -10,53 +10,59 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const LoConstruct = require('./LoConstruct');
 
 
-/**
- * A record select (dot operator) expression
- *
- * @param recordExpr
- * @param field
- */
-var __ = function (recordExpr, field) {
+class Select extends LoConstruct {
 
-    this.recordExpr = recordExpr;
-    this.field = field;
-};
+    /**
+     * A record select (dot operator) expression
+     *
+     * @param recordExpr
+     * @param field
+     */
+    constructor(recordExpr, field) {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+        super();
 
-    return {
-        type: 'select',
-        record: this.recordExpr.getAst(),
-        field: this.field
-    };
-};
+        this.recordExpr = recordExpr;
+        this.field = field;
+    }
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-    return [
-        'select',
-        this.recordExpr.getTree(),
-        this.field
-    ];
-};
+        return {
+            type: 'select',
+            record: this.recordExpr.getAst(),
+            field: this.field
+        };
+    }
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-    return JS.select(this.recordExpr.compile(sourceCtx, targetCtx), this.field);
-};
+        return [
+            'select',
+            this.recordExpr.getTree(),
+            this.field
+        ];
+    }
 
-module.exports = __;
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
+
+        return JS.select(this.recordExpr.compile(sourceCtx, targetCtx), this.field);
+    }
+}
+
+module.exports = Select;

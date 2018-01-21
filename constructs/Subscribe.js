@@ -15,28 +15,18 @@
 
 const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
+const ArrayType = require('../compiler/ArrayType');
 
-
-class String extends LoConstruct {
+class Subscribe extends LoConstruct {
 
     /**
-     * A literal string
      */
-    constructor(value) {
+    constructor(event, handler) {
 
         super();
 
-        this.value = value;
-    }
-
-    /**
-     * Accessor
-     *
-     * @returns {*}
-     */
-    getValue() {
-
-        return this.value;
+        this.event = event;
+        this.handler = handler;
     }
 
     /**
@@ -45,8 +35,9 @@ class String extends LoConstruct {
     getAst() {
 
         return {
-            type: 'string',
-            val: this.value
+            type: 'subscribe',
+            event: this.event.getAst(),
+            handler: this.handler.getAst()
         };
     }
 
@@ -55,15 +46,11 @@ class String extends LoConstruct {
      */
     getTree() {
 
-        return ['string', this.value];
-    }
-
-    /**
-     *
-     */
-    hasType(type) {
-
-        return type == 'string';
+        return [
+            'subscribe',
+            this.event.getTree(),
+            this.handler.getTree()
+        ];
     }
 
     /**
@@ -73,8 +60,7 @@ class String extends LoConstruct {
      */
     compile(sourceCtx) {
 
-        return JS.string(this.value);
     }
 }
 
-module.exports = String;
+module.exports = Subscribe;

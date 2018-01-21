@@ -7,25 +7,37 @@
  *
  =============================================================================*/
 
+/**
+ * Created by seth on 11/12/16.
+ */
+
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
+const ArrayType = require('../compiler/ArrayType');
 
-
-class Membership extends LoConstruct {
+class String extends LoConstruct {
 
     /**
-     * A set membership test operator expression
-     *
-     * @param set
-     * @param member
+     * A literal string
      */
-    constructor(set, member) {
+    constructor(value) {
 
         super();
-        this.set = set;
-        this.member = member;
+
+        this.value = value;
+        this.type = ArrayType.STRING;
+    }
+
+    /**
+     * Accessor
+     *
+     * @returns {*}
+     */
+    getValue() {
+
+        return this.value;
     }
 
     /**
@@ -34,9 +46,8 @@ class Membership extends LoConstruct {
     getAst() {
 
         return {
-            type: 'testMembership',
-            set: this.set.getAst(),
-            member: this.member.getAst()
+            type: 'string',
+            val: this.value
         };
     }
 
@@ -45,27 +56,18 @@ class Membership extends LoConstruct {
      */
     getTree() {
 
-        return [
-            'membership',
-            this.set.getTree(),
-            this.member.getTree()
-        ];
+        return ['string', this.value];
     }
 
     /**
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
-     * @param targetCtx
      */
-    compile(sourceCtx, targetCtx) {
+    compile(sourceCtx) {
 
-        return JS.utilCall(
-            'in', [
-                this.member.compile(sourceCtx, targetCtx),
-                this.set.compile(sourceCtx, targetCtx)
-            ]);
+        return JS.string(this.value);
     }
 }
 
-module.exports = Membership;
+module.exports = String;

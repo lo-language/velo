@@ -117,12 +117,11 @@
     },
     {
       "type": "constant",
-      "name": "homes",
+      "name": "homeWorlds",
       "value": {
         "type": "map",
         "elements": [
           {
-            "type": "pair",
             "key": {
               "type": "string",
               "val": "Ford"
@@ -133,7 +132,6 @@
             }
           },
           {
-            "type": "pair",
             "key": {
               "type": "string",
               "val": "Arthur"
@@ -144,7 +142,6 @@
             }
           },
           {
-            "type": "pair",
             "key": {
               "type": "string",
               "val": "Trillian"
@@ -155,7 +152,6 @@
             }
           },
           {
-            "type": "pair",
             "key": {
               "type": "string",
               "val": "Zaphod"
@@ -198,13 +194,11 @@
         "type": "compound",
         "fields": [
           {
-            "type": "field",
             "label": "name",
             "value": {
               "type": "compound",
               "fields": [
                 {
-                  "type": "field",
                   "label": "first",
                   "value": {
                     "type": "string",
@@ -212,7 +206,6 @@
                   }
                 },
                 {
-                  "type": "field",
                   "label": "middle",
                   "value": {
                     "type": "string",
@@ -220,7 +213,6 @@
                   }
                 },
                 {
-                  "type": "field",
                   "label": "last",
                   "value": {
                     "type": "string",
@@ -231,7 +223,6 @@
             }
           },
           {
-            "type": "field",
             "label": "course",
             "value": {
               "type": "number",
@@ -239,7 +230,6 @@
             }
           },
           {
-            "type": "field",
             "label": "year",
             "value": {
               "type": "number",

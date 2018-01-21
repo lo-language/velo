@@ -7,46 +7,39 @@
  *
  =============================================================================*/
 
-/**
- * A CF graph node that is terminal (can't be appended to).
- *
- * Created by: spurcell
- * 12/25/14
- */
-
 "use strict";
 
-const CFNode = require('./CFNode');
 
-
-class TerminalNode extends CFNode {
+class Symbol {
 
     /**
      *
-     * @param js
-     * @param intact
      */
-    constructor(js, intact = true) {
+    constructor(name) {
 
-        super(js, intact);
     }
 
 
     /**
-     * no-op
+     * @return {Boolean}
      */
-    setNext(next) {
+    isConstant() {
 
     }
 
     /**
-     * no-op
+     * Returns true if the given name refers to a future.
+     *
+     * @param name
      */
-    append (node) {
+    isFuture(name) {
 
-        return this;
+        if (this.symbols['@' + name] !== undefined
+            && this.symbols['@' + name].type == 'future') {
+            return true;
+        }
     }
 }
 
-module.exports = TerminalNode;
 
+module.exports = Symbol;

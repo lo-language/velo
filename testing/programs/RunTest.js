@@ -14,6 +14,28 @@ const Program = require('../../Program');
 const Task = require('../../runtime/Task');
 const util = require('util');
 
+module.exports['yields'] = {
+
+    "setUp": function (cb) {
+
+        this.program = new Program('yields.lo', __dirname);
+        cb();
+    },
+
+    'success': function (test) {
+
+        var name = "Jean-Baptiste Emmanual Zorg";
+
+        var helper = function (args, succ, fail) {
+            succ([name]);
+        };
+
+        this.program.run([helper]).then(function (result) {
+            test.deepEqual(result, [name]);
+            test.done();
+        });
+    }
+};
 
 module.exports['set operations'] = {
 
@@ -216,6 +238,8 @@ module.exports['helloWorld'] = {
 
         this.program.run([[], system, {}]).then(function (result) {
             test.done();
+        }).catch(err => {
+            console.log(err);
         });
     }
 };

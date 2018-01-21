@@ -22,7 +22,6 @@
 
 "use strict";
 
-const JS = require('./../codegen/JsPrimitives');
 
 class CFNode {
 

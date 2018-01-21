@@ -1,0 +1,19 @@
+test is () {
+
+    // no arguments
+    close <<;
+
+    // one arg
+    keypress << 'A';
+
+    // two-argument message
+    click << x, y;
+
+    on mouse.click >> (x, y) {
+
+    }
+
+    on SIGINT >> () {
+
+    }
+};

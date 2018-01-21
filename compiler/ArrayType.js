@@ -9,7 +9,22 @@
 
 "use strict";
 
-module.exports = {
+const Type = require('../compiler/Type');
 
-    String: require("./LoString")
-};
+
+class ArrayType extends Type {
+
+    /**
+     *
+     */
+    constructor(elemType, name) {
+
+        super(name || (elemType.toString() + '*'));
+        this.elemType = elemType;
+    }
+}
+
+ArrayType.STRING = new ArrayType(Type.CHAR, 'string');
+
+
+module.exports = ArrayType;

@@ -1,0 +1,108 @@
+{
+  "type": "module",
+  "definitions": [
+    {
+      "type": "constant",
+      "name": "test",
+      "value": {
+        "type": "procedure",
+        "params": [],
+        "body": {
+          "type": "stmt_list",
+          "head": {
+            "type": "event",
+            "address": {
+              "type": "id",
+              "name": "close"
+            },
+            "args": []
+          },
+          "tail": {
+            "type": "stmt_list",
+            "head": {
+              "type": "event",
+              "address": {
+                "type": "id",
+                "name": "keypress"
+              },
+              "args": [
+                {
+                  "type": "char",
+                  "val": "A"
+                }
+              ]
+            },
+            "tail": {
+              "type": "stmt_list",
+              "head": {
+                "type": "event",
+                "address": {
+                  "type": "id",
+                  "name": "click"
+                },
+                "args": [
+                  {
+                    "type": "id",
+                    "name": "x"
+                  },
+                  {
+                    "type": "id",
+                    "name": "y"
+                  }
+                ]
+              },
+              "tail": {
+                "type": "stmt_list",
+                "head": {
+                  "type": "subscribe",
+                  "event": {
+                    "type": "select",
+                    "record": {
+                      "type": "id",
+                      "name": "mouse"
+                    },
+                    "field": "click"
+                  },
+                  "handler": {
+                    "type": "procedure",
+                    "params": [
+                      "x", "y"
+                    ],
+                    "body": {
+                      "type": "stmt_list",
+                      "head": null,
+                      "tail": null
+                    },
+                    "isService": false
+                  }
+                },
+                "tail": {
+                  "type": "stmt_list",
+                  "head": {
+                    "type": "subscribe",
+                    "event": {
+                      "type": "id",
+                      "name": "SIGINT"
+                    },
+                    "handler": {
+                      "type": "procedure",
+                      "params": [],
+                      "body": {
+                        "type": "stmt_list",
+                        "head": null,
+                        "tail": null
+                      },
+                      "isService": false
+                    }
+                  },
+                  "tail": null
+                }
+              }
+            }
+          }
+        },
+        "isService": true
+      }
+    }
+  ]
+}

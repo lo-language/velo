@@ -10,65 +10,62 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const LoConstruct = require('./LoConstruct');
+const ArrayType = require('../compiler/ArrayType');
 
 
-/**
- * Coerces the given expression to the given type.
- *
- * @param expr
- * @param type
- */
-var __ = function (expr, type) {
+class Coercion extends LoConstruct {
 
-    this.expr = expr;
-    this.type = type || 'string';
-};
+    /**
+     * Coerces the given expression to the given type.
+     *
+     * @param expr
+     */
+    constructor(expr) {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
-
-    return {
-        type: 'coercion',
-        expr: this.expr.getAst(),
-        coerce: this.type
-    };
-};
-
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
-
-    return [
-        'coercion',
-        this.expr.getTree(),
-        this.type
-    ];
-};
-
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.hasType = function (type) {
-
-    return type == this.type;
-};
-
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
-
-    if (this.type == 'string') {
-        return JS.fnCall(JS.ID('String'), [this.expr.compile(sourceCtx, targetCtx)]);
+        super();
+        this.expr = expr;
+        this.type = ArrayType.STRING;
     }
 
-    throw new Error('we only coerce to strings at the moment, baby');
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-module.exports = __;
+        return {
+            type: 'coercion',
+            expr: this.expr.getAst(),
+            coerce: this.type.toString()
+        };
+    }
+
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
+
+        return [
+            'coercion',
+            this.expr.getTree(),
+            this.type
+        ];
+    }
+
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
+
+        if (this.type == ArrayType.STRING) {
+            return JS.fnCall(JS.ID('String'), [this.expr.compile(sourceCtx, targetCtx)]);
+        }
+
+        throw new Error('we only coerce to strings at the moment, baby');
+    }
+}
+
+module.exports = Coercion;

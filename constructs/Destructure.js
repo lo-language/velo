@@ -13,41 +13,48 @@
 
 "use strict";
 
-/**
- * A destructuring assignment.
- */
-var __ = function (names) {
+const LoConstruct = require('./LoConstruct');
 
-    this.names = names;
-};
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getAst = function () {
+class Destructure extends LoConstruct {
 
-    return {
-        type: 'destructure',
-        fields: this.names
-    };
-};
+    /**
+     * A destructuring assignment.
+     */
+    constructor(names) {
 
-/**
- * Returns the Lo AST for this node.
- */
-__.prototype.getTree = function () {
+        super();
+        this.names = names;
+    }
 
-    return ['destructure'].concat(this.names);
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getAst() {
 
-/**
- * Compiles this node to JS in the given context.
- *
- * @param sourceCtx
- * @param targetCtx
- */
-__.prototype.compile = function (sourceCtx, targetCtx) {
+        return {
+            type: 'destructure',
+            fields: this.names
+        };
+    }
 
-};
+    /**
+     * Returns the Lo AST for this node.
+     */
+    getTree() {
 
-module.exports = __;
+        return ['destructure'].concat(this.names);
+    }
+
+    /**
+     * Compiles this node to JS in the given context.
+     *
+     * @param sourceCtx
+     * @param targetCtx
+     */
+    compile(sourceCtx, targetCtx) {
+
+    }
+}
+
+module.exports = Destructure;

@@ -11,19 +11,33 @@
 
 const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
+const MapType = require('../compiler/MapType');
+const Type = require('../compiler/Type');
 
 
 class MapLiteral extends LoConstruct {
 
     /**
-     * An map literal
+     * A map literal
      *
-     * @param elements
+     * @param pairs
      */
-    constructor(elements) {
+    constructor(pairs) {
 
         super();
-        this.elements = elements;
+        this.elements = pairs;
+
+        var keyType, valType;
+
+        pairs.forEach(el => {
+
+            if (keyType == null) {
+                keyType = el.key.type;
+                valType = el.value.type;
+            }
+        });
+
+        this.type = new MapType(keyType || Type.DYN, valType || Type.DYN);
     }
 
     /**
@@ -33,7 +47,9 @@ class MapLiteral extends LoConstruct {
 
         return {
             type: 'map',
-            elements: this.elements.map(elem => elem.getAst())
+            elements: this.elements.map(elem => {
+                return { key: elem.key.getAst(), value: elem.value.getAst() };
+            })
         };
     }
 
@@ -44,7 +60,9 @@ class MapLiteral extends LoConstruct {
 
         return [
             'map-literal',
-            this.elements.map(elem => elem.getTree())
+            this.elements.map(elem => {
+                return [elem.key.getTree(), elem.value.getTree()]
+            })
         ];
     }
 
@@ -52,12 +70,11 @@ class MapLiteral extends LoConstruct {
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
-     * @param targetCtx
      */
-    compile(sourceCtx, targetCtx) {
+    compile(sourceCtx) {
 
-        return JS.objLiteral(this.elements.map(item => {
-            return item.compile(sourceCtx, targetCtx);
+        return JS.objLiteral(this.elements.map(elem => {
+            return [elem.key.compile(sourceCtx), elem.value.compile(sourceCtx)];
         }));
     }
 }

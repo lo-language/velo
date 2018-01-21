@@ -7,24 +7,31 @@
  *
  =============================================================================*/
 
+/**
+ * Created by seth on 11/12/16.
+ */
+
 "use strict";
 
+const JS = require('../codegen/JsPrimitives');
+const Identifier = require('./Identifier');
+const CFNode = require('../compiler/CFNode');
 const LoConstruct = require('./LoConstruct');
 
 
-class Pair extends LoConstruct {
+class Event extends LoConstruct {
 
     /**
-     * A set pair literal
+     * An assignment statement.
      *
-     * @param key
-     * @param value
+     * @param address   expr
+     * @param args      expr
      */
-    constructor(key, value) {
+    constructor(address, args) {
 
         super();
-        this.key = key;
-        this.value = value;
+        this.address = address;
+        this.args = args;
     }
 
     /**
@@ -33,9 +40,9 @@ class Pair extends LoConstruct {
     getAst() {
 
         return {
-            type: 'pair',
-            key: this.key.getAst(),
-            value: this.value.getAst()
+            type: 'event',
+            address: this.address.getAst(),
+            args: this.args.map(arg => arg.getAst())
         };
     }
 
@@ -45,8 +52,9 @@ class Pair extends LoConstruct {
     getTree() {
 
         return [
-            this.key.getTree(),
-            this.value.getTree()
+            'set!',
+            this.address.getTree(),
+            this.args.map(arg => arg.getTree())
         ];
     }
 
@@ -54,13 +62,11 @@ class Pair extends LoConstruct {
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
-     * @param targetCtx
+     * @param last
      */
-    compile(sourceCtx, targetCtx) {
+    compile(sourceCtx, last) {
 
-        return [this.key.compile(sourceCtx, targetCtx), this.value.compile(sourceCtx, targetCtx)];
     }
 }
 
-
-module.exports = Pair;
+module.exports = Event;

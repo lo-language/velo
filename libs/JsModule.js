@@ -1,6 +1,6 @@
 /**=============================================================================
  *
- * Copyright (c) 2013 - 2017 Seth Purcell
+ * Copyright (c) 2013 - 2018 Seth Purcell
  * Licensed under Apache License v2.0 with Runtime Library Exception
  *
  * See LICENSE.txt in the project root for license information.
@@ -22,6 +22,19 @@ class JsModule extends LibModule {
     constructor (name) {
 
         super(name, 'JS');
+    }
+
+    /**
+     * no-op
+     */
+    acquire () {
+
+        return Promise.resolve(this);
+    }
+
+    getDeps () {
+
+        return [];
     }
 
     /**

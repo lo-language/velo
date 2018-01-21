@@ -5,14 +5,10 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
- * Success is finding something you really like to do and caring enough about it
- * to do it well.
  =============================================================================*/
 
 /**
  * Packages up an IR procedure, but isn't a control flow node.
- *
- * We need to do this so we can
  *
  * Created by: spurcell
  * 12/25/14
@@ -21,6 +17,7 @@
 "use strict";
 
 const JS = require('./../codegen/JsPrimitives');
+
 
 class Proc {
 

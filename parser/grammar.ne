@@ -8,6 +8,7 @@
           ws:           { match: /[ \t\r\n]+/, lineBreaks: true },
           bcpl_comment: /\/\/.*?$/,
           number:       /0|-?[1-9][0-9]*(?:\.[0-9]+)?/,
+          char:         { match: /'.'/, value: text => text.slice(1, -1) },
 
           string_start: { match: '"', push: "in_string" },
           interp_end:   { match: '`', pop: true },
@@ -26,6 +27,7 @@
           tilde_arrow:  '~>',
           yields:       '=>',
           forward:      '>>',
+          fire:         '<<',
           concat:       '><',
           push_front:   '+>',
           push_back:    '<+',
@@ -46,8 +48,8 @@
           mod:          '%',
           cond:         '?',
           ID:           { match: /[a-zA-Z_][a-zA-Z_0-9]*/, keywords: {
-                          KW: ['as', 'is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
-                                'module', 'exists', 'defined', 'undefined', 'using',
+                          KW: ['is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
+                                'module', 'exists', 'defined', 'undefined', 'using', 'as', 'on',
 
                                 // le primitive types
                                 'dyn', 'bool', 'int', 'char', 'string', 'float', 'dec'],
@@ -56,8 +58,8 @@
         },
         in_string: {
 
-          string:       { match: /(?:\\[btnr"\\]|[^\n"`\\])*?"/, value: text => text.slice(0, -1), pop: true },
-          interp_begin: { match: /(?:\\[btnr"\\]|[^\n"`\\])*?`/, value: text => text.slice(0, -1), push: "main" }
+          string:       { match: /(?:\\[nrvtbfx"\\]|[^\n"`\\])*?"/, value: text => text.slice(0, -1), pop: true },
+          interp_begin: { match: /(?:\\[nrvtbfx"\\]|[^\n"`\\])*?`/, value: text => text.slice(0, -1), push: "main" }
         }
     });
 
@@ -86,6 +88,9 @@
     };
 %}
 
+####################################################################################################
+# modules
+####################################################################################################
 
 # Pass your lexer object using the @lexer option:
 @lexer lexer
@@ -95,29 +100,28 @@ module -> using:* definition:+                                      {% function 
 using -> "using" dep ";"                                            {% function (d) { return d[1]; } %}
 
 dep
-    ->  %ID                                                         {% function (d) {
-            return new Lo.constant(d[0].value, new Lo.moduleRef(null, d[0].value));
-                                                                    } %}
-    |   locator "as" %ID                                            {% function (d) {
-            return new Lo.constant(d[2].value, d[0]);
-                                                                    } %}
-
-# only supports a single-step namespace for now
-locator
-    ->  %string                                                     {% function (d) { return new Lo.moduleRef(null, d[0].value); } %}
-    |   (%ID "::"):? %ID                                            {% function (d) {
-                                                    return new Lo.moduleRef(d[0] ? d[0][0].value : null, d[1].value); } %}
+    ->  (%ID "::"):? %ID ("as" %ID):?                                            {% function (d) {
+            return new Lo.constant(d[2] ? d[2][1].value : d[1].value,
+                new Lo.moduleRef(d[0] ? d[0][0].value : null, d[1].value));
+        } %}
+    |   %string "as" %ID                                            {% function (d) {
+            return new Lo.constant(d[2].value, new Lo.moduleRef(null, d[0].value));
+        } %}
 
 stmt_list
     ->  statement                                                   {% function (d) { return new Lo.stmtList(d[0]); } %}
     |   statement stmt_list                                         {% function (d) { return new Lo.stmtList(d[0], d[1]); } %}
+
+####################################################################################################
+# statements
+####################################################################################################
 
 statement
     ->  definition                                                  {% id %}
     |   response                                                    {% id %}
     |   expr %assign expr ";"       				                {% function (d) {
             return new Lo.assign(d[0], d[1].value == '=' ? d[2] : new Lo.binaryOpExpr(
-            {'+=': '+', '-=': '-', '*=': '*', '/=': '/', '%=': '%'}[d[1].value], d[0], d[2])); } %}
+                {'+=': '+', '-=': '-', '*=': '*', '/=': '/', '%=': '%'}[d[1].value], d[0], d[2])); } %}
     |   destructure %assign expr ";"       				            {% function (d) {
                                                                         return new Lo.assign(d[0], d[1].value == '=' ? d[2] :
                                                                             new Lo.binaryOpExpr(
@@ -134,10 +138,14 @@ statement
                                                                         return new Lo.arrayPush(
                                                                             d[1][0].value == '<+' ? 'push-back' : 'push-front', d[0], d[2]);
                                                                     } %}
-    |   async:? expr "<-" exprList:? handlers                       {% function (d) {
-                                                                        return new Lo.requestStmt(d[1], d[3] ? d[3] : [],
-                                                                            d[4][0], d[4][1], d[0] == null);
+    # request statement
+    |   async:? expr ("<-" exprList):? handlers                     {% function (d) {
+                                                                        return new Lo.requestStmt(d[1], d[2] ? d[2][1] : [],
+                                                                            d[3][0], d[3][1], d[0] == null);
                                                                     } %}
+    # event statement
+    |   expr "<<" exprList:? ";"                                    {% function (d) {
+            return new Lo.event(d[0], d[2] ? d[2] : []); } %}
     #|   async:? expr exprList:? handlers                            {% function (d) {
     #                                                                    return new Lo.requestStmt(d[1], d[2] || [],
     #                                                                        d[3][0], d[3][1], d[0] == null);
@@ -146,6 +154,8 @@ statement
             return new Lo.while(d[1], d[2]).setSourceLoc(d[0]);} %}
     |   "scan" expr ">>" proc                                       {% function (d) {
             return new Lo.scan(d[1], d[3]).setSourceLoc(d[0]);} %}
+    |   "on" expr ">>" proc                                         {% function (d) {
+            return new Lo.subscribe(d[1], d[3]); } %}
 
 response -> ("reply" | "fail" | "substitute") exprList:? ";"        {% function (d) {
     return new Lo.response(d[0][0].value, d[1] || []).setSourceLoc(d[0][0]);
@@ -163,17 +173,17 @@ definition -> %ID ("is"|"are") expr ";"                             {%
         return new Lo.constant(d[0].value, d[2]).setSourceLoc(d[0]);
     } %}
 
-# there's got to be a better way to describe this
 handlers
     ->  ";"                                     {% function (d) { return [null, null]; } %}
-    |   assign_handler ";"                       {% function (d) { return [d[0], null]; } %}
-    |   assign_handler fail_handler
-    |   reply_handler                            {% function (d) { return [d[0], null]; } %}
-    |   fail_handler                             {% function (d) { return [null, d[0]]; } %}
-    |   reply_handler fail_handler
+    |   assign_handler (fail_handler|";")       {% function (d) { return [d[0], d[1][0].value === ';' ? null : d[1][0]]; } %}
+    |   reply_handler fail_handler:?            {% function (d) { return [d[0], d[1]]; } %}
+    |   fail_handler                            {% function (d) { return [null, d[0]]; } %}
 
+# the assign handler declares and assigns a new var - or constant?
+# todo make the RHS an lvalue or destructure, not just an ID
 assign_handler
-    ->  "=>" %ID                                {% function (d) { return new Lo.yields(new Lo.identifier(d[1].value)); } %}
+    ->  "=>" %ID                                {% function (d) {
+        return new Lo.yields(new Lo.identifier(d[1].value)); } %}
 
 reply_handler
     ->  "->" proc                               {% function (d) { return d[1]; } %}
@@ -189,8 +199,10 @@ conditional
     |   "if" expr block "else" conditional    	{% function (d) {
             return new Lo.conditional(d[1], d[2], new Lo.stmtList(d[4])).setSourceLoc(d[0]); } %}
 
-
-# expression grammar, mostly courtesy of Jeff Lee's 1985 C grammar
+####################################################################################################
+# expressions
+# mostly courtesy of Jeff Lee's 1985 C grammar
+####################################################################################################
 
 primary_expr
     ->   %ID                                            {% function (d) {
@@ -259,17 +271,15 @@ literal
             return new Lo.boolean(d[0].value === 'true').setSourceLoc(d[0]); } %}
     |   %number                                     {% function (d) {
             return new Lo.number(d[0].value).setSourceLoc(d[0]); } %}
+    |   %char                                       {% function (d) {
+            return new Lo.charLiteral(d[0].value).setSourceLoc(d[0]); } %}
     |   interp_string                               {% id %}
     |   "[" (expr ",":?):* "]"                      {%
     function (d) {
             return new Lo.arrayLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]);
     } %}
-    |   "(" (field ",":?):+ ")"                     {% function (d) {
-            return new Lo.compound(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } %}
-    |   "{" "=" "}"                                {% function (d) {
-            return new Lo.mapLiteral([]).setSourceLoc(d[0]); } %}
-    |   "{" (pair ",":?):+ "}"                      {% function (d) {
-            return new Lo.mapLiteral(d[1].map(function (pair) {return pair[0];})).setSourceLoc(d[0]); } %}
+    |   struct_literal                              {% id %}
+    |   map_literal                                 {% id %}
     |   "{" (expr ",":?):* "}"                      {% function (d) {
             return new Lo.setLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]); } %}
     |   proc                                        {% function (d) { d[0].isService = true; return d[0]; } %}
@@ -288,10 +298,24 @@ interp_string
             d[3]).setSourceLoc(d[0].line, d[0].col - 1);
     } %}
 
-field   -> %ID ":" expr                             {% function (d) { return new Lo.field(d[0].value, d[2]); } %}
-pair    -> expr "=" expr                            {% function (d) { return new Lo.pair(d[0], d[2]); } %}
+struct_literal
+    ->   "(" (field ",":?):+ ")"                     {% function (d) {
+            return new Lo.compound(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } %}
 
-typed_id -> type_spec:? %ID                         {% function (d) { return d[1]; } %}
+field   -> %ID ":" expr                             {% function (d) { return {label: d[0].value, value: d[2]}; } %}
+
+map_literal
+    ->   "{" "=>" "}"                               {% function (d) {
+            return new Lo.mapLiteral([]).setSourceLoc(d[0]); } %}
+    |   "{" (pair ",":?):+ "}"                      {% function (d) {
+            return new Lo.mapLiteral(d[1].map(function (pair) {return pair[0];})).setSourceLoc(d[0]); } %}
+
+pair    -> expr "=>" expr                           {% function (d) { return {key: d[0], value: d[2]}; } %}
+
+
+####################################################################################################
+# procedures and blocks
+####################################################################################################
 
 proc -> "(" id_list:? ")" block                   {% function (d) {
     return new Lo.procedure(d[1] ? d[1] : [], d[3]).setSourceLoc(d[0]); } %}
@@ -302,13 +326,24 @@ id_list
 	-> typed_id ("," typed_id):*                              {% function (d) {
 	    return [d[0].value].concat(d[1].map(function (id) {return id[1].value;})); } %}
 
+
+####################################################################################################
+# types
+####################################################################################################
+
+typed_id -> type_spec:? %ID                         {% function (d) { return d[1]; } %}
+
 type_spec
-    ->  "dyn"
+    ->  "null"
+    |   "dyn"
     |   "bool"
-    |   "int"
     |   "char"
-    |   "string"
+    |   "int"
     |   "float"
     |   "dec"
+    |   "num"
+    |   "string"
     |   %ID
+    | type_spec "?"
     | type_spec "*"
+    | type_spec "+"

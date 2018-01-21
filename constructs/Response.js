@@ -13,6 +13,7 @@ const JS = require('../codegen/JsPrimitives');
 const CFNode = require('../compiler/CFNode');
 const TerminalNode = require('../compiler/TerminalNode');
 const LoConstruct = require('./LoConstruct');
+const Type = require('../compiler/Type');
 
 
 class Response extends LoConstruct {
@@ -58,30 +59,29 @@ class Response extends LoConstruct {
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
-     * @param targetCtx
      */
-    compile(sourceCtx, targetCtx) {
+    compile(sourceCtx) {
 
         if (sourceCtx.canRespond() == false) {
             sourceCtx.reportError(this, "can't respond from this context");
         }
 
-        var args = JS.arrayLiteral(this.args.map(arg => arg.compile(sourceCtx, targetCtx)));
+        var type = Type.NULL;
+        var args = this.args.map(arg => arg.compile(sourceCtx));
+        var response;
 
-        var response = this.type == 'reply' ?
-            JS.exprStmt(JS.runtimeCall('succ', [args])) :
-            JS.exprStmt(JS.runtimeCall('fail', [args]));
+        if (this.args.length == 1) {
+            type = this.args[0].type;
+        }
 
-        // a response should compile to a non-appendable JS stmt list
-
-        // var following = sourceCtx.getFollowing();
-        //
-        // // if the following is a connector, include it, otherwise we can drop it
-        // sourceCtx.setFollowing(null);
-        //
-        // if (following == null) {
-        //     return response;
-        // }
+        if (this.type == 'reply') {
+            sourceCtx.setSuccType(type);
+            response = JS.exprStmt(JS.runtimeCall('succ', [JS.arrayLiteral(args)]));
+        }
+        else {
+            sourceCtx.setFailType(type);
+            response = JS.exprStmt(JS.runtimeCall('fail', [JS.arrayLiteral(args)]));
+        }
 
         // only if we're in a non-async branch context do we need the return
         // if the following is an async connector, we don't need the return

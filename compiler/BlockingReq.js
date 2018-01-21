@@ -5,8 +5,6 @@
  *
  * See LICENSE.txt in the project root for license information.
  *
- * Success is finding something you really like to do and caring enough about it
- * to do it well.
  =============================================================================*/
 
 /**
@@ -22,7 +20,6 @@
 const JS = require('../codegen/JsPrimitives');
 const CFNode = require('./CFNode');
 const JsWriter = require('../codegen/JsWriter');
-const Connector = require('../codegen/Connector');
 
 
 class ReqNode extends CFNode {

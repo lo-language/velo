@@ -15,8 +15,6 @@
  * Date: 12/24/14
  */
 
-// todo - put all the logic in a tested module and just call into it here
-
 'use strict';
 
 process.title = 'velo';
@@ -41,19 +39,16 @@ if (sourceFile == null) {
 
 var program = new Program(sourceFile, process.cwd());
 
-program.on('INFO', msg => {
-    console.error('INFO', msg);
-});
-
 program.on('ERROR', msg => {
     console.error('ERROR', msg);
 });
 
-// localSpace.on('error', function (file, node, message) {
+// program.on('INFO', msg => {
+//     console.error('INFO', msg);
+// });
 //
-//     var loc = node.getSourceLoc();
-//
-//     console.error(`${file} L${loc[0]}c${loc[1]}:`, message);
+// program.on('DEBUG', msg => {
+//     console.error('DEBUG', msg);
 // });
 
 switch (cmd) {
@@ -84,7 +79,19 @@ switch (cmd) {
 
                 var exitCode = 1;
 
-                process.exit(exitCode);
+                console.error("Compilation failed:", failParams);
+
+                // dump the JS that failed
+                // return localSpace.resolve(program).then(function () {
+                //
+                //     console.error(failParams);
+                //     console.error("\n>>> CRASH DETECTED -- JS dumped to velo_crash.js");
+                //
+                //     var ostream = fs.createWriteStream('velo_crash.js');
+                //     // localSpace.dumpModules(ostream);
+                //
+                //     ostream.on('close', function () { process.exit(exitCode); });
+                // });
 
                 // if (failParams.length > 0) {
                 //
@@ -97,17 +104,8 @@ switch (cmd) {
                 //     }
                 // }
 
-                // todo -- dump without recompiling
-                // return localSpace.resolve(program).then(function () {
-                //
-                //     console.error(failParams);
-                //     console.error("\n>>> CRASH DETECTED -- JS dumped to velo_crash.js");
-                //
-                //     var ostream = fs.createWriteStream('velo_crash.js');
-                //     // localSpace.dumpModules(ostream);
-                //
-                //     ostream.on('close', function () { process.exit(exitCode); });
-                // });
+
+                process.exit(exitCode);
             });
 
     default:
