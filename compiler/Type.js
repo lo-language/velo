@@ -27,6 +27,7 @@ class Type {
     }
 }
 
+Type.NULL    = new Type('null');
 Type.DYN    = new Type('dyn');
 Type.BOOL   = new Type('boolean');
 Type.CHAR   = new Type('char');

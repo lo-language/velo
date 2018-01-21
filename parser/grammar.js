@@ -316,15 +316,19 @@ var grammar = {
     {"name": "id_list$ebnf$1", "symbols": ["id_list$ebnf$1", "id_list$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
     {"name": "id_list", "symbols": ["typed_id", "id_list$ebnf$1"], "postprocess":  function (d) {
         return [d[0].value].concat(d[1].map(function (id) {return id[1].value;})); } },
+    {"name": "type_spec", "symbols": [{"literal":"null"}]},
     {"name": "type_spec", "symbols": [{"literal":"dyn"}]},
     {"name": "type_spec", "symbols": [{"literal":"bool"}]},
-    {"name": "type_spec", "symbols": [{"literal":"int"}]},
     {"name": "type_spec", "symbols": [{"literal":"char"}]},
-    {"name": "type_spec", "symbols": [{"literal":"string"}]},
+    {"name": "type_spec", "symbols": [{"literal":"int"}]},
     {"name": "type_spec", "symbols": [{"literal":"float"}]},
     {"name": "type_spec", "symbols": [{"literal":"dec"}]},
+    {"name": "type_spec", "symbols": [{"literal":"num"}]},
+    {"name": "type_spec", "symbols": [{"literal":"string"}]},
     {"name": "type_spec", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID)]},
-    {"name": "type_spec", "symbols": ["type_spec", {"literal":"*"}]}
+    {"name": "type_spec", "symbols": ["type_spec", {"literal":"?"}]},
+    {"name": "type_spec", "symbols": ["type_spec", {"literal":"*"}]},
+    {"name": "type_spec", "symbols": ["type_spec", {"literal":"+"}]}
 ]
   , ParserStart: "module"
 }

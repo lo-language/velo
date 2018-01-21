@@ -12,14 +12,15 @@
 
 "use strict";
 
-const JS = require('../codegen/JsPrimitives');
-const Proc = require('../compiler/Proc');
-const CFNode = require('../compiler/CFNode');
-const TerminalNode = require('../compiler/TerminalNode');
-const Response = require('../constructs/Response');
-const JsWriter = require('../codegen/JsWriter');
-const LoConstruct = require('./LoConstruct');
-const Connector = require('../codegen/Connector');
+const JS            = require('../codegen/JsPrimitives');
+const Proc          = require('../compiler/Proc');
+const CFNode        = require('../compiler/CFNode');
+const TerminalNode  = require('../compiler/TerminalNode');
+const ServiceType   = require('../compiler/ServiceType');
+const Response      = require('../constructs/Response');
+const JsWriter      = require('../codegen/JsWriter');
+const Connector     = require('../codegen/Connector');
+const LoConstruct   = require('./LoConstruct');
 
 
 class Procedure extends LoConstruct {
@@ -37,6 +38,9 @@ class Procedure extends LoConstruct {
         this.params = params;
         this.body = body;
         this.isService = isService || false; // nice hack! thanks!
+
+        // hmmm, i don't think we'll know the service type until we analyze the service
+        this.type = new ServiceType('foo', 'null', 'null');
     }
 
     /**

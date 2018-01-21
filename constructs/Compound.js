@@ -11,6 +11,7 @@
 
 const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
+const ProductType = require('../compiler/ProductType');
 
 
 class Compound extends LoConstruct {
@@ -24,6 +25,7 @@ class Compound extends LoConstruct {
 
         super();
         this.fields = fields;
+        this.type = new ProductType(fields.map(field => field.value.type));
     }
 
     /**

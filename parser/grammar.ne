@@ -305,12 +305,16 @@ id_list
 	    return [d[0].value].concat(d[1].map(function (id) {return id[1].value;})); } %}
 
 type_spec
-    ->  "dyn"
+    ->  "null"
+    |   "dyn"
     |   "bool"
-    |   "int"
     |   "char"
-    |   "string"
+    |   "int"
     |   "float"
     |   "dec"
+    |   "num"
+    |   "string"
     |   %ID
+    | type_spec "?"
     | type_spec "*"
+    | type_spec "+"

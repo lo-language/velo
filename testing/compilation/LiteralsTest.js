@@ -102,18 +102,18 @@ module.exports["literals"] = {
     "record": function (test) {
 
         var node = new Lo.compound([
-                {label: 'Zaphod', value: new Lo.string('Betelgeuse')},
-                {label: 'Ford', value: new Lo.string('Betelgeuse')},
-                {label: 'Arthur', value: new Lo.string('Earth')},
-                {label: 'Trillian', value: new Lo.string('Earth')},
+                {label: 'first', value: new Lo.string('Zaphod')},
+                {label: 'last', value: new Lo.string('Beeblebrox')},
+                {label: 'homeworld', value: new Lo.string('Betelgeuse')}
         ]);
 
         test.deepEqual(node.compile(new LoContext()).renderTree(),
             [ 'objLiteral',
-                [ [ [ 'string', 'Zaphod' ], [ 'string', 'Betelgeuse' ] ],
-                    [ [ 'string', 'Ford' ], [ 'string', 'Betelgeuse' ] ],
-                    [ [ 'string', 'Arthur' ], [ 'string', 'Earth' ] ],
-                    [ [ 'string', 'Trillian' ], [ 'string', 'Earth' ] ] ] ]);
+                [ [ [ 'string', 'first' ], [ 'string', 'Zaphod' ] ],
+                    [ [ 'string', 'last' ], [ 'string', 'Beeblebrox' ] ],
+                    [ [ 'string', 'homeworld' ], [ 'string', 'Betelgeuse' ] ] ] ]);
+
+        test.equal(node.type.toString(), '(string,string,string)');
 
         test.done();
     }
