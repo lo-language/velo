@@ -8,6 +8,7 @@
           ws:           { match: /[ \t\r\n]+/, lineBreaks: true },
           bcpl_comment: /\/\/.*?$/,
           number:       /0|-?[1-9][0-9]*(?:\.[0-9]+)?/,
+          char:         { match: /'.'/, value: text => text.slice(1, -1) },
 
           string_start: { match: '"', push: "in_string" },
           interp_end:   { match: '`', pop: true },
@@ -26,6 +27,7 @@
           tilde_arrow:  '~>',
           yields:       '=>',
           forward:      '>>',
+          fire:         '<<',
           concat:       '><',
           push_front:   '+>',
           push_back:    '<+',
@@ -46,8 +48,8 @@
           mod:          '%',
           cond:         '?',
           ID:           { match: /[a-zA-Z_][a-zA-Z_0-9]*/, keywords: {
-                          KW: ['as', 'is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
-                                'module', 'exists', 'defined', 'undefined', 'using',
+                          KW: ['is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
+                                'module', 'exists', 'defined', 'undefined', 'using', 'as', 'on',
 
                                 // le primitive types
                                 'dyn', 'bool', 'int', 'char', 'string', 'float', 'dec'],
@@ -112,7 +114,7 @@ statement
     |   response                                                    {% id %}
     |   expr %assign expr ";"       				                {% function (d) {
             return new Lo.assign(d[0], d[1].value == '=' ? d[2] : new Lo.binaryOpExpr(
-            {'+=': '+', '-=': '-', '*=': '*', '/=': '/', '%=': '%'}[d[1].value], d[0], d[2])); } %}
+                {'+=': '+', '-=': '-', '*=': '*', '/=': '/', '%=': '%'}[d[1].value], d[0], d[2])); } %}
     |   destructure %assign expr ";"       				            {% function (d) {
                                                                         return new Lo.assign(d[0], d[1].value == '=' ? d[2] :
                                                                             new Lo.binaryOpExpr(
@@ -129,10 +131,14 @@ statement
                                                                         return new Lo.arrayPush(
                                                                             d[1][0].value == '<+' ? 'push-back' : 'push-front', d[0], d[2]);
                                                                     } %}
-    |   async:? expr ("<-" exprList):? handlers                       {% function (d) {
+    # request statement
+    |   async:? expr ("<-" exprList):? handlers                     {% function (d) {
                                                                         return new Lo.requestStmt(d[1], d[2] ? d[2][1] : [],
                                                                             d[3][0], d[3][1], d[0] == null);
                                                                     } %}
+    # event statement
+    |   expr "<<" exprList:? ";"                                    {% function (d) {
+            return new Lo.event(d[0], d[2] ? d[2] : []); } %}
     #|   async:? expr exprList:? handlers                            {% function (d) {
     #                                                                    return new Lo.requestStmt(d[1], d[2] || [],
     #                                                                        d[3][0], d[3][1], d[0] == null);
@@ -141,6 +147,8 @@ statement
             return new Lo.while(d[1], d[2]).setSourceLoc(d[0]);} %}
     |   "scan" expr ">>" proc                                       {% function (d) {
             return new Lo.scan(d[1], d[3]).setSourceLoc(d[0]);} %}
+    |   "on" expr ">>" proc                                         {% function (d) {
+            return new Lo.subscribe(d[1], d[3]); } %}
 
 response -> ("reply" | "fail" | "substitute") exprList:? ";"        {% function (d) {
     return new Lo.response(d[0][0].value, d[1] || []).setSourceLoc(d[0][0]);
@@ -161,12 +169,15 @@ definition -> %ID ("is"|"are") expr ";"                             {%
 # there's got to be a better way to describe this
 handlers
     ->  ";"                                     {% function (d) { return [null, null]; } %}
-    |   assign_handler ";"                       {% function (d) { return [d[0], null]; } %}
+    |   assign_handler ";"                      {% function (d) { return [d[0], null]; } %}
+    |   reply_handler                           {% function (d) { return [d[0], null]; } %}
+    |   fail_handler                            {% function (d) { return [null, d[0]]; } %}
     |   assign_handler fail_handler
-    |   reply_handler                            {% function (d) { return [d[0], null]; } %}
-    |   fail_handler                             {% function (d) { return [null, d[0]]; } %}
     |   reply_handler fail_handler
+    |   event_handler
 
+# the assign handler declares and assigns a new var - or constant?
+# todo make the RHS an lvalue or destructure, not just an ID
 assign_handler
     ->  "=>" %ID                                {% function (d) { return new Lo.yields(new Lo.identifier(d[1].value)); } %}
 
@@ -175,6 +186,9 @@ reply_handler
 
 fail_handler
     ->  "~>" proc                               {% function (d) { return d[1]; } %}
+
+event_handler
+    ->  ">>" proc                               {% function (d) { return d[1]; } %}
 
 conditional
 	->  "if" expr block                         {% function (d) {
@@ -254,6 +268,8 @@ literal
             return new Lo.boolean(d[0].value === 'true').setSourceLoc(d[0]); } %}
     |   %number                                     {% function (d) {
             return new Lo.number(d[0].value).setSourceLoc(d[0]); } %}
+    |   %char                                       {% function (d) {
+            return new Lo.charConst(d[0].value).setSourceLoc(d[0]); } %}
     |   interp_string                               {% id %}
     |   "[" (expr ",":?):* "]"                      {%
     function (d) {

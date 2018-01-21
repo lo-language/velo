@@ -12,6 +12,7 @@ function id(x) {return x[0]; }
           ws:           { match: /[ \t\r\n]+/, lineBreaks: true },
           bcpl_comment: /\/\/.*?$/,
           number:       /0|-?[1-9][0-9]*(?:\.[0-9]+)?/,
+          char:         { match: /'.'/, value: text => text.slice(1, -1) },
 
           string_start: { match: '"', push: "in_string" },
           interp_end:   { match: '`', pop: true },
@@ -30,6 +31,7 @@ function id(x) {return x[0]; }
           tilde_arrow:  '~>',
           yields:       '=>',
           forward:      '>>',
+          fire:         '<<',
           concat:       '><',
           push_front:   '+>',
           push_back:    '<+',
@@ -50,8 +52,8 @@ function id(x) {return x[0]; }
           mod:          '%',
           cond:         '?',
           ID:           { match: /[a-zA-Z_][a-zA-Z_0-9]*/, keywords: {
-                          KW: ['as', 'is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
-                                'module', 'exists', 'defined', 'undefined', 'using',
+                          KW: ['is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
+                                'module', 'exists', 'defined', 'undefined', 'using', 'as', 'on',
 
                                 // le primitive types
                                 'dyn', 'bool', 'int', 'char', 'string', 'float', 'dec'],
@@ -116,7 +118,7 @@ var grammar = {
     {"name": "statement", "symbols": ["response"], "postprocess": id},
     {"name": "statement", "symbols": ["expr", (lexer.has("assign") ? {type: "assign"} : assign), "expr", {"literal":";"}], "postprocess":  function (d) {
         return new Lo.assign(d[0], d[1].value == '=' ? d[2] : new Lo.binaryOpExpr(
-        {'+=': '+', '-=': '-', '*=': '*', '/=': '/', '%=': '%'}[d[1].value], d[0], d[2])); } },
+            {'+=': '+', '-=': '-', '*=': '*', '/=': '/', '%=': '%'}[d[1].value], d[0], d[2])); } },
     {"name": "statement", "symbols": ["destructure", (lexer.has("assign") ? {type: "assign"} : assign), "expr", {"literal":";"}], "postprocess":  function (d) {
         return new Lo.assign(d[0], d[1].value == '=' ? d[2] :
             new Lo.binaryOpExpr(
@@ -144,10 +146,16 @@ var grammar = {
             return new Lo.requestStmt(d[1], d[2] ? d[2][1] : [],
                 d[3][0], d[3][1], d[0] == null);
         } },
+    {"name": "statement$ebnf$3", "symbols": ["exprList"], "postprocess": id},
+    {"name": "statement$ebnf$3", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "statement", "symbols": ["expr", {"literal":"<<"}, "statement$ebnf$3", {"literal":";"}], "postprocess":  function (d) {
+        return new Lo.event(d[0], d[2] ? d[2] : []); } },
     {"name": "statement", "symbols": [{"literal":"while"}, "expr", "block"], "postprocess":  function (d) {
         return new Lo.while(d[1], d[2]).setSourceLoc(d[0]);} },
     {"name": "statement", "symbols": [{"literal":"scan"}, "expr", {"literal":">>"}, "proc"], "postprocess":  function (d) {
         return new Lo.scan(d[1], d[3]).setSourceLoc(d[0]);} },
+    {"name": "statement", "symbols": [{"literal":"on"}, "expr", {"literal":">>"}, "proc"], "postprocess":  function (d) {
+        return new Lo.subscribe(d[1], d[3]); } },
     {"name": "response$subexpression$1", "symbols": [{"literal":"reply"}]},
     {"name": "response$subexpression$1", "symbols": [{"literal":"fail"}]},
     {"name": "response$subexpression$1", "symbols": [{"literal":"substitute"}]},
@@ -172,13 +180,15 @@ var grammar = {
         } },
     {"name": "handlers", "symbols": [{"literal":";"}], "postprocess": function (d) { return [null, null]; }},
     {"name": "handlers", "symbols": ["assign_handler", {"literal":";"}], "postprocess": function (d) { return [d[0], null]; }},
-    {"name": "handlers", "symbols": ["assign_handler", "fail_handler"]},
     {"name": "handlers", "symbols": ["reply_handler"], "postprocess": function (d) { return [d[0], null]; }},
     {"name": "handlers", "symbols": ["fail_handler"], "postprocess": function (d) { return [null, d[0]]; }},
+    {"name": "handlers", "symbols": ["assign_handler", "fail_handler"]},
     {"name": "handlers", "symbols": ["reply_handler", "fail_handler"]},
+    {"name": "handlers", "symbols": ["event_handler"]},
     {"name": "assign_handler", "symbols": [{"literal":"=>"}, (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess": function (d) { return new Lo.yields(new Lo.identifier(d[1].value)); }},
     {"name": "reply_handler", "symbols": [{"literal":"->"}, "proc"], "postprocess": function (d) { return d[1]; }},
     {"name": "fail_handler", "symbols": [{"literal":"~>"}, "proc"], "postprocess": function (d) { return d[1]; }},
+    {"name": "event_handler", "symbols": [{"literal":">>"}, "proc"], "postprocess": function (d) { return d[1]; }},
     {"name": "conditional", "symbols": [{"literal":"if"}, "expr", "block"], "postprocess":  function (d) {
         return new Lo.conditional(d[1], d[2]).setSourceLoc(d[0]); } },
     {"name": "conditional", "symbols": [{"literal":"if"}, "expr", "block", {"literal":"else"}, "block"], "postprocess":  function (d) {
@@ -245,6 +255,8 @@ var grammar = {
         return new Lo.boolean(d[0].value === 'true').setSourceLoc(d[0]); } },
     {"name": "literal", "symbols": [(lexer.has("number") ? {type: "number"} : number)], "postprocess":  function (d) {
         return new Lo.number(d[0].value).setSourceLoc(d[0]); } },
+    {"name": "literal", "symbols": [(lexer.has("char") ? {type: "char"} : char)], "postprocess":  function (d) {
+        return new Lo.charConst(d[0].value).setSourceLoc(d[0]); } },
     {"name": "literal", "symbols": ["interp_string"], "postprocess": id},
     {"name": "literal$ebnf$1", "symbols": []},
     {"name": "literal$ebnf$1$subexpression$1$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
