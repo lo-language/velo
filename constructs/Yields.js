@@ -14,11 +14,9 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const Procedure = require('./Procedure');
-const StmtList = require('./StmtList');
-const Assignment = require('./Assignment');
-const Identifier = require('./Identifier');
 const LoConstruct = require('./LoConstruct');
+const Proc = require('../compiler/Proc');
+const CFNode = require('../compiler/CFNode');
 
 
 class Yields extends LoConstruct {
@@ -65,11 +63,10 @@ class Yields extends LoConstruct {
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
-     * @param targetCtx
      */
-    compile(sourceCtx, targetCtx) {
+    compile(sourceCtx) {
 
-        var target = this.target.compile(sourceCtx, targetCtx);
+        var target = this.target.compile(sourceCtx);
 
         // not DRY -- duplicates logic from Assignment...
         // if the LHS is a bare ID...
@@ -86,8 +83,8 @@ class Yields extends LoConstruct {
             sourceCtx.declare(name);
         }
 
-        return JS.fnDef(['res'], JS.stmtList(
-            JS.assign(target, JS.subscript(JS.ID('res'), JS.num('0')), '=')));
+        return new Proc(['res'],
+            new CFNode(JS.assign(target, JS.subscript(JS.ID('res'), JS.num('0')), '=')));
     }
 }
 

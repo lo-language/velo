@@ -274,7 +274,7 @@ module.exports["requests"] = {
 
     "arrow style with yields": function (test) {
 
-        test.deepEqual(new Parser("statement").parse('foo <- (bar) => baz;').getAst(),
+        test.deepEqual(new Parser("statement").parse('foo <- bar => baz;').getAst(),
             { type: 'request_stmt',
                 address: { type: 'id', name: 'foo' },
                 args: [ { type: 'id', name: 'bar' } ],
@@ -282,7 +282,7 @@ module.exports["requests"] = {
                 contingency: undefined,
                 blocking: true });
 
-        test.deepEqual(new Parser("statement").parse('@foo <- (bar) => baz;').getAst(),
+        test.deepEqual(new Parser("statement").parse('@foo <- bar => baz;').getAst(),
             { type: 'request_stmt',
                 address: { type: 'id', name: 'foo' },
                 args: [ { type: 'id', name: 'bar' } ],

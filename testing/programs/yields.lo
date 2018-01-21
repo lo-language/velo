@@ -1,0 +1,11 @@
+/*
+ */
+
+main is (getName) {
+
+    // todo -- exercise different combos of handlers
+
+    getName <- 42 => name;
+
+    reply name;
+};

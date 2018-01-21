@@ -76,19 +76,18 @@ class RequestStmt extends LoConstruct {
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
-     * @param targetCtx
      */
-    compile(sourceCtx, targetCtx) {
+    compile(sourceCtx) {
 
-        var address = this.address.compile(sourceCtx, targetCtx);
+        var address = this.address.compile(sourceCtx);
         var args = this.args.map(arg => {
-            return arg.compile(sourceCtx, targetCtx);
+            return arg.compile(sourceCtx);
         });
 
         // these return proc objects
 
-        var succHandler = this.succHandler ? this.succHandler.compile(sourceCtx, targetCtx) : null;
-        var failHandler = this.failHandler ? this.failHandler.compile(sourceCtx, targetCtx) : null;
+        var succHandler = this.succHandler ? this.succHandler.compile(sourceCtx) : null;
+        var failHandler = this.failHandler ? this.failHandler.compile(sourceCtx) : null;
 
         return this.blocking ?
             new BlockingReq(address, args, succHandler, failHandler) :

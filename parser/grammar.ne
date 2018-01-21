@@ -88,6 +88,9 @@
     };
 %}
 
+####################################################################################################
+# modules
+####################################################################################################
 
 # Pass your lexer object using the @lexer option:
 @lexer lexer
@@ -108,6 +111,10 @@ dep
 stmt_list
     ->  statement                                                   {% function (d) { return new Lo.stmtList(d[0]); } %}
     |   statement stmt_list                                         {% function (d) { return new Lo.stmtList(d[0], d[1]); } %}
+
+####################################################################################################
+# statements
+####################################################################################################
 
 statement
     ->  definition                                                  {% id %}
@@ -166,29 +173,23 @@ definition -> %ID ("is"|"are") expr ";"                             {%
         return new Lo.constant(d[0].value, d[2]).setSourceLoc(d[0]);
     } %}
 
-# there's got to be a better way to describe this
 handlers
     ->  ";"                                     {% function (d) { return [null, null]; } %}
-    |   assign_handler ";"                      {% function (d) { return [d[0], null]; } %}
-    |   reply_handler                           {% function (d) { return [d[0], null]; } %}
+    |   assign_handler (fail_handler|";")       {% function (d) { return [d[0], d[1][0].value === ';' ? null : d[1][0]]; } %}
+    |   reply_handler fail_handler:?            {% function (d) { return [d[0], d[1]]; } %}
     |   fail_handler                            {% function (d) { return [null, d[0]]; } %}
-    |   assign_handler fail_handler
-    |   reply_handler fail_handler
-    |   event_handler
 
 # the assign handler declares and assigns a new var - or constant?
 # todo make the RHS an lvalue or destructure, not just an ID
 assign_handler
-    ->  "=>" %ID                                {% function (d) { return new Lo.yields(new Lo.identifier(d[1].value)); } %}
+    ->  "=>" %ID                                {% function (d) {
+        return new Lo.yields(new Lo.identifier(d[1].value)); } %}
 
 reply_handler
     ->  "->" proc                               {% function (d) { return d[1]; } %}
 
 fail_handler
     ->  "~>" proc                               {% function (d) { return d[1]; } %}
-
-event_handler
-    ->  ">>" proc                               {% function (d) { return d[1]; } %}
 
 conditional
 	->  "if" expr block                         {% function (d) {
@@ -198,8 +199,10 @@ conditional
     |   "if" expr block "else" conditional    	{% function (d) {
             return new Lo.conditional(d[1], d[2], new Lo.stmtList(d[4])).setSourceLoc(d[0]); } %}
 
-
-# expression grammar, mostly courtesy of Jeff Lee's 1985 C grammar
+####################################################################################################
+# expressions
+# mostly courtesy of Jeff Lee's 1985 C grammar
+####################################################################################################
 
 primary_expr
     ->   %ID                                            {% function (d) {
@@ -269,7 +272,7 @@ literal
     |   %number                                     {% function (d) {
             return new Lo.number(d[0].value).setSourceLoc(d[0]); } %}
     |   %char                                       {% function (d) {
-            return new Lo.charConst(d[0].value).setSourceLoc(d[0]); } %}
+            return new Lo.charLiteral(d[0].value).setSourceLoc(d[0]); } %}
     |   interp_string                               {% id %}
     |   "[" (expr ",":?):* "]"                      {%
     function (d) {
@@ -309,7 +312,10 @@ map_literal
 
 pair    -> expr "=>" expr                           {% function (d) { return {key: d[0], value: d[2]}; } %}
 
-typed_id -> type_spec:? %ID                         {% function (d) { return d[1]; } %}
+
+####################################################################################################
+# procedures and blocks
+####################################################################################################
 
 proc -> "(" id_list:? ")" block                   {% function (d) {
     return new Lo.procedure(d[1] ? d[1] : [], d[3]).setSourceLoc(d[0]); } %}
@@ -319,6 +325,13 @@ block -> "{" stmt_list:? "}"                    {% function (d) { return d[1] ? 
 id_list
 	-> typed_id ("," typed_id):*                              {% function (d) {
 	    return [d[0].value].concat(d[1].map(function (id) {return id[1].value;})); } %}
+
+
+####################################################################################################
+# types
+####################################################################################################
+
+typed_id -> type_spec:? %ID                         {% function (d) { return d[1]; } %}
 
 type_spec
     ->  "null"

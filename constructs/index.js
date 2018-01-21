@@ -16,7 +16,7 @@ module.exports = {
     assign: require("./Assignment"),
     binaryOpExpr: require("./BinaryOpExpr"),
     boolean: require("./Boolean"),
-    charConst: require("./CharConst"),
+    charLiteral: require("./CharLiteral"),
     coercion: require("./Coercion"),
     concat: require("./Concat"),
     conditional: require("./Conditional"),
