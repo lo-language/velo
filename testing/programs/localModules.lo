@@ -1,0 +1,6 @@
+using "factorial.lo" as fact;
+
+main is () {
+
+    reply fact.main(10);
+};

@@ -57,7 +57,7 @@ class ModuleRef extends LoConstruct {
     compile(sourceCtx) {
 
         // module namespaces are injected as globals at load-time
-        return JS.select(JS.ID(this.namespace || '__local'), this.id);
+        return JS.subscript(JS.ID(this.namespace || '__local'), JS.string(this.id));
     }
 }
 

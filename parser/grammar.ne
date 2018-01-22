@@ -299,7 +299,7 @@ interp_string
     } %}
 
 struct_literal
-    ->   "(" (field ",":?):+ ")"                     {% function (d) {
+    ->   "{" (field ",":?):+ "}"                     {% function (d) {
             return new Lo.compound(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } %}
 
 field   -> %ID ":" expr                             {% function (d) { return {label: d[0].value, value: d[2]}; } %}

@@ -14,6 +14,24 @@ const Program = require('../../Program');
 const Task = require('../../runtime/Task');
 const util = require('util');
 
+
+module.exports['localModules'] = {
+
+    "setUp": function (cb) {
+
+        this.program = new Program('localModules.lo', __dirname);
+        cb();
+    },
+
+    'success': function (test) {
+
+        this.program.run([]).then(function (result) {
+            test.deepEqual(result, [3628800]);
+            test.done();
+        });
+    }
+};
+
 module.exports['yields'] = {
 
     "setUp": function (cb) {

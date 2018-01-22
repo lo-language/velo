@@ -15,11 +15,12 @@ const Type = require('../compiler/Type');
 class ProductType extends Type {
 
     /**
-     *
+     * todo types can't be figured out at parse time and fed to constructors like this
+     * because service literals won't know their types until compile time!
      */
     constructor(types) {
 
-        super('(' + types.map(type => type.toString()).join(',') + ')');
+        super('(' + types.map(type => type ? type.toString() : '??').join(',') + ')');
     }
 }
 

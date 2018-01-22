@@ -186,7 +186,8 @@ var grammar = {
     {"name": "handlers$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "handlers", "symbols": ["reply_handler", "handlers$ebnf$1"], "postprocess": function (d) { return [d[0], d[1]]; }},
     {"name": "handlers", "symbols": ["fail_handler"], "postprocess": function (d) { return [null, d[0]]; }},
-    {"name": "assign_handler", "symbols": [{"literal":"=>"}, (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess": function (d) { return new Lo.yields(new Lo.identifier(d[1].value)); }},
+    {"name": "assign_handler", "symbols": [{"literal":"=>"}, (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess":  function (d) {
+        return new Lo.yields(new Lo.identifier(d[1].value)); } },
     {"name": "reply_handler", "symbols": [{"literal":"->"}, "proc"], "postprocess": function (d) { return d[1]; }},
     {"name": "fail_handler", "symbols": [{"literal":"~>"}, "proc"], "postprocess": function (d) { return d[1]; }},
     {"name": "conditional", "symbols": [{"literal":"if"}, "expr", "block"], "postprocess":  function (d) {
@@ -297,7 +298,7 @@ var grammar = {
     {"name": "struct_literal$ebnf$1$subexpression$2$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "struct_literal$ebnf$1$subexpression$2", "symbols": ["field", "struct_literal$ebnf$1$subexpression$2$ebnf$1"]},
     {"name": "struct_literal$ebnf$1", "symbols": ["struct_literal$ebnf$1", "struct_literal$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "struct_literal", "symbols": [{"literal":"("}, "struct_literal$ebnf$1", {"literal":")"}], "postprocess":  function (d) {
+    {"name": "struct_literal", "symbols": [{"literal":"{"}, "struct_literal$ebnf$1", {"literal":"}"}], "postprocess":  function (d) {
         return new Lo.compound(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } },
     {"name": "field", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID), {"literal":":"}, "expr"], "postprocess": function (d) { return {label: d[0].value, value: d[2]}; }},
     {"name": "map_literal", "symbols": [{"literal":"{"}, {"literal":"=>"}, {"literal":"}"}], "postprocess":  function (d) {
