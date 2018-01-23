@@ -156,7 +156,7 @@ JS.strictEqual = (left, right) => {
 
     return {
         renderTree: () => ['strict-eq', left.renderTree(), right.renderTree()],
-        renderJs: () => left.renderJs() + ' === ' + right.renderJs()
+        renderJs: () => '(' + left.renderJs() + ' === ' + right.renderJs() + ')'
     };
 };
 
@@ -164,7 +164,7 @@ JS.notEqual = (left, right) => {
 
     return {
         renderTree: () => ['ne', left.renderTree(), right.renderTree()],
-        renderJs: () => left.renderJs() + ' != ' + right.renderJs()
+        renderJs: () => '(' + left.renderJs() + ' != ' + right.renderJs() + ')'
     };
 };
 
@@ -172,7 +172,7 @@ JS.strictNotEqual = (left, right) => {
 
     return {
         renderTree: () => ['strict-ne', left.renderTree(), right.renderTree()],
-        renderJs: () => left.renderJs() + ' !== ' + right.renderJs()
+        renderJs: () => '(' + left.renderJs() + ' !== ' + right.renderJs() + ')'
     };
 };
 
@@ -180,7 +180,7 @@ JS.lt = (left, right) => {
 
     return {
         renderTree: () => ['lt', left.renderTree(), right.renderTree()],
-        renderJs: () => left.renderJs() + ' < ' + right.renderJs()
+        renderJs: () => '(' + left.renderJs() + ' < ' + right.renderJs() + ')'
     };
 };
 
@@ -188,7 +188,7 @@ JS.gt = (left, right) => {
 
     return {
         renderTree: () => ['gt', left.renderTree(), right.renderTree()],
-        renderJs: () => left.renderJs() + ' > ' + right.renderJs()
+        renderJs: () => '(' + left.renderJs() + ' > ' + right.renderJs() + ')'
     };
 };
 
@@ -196,7 +196,7 @@ JS.lte = (left, right) => {
 
     return {
         renderTree: () => ['lte', left.renderTree(), right.renderTree()],
-        renderJs: () => left.renderJs() + ' <= ' + right.renderJs()
+        renderJs: () => '(' + left.renderJs() + ' <= ' + right.renderJs() + ')'
     };
 };
 
@@ -204,7 +204,7 @@ JS.gte = (left, right) => {
 
     return {
         renderTree: () => ['gte', left.renderTree(), right.renderTree()],
-        renderJs: () => left.renderJs() + ' >= ' + right.renderJs()
+        renderJs: () => '(' + left.renderJs() + ' >= ' + right.renderJs() + ')'
     };
 };
 

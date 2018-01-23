@@ -65,11 +65,11 @@ class UnaryOpExpr extends LoConstruct {
             return JS.utilCall('cardinality', [this.operand.compile(sourceCtx, targetCtx)]);
         }
 
-
-        if (this.op == 'complement') {
-
+        if (this.op == 'not') {
             return JS.not(this.operand.compile(sourceCtx, targetCtx));
         }
+
+        throw new Error('unknown unary operator: ' + this.op);
     }
 }
 

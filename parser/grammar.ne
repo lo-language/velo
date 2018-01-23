@@ -46,10 +46,11 @@
           mul:          '*',
           div:          '/',
           mod:          '%',
+          not:          '!',
           cond:         '?',
           ID:           { match: /[a-zA-Z_][a-zA-Z_0-9]*/, keywords: {
                           KW: ['is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
-                                'module', 'exists', 'defined', 'undefined', 'using', 'as', 'on',
+                                'module', 'have', 'drop', 'using', 'as', 'on',
 
                                 // le primitive types
                                 'dyn', 'bool', 'int', 'char', 'string', 'float', 'dec'],
@@ -156,6 +157,8 @@ statement
             return new Lo.scan(d[1], d[3]).setSourceLoc(d[0]);} %}
     |   "on" expr ">>" proc                                         {% function (d) {
             return new Lo.subscribe(d[1], d[3]); } %}
+    |   "drop" %ID ";"                                                {% function (d) {
+            return new Lo.drop(d[1]); } %}
 
 response -> ("reply" | "fail" | "substitute") exprList:? ";"        {% function (d) {
     return new Lo.response(d[0][0].value, d[1] || []).setSourceLoc(d[0][0]);
@@ -222,13 +225,13 @@ postfix_expr
 
 has_expr
     ->  postfix_expr                                    {% id %}
-    |   expr ("has"|"contains") postfix_expr            {% function (d) {return new Lo.membership(d[0], d[2]); } %}
-    |   expr ("exists"|"defined"|"undefined")           {% function (d) {return new Lo.existence(d[0], d[1][0].value == 'undefined'); } %}
+    |   expr ("has"|"contains") has_expr                {% function (d) {return new Lo.membership(d[0], d[2]); } %}
+    |   "have" has_expr                                 {% function (d) {return new Lo.defined(d[1]); } %}
 
 unary_expr
     ->  has_expr                                        {% id %}
-    |   "#" mult_expr                                   {% function (d) { return new Lo.unaryOpExpr('cardinality', d[1]); } %}
-    |   "not" mult_expr                                 {% function (d) {return new Lo.unaryOpExpr('not', d[1]); } %}
+    |   "#" unary_expr                                  {% function (d) { return new Lo.unaryOpExpr('cardinality', d[1]); } %}
+    |   ("not"|"!") unary_expr                          {% function (d) {return new Lo.unaryOpExpr('not', d[1]); } %}
 
 mult_expr
     ->  unary_expr                                      {% id %}
@@ -334,8 +337,7 @@ id_list
 typed_id -> type_spec:? %ID                         {% function (d) { return d[1]; } %}
 
 type_spec
-    ->  "null"
-    |   "dyn"
+    ->  "dyn"
     |   "bool"
     |   "char"
     |   "int"

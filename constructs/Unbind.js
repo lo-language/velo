@@ -17,15 +17,13 @@ const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
 
 
-class Existence extends LoConstruct {
+class Unbind extends LoConstruct {
 
     /**
-     * A runtime existence check operator.
      *
      * @param expr      a nominal expression
-     * @param undef     true if checking for non-existence
      */
-    constructor(expr, undef) {
+    constructor(expr) {
 
         super();
         this.expr = expr;
@@ -68,4 +66,4 @@ class Existence extends LoConstruct {
     }
 }
 
-module.exports = Existence;
+module.exports = Unbind;

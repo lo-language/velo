@@ -7,6 +7,14 @@ test is () {
     foo = baz contains bar;
     foo = baz and bar or buzzy;
 
+    if have foo {
+
+    }
+
+    if !have foo {
+
+    }
+
     doghouse = "dog" >< "house";
 
     fruits = ["apple", "pear"];

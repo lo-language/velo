@@ -10,23 +10,12 @@ var LoContext = require('../../compiler/LoContext');
 
 module.exports["exists"] = {
 
-    "existence": function (test) {
+    "binding": function (test) {
 
-        var node = new Lo.existence(new Lo.identifier('foo'));
+        var node = new Lo.defined(new Lo.identifier('foo'));
 
         test.deepEqual(node.compile(new LoContext()).renderTree(),
             [ 'strict-ne',
-                [ 'typeof', [ 'id', '$foo' ] ],
-                [ 'string', 'undefined' ] ]);
-        test.done();
-    },
-
-    "non-existence": function (test) {
-
-        var node = new Lo.existence(new Lo.identifier('foo'), true);
-
-        test.deepEqual(node.compile(new LoContext()).renderTree(),
-            [ 'strict-eq',
                 [ 'typeof', [ 'id', '$foo' ] ],
                 [ 'string', 'undefined' ] ]);
         test.done();

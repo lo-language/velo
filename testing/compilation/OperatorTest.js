@@ -65,9 +65,9 @@ module.exports["op"] = {
         test.done();
     },
 
-    "complement": function (test) {
+    "not": function (test) {
 
-        var node = new Lo.unaryOpExpr('complement', new Lo.identifier('foo'));
+        var node = new Lo.unaryOpExpr('not', new Lo.identifier('foo'));
 
         test.deepEqual(node.compile(new LoContext()).renderTree(),
             [ 'not', [ 'id', '$foo' ] ]);

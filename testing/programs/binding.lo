@@ -1,0 +1,22 @@
+/*
+ */
+
+main is (log) {
+
+    if have log {
+
+        log <- "hooray!";
+
+        //drop log;
+
+        //if have log {
+        //    log <- "uh-oh";
+        //}
+
+    }
+    else {
+        fail "no log!";
+    }
+
+    reply;
+};
