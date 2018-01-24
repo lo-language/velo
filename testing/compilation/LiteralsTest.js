@@ -101,7 +101,7 @@ module.exports["literals"] = {
 
     "record": function (test) {
 
-        var node = new Lo.compound([
+        var node = new Lo.recordLiteral([
                 {label: 'first', value: new Lo.string('Zaphod')},
                 {label: 'last', value: new Lo.string('Beeblebrox')},
                 {label: 'homeworld', value: new Lo.string('Betelgeuse')}

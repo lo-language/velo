@@ -281,7 +281,7 @@ literal
     function (d) {
             return new Lo.arrayLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]);
     } %}
-    |   struct_literal                              {% id %}
+    |   record_literal                              {% id %}
     |   map_literal                                 {% id %}
     |   "{" (expr ",":?):* "}"                      {% function (d) {
             return new Lo.setLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]); } %}
@@ -301,9 +301,9 @@ interp_string
             d[3]).setSourceLoc(d[0].line, d[0].col - 1);
     } %}
 
-struct_literal
+record_literal
     ->   "{" (field ",":?):+ "}"                     {% function (d) {
-            return new Lo.compound(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } %}
+            return new Lo.recordLiteral(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } %}
 
 field   -> %ID ":" expr                             {% function (d) { return {label: d[0].value, value: d[2]}; } %}
 

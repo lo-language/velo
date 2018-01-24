@@ -270,7 +270,7 @@ var grammar = {
         function (d) {
                 return new Lo.arrayLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]);
         } },
-    {"name": "literal", "symbols": ["struct_literal"], "postprocess": id},
+    {"name": "literal", "symbols": ["record_literal"], "postprocess": id},
     {"name": "literal", "symbols": ["map_literal"], "postprocess": id},
     {"name": "literal$ebnf$2", "symbols": []},
     {"name": "literal$ebnf$2$subexpression$1$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
@@ -292,16 +292,16 @@ var grammar = {
                 new Lo.concat(new Lo.string(d[0].value), new Lo.coercion(d[1])),
                 d[3]).setSourceLoc(d[0].line, d[0].col - 1);
         } },
-    {"name": "struct_literal$ebnf$1$subexpression$1$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
-    {"name": "struct_literal$ebnf$1$subexpression$1$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "struct_literal$ebnf$1$subexpression$1", "symbols": ["field", "struct_literal$ebnf$1$subexpression$1$ebnf$1"]},
-    {"name": "struct_literal$ebnf$1", "symbols": ["struct_literal$ebnf$1$subexpression$1"]},
-    {"name": "struct_literal$ebnf$1$subexpression$2$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
-    {"name": "struct_literal$ebnf$1$subexpression$2$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
-    {"name": "struct_literal$ebnf$1$subexpression$2", "symbols": ["field", "struct_literal$ebnf$1$subexpression$2$ebnf$1"]},
-    {"name": "struct_literal$ebnf$1", "symbols": ["struct_literal$ebnf$1", "struct_literal$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "struct_literal", "symbols": [{"literal":"{"}, "struct_literal$ebnf$1", {"literal":"}"}], "postprocess":  function (d) {
-        return new Lo.compound(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } },
+    {"name": "record_literal$ebnf$1$subexpression$1$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
+    {"name": "record_literal$ebnf$1$subexpression$1$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "record_literal$ebnf$1$subexpression$1", "symbols": ["field", "record_literal$ebnf$1$subexpression$1$ebnf$1"]},
+    {"name": "record_literal$ebnf$1", "symbols": ["record_literal$ebnf$1$subexpression$1"]},
+    {"name": "record_literal$ebnf$1$subexpression$2$ebnf$1", "symbols": [{"literal":","}], "postprocess": id},
+    {"name": "record_literal$ebnf$1$subexpression$2$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
+    {"name": "record_literal$ebnf$1$subexpression$2", "symbols": ["field", "record_literal$ebnf$1$subexpression$2$ebnf$1"]},
+    {"name": "record_literal$ebnf$1", "symbols": ["record_literal$ebnf$1", "record_literal$ebnf$1$subexpression$2"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "record_literal", "symbols": [{"literal":"{"}, "record_literal$ebnf$1", {"literal":"}"}], "postprocess":  function (d) {
+        return new Lo.recordLiteral(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } },
     {"name": "field", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID), {"literal":":"}, "expr"], "postprocess": function (d) { return {label: d[0].value, value: d[2]}; }},
     {"name": "map_literal", "symbols": [{"literal":"{"}, {"literal":"=>"}, {"literal":"}"}], "postprocess":  function (d) {
         return new Lo.mapLiteral([]).setSourceLoc(d[0]); } },
@@ -341,8 +341,7 @@ var grammar = {
     {"name": "type_spec", "symbols": [{"literal":"string"}]},
     {"name": "type_spec", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID)]},
     {"name": "type_spec", "symbols": ["type_spec", {"literal":"?"}]},
-    {"name": "type_spec", "symbols": ["type_spec", {"literal":"*"}]},
-    {"name": "type_spec", "symbols": ["type_spec", {"literal":"+"}]}
+    {"name": "type_spec", "symbols": ["type_spec", {"literal":"*"}]}
 ]
   , ParserStart: "module"
 }

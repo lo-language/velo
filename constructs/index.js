@@ -33,7 +33,7 @@ module.exports = {
     moduleRef: require("./ModuleRef"),
     number: require("./Number"),
     procedure: require("./Procedure"),
-    compound: require("./Compound"),
+    recordLiteral: require("./RecordLiteral"),
     requestExpr: require("./RequestExpr"),
     requestStmt: require("./RequestStmt"),
     response: require("./Response"),
