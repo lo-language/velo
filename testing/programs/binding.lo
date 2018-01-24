@@ -7,11 +7,11 @@ main is (log) {
 
         log <- "hooray!";
 
-        //drop log;
+        drop log;
 
-        //if have log {
-        //    log <- "uh-oh";
-        //}
+        if have log {
+            log <- "uh-oh";
+        }
 
     }
     else {

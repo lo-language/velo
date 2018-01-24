@@ -24,6 +24,7 @@ module.exports = {
     constant: require("./Constant"),
     "defined": require("./Defined"),
     destructure: require("./Destructure"),
+    drop: require("./Drop"),
     event: require("./Event"),
     identifier: require("./Identifier"),
     mapLiteral: require("./MapLiteral"),

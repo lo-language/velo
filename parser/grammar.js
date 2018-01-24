@@ -157,7 +157,7 @@ var grammar = {
         return new Lo.scan(d[1], d[3]).setSourceLoc(d[0]);} },
     {"name": "statement", "symbols": [{"literal":"on"}, "expr", {"literal":">>"}, "proc"], "postprocess":  function (d) {
         return new Lo.subscribe(d[1], d[3]); } },
-    {"name": "statement", "symbols": [{"literal":"drop"}, (lexer.has("ID") ? {type: "ID"} : ID), {"literal":";"}], "postprocess":  function (d) {
+    {"name": "statement", "symbols": [{"literal":"drop"}, "expr", {"literal":";"}], "postprocess":  function (d) {
         return new Lo.drop(d[1]); } },
     {"name": "response$subexpression$1", "symbols": [{"literal":"reply"}]},
     {"name": "response$subexpression$1", "symbols": [{"literal":"fail"}]},

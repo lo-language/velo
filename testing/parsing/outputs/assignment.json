@@ -175,7 +175,17 @@
                               }
                             }
                           },
-                          "tail": null
+                          "tail": {
+                            "type": "stmt_list",
+                            "head": {
+                              "type": "drop",
+                              "expr": {
+                                "type": "id",
+                                "name": "foo"
+                              }
+                            },
+                            "tail": null
+                          }
                         }
                       }
                     }

@@ -157,7 +157,7 @@ statement
             return new Lo.scan(d[1], d[3]).setSourceLoc(d[0]);} %}
     |   "on" expr ">>" proc                                         {% function (d) {
             return new Lo.subscribe(d[1], d[3]); } %}
-    |   "drop" %ID ";"                                                {% function (d) {
+    |   "drop" expr ";"                                                {% function (d) {
             return new Lo.drop(d[1]); } %}
 
 response -> ("reply" | "fail" | "substitute") exprList:? ";"        {% function (d) {
@@ -336,6 +336,11 @@ id_list
 
 typed_id -> type_spec:? %ID                         {% function (d) { return d[1]; } %}
 
+# a nullable string: string?
+# an array of nullable strings: string?*
+# a nullable array of strings: string*?
+# an optional array of nullable strings: string?*?
+
 type_spec
     ->  "dyn"
     |   "bool"
@@ -348,4 +353,3 @@ type_spec
     |   %ID
     | type_spec "?"
     | type_spec "*"
-    | type_spec "+"

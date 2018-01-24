@@ -14,6 +14,7 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const CFNode = require('../compiler/CFNode');
 const LoConstruct = require('./LoConstruct');
 
 
@@ -56,6 +57,7 @@ class Drop extends LoConstruct {
      */
     compile(sourceCtx) {
 
+        return new CFNode(JS.assign(this.expr.compile(sourceCtx), JS.ID('undefined')));
     }
 }
 
