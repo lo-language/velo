@@ -146,7 +146,7 @@ module.exports["operators"] = {
         var n = JS.strictEqual(JS.ID('foo'), JS.ID('bar'));
 
         test.deepEqual(n.renderTree(), [ 'strict-eq', [ 'id', 'foo' ], ['id', 'bar'] ]);
-        test.equal(n.renderJs(), "foo === bar");
+        test.equal(n.renderJs(), "(foo === bar)");
 
         test.done();
     },
@@ -156,7 +156,7 @@ module.exports["operators"] = {
         var n = JS.notEqual(JS.ID('foo'), JS.ID('bar'));
 
         test.deepEqual(n.renderTree(), [ 'ne', [ 'id', 'foo' ], ['id', 'bar'] ]);
-        test.equal(n.renderJs(), "foo != bar");
+        test.equal(n.renderJs(), "(foo != bar)");
 
         test.done();
     },
@@ -166,7 +166,7 @@ module.exports["operators"] = {
         var n = JS.strictNotEqual(JS.ID('foo'), JS.ID('bar'));
 
         test.deepEqual(n.renderTree(), [ 'strict-ne', [ 'id', 'foo' ], ['id', 'bar'] ]);
-        test.equal(n.renderJs(), "foo !== bar");
+        test.equal(n.renderJs(), "(foo !== bar)");
 
         test.done();
     },
@@ -176,7 +176,7 @@ module.exports["operators"] = {
         var n = JS.lt(JS.ID('foo'), JS.ID('bar'));
 
         test.deepEqual(n.renderTree(), [ 'lt', [ 'id', 'foo' ], ['id', 'bar'] ]);
-        test.equal(n.renderJs(), "foo < bar");
+        test.equal(n.renderJs(), "(foo < bar)");
 
         test.done();
     },
@@ -186,7 +186,7 @@ module.exports["operators"] = {
         var n = JS.gt(JS.ID('foo'), JS.ID('bar'));
 
         test.deepEqual(n.renderTree(), [ 'gt', [ 'id', 'foo' ], ['id', 'bar'] ]);
-        test.equal(n.renderJs(), "foo > bar");
+        test.equal(n.renderJs(), "(foo > bar)");
 
         test.done();
     },
@@ -196,7 +196,7 @@ module.exports["operators"] = {
         var n = JS.lte(JS.ID('foo'), JS.ID('bar'));
 
         test.deepEqual(n.renderTree(), [ 'lte', [ 'id', 'foo' ], ['id', 'bar'] ]);
-        test.equal(n.renderJs(), "foo <= bar");
+        test.equal(n.renderJs(), "(foo <= bar)");
 
         test.done();
     },
@@ -206,7 +206,7 @@ module.exports["operators"] = {
         var n = JS.gte(JS.ID('foo'), JS.ID('bar'));
 
         test.deepEqual(n.renderTree(), [ 'gte', [ 'id', 'foo' ], ['id', 'bar'] ]);
-        test.equal(n.renderJs(), "foo >= bar");
+        test.equal(n.renderJs(), "(foo >= bar)");
 
         test.done();
     },

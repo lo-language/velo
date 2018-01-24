@@ -4,7 +4,7 @@
 
 main is (num) {
 
-    if num undefined {
+    if !have num {
         fail "c'mon!";
     }
 

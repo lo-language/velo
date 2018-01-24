@@ -228,16 +228,14 @@ module.exports["basic"] = {
         test.done();
     },
 
-    "existence": function (test) {
+    "binding": function (test) {
 
-        test.deepEqual(new Parser("expr").parse("foo exists").getAst(),
+        test.deepEqual(new Parser("expr").parse("have foo").getAst(),
             {type: 'defined', expr: {type: 'id', name: 'foo'}});
 
-        test.deepEqual(new Parser("expr").parse("foo defined").getAst(),
-            {type: 'defined', expr: {type: 'id', name: 'foo'}});
-
-        test.deepEqual(new Parser("expr").parse("foo undefined").getAst(),
-            {type: 'undefined', expr: {type: 'id', name: 'foo'}});
+        test.deepEqual(new Parser("expr").parse("!have foo").getAst(),
+            { type: 'not',
+                operand: { type: 'defined', expr: { type: 'id', name: 'foo' } } });
 
         test.done();
     },

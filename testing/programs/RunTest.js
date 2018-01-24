@@ -14,6 +14,28 @@ const Program = require('../../Program');
 const Task = require('../../runtime/Task');
 const util = require('util');
 
+
+module.exports['localModules'] = {
+
+    "setUp": function (cb) {
+
+        this.program = new Program('localModules.lo', __dirname);
+        cb();
+    },
+
+    'success': function (test) {
+
+        // this.program.compile().then(() => {
+        //     this.program.dump();
+        // });
+
+        this.program.run([]).then(function (result) {
+            test.deepEqual(result, [3628800]);
+            test.done();
+        });
+    }
+};
+
 module.exports['yields'] = {
 
     "setUp": function (cb) {
@@ -65,26 +87,30 @@ module.exports['set operations'] = {
     }
 };
 
-module.exports['exists'] = {
+module.exports['binding'] = {
 
     "setUp": function (cb) {
 
-        this.program = new Program('exists.lo', __dirname);
+        this.program = new Program('binding.lo', __dirname);
         cb();
     },
 
-    'obj exists': function (test) {
+    'obj bound': function (test) {
+
+        test.expect(1);
 
         var log = function (args, succ, fail) {
+
+            test.deepEqual(args, ['hooray!']);
             succ();
         };
 
-        this.program.run([log]).then(function () {
+        this.program.run([log]).then(function (result) {
             test.done();
         });
     },
 
-    'obj not exists': function (test) {
+    'obj unbound': function (test) {
 
         this.program.run().catch(function (result) {
 

@@ -7,26 +7,27 @@
  *
  =============================================================================*/
 
+/**
+ * Created by seth on 11/12/16.
+ */
+
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
 
 
-class UnaryOpExpr extends LoConstruct {
+class Unbind extends LoConstruct {
 
     /**
-     * A unary operator expression
      *
-     * @param op
-     * @param operand
+     * @param expr      a nominal expression
      */
-    constructor(op, operand) {
+    constructor(expr) {
 
         super();
-
-        this.op = op;
-        this.operand = operand;
+        this.expr = expr;
+        this.undef = undef;
     }
 
     /**
@@ -35,8 +36,8 @@ class UnaryOpExpr extends LoConstruct {
     getAst() {
 
         return {
-            type: this.op,
-            operand: this.operand.getAst()
+            type: this.undef ? 'undefined' : 'defined',
+            expr: this.expr.getAst()
         };
     }
 
@@ -46,9 +47,9 @@ class UnaryOpExpr extends LoConstruct {
     getTree() {
 
         return [
-            this.op,
-            this.operand.getTree()
-        ];
+            'exists',
+            this.undef ? 'undefined' : 'defined',
+            this.expr.getTree()];
     }
 
     /**
@@ -59,18 +60,10 @@ class UnaryOpExpr extends LoConstruct {
      */
     compile(sourceCtx, targetCtx) {
 
-        if (this.op == 'cardinality') {
-
-            // offload to the runtime lib
-            return JS.utilCall('cardinality', [this.operand.compile(sourceCtx, targetCtx)]);
-        }
-
-        if (this.op == 'not') {
-            return JS.not(this.operand.compile(sourceCtx, targetCtx));
-        }
-
-        throw new Error('unknown unary operator: ' + this.op);
+        return this.undef ?
+            JS.strictEqual(JS.typeof(this.expr.compile(sourceCtx, targetCtx)), JS.string('undefined')) :
+            JS.strictNotEqual(JS.typeof(this.expr.compile(sourceCtx, targetCtx)), JS.string('undefined'));
     }
 }
 
-module.exports = UnaryOpExpr;
+module.exports = Unbind;

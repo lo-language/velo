@@ -13,4 +13,6 @@ test is () {
     foo -= 7;
     foo *= 10;
     foo /= 4;
+
+    drop foo;
 };

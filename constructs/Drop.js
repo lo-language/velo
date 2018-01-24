@@ -14,22 +14,21 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
+const CFNode = require('../compiler/CFNode');
 const LoConstruct = require('./LoConstruct');
 
 
-class Existence extends LoConstruct {
+class Drop extends LoConstruct {
 
     /**
-     * A runtime existence check operator.
+     * Unbinds the given symbol, which must be a nullable lvalue.
      *
      * @param expr      a nominal expression
-     * @param undef     true if checking for non-existence
      */
-    constructor(expr, undef) {
+    constructor(expr) {
 
         super();
         this.expr = expr;
-        this.undef = undef;
     }
 
     /**
@@ -38,7 +37,7 @@ class Existence extends LoConstruct {
     getAst() {
 
         return {
-            type: this.undef ? 'undefined' : 'defined',
+            type: 'drop',
             expr: this.expr.getAst()
         };
     }
@@ -48,24 +47,18 @@ class Existence extends LoConstruct {
      */
     getTree() {
 
-        return [
-            'exists',
-            this.undef ? 'undefined' : 'defined',
-            this.expr.getTree()];
+        return ['drop', this.expr.getTree()];
     }
 
     /**
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
-     * @param targetCtx
      */
-    compile(sourceCtx, targetCtx) {
+    compile(sourceCtx) {
 
-        return this.undef ?
-            JS.strictEqual(JS.typeof(this.expr.compile(sourceCtx, targetCtx)), JS.string('undefined')) :
-            JS.strictNotEqual(JS.typeof(this.expr.compile(sourceCtx, targetCtx)), JS.string('undefined'));
+        return new CFNode(JS.assign(this.expr.compile(sourceCtx), JS.ID('undefined')));
     }
 }
 
-module.exports = Existence;
+module.exports = Drop;

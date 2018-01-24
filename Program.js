@@ -132,22 +132,13 @@ class Program extends EventEmitter {
     }
 
     /**
-     * Builds a Node executable
-     *
-     * @param target    file name to build into
+     * Dumps all compiled modules into a string.
      */
-    build (target) {
+    dump () {
 
-        this.compile()
-            .then(() => {
-
-                // open the target file
-
-            })
-            .then(() => {
-
-                // serialize the modules
-            });
+        Object.keys(this.modules).forEach(modRef => {
+            console.log(this.modules[modRef].js);
+        });
     }
 
     /**

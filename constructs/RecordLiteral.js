@@ -14,7 +14,7 @@ const LoConstruct = require('./LoConstruct');
 const ProductType = require('../compiler/ProductType');
 
 
-class Compound extends LoConstruct {
+class RecordLiteral extends LoConstruct {
 
     /**
      * A compound literal
@@ -73,4 +73,4 @@ class Compound extends LoConstruct {
     }
 }
 
-module.exports = Compound;
+module.exports = RecordLiteral;

@@ -7,22 +7,27 @@
  *
  =============================================================================*/
 
+/**
+ * Created by seth on 11/12/16.
+ */
+
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
 
 
-class ModuleRef extends LoConstruct {
+class Defined extends LoConstruct {
 
     /**
-     * A module reference
+     * A runtime binding check operator. Checks whether a symbol is bound or null.
+     *
+     * @param expr      a nominal expression
      */
-    constructor(namespace, id) {
+    constructor(expr) {
 
         super();
-        this.namespace = namespace;
-        this.id = id;
+        this.expr = expr;
     }
 
     /**
@@ -31,9 +36,8 @@ class ModuleRef extends LoConstruct {
     getAst() {
 
         return {
-            type: 'modref',
-            namespace: this.namespace,
-            id: this.id
+            type: 'defined',
+            expr: this.expr.getAst()
         };
     }
 
@@ -42,23 +46,18 @@ class ModuleRef extends LoConstruct {
      */
     getTree() {
 
-        return [
-            'modref',
-            this.namespace,
-            this.id
-        ];
+        return ['exists', this.expr.getTree()];
     }
 
     /**
-     * Compiles this module reference to JS.
+     * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
      */
     compile(sourceCtx) {
 
-        // module namespaces are injected as globals at load-time
-        return JS.subscript(JS.ID(this.namespace || '__local'), JS.string(this.id));
+        return JS.strictNotEqual(JS.typeof(this.expr.compile(sourceCtx)), JS.string('undefined'));
     }
 }
 
-module.exports = ModuleRef;
+module.exports = Defined;

@@ -113,11 +113,11 @@ module.exports["literals"] = {
         test.done();
     },
 
-    "compound": function (test) {
+    "record": function (test) {
 
         var parser = new Parser("literal");
 
-        var result = parser.parse('(name: "Fry", age: 1024)');
+        var result = parser.parse('{name: "Fry", age: 1024}');
 
         test.deepEqual(result.getAst(),
             { type: 'compound',

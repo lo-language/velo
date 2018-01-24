@@ -182,130 +182,169 @@
                     "tail": {
                       "type": "stmt_list",
                       "head": {
-                        "type": "assign",
-                        "left": {
-                          "type": "id",
-                          "name": "doghouse"
-                        },
-                        "right": {
-                          "type": "concat",
-                          "left": {
-                            "type": "string",
-                            "val": "dog"
-                          },
-                          "right": {
-                            "type": "string",
-                            "val": "house"
+                        "type": "conditional",
+                        "predicate": {
+                          "type": "defined",
+                          "expr": {
+                            "type": "id",
+                            "name": "foo"
                           }
+                        },
+                        "consequent": {
+                          "type": "stmt_list",
+                          "head": null,
+                          "tail": null
                         }
                       },
                       "tail": {
                         "type": "stmt_list",
                         "head": {
-                          "type": "assign",
-                          "left": {
-                            "type": "id",
-                            "name": "fruits"
-                          },
-                          "right": {
-                            "type": "array",
-                            "elements": [
-                              {
-                                "type": "string",
-                                "val": "apple"
-                              },
-                              {
-                                "type": "string",
-                                "val": "pear"
+                          "type": "conditional",
+                          "predicate": {
+                            "type": "not",
+                            "operand": {
+                              "type": "defined",
+                              "expr": {
+                                "type": "id",
+                                "name": "foo"
                               }
-                            ]
+                            }
+                          },
+                          "consequent": {
+                            "type": "stmt_list",
+                            "head": null,
+                            "tail": null
                           }
                         },
                         "tail": {
                           "type": "stmt_list",
                           "head": {
-                            "type": "push-back",
+                            "type": "assign",
                             "left": {
                               "type": "id",
-                              "name": "fruits"
+                              "name": "doghouse"
                             },
                             "right": {
-                              "type": "string",
-                              "val": "banana"
+                              "type": "concat",
+                              "left": {
+                                "type": "string",
+                                "val": "dog"
+                              },
+                              "right": {
+                                "type": "string",
+                                "val": "house"
+                              }
                             }
                           },
                           "tail": {
                             "type": "stmt_list",
                             "head": {
-                              "type": "push-front",
+                              "type": "assign",
                               "left": {
-                                "type": "string",
-                                "val": "mango"
-                              },
-                              "right": {
                                 "type": "id",
                                 "name": "fruits"
+                              },
+                              "right": {
+                                "type": "array",
+                                "elements": [
+                                  {
+                                    "type": "string",
+                                    "val": "apple"
+                                  },
+                                  {
+                                    "type": "string",
+                                    "val": "pear"
+                                  }
+                                ]
                               }
                             },
                             "tail": {
                               "type": "stmt_list",
                               "head": {
-                                "type": "assign",
+                                "type": "push-back",
                                 "left": {
                                   "type": "id",
-                                  "name": "result"
+                                  "name": "fruits"
                                 },
                                 "right": {
-                                  "type": "concat",
-                                  "left": {
-                                    "type": "id",
-                                    "name": "base"
-                                  },
-                                  "right": {
-                                    "type": "request_expr",
-                                    "address": {
-                                      "type": "select",
-                                      "record": {
-                                        "type": "id",
-                                        "name": "person"
-                                      },
-                                      "field": "getName"
-                                    },
-                                    "args": [],
-                                    "blocking": true
-                                  }
+                                  "type": "string",
+                                  "val": "banana"
                                 }
                               },
                               "tail": {
                                 "type": "stmt_list",
                                 "head": {
-                                  "type": "assign",
+                                  "type": "push-front",
                                   "left": {
-                                    "type": "id",
-                                    "name": "bar"
+                                    "type": "string",
+                                    "val": "mango"
                                   },
                                   "right": {
-                                    "type": "op",
-                                    "op": "+",
-                                    "left": {
-                                      "type": "select",
-                                      "record": {
-                                        "type": "id",
-                                        "name": "assertions"
-                                      },
-                                      "field": "passed"
-                                    },
-                                    "right": {
-                                      "type": "select",
-                                      "record": {
-                                        "type": "id",
-                                        "name": "assertions"
-                                      },
-                                      "field": "failed"
-                                    }
+                                    "type": "id",
+                                    "name": "fruits"
                                   }
                                 },
-                                "tail": null
+                                "tail": {
+                                  "type": "stmt_list",
+                                  "head": {
+                                    "type": "assign",
+                                    "left": {
+                                      "type": "id",
+                                      "name": "result"
+                                    },
+                                    "right": {
+                                      "type": "concat",
+                                      "left": {
+                                        "type": "id",
+                                        "name": "base"
+                                      },
+                                      "right": {
+                                        "type": "request_expr",
+                                        "address": {
+                                          "type": "select",
+                                          "record": {
+                                            "type": "id",
+                                            "name": "person"
+                                          },
+                                          "field": "getName"
+                                        },
+                                        "args": [],
+                                        "blocking": true
+                                      }
+                                    }
+                                  },
+                                  "tail": {
+                                    "type": "stmt_list",
+                                    "head": {
+                                      "type": "assign",
+                                      "left": {
+                                        "type": "id",
+                                        "name": "bar"
+                                      },
+                                      "right": {
+                                        "type": "op",
+                                        "op": "+",
+                                        "left": {
+                                          "type": "select",
+                                          "record": {
+                                            "type": "id",
+                                            "name": "assertions"
+                                          },
+                                          "field": "passed"
+                                        },
+                                        "right": {
+                                          "type": "select",
+                                          "record": {
+                                            "type": "id",
+                                            "name": "assertions"
+                                          },
+                                          "field": "failed"
+                                        }
+                                      }
+                                    },
+                                    "tail": null
+                                  }
+                                }
                               }
                             }
                           }
