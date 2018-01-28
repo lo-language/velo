@@ -57,7 +57,7 @@ class Drop extends LoConstruct {
      */
     compile(sourceCtx) {
 
-        return new CFNode(JS.assign(this.expr.compile(sourceCtx), JS.ID('undefined')));
+        return new CFNode(JS.exprStmt(JS.assign(this.expr.compile(sourceCtx), JS.ID('undefined'))));
     }
 }
 

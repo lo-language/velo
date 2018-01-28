@@ -31,6 +31,7 @@ module.exports = {
     membership: require("./Membership"),
     module: require("./Module"),
     moduleRef: require("./ModuleRef"),
+    nil: require("./Nil"),
     number: require("./Number"),
     procedure: require("./Procedure"),
     recordLiteral: require("./RecordLiteral"),

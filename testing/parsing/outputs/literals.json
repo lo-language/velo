@@ -67,6 +67,13 @@
     },
     {
       "type": "constant",
+      "name": "foo",
+      "value": {
+        "type": "nil"
+      }
+    },
+    {
+      "type": "constant",
       "name": "nameList",
       "value": {
         "type": "array",

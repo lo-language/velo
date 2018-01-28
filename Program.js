@@ -30,6 +30,7 @@ const Task = require('./runtime/Task');
 const Util = require('./runtime/Util');
 const LibModule = require('./libs/LibModule');
 const JsModule = require('./libs/JsModule');
+const fs = require('fs');
 
 
 class Program extends EventEmitter {
@@ -125,7 +126,12 @@ class Program extends EventEmitter {
 
                     // crash detected
                     console.error(err);
-                    console.log(this.rootModule.js);
+
+                    console.error("\n>>> CRASH DETECTED -- JS dumped to velo_crash.js");
+
+                    var ostream = fs.createWriteStream('velo_crash.js');
+                    this.dump(ostream);
+                    // ostream.on('close', function () { process.exit(exitCode); });
                 }
             });
         });
@@ -134,10 +140,13 @@ class Program extends EventEmitter {
     /**
      * Dumps all compiled modules into a string.
      */
-    dump () {
+    dump (ostream) {
 
         Object.keys(this.modules).forEach(modRef => {
-            console.log(this.modules[modRef].js);
+
+            if (this.modules[modRef].js) {
+                ostream.write(this.modules[modRef].js);
+            }
         });
     }
 

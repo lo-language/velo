@@ -15,19 +15,16 @@
 
 const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
+const Type = require('../compiler/Type');
 
-
-class Unbind extends LoConstruct {
-
+class Nil extends LoConstruct {
+    
     /**
-     *
-     * @param expr      a nominal expression
+     * A literal boolean
      */
-    constructor(expr) {
+    constructor() {
 
         super();
-        this.expr = expr;
-        this.undef = undef;
     }
 
     /**
@@ -35,9 +32,10 @@ class Unbind extends LoConstruct {
      */
     getAst() {
 
+        // ??? might not want to return an actual bool here - number literals are kept as strings
+
         return {
-            type: this.undef ? 'undefined' : 'defined',
-            expr: this.expr.getAst()
+            type: 'nil'
         };
     }
 
@@ -46,24 +44,18 @@ class Unbind extends LoConstruct {
      */
     getTree() {
 
-        return [
-            'exists',
-            this.undef ? 'undefined' : 'defined',
-            this.expr.getTree()];
+        return this.value;
     }
 
     /**
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
-     * @param targetCtx
      */
-    compile(sourceCtx, targetCtx) {
+    compile(sourceCtx) {
 
-        return this.undef ?
-            JS.strictEqual(JS.typeof(this.expr.compile(sourceCtx, targetCtx)), JS.string('undefined')) :
-            JS.strictNotEqual(JS.typeof(this.expr.compile(sourceCtx, targetCtx)), JS.string('undefined'));
+        return JS.ID('undefined'); // hack
     }
 }
 
-module.exports = Unbind;
+module.exports = Nil;

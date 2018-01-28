@@ -21,7 +21,6 @@
           pound:        '#',
           range:        '..',
           dot:          '.',
-          bool:         /true|false/,
           left_arrow:   '<-',
           right_arrow:  '->',
           tilde_arrow:  '~>',
@@ -50,7 +49,7 @@
           cond:         '?',
           ID:           { match: /[a-zA-Z_][a-zA-Z_0-9]*/, keywords: {
                           KW: ['is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
-                                'module', 'have', 'drop', 'using', 'as', 'on',
+                                'module', 'have', 'drop', 'using', 'as', 'on', 'nil', 'true', 'false',
 
                                 // le primitive types
                                 'dyn', 'bool', 'int', 'char', 'string', 'float', 'dec'],
@@ -270,8 +269,9 @@ exprList -> expr ("," expr):*                           {% function (d) {
                                                         } %}
 
 literal
-    ->  %bool                                       {% function (d) {
-            return new Lo.boolean(d[0].value === 'true').setSourceLoc(d[0]); } %}
+    ->  "nil"                                       {% function (d) { return new Lo.nil(); } %}
+    |   ("true"|"false")                            {% function (d) {
+            return new Lo.boolean(d[0][0].value === 'true').setSourceLoc(d[0][0]); } %}
     |   %number                                     {% function (d) {
             return new Lo.number(d[0].value).setSourceLoc(d[0]); } %}
     |   %char                                       {% function (d) {
@@ -282,9 +282,8 @@ literal
             return new Lo.arrayLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]);
     } %}
     |   record_literal                              {% id %}
+    |   set_literal                                 {% id %}
     |   map_literal                                 {% id %}
-    |   "{" (expr ",":?):* "}"                      {% function (d) {
-            return new Lo.setLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]); } %}
     |   proc                                        {% function (d) { d[0].isService = true; return d[0]; } %}
 
 interp_string
@@ -302,13 +301,17 @@ interp_string
     } %}
 
 record_literal
-    ->   "{" (field ",":?):+ "}"                     {% function (d) {
+    ->  "{" (field ",":?):+ "}"                     {% function (d) {
             return new Lo.recordLiteral(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } %}
 
 field   -> %ID ":" expr                             {% function (d) { return {label: d[0].value, value: d[2]}; } %}
 
+set_literal
+    ->  "{" (expr ",":?):* "}"                      {% function (d) {
+            return new Lo.setLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]); } %}
+
 map_literal
-    ->   "{" "=>" "}"                               {% function (d) {
+    ->  "{" "=>" "}"                               {% function (d) {
             return new Lo.mapLiteral([]).setSourceLoc(d[0]); } %}
     |   "{" (pair ",":?):+ "}"                      {% function (d) {
             return new Lo.mapLiteral(d[1].map(function (pair) {return pair[0];})).setSourceLoc(d[0]); } %}

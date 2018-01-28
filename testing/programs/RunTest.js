@@ -107,6 +107,9 @@ module.exports['binding'] = {
 
         this.program.run([log]).then(function (result) {
             test.done();
+        }).catch((err) => {
+            console.error('program failed with reason:', err);
+            this.program.dump(process.stdout);
         });
     },
 
