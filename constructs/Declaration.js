@@ -8,26 +8,27 @@
  =============================================================================*/
 
 /**
- * Created by seth on 11/12/16.
+ * A declaration is exactly like a typedef except we're not creating a new type,
+ * we're specifying the type of an identifier to be defined elsewhere.
+ *
+ * Created by seth on 2/4/18.
  */
 
 "use strict";
 
-const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
 
 
-class Defined extends LoConstruct {
+class Declaration extends LoConstruct {
 
     /**
-     * A runtime binding check operator. Checks whether a symbol is bound or null.
-     *
-     * @param expr      a nominal expression
+     * A declaration
      */
-    constructor(expr) {
+    constructor(id, typespec) {
 
         super();
-        this.expr = expr;
+        this.id = id;
+        this.spec = typespec;
     }
 
     /**
@@ -36,8 +37,9 @@ class Defined extends LoConstruct {
     getAst() {
 
         return {
-            type: 'defined',
-            expr: this.expr.getAst()
+            type: 'declaration',
+            id: this.id,
+            spec: this.spec
         };
     }
 
@@ -46,18 +48,18 @@ class Defined extends LoConstruct {
      */
     getTree() {
 
-        return ['exists', this.expr.getTree()];
+        return ['declaration'];
     }
 
     /**
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
+     * @param targetCtx
      */
-    compile(sourceCtx) {
+    compile(sourceCtx, targetCtx) {
 
-        return JS.strictNotEqual(JS.typeof(this.expr.compile(sourceCtx)), JS.string('undefined'));
     }
 }
 
-module.exports = Defined;
+module.exports = Declaration;

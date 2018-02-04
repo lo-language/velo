@@ -184,8 +184,8 @@
                       "head": {
                         "type": "conditional",
                         "predicate": {
-                          "type": "defined",
-                          "expr": {
+                          "type": "have",
+                          "operand": {
                             "type": "id",
                             "name": "foo"
                           }
@@ -203,8 +203,8 @@
                           "predicate": {
                             "type": "not",
                             "operand": {
-                              "type": "defined",
-                              "expr": {
+                              "type": "have",
+                              "operand": {
                                 "type": "id",
                                 "name": "foo"
                               }

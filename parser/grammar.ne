@@ -48,11 +48,17 @@
           not:          '!',
           cond:         '?',
           ID:           { match: /[a-zA-Z_][a-zA-Z_0-9]*/, keywords: {
-                          KW: ['is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
-                                'module', 'have', 'drop', 'using', 'as', 'on', 'nil', 'true', 'false', 'deftype',
-
-                                // le primitive types
-                                'dyn', 'bool', 'int', 'char', 'string', 'float', 'dec'],
+                          KW: [
+                              'is', 'are',
+                              'if', 'else', 'while', 'scan', 'on',
+                              'reply', 'fail', 'substitute',
+                              'async',
+                              'have', 'drop',
+                              'using', 'as',
+                              'nil', 'true', 'false',
+                              'deftype', 'declare',
+                              'dyn', 'bool', 'int', 'char', 'string', 'float', 'dec'
+                            ],
                         }},
           NL:           { match: /\n/, lineBreaks: true },
         },
@@ -175,6 +181,7 @@ definition
             return new Lo.constant(d[0].value, d[2]).setSourceLoc(d[0]);
         } %}
     | "deftype" %ID "as" type_spec ";"          {% function (d) { return new Lo.typedef(d[1].value, d[3]); } %}
+    | "declare" %ID "as" type_spec ";"          {% function (d) { return new Lo.declaration(d[1].value, d[3]); } %}
 
 handlers
     ->  ";"                                     {% function (d) { return [null, null]; } %}
@@ -210,7 +217,7 @@ conditional
 primary_expr
     ->  (%ID "::"):* %ID                                {% function (d) {
             return d[0].length > 0 ?
-             new Lo.identifier(d[1].value, d[0].map(function (item) {return item[0].value;})).setSourceLoc(d[0]) :
+             new Lo.identifier(d[1].value, d[0].map(function (item) {return item[0].value;})).setSourceLoc(d[0][0][0]) :
              new Lo.identifier(d[1].value).setSourceLoc(d[1]); } %}
     |   literal                                         {% id %}
     |   "(" expr ")"                                    {% function (d) {return d[1]; } %}
@@ -228,7 +235,7 @@ postfix_expr
 has_expr
     ->  postfix_expr                                    {% id %}
     |   expr ("has"|"contains") has_expr                {% function (d) {return new Lo.membership(d[0], d[2]); } %}
-    |   "have" has_expr                                 {% function (d) {return new Lo.defined(d[1]); } %}
+    |   "have" has_expr                                 {% function (d) {return new Lo.unaryOpExpr('have', d[1]); } %}
 
 unary_expr
     ->  has_expr                                        {% id %}

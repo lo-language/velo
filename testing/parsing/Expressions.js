@@ -22,6 +22,16 @@ module.exports["basic"] = {
         test.done();
     },
 
+    "external id": function (test) {
+
+        var result = new Parser("expr").parse(" Lo::String::toInt");
+
+        test.deepEqual(result.getAst(), {type: 'external-id', ns: [ 'Lo', 'String' ], name: 'toInt'});
+        test.deepEqual(result.getSourceLoc(), [1,2]);
+
+        test.done();
+    },
+
     "concat": function (test) {
 
         test.deepEqual(new Parser("expr").parse("foo >< bar").getAst(),
@@ -231,11 +241,11 @@ module.exports["basic"] = {
     "binding": function (test) {
 
         test.deepEqual(new Parser("expr").parse("have foo").getAst(),
-            {type: 'defined', expr: {type: 'id', name: 'foo'}});
+            {type: 'have', operand: {type: 'id', name: 'foo'}});
 
         test.deepEqual(new Parser("expr").parse("!have foo").getAst(),
             { type: 'not',
-                operand: { type: 'defined', expr: { type: 'id', name: 'foo' } } });
+                operand: { type: 'have', operand: { type: 'id', name: 'foo' } } });
 
         test.done();
     },

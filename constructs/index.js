@@ -22,7 +22,7 @@ module.exports = {
     conditional: require("./Conditional"),
     condExpr: require("./CondExpr"),
     constant: require("./Constant"),
-    "defined": require("./Defined"),
+    declaration: require("./Declaration"),
     destructure: require("./Destructure"),
     drop: require("./Drop"),
     event: require("./Event"),

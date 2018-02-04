@@ -5,6 +5,11 @@
       "type": "typedef",
       "name": "year",
       "def": null
+    },
+    {
+      "type": "declaration",
+      "id": "create",
+      "spec": null
     }
   ]
 }

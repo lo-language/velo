@@ -1,1 +1,3 @@
 deftype year as int;
+
+declare create as int;
