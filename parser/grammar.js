@@ -198,8 +198,13 @@ var grammar = {
         return new Lo.conditional(d[1], d[2], d[4]).setSourceLoc(d[0]); } },
     {"name": "conditional", "symbols": [{"literal":"if"}, "expr", "block", {"literal":"else"}, "conditional"], "postprocess":  function (d) {
         return new Lo.conditional(d[1], d[2], new Lo.stmtList(d[4])).setSourceLoc(d[0]); } },
-    {"name": "primary_expr", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID)], "postprocess":  function (d) {
-        return new Lo.identifier(d[0].value).setSourceLoc(d[0]); } },
+    {"name": "primary_expr$ebnf$1", "symbols": []},
+    {"name": "primary_expr$ebnf$1$subexpression$1", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID), {"literal":"::"}]},
+    {"name": "primary_expr$ebnf$1", "symbols": ["primary_expr$ebnf$1", "primary_expr$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
+    {"name": "primary_expr", "symbols": ["primary_expr$ebnf$1", (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess":  function (d) {
+        return d[0].length > 0 ?
+         new Lo.identifier(d[1].value, d[0].map(function (item) {return item[0].value;})).setSourceLoc(d[0]) :
+         new Lo.identifier(d[1].value).setSourceLoc(d[1]); } },
     {"name": "primary_expr", "symbols": ["literal"], "postprocess": id},
     {"name": "primary_expr", "symbols": [{"literal":"("}, "expr", {"literal":")"}], "postprocess": function (d) {return d[1]; }},
     {"name": "primary_expr", "symbols": [{"literal":"`"}, "expr", {"literal":"`"}], "postprocess": function (d) {return new Lo.coercion(d[1]); }},

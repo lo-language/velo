@@ -208,8 +208,10 @@ conditional
 ####################################################################################################
 
 primary_expr
-    ->   %ID                                            {% function (d) {
-            return new Lo.identifier(d[0].value).setSourceLoc(d[0]); } %}
+    ->  (%ID "::"):* %ID                                {% function (d) {
+            return d[0].length > 0 ?
+             new Lo.identifier(d[1].value, d[0].map(function (item) {return item[0].value;})).setSourceLoc(d[0]) :
+             new Lo.identifier(d[1].value).setSourceLoc(d[1]); } %}
     |   literal                                         {% id %}
     |   "(" expr ")"                                    {% function (d) {return d[1]; } %}
     |   "`" expr "`"                                    {% function (d) {return new Lo.coercion(d[1]); } %}

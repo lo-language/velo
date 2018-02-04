@@ -1,0 +1,6 @@
+test is () {
+
+    rect = Rect::create(top, left, bottom, right);
+
+    angle = JS::Math::PI / 2;
+};
