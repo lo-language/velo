@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "definitions": [
+    {
+      "type": "typedef",
+      "name": "year",
+      "def": null
+    }
+  ]
+}

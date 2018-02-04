@@ -46,6 +46,7 @@ module.exports = {
     string: require("./StringLiteral"),
     subscribe: require("./Subscribe"),
     subscript: require("./Subscript"),
+    typedef: require("./TypeDef"),
     unaryOpExpr: require("./UnaryOpExpr"),
     while: require("./While"),
     yields: require("./Yields")

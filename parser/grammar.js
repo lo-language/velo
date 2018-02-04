@@ -53,7 +53,7 @@ function id(x) {return x[0]; }
           cond:         '?',
           ID:           { match: /[a-zA-Z_][a-zA-Z_0-9]*/, keywords: {
                           KW: ['is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
-                                'module', 'have', 'drop', 'using', 'as', 'on', 'nil', 'true', 'false',
+                                'module', 'have', 'drop', 'using', 'as', 'on', 'nil', 'true', 'false', 'deftype',
 
                                 // le primitive types
                                 'dyn', 'bool', 'int', 'char', 'string', 'float', 'dec'],
@@ -176,10 +176,10 @@ var grammar = {
         concat(d[2].map(function (id) { return id[1].value; }))); } },
     {"name": "definition$subexpression$1", "symbols": [{"literal":"is"}]},
     {"name": "definition$subexpression$1", "symbols": [{"literal":"are"}]},
-    {"name": "definition", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID), "definition$subexpression$1", "expr", {"literal":";"}], "postprocess": 
-        function (d) {
+    {"name": "definition", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID), "definition$subexpression$1", "expr", {"literal":";"}], "postprocess":  function (d) {
             return new Lo.constant(d[0].value, d[2]).setSourceLoc(d[0]);
         } },
+    {"name": "definition", "symbols": [{"literal":"deftype"}, (lexer.has("ID") ? {type: "ID"} : ID), {"literal":"as"}, "type_spec", {"literal":";"}], "postprocess": function (d) { return new Lo.typedef(d[1].value, d[3]); }},
     {"name": "handlers", "symbols": [{"literal":";"}], "postprocess": function (d) { return [null, null]; }},
     {"name": "handlers$subexpression$1", "symbols": ["fail_handler"]},
     {"name": "handlers$subexpression$1", "symbols": [{"literal":";"}]},
@@ -334,17 +334,18 @@ var grammar = {
     {"name": "typed_id$ebnf$1", "symbols": ["type_spec"], "postprocess": id},
     {"name": "typed_id$ebnf$1", "symbols": [], "postprocess": function(d) {return null;}},
     {"name": "typed_id", "symbols": ["typed_id$ebnf$1", (lexer.has("ID") ? {type: "ID"} : ID)], "postprocess": function (d) { return d[1]; }},
-    {"name": "type_spec", "symbols": [{"literal":"dyn"}]},
-    {"name": "type_spec", "symbols": [{"literal":"bool"}]},
-    {"name": "type_spec", "symbols": [{"literal":"char"}]},
-    {"name": "type_spec", "symbols": [{"literal":"int"}]},
-    {"name": "type_spec", "symbols": [{"literal":"float"}]},
-    {"name": "type_spec", "symbols": [{"literal":"dec"}]},
-    {"name": "type_spec", "symbols": [{"literal":"num"}]},
-    {"name": "type_spec", "symbols": [{"literal":"string"}]},
-    {"name": "type_spec", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID)]},
-    {"name": "type_spec", "symbols": ["type_spec", {"literal":"?"}]},
-    {"name": "type_spec", "symbols": ["type_spec", {"literal":"*"}]}
+    {"name": "type_spec", "symbols": [{"literal":"dyn"}], "postprocess": function (d) { return null; }},
+    {"name": "type_spec", "symbols": [{"literal":"bool"}], "postprocess": function (d) { return null; }},
+    {"name": "type_spec", "symbols": [{"literal":"char"}], "postprocess": function (d) { return null; }},
+    {"name": "type_spec", "symbols": [{"literal":"int"}], "postprocess": function (d) { return null; }},
+    {"name": "type_spec", "symbols": [{"literal":"nat"}], "postprocess": function (d) { return null; }},
+    {"name": "type_spec", "symbols": [{"literal":"float"}], "postprocess": function (d) { return null; }},
+    {"name": "type_spec", "symbols": [{"literal":"dec"}], "postprocess": function (d) { return null; }},
+    {"name": "type_spec", "symbols": [{"literal":"num"}], "postprocess": function (d) { return null; }},
+    {"name": "type_spec", "symbols": [{"literal":"string"}], "postprocess": function (d) { return null; }},
+    {"name": "type_spec", "symbols": [(lexer.has("ID") ? {type: "ID"} : ID)], "postprocess": function (d) { return null; }},
+    {"name": "type_spec", "symbols": ["type_spec", {"literal":"?"}], "postprocess": function (d) { return null; }},
+    {"name": "type_spec", "symbols": ["type_spec", {"literal":"*"}], "postprocess": function (d) { return null; }}
 ]
   , ParserStart: "module"
 }

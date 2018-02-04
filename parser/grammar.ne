@@ -49,7 +49,7 @@
           cond:         '?',
           ID:           { match: /[a-zA-Z_][a-zA-Z_0-9]*/, keywords: {
                           KW: ['is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
-                                'module', 'have', 'drop', 'using', 'as', 'on', 'nil', 'true', 'false',
+                                'module', 'have', 'drop', 'using', 'as', 'on', 'nil', 'true', 'false', 'deftype',
 
                                 // le primitive types
                                 'dyn', 'bool', 'int', 'char', 'string', 'float', 'dec'],
@@ -170,10 +170,11 @@ destructure
                                                                         concat(d[2].map(function (id) { return id[1].value; }))); } %}
 
 # we don't need typed_id here since it's always obvious and inferrable from the provided value
-definition -> %ID ("is"|"are") expr ";"                             {%
-    function (d) {
-        return new Lo.constant(d[0].value, d[2]).setSourceLoc(d[0]);
-    } %}
+definition
+    -> %ID ("is"|"are") expr ";"                             {% function (d) {
+            return new Lo.constant(d[0].value, d[2]).setSourceLoc(d[0]);
+        } %}
+    | "deftype" %ID "as" type_spec ";"          {% function (d) { return new Lo.typedef(d[1].value, d[3]); } %}
 
 handlers
     ->  ";"                                     {% function (d) { return [null, null]; } %}
@@ -345,14 +346,15 @@ typed_id -> type_spec:? %ID                         {% function (d) { return d[1
 # an optional array of nullable strings: string?*?
 
 type_spec
-    ->  "dyn"
-    |   "bool"
-    |   "char"
-    |   "int"
-    |   "float"
-    |   "dec"
-    |   "num"
-    |   "string"
-    |   %ID
-    | type_spec "?"
-    | type_spec "*"
+    ->  "dyn"                                       {% function (d) { return null; } %}
+    |   "bool"                                      {% function (d) { return null; } %}
+    |   "char"                                      {% function (d) { return null; } %}
+    |   "int"                                       {% function (d) { return null; } %}
+    |   "nat"                                       {% function (d) { return null; } %}
+    |   "float"                                     {% function (d) { return null; } %}
+    |   "dec"                                       {% function (d) { return null; } %}
+    |   "num"                                       {% function (d) { return null; } %}
+    |   "string"                                    {% function (d) { return null; } %}
+    |   %ID                                         {% function (d) { return null; } %}
+    | type_spec "?"                                 {% function (d) { return null; } %}
+    | type_spec "*"                                 {% function (d) { return null; } %}

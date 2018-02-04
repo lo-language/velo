@@ -54,9 +54,9 @@ program.on('ERROR', msg => {
 switch (cmd) {
 
     case 'dump':
-        // return localSpace.resolve(program).then(function () {
-        //     localSpace.dumpModules(process.stdout);
-        // });
+        return program.compile().then(function () {
+            program.dump(process.stdout);
+        });
 
     case 'build':
         console.error("sorry, building not supported yet");
