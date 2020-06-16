@@ -1,0 +1,80 @@
+{
+  "type": "module",
+  "definitions": [
+    {
+      "type": "constant",
+      "name": "test",
+      "value": {
+        "type": "procedure",
+        "params": [],
+        "body": {
+          "type": "stmt_list",
+          "head": {
+            "type": "assign",
+            "left": {
+              "type": "id",
+              "name": "rect"
+            },
+            "right": {
+              "type": "request_expr",
+              "address": {
+                "type": "external-id",
+                "ns": [
+                  "Rect"
+                ],
+                "name": "create"
+              },
+              "args": [
+                {
+                  "type": "id",
+                  "name": "top"
+                },
+                {
+                  "type": "id",
+                  "name": "left"
+                },
+                {
+                  "type": "id",
+                  "name": "bottom"
+                },
+                {
+                  "type": "id",
+                  "name": "right"
+                }
+              ],
+              "blocking": true
+            }
+          },
+          "tail": {
+            "type": "stmt_list",
+            "head": {
+              "type": "assign",
+              "left": {
+                "type": "id",
+                "name": "angle"
+              },
+              "right": {
+                "type": "op",
+                "op": "/",
+                "left": {
+                  "type": "external-id",
+                  "ns": [
+                    "JS",
+                    "Math"
+                  ],
+                  "name": "PI"
+                },
+                "right": {
+                  "type": "number",
+                  "val": "2"
+                }
+              }
+            },
+            "tail": null
+          }
+        },
+        "isService": true
+      }
+    }
+  ]
+}

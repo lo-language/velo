@@ -21,7 +21,6 @@
           pound:        '#',
           range:        '..',
           dot:          '.',
-          bool:         /true|false/,
           left_arrow:   '<-',
           right_arrow:  '->',
           tilde_arrow:  '~>',
@@ -49,11 +48,17 @@
           not:          '!',
           cond:         '?',
           ID:           { match: /[a-zA-Z_][a-zA-Z_0-9]*/, keywords: {
-                          KW: ['is', 'are', 'if', 'else', 'while', 'scan', 'reply', 'fail', 'substitute', 'async',
-                                'module', 'have', 'drop', 'using', 'as', 'on',
-
-                                // le primitive types
-                                'dyn', 'bool', 'int', 'char', 'string', 'float', 'dec'],
+                          KW: [
+                              'is', 'are',
+                              'if', 'else', 'while', 'scan', 'on',
+                              'reply', 'fail', 'substitute',
+                              'async',
+                              'have', 'drop',
+                              'using', 'as',
+                              'nil', 'true', 'false',
+                              'deftype', 'declare',
+                              'dyn', 'bool', 'int', 'char', 'string', 'float', 'dec'
+                            ],
                         }},
           NL:           { match: /\n/, lineBreaks: true },
         },
@@ -171,10 +176,12 @@ destructure
                                                                         concat(d[2].map(function (id) { return id[1].value; }))); } %}
 
 # we don't need typed_id here since it's always obvious and inferrable from the provided value
-definition -> %ID ("is"|"are") expr ";"                             {%
-    function (d) {
-        return new Lo.constant(d[0].value, d[2]).setSourceLoc(d[0]);
-    } %}
+definition
+    -> %ID ("is"|"are") expr ";"                             {% function (d) {
+            return new Lo.constant(d[0].value, d[2]).setSourceLoc(d[0]);
+        } %}
+    | "deftype" %ID "as" type_spec ";"          {% function (d) { return new Lo.typedef(d[1].value, d[3]); } %}
+    | "declare" %ID "as" type_spec ";"          {% function (d) { return new Lo.declaration(d[1].value, d[3]); } %}
 
 handlers
     ->  ";"                                     {% function (d) { return [null, null]; } %}
@@ -208,8 +215,10 @@ conditional
 ####################################################################################################
 
 primary_expr
-    ->   %ID                                            {% function (d) {
-            return new Lo.identifier(d[0].value).setSourceLoc(d[0]); } %}
+    ->  (%ID "::"):* %ID                                {% function (d) {
+            return d[0].length > 0 ?
+             new Lo.identifier(d[1].value, d[0].map(function (item) {return item[0].value;})).setSourceLoc(d[0][0][0]) :
+             new Lo.identifier(d[1].value).setSourceLoc(d[1]); } %}
     |   literal                                         {% id %}
     |   "(" expr ")"                                    {% function (d) {return d[1]; } %}
     |   "`" expr "`"                                    {% function (d) {return new Lo.coercion(d[1]); } %}
@@ -226,7 +235,7 @@ postfix_expr
 has_expr
     ->  postfix_expr                                    {% id %}
     |   expr ("has"|"contains") has_expr                {% function (d) {return new Lo.membership(d[0], d[2]); } %}
-    |   "have" has_expr                                 {% function (d) {return new Lo.defined(d[1]); } %}
+    |   "have" has_expr                                 {% function (d) {return new Lo.unaryOpExpr('have', d[1]); } %}
 
 unary_expr
     ->  has_expr                                        {% id %}
@@ -270,8 +279,9 @@ exprList -> expr ("," expr):*                           {% function (d) {
                                                         } %}
 
 literal
-    ->  %bool                                       {% function (d) {
-            return new Lo.boolean(d[0].value === 'true').setSourceLoc(d[0]); } %}
+    ->  "nil"                                       {% function (d) { return new Lo.nil(); } %}
+    |   ("true"|"false")                            {% function (d) {
+            return new Lo.boolean(d[0][0].value === 'true').setSourceLoc(d[0][0]); } %}
     |   %number                                     {% function (d) {
             return new Lo.number(d[0].value).setSourceLoc(d[0]); } %}
     |   %char                                       {% function (d) {
@@ -282,9 +292,8 @@ literal
             return new Lo.arrayLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]);
     } %}
     |   record_literal                              {% id %}
+    |   set_literal                                 {% id %}
     |   map_literal                                 {% id %}
-    |   "{" (expr ",":?):* "}"                      {% function (d) {
-            return new Lo.setLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]); } %}
     |   proc                                        {% function (d) { d[0].isService = true; return d[0]; } %}
 
 interp_string
@@ -302,13 +311,17 @@ interp_string
     } %}
 
 record_literal
-    ->   "{" (field ",":?):+ "}"                     {% function (d) {
+    ->  "{" (field ",":?):+ "}"                     {% function (d) {
             return new Lo.recordLiteral(d[1].map(function (field) {return field[0];})).setSourceLoc(d[0]); } %}
 
 field   -> %ID ":" expr                             {% function (d) { return {label: d[0].value, value: d[2]}; } %}
 
+set_literal
+    ->  "{" (expr ",":?):* "}"                      {% function (d) {
+            return new Lo.setLiteral(d[1].map(function (elem) {return elem[0];})).setSourceLoc(d[0]); } %}
+
 map_literal
-    ->   "{" "=>" "}"                               {% function (d) {
+    ->  "{" "=>" "}"                               {% function (d) {
             return new Lo.mapLiteral([]).setSourceLoc(d[0]); } %}
     |   "{" (pair ",":?):+ "}"                      {% function (d) {
             return new Lo.mapLiteral(d[1].map(function (pair) {return pair[0];})).setSourceLoc(d[0]); } %}
@@ -342,14 +355,15 @@ typed_id -> type_spec:? %ID                         {% function (d) { return d[1
 # an optional array of nullable strings: string?*?
 
 type_spec
-    ->  "dyn"
-    |   "bool"
-    |   "char"
-    |   "int"
-    |   "float"
-    |   "dec"
-    |   "num"
-    |   "string"
-    |   %ID
-    | type_spec "?"
-    | type_spec "*"
+    ->  "dyn"                                       {% function (d) { return null; } %}
+    |   "bool"                                      {% function (d) { return null; } %}
+    |   "char"                                      {% function (d) { return null; } %}
+    |   "int"                                       {% function (d) { return null; } %}
+    |   "nat"                                       {% function (d) { return null; } %}
+    |   "float"                                     {% function (d) { return null; } %}
+    |   "dec"                                       {% function (d) { return null; } %}
+    |   "num"                                       {% function (d) { return null; } %}
+    |   "string"                                    {% function (d) { return null; } %}
+    |   %ID                                         {% function (d) { return null; } %}
+    | type_spec "?"                                 {% function (d) { return null; } %}
+    | type_spec "*"                                 {% function (d) { return null; } %}

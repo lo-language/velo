@@ -113,5 +113,16 @@ module.exports["op"] = {
             [ 'select', [ 'id', 'Util' ], 'concat' ],
             [ [ 'id', '$foo' ], [ 'id', '$bar' ] ] ]);
         test.done();
+    },
+
+    "have": function (test) {
+
+        var node = new Lo.unaryOpExpr('have', new Lo.identifier('foo'));
+
+        test.deepEqual(node.compile(new LoContext()).renderTree(),
+            [ 'strict-ne',
+                [ 'typeof', [ 'id', '$foo' ] ],
+                [ 'string', 'undefined' ] ]);
+        test.done();
     }
 };

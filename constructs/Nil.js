@@ -14,21 +14,17 @@
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const CFNode = require('../compiler/CFNode');
 const LoConstruct = require('./LoConstruct');
+const Type = require('../compiler/Type');
 
-
-class Drop extends LoConstruct {
-
+class Nil extends LoConstruct {
+    
     /**
-     * Unbinds the given symbol, which must be a nullable lvalue.
-     *
-     * @param expr      a nominal expression
+     * A literal boolean
      */
-    constructor(expr) {
+    constructor() {
 
         super();
-        this.expr = expr;
     }
 
     /**
@@ -36,9 +32,10 @@ class Drop extends LoConstruct {
      */
     getAst() {
 
+        // ??? might not want to return an actual bool here - number literals are kept as strings
+
         return {
-            type: 'drop',
-            expr: this.expr.getAst()
+            type: 'nil'
         };
     }
 
@@ -47,7 +44,7 @@ class Drop extends LoConstruct {
      */
     getTree() {
 
-        return ['drop', this.expr.getTree()];
+        return this.value;
     }
 
     /**
@@ -57,8 +54,8 @@ class Drop extends LoConstruct {
      */
     compile(sourceCtx) {
 
-        return new CFNode(JS.exprStmt(JS.assign(this.expr.compile(sourceCtx), JS.ID('undefined'))));
+        return JS.ID('undefined'); // hack
     }
 }
 
-module.exports = Drop;
+module.exports = Nil;

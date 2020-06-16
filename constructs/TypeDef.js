@@ -8,6 +8,8 @@
  =============================================================================*/
 
 /**
+ * C-style conditional expression
+ *
  * Created by seth on 11/12/16.
  */
 
@@ -17,17 +19,18 @@ const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
 
 
-class Defined extends LoConstruct {
+class TypeDef extends LoConstruct {
 
     /**
-     * A runtime binding check operator. Checks whether a symbol is bound or null.
      *
-     * @param expr      a nominal expression
+     * @param id
+     * @param spec
      */
-    constructor(expr) {
+    constructor(id, spec) {
 
         super();
-        this.expr = expr;
+        this.name = id;
+        this.spec = spec;
     }
 
     /**
@@ -36,8 +39,9 @@ class Defined extends LoConstruct {
     getAst() {
 
         return {
-            type: 'defined',
-            expr: this.expr.getAst()
+            type:   'typedef',
+            name:   this.name,
+            def:    this.spec
         };
     }
 
@@ -46,18 +50,19 @@ class Defined extends LoConstruct {
      */
     getTree() {
 
-        return ['exists', this.expr.getTree()];
+        return ['typedef'];
     }
 
     /**
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
+     * @param targetCtx
      */
-    compile(sourceCtx) {
+    compile(sourceCtx, targetCtx) {
 
-        return JS.strictNotEqual(JS.typeof(this.expr.compile(sourceCtx)), JS.string('undefined'));
     }
 }
 
-module.exports = Defined;
+
+module.exports = TypeDef;

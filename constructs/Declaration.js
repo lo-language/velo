@@ -8,26 +8,27 @@
  =============================================================================*/
 
 /**
- * Created by seth on 11/12/16.
+ * A declaration is exactly like a typedef except we're not creating a new type,
+ * we're specifying the type of an identifier to be defined elsewhere.
+ *
+ * Created by seth on 2/4/18.
  */
 
 "use strict";
 
-const JS = require('../codegen/JsPrimitives');
 const LoConstruct = require('./LoConstruct');
 
 
-class Unbind extends LoConstruct {
+class Declaration extends LoConstruct {
 
     /**
-     *
-     * @param expr      a nominal expression
+     * A declaration
      */
-    constructor(expr) {
+    constructor(id, typespec) {
 
         super();
-        this.expr = expr;
-        this.undef = undef;
+        this.id = id;
+        this.spec = typespec;
     }
 
     /**
@@ -36,8 +37,9 @@ class Unbind extends LoConstruct {
     getAst() {
 
         return {
-            type: this.undef ? 'undefined' : 'defined',
-            expr: this.expr.getAst()
+            type: 'declaration',
+            id: this.id,
+            spec: this.spec
         };
     }
 
@@ -46,10 +48,7 @@ class Unbind extends LoConstruct {
      */
     getTree() {
 
-        return [
-            'exists',
-            this.undef ? 'undefined' : 'defined',
-            this.expr.getTree()];
+        return ['declaration'];
     }
 
     /**
@@ -60,10 +59,7 @@ class Unbind extends LoConstruct {
      */
     compile(sourceCtx, targetCtx) {
 
-        return this.undef ?
-            JS.strictEqual(JS.typeof(this.expr.compile(sourceCtx, targetCtx)), JS.string('undefined')) :
-            JS.strictNotEqual(JS.typeof(this.expr.compile(sourceCtx, targetCtx)), JS.string('undefined'));
     }
 }
 
-module.exports = Unbind;
+module.exports = Declaration;

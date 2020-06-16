@@ -69,6 +69,10 @@ class UnaryOpExpr extends LoConstruct {
             return JS.not(this.operand.compile(sourceCtx, targetCtx));
         }
 
+        if (this.op == 'have') {
+            return JS.strictNotEqual(JS.typeof(this.operand.compile(sourceCtx)), JS.string('undefined'));
+        }
+
         throw new Error('unknown unary operator: ' + this.op);
     }
 }

@@ -1,6 +1,16 @@
 /*
  */
 
+check is (arg) {
+
+    if have arg {
+        fail;
+    }
+
+    reply;
+};
+
+
 main is (log) {
 
     if have log {
@@ -12,10 +22,19 @@ main is (log) {
         if have log {
             log <- "uh-oh";
         }
-
     }
     else {
         fail "no log!";
+    }
+
+    // test call with nil
+    check <- nil ~> () {
+        fail;
+    }
+
+    // this seems like a bug...
+    if have nil {
+        fail;
     }
 
     reply;

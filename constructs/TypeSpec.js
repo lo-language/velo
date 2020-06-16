@@ -8,27 +8,29 @@
  =============================================================================*/
 
 /**
+ * C-style conditional expression
+ *
  * Created by seth on 11/12/16.
  */
 
 "use strict";
 
 const JS = require('../codegen/JsPrimitives');
-const CFNode = require('../compiler/CFNode');
 const LoConstruct = require('./LoConstruct');
 
 
-class Drop extends LoConstruct {
+class TypeSpec extends LoConstruct {
 
     /**
-     * Unbinds the given symbol, which must be a nullable lvalue.
      *
-     * @param expr      a nominal expression
+     * @param id
+     * @param spec
      */
-    constructor(expr) {
+    constructor(spec) {
 
         super();
-        this.expr = expr;
+        this.name = id;
+        this.spec = spec;
     }
 
     /**
@@ -37,8 +39,9 @@ class Drop extends LoConstruct {
     getAst() {
 
         return {
-            type: 'drop',
-            expr: this.expr.getAst()
+            type:   'typedef',
+            name:   this.name,
+            def:    this.spec
         };
     }
 
@@ -47,18 +50,19 @@ class Drop extends LoConstruct {
      */
     getTree() {
 
-        return ['drop', this.expr.getTree()];
+        return ['typedef'];
     }
 
     /**
      * Compiles this node to JS in the given context.
      *
      * @param sourceCtx
+     * @param targetCtx
      */
-    compile(sourceCtx) {
+    compile(sourceCtx, targetCtx) {
 
-        return new CFNode(JS.exprStmt(JS.assign(this.expr.compile(sourceCtx), JS.ID('undefined'))));
     }
 }
 
-module.exports = Drop;
+
+module.exports = TypeSpec;

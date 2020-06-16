@@ -22,11 +22,12 @@ class Identifier extends LoConstruct {
     /**
      * An identifier
      */
-    constructor(name, line, isLvalue) {
+    constructor(name, ns, isLvalue) {
 
         super();
         this.name = name;
-        this.line = line || '??';
+        this.ns = ns;
+        this.line = '??';
         this.isLvalue = isLvalue || false;
     }
 
@@ -39,7 +40,13 @@ class Identifier extends LoConstruct {
      */
     getAst() {
 
-        return {
+        return this.ns ?
+        {
+            type: "external-id",
+            ns: this.ns,
+            name: this.name
+        }
+        : {
             type: "id",
             name: this.name
         };

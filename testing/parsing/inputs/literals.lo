@@ -6,6 +6,7 @@ message is "hello, world!";
 escaped is "\thello, \"world\"?\n";
 empty is [];
 emptySet is {};
+foo is nil;
 
 // sequence
 nameList is ["Ford", "Arthur", "Trillian", "Zaphod"];

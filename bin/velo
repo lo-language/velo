@@ -54,9 +54,9 @@ program.on('ERROR', msg => {
 switch (cmd) {
 
     case 'dump':
-        // return localSpace.resolve(program).then(function () {
-        //     localSpace.dumpModules(process.stdout);
-        // });
+        return program.compile().then(function () {
+            program.dump(process.stdout);
+        });
 
     case 'build':
         console.error("sorry, building not supported yet");
@@ -79,19 +79,16 @@ switch (cmd) {
 
                 var exitCode = 1;
 
-                console.error("Compilation failed:", failParams);
+                console.error("Program failed with reason:", failParams);
 
                 // dump the JS that failed
-                // return localSpace.resolve(program).then(function () {
-                //
-                //     console.error(failParams);
-                //     console.error("\n>>> CRASH DETECTED -- JS dumped to velo_crash.js");
-                //
-                //     var ostream = fs.createWriteStream('velo_crash.js');
-                //     // localSpace.dumpModules(ostream);
-                //
-                //     ostream.on('close', function () { process.exit(exitCode); });
-                // });
+                // return program.dump();
+
+
+                    // var ostream = fs.createWriteStream('velo_crash.js');
+                    // localSpace.dumpModules(ostream);
+
+                    // ostream.on('close', function () { process.exit(exitCode); });
 
                 // if (failParams.length > 0) {
                 //
